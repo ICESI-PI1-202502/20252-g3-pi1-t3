@@ -1,0 +1,40 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev20c class="oracle.dbtools.crest.model.design.storage.oracle.v20c.TableProxyOraclev20c" name="MOTIVOS_CITA" directorySegmentName="seg_0" id="671DED1E-5F6C-7914-2C6F-D2C5435C9E9D">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="ID_MOTIVO" id="5986BBEF-4523-3EE5-5CB6-4CC6E166EE3C">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NOMBRE" id="A1B7E8DF-3D0F-94C2-A91C-55D2EF73EFBD">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="MOTIVOS_CITA_PK" id="4610434B-0E0E-8B91-50A6-A1319576703F">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="INDEX_1" id="57F20FFF-B2BC-0986-2270-0AB4078DACDD">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<nameChanged>true</nameChanged>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev20c>

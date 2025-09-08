@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_EQUIPOS_RESPONSABLE" directorySegmentName="seg_0" id="A3A775C6-BA64-946F-BD12-800A7D8F5DCE">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>2B91B096-703F-5881-02EC-1D180B119ED2</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>7F1D2D5A-FE21-D291-F3FB-126D28F7131A</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>8B87F331-CDA0-9523-9FF1-A9388BCFE8DE</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>44DFCCB8-E826-E645-68C4-9FEC0DEDE7B4</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

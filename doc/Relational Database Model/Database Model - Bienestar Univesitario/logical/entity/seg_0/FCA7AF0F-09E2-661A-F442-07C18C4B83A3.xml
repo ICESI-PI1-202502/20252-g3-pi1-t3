@@ -1,0 +1,61 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Entity class="oracle.dbtools.crest.model.design.logical.Entity" directorySegmentName="seg_0" id="FCA7AF0F-09E2-661A-F442-07C18C4B83A3" name="ROLES">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>8FD89F33-96A8-A7E6-BF84-FF89ADDD3C67</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<adequatelyNormalized>NO</adequatelyNormalized>
+<expectedVolumes>0</expectedVolumes>
+<fwdEngineeringStrategyName>Single Table</fwdEngineeringStrategyName>
+<growthPercent>0</growthPercent>
+<growthType>Year</growthType>
+<maxVolumes>9999999</maxVolumes>
+<minVolumes>0</minVolumes>
+<normalForm>Third</normalForm>
+<attributes itemClass="oracle.dbtools.crest.model.design.logical.Attribute">
+<Attribute name="ID ROL" id="61BA7DD6-6A54-DB61-9172-D34DE585A4E3">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>7E33232B-1F6D-48E6-EFA0-8CB88FF6970C</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+<Attribute name="NOMBRE ROL" id="31840F93-4285-4981-9961-232370DD8690">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>0E0CD544-746F-53C1-7785-B8A57B944C3A</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1583DD25-71C4-4E6B-9A5D-E891EE46B7A4</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+</Attribute>
+</attributes>
+<identifiers itemClass="oracle.dbtools.crest.model.design.logical.CandidateKey">
+<identifier id="D7E9305D-8CB2-2E40-CCA2-92D5F2E2388C" name="ROLES PK">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>DA0F7FEE-B93A-CB30-5D38-CF1BCAA0B18B</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<pk>true</pk>
+<usedAttributes>
+<attributeRef>61BA7DD6-6A54-DB61-9172-D34DE585A4E3</attributeRef>
+</usedAttributes>
+</identifier>
+</identifiers>
+</Entity>

@@ -1,0 +1,109 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="EB0F1DE5-8D35-020F-5DD0-BB6AEEA9D6DC" name="AGENDA_PSICOLOGOS">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>8DCB0876-303C-5F42-531C-F077A061C225</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID_AGENDA_SLOT" id="3E0138D8-3D52-6D8D-2B2E-E7FCBB0DF81A">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>79344C57-D8A4-0833-7400-F00E53DD5B31</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ID_PSICOLOGO" id="E24FBBDE-6392-983A-9499-F25733C84C3E">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>5AF57286-784F-37A6-7279-CE3F5439A871</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6CAE8AEC-7503-7842-68C1-786CC4B1D881" referredColumn="FBB59C94-6A2B-A799-039B-16A215C8F142"/>
+</associations>
+</Column>
+<Column name="FECHA_INICIO" id="307832FC-FB8F-3A4C-B188-65E2A3833260">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>C267B004-2D7C-66D6-76D4-353DD209B7A5</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>9E36564B-97CA-A3F2-0279-15B4AF6EBF21</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FECHA_FIN" id="74C35179-DD96-D1B4-8AC3-8396D79BA735">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>DC1875B0-09F8-D4A7-DCEB-DCA908E55A81</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>9E36564B-97CA-A3F2-0279-15B4AF6EBF21</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ESTADO_SLOT" id="62A0D2A3-5761-1605-B733-8599559634A5">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>49F1124D-9CEE-BE73-131E-37AE9E7F489F</importedID>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>483B8CBD-7A60-F6A4-EC4F-6FC8E1446B44</domain>
+<listOfValues>
+<valueDef value="BLOQUEADO" description=""/>
+<valueDef value="DISPONIBLE" description=""/>
+<valueDef value="RESERVADO" description=""/>
+</listOfValues>
+<defaultValue>&apos;DISPONIBLE&apos;</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="D42173CB-7547-ABF6-EA21-7FEFE4D72CA8" name="AGENDA_PSICOLOGOS_PK">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>7EB3561C-622F-E212-13DB-7834DF861C6F</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="3E0138D8-3D52-6D8D-2B2E-E7FCBB0DF81A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="CD3BE84F-CD8F-6857-9361-B3E18618ECC9" name="FK_AGENDA_PSICOLOGO">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E24FBBDE-6392-983A-9499-F25733C84C3E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,54 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev20c class="oracle.dbtools.crest.model.design.storage.oracle.v20c.TableProxyOraclev20c" name="AGENDA_PSICOLOGOS" directorySegmentName="seg_0" id="EB0F1DE5-8D35-020F-5DD0-BB6AEEA9D6DC">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="FECHA_INICIO" id="307832FC-FB8F-3A4C-B188-65E2A3833260">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID_AGENDA_SLOT" id="3E0138D8-3D52-6D8D-2B2E-E7FCBB0DF81A">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ESTADO_SLOT" id="62A0D2A3-5761-1605-B733-8599559634A5">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<defaultValue>&apos;DISPONIBLE&apos;</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="FECHA_FIN" id="74C35179-DD96-D1B4-8AC3-8396D79BA735">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID_PSICOLOGO" id="E24FBBDE-6392-983A-9499-F25733C84C3E">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="FK_AGENDA_PSICOLOGO" id="CD3BE84F-CD8F-6857-9361-B3E18618ECC9">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="AGENDA_PSICOLOGOS_PK" id="D42173CB-7547-ABF6-EA21-7FEFE4D72CA8">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev20c>

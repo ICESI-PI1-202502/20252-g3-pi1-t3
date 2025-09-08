@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_PARTIDO_EQB" directorySegmentName="seg_0" id="683C1A1E-647A-E15C-4A8A-9894BA66BF31">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>B88D69AA-DE5A-8D3E-0619-AB64CB60A1BA</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>64581172-0440-C6CD-5D85-6F40A6D96F1C</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>44DFCCB8-E826-E645-68C4-9FEC0DEDE7B4</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>A36B6B5E-D0C6-9C22-9A77-09957E6F8972</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

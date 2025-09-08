@@ -1,0 +1,230 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="2BF5A6B2-680E-C1F5-B523-037AA13AED62" name="PARTIDOS">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>F55656A4-ECDC-25B5-F580-CE7A0C08AAD9</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID_PARTIDO" id="40520E4F-8F86-7045-F424-AFC7BAD0245F">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>DDB2CB07-C456-0A33-8DE0-1416ACDDC5E8</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ID_TORNEO" id="D14A94C9-7A3F-1AB0-1B30-0375E905FE00">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>7CACC186-C3FB-65AB-30FA-C4C344FA6EA9</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="A080CAB1-EEED-D454-2076-65459B07E295" referredColumn="2BD4BC64-0D6E-0122-583A-3446CB2F3334"/>
+</associations>
+</Column>
+<Column name="FECHA_INICIO" id="5C75063A-0A02-0E63-8603-26C699B632FD">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>E45BA82E-83A2-7264-6636-08365686F6FC</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>9E36564B-97CA-A3F2-0279-15B4AF6EBF21</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="FECHA_FIN" id="7F6B60F3-1A7D-DF8D-99B2-0BC27090AE53">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>4284110B-27E3-61DC-4CAA-BAA10825AC58</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>9E36564B-97CA-A3F2-0279-15B4AF6EBF21</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="LUGAR" id="405E8C96-C670-1E2E-AF96-FD3F06EB7F79">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>863C7093-99BE-8F69-C2DA-ED844A6F8F47</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>19CEB285-7D51-DF93-8CAC-6BAF529EEE9E</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ID_EQUIPO_A" id="7427727B-A007-FA79-27D1-83D4CB6145AE">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>65419DF2-2837-459A-8A65-200BC299FD60</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="2B27ED35-F7E5-3624-92DC-8E1AC7BE5C2D" referredColumn="C2C84802-0C37-3795-D8CB-47B6ACA5C35C"/>
+</associations>
+</Column>
+<Column name="ID_EQUIPO_B" id="8858564E-DCD9-B543-AFC6-0376538F61D2">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>131A9CE4-45A8-490A-1503-8F0367C3EB45</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="B88D69AA-DE5A-8D3E-0619-AB64CB60A1BA" referredColumn="C2C84802-0C37-3795-D8CB-47B6ACA5C35C"/>
+</associations>
+</Column>
+<Column name="MARCADOR_A" id="3689D70A-6178-0597-CCFA-769E5F0E11AF">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>30EF115C-3EDD-1DC3-A102-B6DCE33A33CF</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="MARCADOR_B" id="AD4A3BEE-AFD5-B99F-5B98-DDA6B1D51C7E">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>0C38D865-C870-989F-CB8C-DDE6F42F03A4</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ESTADO" id="EE19E2FB-A7B3-EFF1-0D37-43C41B3E3E30">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>4DAB82A6-4A57-FE34-10FF-0F1550088E42</importedID>
+<nullsAllowed>true</nullsAllowed>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>483B8CBD-7A60-F6A4-EC4F-6FC8E1446B44</domain>
+<listOfValues>
+<valueDef value="EN_CURSO" description=""/>
+<valueDef value="FINALIZADO" description=""/>
+<valueDef value="PROGRAMADO" description=""/>
+<valueDef value="SUSPENDIDO" description=""/>
+</listOfValues>
+<defaultValue>&apos;PROGRAMADO&apos;</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="DF6B7EBC-C1EE-149F-DF5C-C09DD452F9CB" name="PARTIDOS_PK">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>309D9467-6308-A90A-D762-C09D5B1CF8E5</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="40520E4F-8F86-7045-F424-AFC7BAD0245F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A3B2CA83-283F-AE8B-5C82-8C0420152B85" name="IX_PARTIDOS_TORNEO_FECHA">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>4F1318F3-5A0E-AFEE-DDC5-EE59897ABC91</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D14A94C9-7A3F-1AB0-1B30-0375E905FE00"/>
+<colUsage columnID="5C75063A-0A02-0E63-8603-26C699B632FD"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="60DF4CBD-76DE-E186-0F6D-D86E60A58463" name="FK_PARTIDO_EQA">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7427727B-A007-FA79-27D1-83D4CB6145AE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="137AB33C-64BF-4D9A-AFEF-CED1416A5844" name="FK_PARTIDO_EQB">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8858564E-DCD9-B543-AFC6-0376538F61D2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="865C86AE-8110-9DC1-30AA-19C09EE59472" name="FK_PARTIDO_TORNEO">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="D14A94C9-7A3F-1AB0-1B30-0375E905FE00"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+<tableCheckConstraints itemClass="oracle.dbtools.crest.model.design.constraint.TableLevelConstraint">
+<tableCheckConstraint name="CHK_PARTIDO_EQUIPOS_DISTINTOS" directorySegmentName="seg_0" id="6CF42A10-5916-F7DA-4355-213D8E2A1E39">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>2D1BEBD7-3C83-B398-1CC2-0CCA1C631738</importedID>
+<rule><![CDATA[ID_EQUIPO_A <> ID_EQUIPO_B]]></rule>
+</tableCheckConstraint>
+<tableCheckConstraint name="CHK_PARTIDOS_MARCADORES" directorySegmentName="seg_0" id="5ECFD13C-F04E-D01C-674C-FE71AE89CC96">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>FA790182-BD03-DC9C-A8E4-E1B22ED8A71C</importedID>
+<rule><![CDATA[(MARCADOR_A IS NULL AND MARCADOR_B IS NULL) OR (MARCADOR_A >= 0 AND MARCADOR_B >= 0)]]></rule>
+</tableCheckConstraint>
+</tableCheckConstraints>
+</Table>

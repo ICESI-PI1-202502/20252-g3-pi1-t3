@@ -1,0 +1,52 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="73DD3136-7349-748A-517F-A9B3E04B563D" name="TIPOS_ACTIVIDAD">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>77B25C58-B5AE-7CE8-3573-75D338D1EAEB</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID_TIPO" id="8E12BC1D-AF5C-6FF3-6544-9C9344457635">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>3932DF21-C197-D362-AFF8-0D94D379790F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="NOMBRE_TIPO" id="9221F896-52B4-99C9-DD18-DDAA2FFC99CA">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>00E5AD86-0287-D0DD-ADCD-69B50E16CE9D</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1583DD25-71C4-4E6B-9A5D-E891EE46B7A4</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="757CF47A-B6E4-5C52-3E61-2D54FDA42305" name="TIPOS_ACTIVIDAD_PK">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>9872BB6E-B782-0289-32EB-AC35F8FC5D3A</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8E12BC1D-AF5C-6FF3-6544-9C9344457635"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

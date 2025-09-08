@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="Database Model - Bienestar Univesitario" id="14F48C84-EF80-BD30-6440-5D58BEED3021" version="3.5">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:21:58 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>14F48C84-EF80-BD30-6440-5D58BEED3021</designId>
+<usedDesignStorageDescriptors>
+<designDescr class="oracle.dbtools.crest.model.design.Design$DesignStorageDesc" id="2BA9D7EE-AF7D-9297-72EA-9236313FC19E">
+<designStoragePath>C:\bu</designStoragePath>
+</designDescr>
+</usedDesignStorageDescriptors>
+</OSDM_Design>

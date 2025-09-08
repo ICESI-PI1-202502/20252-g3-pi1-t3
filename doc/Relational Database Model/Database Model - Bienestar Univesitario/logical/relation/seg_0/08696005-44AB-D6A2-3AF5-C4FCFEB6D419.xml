@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_HCITA_PSICOLOGO" directorySegmentName="seg_0" id="08696005-44AB-D6A2-3AF5-C4FCFEB6D419">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>3430C001-51E3-C1F6-01D5-22DB2064A0E2</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>7F1D2D5A-FE21-D291-F3FB-126D28F7131A</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>8B87F331-CDA0-9523-9FF1-A9388BCFE8DE</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>8D7D70F6-0AD5-9191-A57B-0FA6FCA1CE6A</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

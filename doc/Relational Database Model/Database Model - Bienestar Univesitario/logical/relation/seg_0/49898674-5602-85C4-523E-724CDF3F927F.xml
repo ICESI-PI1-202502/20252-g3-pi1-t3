@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_HPART_PARTICIPACION" directorySegmentName="seg_0" id="49898674-5602-85C4-523E-724CDF3F927F">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>48CDFDE2-1B52-3B1E-F891-29E5C217BA88</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>76D9CD0F-4B14-FF7D-04AB-7170A1588B6B</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>9C3EBAEA-05E9-12CA-BACA-632E260292C4</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>36820368-B516-01E9-E02E-94F34973D54F</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

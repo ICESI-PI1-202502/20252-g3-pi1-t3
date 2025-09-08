@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_CITAS_AGENDA_SLOT" directorySegmentName="seg_0" id="91AA8128-AE8F-95DE-7CB6-16F323021ABD">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>832C7BC8-CAB2-4C60-4936-813B0710DF8F</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>437B324D-DE3A-2C8F-642F-5E2D43F1D46D</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>412FF24B-1C0A-A1F2-68C8-A02B52A21D38</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>FFA20A1E-4D10-FDD5-3C3B-A668F3A1AE1F</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

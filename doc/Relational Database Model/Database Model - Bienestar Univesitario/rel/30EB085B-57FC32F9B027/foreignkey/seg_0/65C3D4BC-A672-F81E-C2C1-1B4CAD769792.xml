@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="65C3D4BC-A672-F81E-C2C1-1B4CAD769792" containerWithKeyObject="F8990BE8-945D-2407-A95C-8510DF1C8F53" localFKIndex="3937366F-5059-5F49-A57F-B52161F72C10" name="FK_ACTIVIDADES_TIPO">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>EF84AD9F-F4DB-691B-698D-3F542D57E36E</importedID>
+<referredTableLongName>TIPOS_ACTIVIDAD</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>73DD3136-7349-748A-517F-A9B3E04B563D</referredTableID>
+<keyObject>757CF47A-B6E4-5C52-3E61-2D54FDA42305</keyObject>
+<referredKeyID>757CF47A-B6E4-5C52-3E61-2D54FDA42305</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ID_TIPO</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="4D0463AD-7B9B-BF22-B000-37377D42C386" containerWithKeyObject="AAD1E401-6410-0A18-0D1D-87F789F817F7" localFKIndex="2DD58FBA-2B16-BCE2-961B-EE2918BBE08E" name="FK_EQUIPOS_DISCIPLINA">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>42093C2C-534A-EF55-D140-CDD817E55382</importedID>
+<referredTableLongName>DISCIPLINAS</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>D52AB55F-D325-2EE6-FD33-4D8373367048</referredTableID>
+<keyObject>947D8C21-7AA5-0C6C-4DA0-13630607A006</keyObject>
+<referredKeyID>947D8C21-7AA5-0C6C-4DA0-13630607A006</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>ID_DISCIPLINA</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_CAL_ACT_ACTIVIDAD" directorySegmentName="seg_0" id="CB66D324-C923-C6F2-EACF-AE305A9DCC24">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>DD93E143-532D-9707-C817-E304583353CD</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>D1C79A46-20E1-D364-180A-5E4981042009</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>559C3D1A-DE48-1952-401B-808163EA8417</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>491BF754-D4C9-2F02-D010-7FC681E219D9</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

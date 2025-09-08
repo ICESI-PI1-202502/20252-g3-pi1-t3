@@ -1,0 +1,73 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev20c class="oracle.dbtools.crest.model.design.storage.oracle.v20c.TableProxyOraclev20c" name="TORNEOS" directorySegmentName="seg_0" id="F93CF614-A1DC-E9FA-BB3A-F144B1E3C896">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="FECHA_FIN" id="2331431F-E2D5-0ADE-C721-5F4A21A8B17A">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID_TORNEO" id="2BD4BC64-0D6E-0122-583A-3446CB2F3334">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID_DISCIPLINA" id="37E2BA13-A99F-7111-A17B-F9AF9ED84F36">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="FECHA_INICIO" id="5BB96EDB-0BD2-EB1B-5FC7-119C9B9802FA">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="ID_ESTADO_TORNEO" id="6F6E8631-AB8C-A9C5-CBEE-660324E15D61">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="REGLAS_ELEGIBILIDAD" id="BBECAD3E-7DF8-A39F-6132-4995A968991F">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="NOMBRE" id="D9C49499-C70E-8622-CC79-F096716FF66C">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="AFORO_EQUIPOS" id="E03E2F62-8A87-248B-9E37-D58F906E232C">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="FK_TORNEO_DISCIPLINA" id="4A9C96E5-24EB-0049-5647-57DE270AB00F">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="FK_TORNEO_ESTADO" id="725C7CB7-DBA4-BB93-E0F2-72E951F2FF8C">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="TORNEOS_PK" id="03AF0AAA-687E-41C5-610C-8FC39E3FCCB0">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+</TableProxyOraclev20c>

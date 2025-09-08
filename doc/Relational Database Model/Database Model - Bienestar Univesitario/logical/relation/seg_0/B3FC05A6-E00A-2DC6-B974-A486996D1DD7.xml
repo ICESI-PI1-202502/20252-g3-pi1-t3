@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_TORNEO_DISCIPLINA" directorySegmentName="seg_0" id="B3FC05A6-E00A-2DC6-B974-A486996D1DD7">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>E28F753A-3978-796C-6512-6B098ED8A01A</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>88875CB0-54B1-286B-35B4-6569195A0ECF</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>D5C1AD16-FE14-E11D-FD43-F587CC2AA84B</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>945F22A9-1CDB-1212-AC1D-30B9AEE1FAA0</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

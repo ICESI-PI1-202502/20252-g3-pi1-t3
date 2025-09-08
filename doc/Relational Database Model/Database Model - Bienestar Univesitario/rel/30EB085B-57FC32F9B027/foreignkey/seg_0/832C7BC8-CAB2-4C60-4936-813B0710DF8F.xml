@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="832C7BC8-CAB2-4C60-4936-813B0710DF8F" containerWithKeyObject="F4010575-B103-C522-7E7C-6E31F5EC773F" localFKIndex="3C6245AF-E835-E388-4FDE-DE00F69F35D5" name="FK_CITAS_AGENDA_SLOT">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>560DB37E-4DA6-7C9C-E045-905CE6C2FC90</importedID>
+<referredTableLongName>AGENDA_PSICOLOGOS</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>EB0F1DE5-8D35-020F-5DD0-BB6AEEA9D6DC</referredTableID>
+<keyObject>D42173CB-7547-ABF6-EA21-7FEFE4D72CA8</keyObject>
+<referredKeyID>D42173CB-7547-ABF6-EA21-7FEFE4D72CA8</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>ID_AGENDA_SLOT</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

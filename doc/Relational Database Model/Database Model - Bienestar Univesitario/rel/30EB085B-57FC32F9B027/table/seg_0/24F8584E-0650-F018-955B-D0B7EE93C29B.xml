@@ -1,0 +1,141 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="24F8584E-0650-F018-955B-D0B7EE93C29B" name="INSCRIPCIONES_PSU">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>0D86B094-B5C6-1CA5-94BC-393BA15C7974</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="ID_INSCRIPCION_PSU" id="4C9D82D6-BE85-4751-82DD-CE6797B0197F">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>045B5295-DF1A-8B16-2E0C-83BC0AF596D4</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ID_PARTICIPANTE" id="DE6BB47A-FDAA-A1F7-EDDF-EFB8FD930C33">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>AE60866F-0613-5155-8027-E2AEC7404B98</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="BCCD2285-3EB8-397B-D8EF-0975B8ECE742" referredColumn="FBB59C94-6A2B-A799-039B-16A215C8F142"/>
+</associations>
+</Column>
+<Column name="ID_PROYECTO" id="B75D6BF3-C4EF-956D-17FA-E0F12E16A4B6">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>A79C443E-4DCD-3F49-0E34-DE2CBC1BF988</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AA080F32-5BB2-ADCB-F134-29327BA5B702" referredColumn="006E1D4C-3353-3DBE-E1C5-41D71B590DA4"/>
+</associations>
+</Column>
+<Column name="FECHA_INSCRIPCION" id="BD089ECB-CF03-459F-3CF3-1085686B6ECE">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>66DBF944-5F2E-A3BE-A89A-996F8AB76938</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT007</logicalDatatype>
+<domain>9E36564B-97CA-A3F2-0279-15B4AF6EBF21</domain>
+<defaultValue>SYSDATE</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="ID_ESTADO" id="7756B757-7D31-6D58-F4EF-CCB89710B1BD">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>DC855EAA-6B59-6A7A-5071-7F2819429EAA</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>9FFBFFA8-B888-625E-33E1-45223E982436</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="8DD3168B-EDAC-EC45-85DE-CB3561A5253E" referredColumn="5B9A8FF5-4EC9-45DD-B06E-9769660E4CB3"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A03FC7C1-8F75-A5DF-9903-5D7E10F01A03" name="INSCRIPCIONES_PSU_PK">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>76CF0675-5137-05A2-D68D-8A59459282BE</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4C9D82D6-BE85-4751-82DD-CE6797B0197F"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="CD1E8FAC-9EB1-4174-1483-2E68F7B5BDD7" name="UQ_PSU_UNICA">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>9F23117B-E694-A626-FB4C-C60EC2243287</importedID>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DE6BB47A-FDAA-A1F7-EDDF-EFB8FD930C33"/>
+<colUsage columnID="B75D6BF3-C4EF-956D-17FA-E0F12E16A4B6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="90150BBD-ADD8-AB10-CF8D-D22CFC97F21A" name="FK_PSU_ESTADO">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="7756B757-7D31-6D58-F4EF-CCB89710B1BD"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C43BAAE4-D68B-7486-61EC-68F4D01CC517" name="FK_PSU_PARTICIPANTE">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="DE6BB47A-FDAA-A1F7-EDDF-EFB8FD930C33"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B5858E9D-F750-12BD-93CE-25E900E1DA21" name="FK_PSU_PROYECTO">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B75D6BF3-C4EF-956D-17FA-E0F12E16A4B6"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

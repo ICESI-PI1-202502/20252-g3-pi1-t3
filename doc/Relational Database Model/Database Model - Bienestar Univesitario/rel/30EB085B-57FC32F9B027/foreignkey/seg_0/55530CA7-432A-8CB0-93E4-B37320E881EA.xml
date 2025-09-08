@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="55530CA7-432A-8CB0-93E4-B37320E881EA" containerWithKeyObject="6E08C91D-FF87-0EC2-E92F-AA2BC23C1E77" localFKIndex="8E7BDB44-C9F6-D52D-7A6F-B781AE508F0E" name="FK_HCITA_CITA">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>81E7872F-53D1-6106-B0EB-B6AE022A2BF1</importedID>
+<referredTableLongName>CITAS</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>F4010575-B103-C522-7E7C-6E31F5EC773F</referredTableID>
+<keyObject>7F50758E-5B2A-C89D-E77F-A4E2AB40F51A</keyObject>
+<referredKeyID>7F50758E-5B2A-C89D-E77F-A4E2AB40F51A</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ID_CITA</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_CITAS_MOTIVO" directorySegmentName="seg_0" id="CFFA1238-7699-3710-07A5-875D913E3DF3">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>65F05338-7D5F-E959-7C06-CF3F18C4A099</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>66B5447F-4B8D-0E82-360C-030641AAA1B2</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>true</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>AC1264B7-BAD4-B3C4-EC18-19D0E7484F3D</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>FFA20A1E-4D10-FDD5-3C3B-A668F3A1AE1F</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

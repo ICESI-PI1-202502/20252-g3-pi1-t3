@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="1A6623AA-1630-FC28-3710-7D75005415CC" containerWithKeyObject="AB269D29-23A1-6FB3-8D8F-666DEC231B59" localFKIndex="5F7538C8-9CDA-0911-E4A3-B0CB5827B028" name="FK_PROYSOC_COORDINADOR">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:46 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>CA73D9BA-7126-0647-E408-3B2ADF8F9AAC</importedID>
+<referredTableLongName>PARTICIPANTES</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>C68C3710-9F52-D4C7-9A82-7756B0E44EC9</referredTableID>
+<keyObject>BBF75F7D-F91D-DC8E-97CC-C6CF28C7CE65</keyObject>
+<referredKeyID>BBF75F7D-F91D-DC8E-97CC-C6CF28C7CE65</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ID_PARTICIPANTE</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

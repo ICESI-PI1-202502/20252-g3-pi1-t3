@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="1BA93B8F-DB07-4305-D96C-5B2E25C08A74" containerWithKeyObject="16DCBB10-B6FE-1EE1-2992-E15071C198AA" localFKIndex="3B0CD519-F25D-A885-5877-BB2A7ACEA35D" name="FK_CLAS_TORNEO">
+<sourceDDLFile>bu.ddl</sourceDDLFile>
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:22:45 UTC</createdTime>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<importedID>F3136841-EAE0-41DD-5F72-C9163A3586B6</importedID>
+<referredTableLongName>TORNEOS</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>F93CF614-A1DC-E9FA-BB3A-F144B1E3C896</referredTableID>
+<keyObject>03AF0AAA-687E-41C5-610C-8FC39E3FCCB0</keyObject>
+<referredKeyID>03AF0AAA-687E-41C5-610C-8FC39E3FCCB0</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>ID_TORNEO</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

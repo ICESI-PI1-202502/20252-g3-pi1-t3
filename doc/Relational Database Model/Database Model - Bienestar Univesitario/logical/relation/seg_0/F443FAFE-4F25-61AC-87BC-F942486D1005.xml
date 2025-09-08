@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_EQPAR_EQUIPO" directorySegmentName="seg_0" id="F443FAFE-4F25-61AC-87BC-F942486D1005">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>6504414B-64DE-39D2-0985-33C2E45C4524</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>64581172-0440-C6CD-5D85-6F40A6D96F1C</sourcePk>
+<identifying>true</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>44DFCCB8-E826-E645-68C4-9FEC0DEDE7B4</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>80A6F607-4ACF-0DD6-2B33-304FA0AE3CCA</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>

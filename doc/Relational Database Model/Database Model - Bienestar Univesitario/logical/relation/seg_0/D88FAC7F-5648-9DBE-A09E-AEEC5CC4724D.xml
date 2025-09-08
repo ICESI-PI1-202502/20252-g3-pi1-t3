@@ -1,0 +1,20 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Relation class="oracle.dbtools.crest.model.design.logical.Relation" name="FK_AGENDA_PSICOLOGO" directorySegmentName="seg_0" id="D88FAC7F-5648-9DBE-A09E-AEEC5CC4724D">
+<createdBy>David</createdBy>
+<createdTime>2025-09-08 06:31:45 UTC</createdTime>
+<generatorID>6CAE8AEC-7503-7842-68C1-786CC4B1D881</generatorID>
+<ownerDesignName>Database Model - Bienestar Univesitario</ownerDesignName>
+<engineerTo>
+<item key="30EB085B-617C-E0E0-8108-57FC32F9B027" value="true"/>
+</engineerTo>
+<sourcePk>7F1D2D5A-FE21-D291-F3FB-126D28F7131A</sourcePk>
+<identifying>false</identifying>
+<optionalSource>true</optionalSource>
+<optionalTarget>false</optionalTarget>
+<sourceCardinality>1</sourceCardinality>
+<sourceEntity>8B87F331-CDA0-9523-9FF1-A9388BCFE8DE</sourceEntity>
+<targetCardinalityString>*</targetCardinalityString>
+<targetEntity>412FF24B-1C0A-A1F2-68C8-A02B52A21D38</targetEntity>
+<transferable>true</transferable>
+<deleteRule>NO ACTION</deleteRule>
+</Relation>
