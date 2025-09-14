@@ -1,0 +1,87 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="initial-scale=1, width=device-width">
+
+	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/login.css' %}">
+
+</head>
+
+<body>
+
+	<div class="login-1">
+		<img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}"
+			alt="Logo Icesi">
+		<div class="hola-de-nuevo">¡Hola de nuevo!</div>
+		<div class="field" id="emailField">
+			<div class="value">
+				<input type="email" id="email" name="email" placeholder="E-mail" autocomplete="email">
+			</div>
+		</div>
+		<div class="field {% if not show_password %}hidden{% endif %}" id="passwordField">
+			<div class="value">
+				<input type="password" id="password" name="password" placeholder="Contraseña">
+			</div>
+		</div>
+		<div class="botn-agregar">
+			<div class="botn-agregar-child">
+			</div>
+			<b class="b">Ingresar</b>
+		</div>
+		<b class="registrarse" id="registrarseText">Registrarse</b>
+
+		<div class="administrador" id="administradorText">Administrador</div>
+		<div class="universidad-icesi-calle-container">
+			<p class="universidad-icesi-calle">Universidad Icesi, Calle 18 No. 122-135</p>
+			<p class="universidad-icesi-calle">Pance, Cali - Colombia</p>
+			<p class="universidad-icesi-calle">Teléfono: +57 (602) 555 2334</p>
+			<p class="universidad-icesi-calle">Celular: +57 300 910 8606</p>
+			<p class="universidad-icesi-calle">
+				<a class="login-1-ventanillaunicaicesieduco" href="mailto:ventanillaunica@icesi.edu.co" target="_blank">
+					<span class="ventanillaunicaicesieduco2">ventanillaunica@icesi.edu.co</span>
+				</a>
+			</p>
+		</div>
+	</div>
+
+
+
+
+	<script>
+		const emailInput = document.getElementById("email");
+		const passwordField = document.getElementById("passwordField");
+
+		emailInput.addEventListener("input", function () {
+			if (emailInput.value.trim() !== "") {
+				passwordField.classList.remove("hidden");  // mostrar
+			} else {
+				passwordField.classList.add("hidden");     // ocultar
+			}
+		});
+
+		var fieldContainer = document.getElementById("fieldContainer");
+		if (fieldContainer) {
+			fieldContainer.addEventListener("click", function (e) {
+				// Add your code here JAVA SCRIPT NOpoasoaSOIosiaoiOS HELP DAMARALS
+			});
+		}
+
+		var registrarseText = document.getElementById("registrarseText");
+		if (registrarseText) {
+			registrarseText.addEventListener("click", function (e) {
+				window.location.href = "{% url 'register' %}";
+			});
+		}
+
+		var administradorText = document.getElementById("administradorText");
+		if (administradorText) {
+			administradorText.addEventListener("click", function (e) {
+				// Add your code here
+			});
+		}</script>
+</body>
+
+</html>

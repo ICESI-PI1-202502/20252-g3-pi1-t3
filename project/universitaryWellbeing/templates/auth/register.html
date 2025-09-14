@@ -1,0 +1,67 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="initial-scale=1, width=device-width">
+
+  <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/login.css' %}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap">
+</head>
+
+<body>
+  <div class="login-1">
+    <!-- Logo -->
+    <img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}" alt="Logo Icesi">
+
+    <!-- Título -->
+    <div class="hola-de-nuevo">Crea tu cuenta</div>
+
+    <!-- Formulario de registro -->
+    <form method="post">
+      {% csrf_token %}
+
+      <!-- Nombre completo -->
+      <div class="field">
+        <div class="value">
+          <input type="text" id="full_name" name="full_name" placeholder="Nombre completo" required>
+        </div>
+      </div>
+
+      <!-- Email -->
+      <div class="field">
+        <div class="value">
+          <input type="email" id="email" name="email" placeholder="E-mail" required>
+        </div>
+      </div>
+
+      <!-- Password -->
+      <div class="field">
+        <div class="value">
+          <input type="password" id="password" name="password" placeholder="Contraseña" required>
+        </div>
+      </div>
+
+      <!-- Botón registrar -->
+      <div class="botn-agregar">
+        <b class="b">Registrarse</b>
+      </div>
+    </form>
+
+    <!-- Footer -->
+    <div class="universidad-icesi-calle-container">
+      <p class="universidad-icesi-calle">Universidad Icesi, Calle 18 No. 122-135</p>
+      <p class="universidad-icesi-calle">Pance, Cali - Colombia</p>
+      <p class="universidad-icesi-calle">Teléfono: +57 (602) 555 2334</p>
+      <p class="universidad-icesi-calle">Celular: +57 300 910 8606</p>
+      <p class="universidad-icesi-calle">
+        <a class="login-1-ventanillaunicaicesieduco" href="mailto:ventanillaunica@icesi.edu.co" target="_blank">
+          <span class="ventanillaunicaicesieduco2">ventanillaunica@icesi.edu.co</span>
+        </a>
+      </p>
+    </div>
+  </div>
+</body>
+
+</html>
