@@ -2,23 +2,40 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
+from django.contrib.auth.decorators import login_required
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 # Create your views here.
 
 def user_login(request):
+    email = ""
     if request.method == "POST":
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        email = request.POST.get("email", "")
+        password = request.POST.get("password", "")
 
-        if email and password:
+        # Validar formato de email
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "El correo ingresado no es válido")
+            return render(request, "login.html", {"email": email})
+
+        # Verificar si el usuario existe
+        if not User.objects.filter(username=email).exists():
+            messages.error(request, "El usuario no existe")
+        else:
             user = authenticate(request, username=email, password=password)
             if user is not None:
                 login(request, user)
                 return redirect("home")
             else:
-                messages.error(request, "Email o contraseña incorrectos")
+                messages.error(request, "Contraseña incorrecta")
+        # Redirige a login para limpiar POST y mostrar mensajes
+        return redirect('login')  # nombre de la url de login
 
-    # Si es GET o si falló el login, simplemente renderizamos el login vacío
-    return render(request, "login.html")
+    # GET normal
+    return render(request, "login.html", {"email": ""})
+
 
 #Login descartado para 2 pantallas como en la secuencia de figma (NO Practico y poco elegante)
 #def user_login_step1(request):
@@ -59,26 +76,28 @@ def user_login(request):
 
 def register(request):
     if request.method == "POST":
-        username = request.POST["username"]
-        email = request.POST["email"]
-        password1 = request.POST["password1"]
-        password2 = request.POST["password2"]
+        username = request.POST.get("username", "")
+        email = request.POST.get("email", "")
+        password = request.POST.get("password", "")
 
-        if password1 != password2:
-            messages.error(request, "Las contraseñas no coinciden")
-        elif User.objects.filter(username=username).exists():
+        # Validar formato de email
+        try:
+            validate_email(email)
+        except ValidationError:
+            messages.error(request, "El correo ingresado no es válido")
+            return render(request, "auth/register.html", {"username": username, "email": email})
+
+        # Validar usuario existente
+        if User.objects.filter(username=username).exists():
             messages.error(request, "El usuario ya existe")
         else:
-            user = User.objects.create_user(username=username, email=email, password=password1)
-
-            # Asignar grupo "Usuarios" automáticamente
+            user = User.objects.create_user(username=username, email=email, password=password)
             user_group, created = Group.objects.get_or_create(name="Usuarios")
             user.groups.add(user_group)
-
             login(request, user)
             messages.success(request, "¡Registro exitoso!")
-            return redirect("")
-
+            return redirect("preferences")
+        
     return render(request, "auth/register.html")
 
 def user_logout(request):
@@ -88,6 +107,10 @@ def user_logout(request):
 
 def is_role_admin(user):
     return user.groups.filter(name="admin").exists() or user.is_superuser
+
+@login_required
+def preferences(request):
+    return render(request, 'list_prefences_1.html')
 
 
 def home(request):

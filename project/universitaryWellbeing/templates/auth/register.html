@@ -13,13 +13,14 @@
 <body>
   <div class="login-1">
     <!-- Logo -->
-    <img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}" alt="Logo Icesi">
+    <img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}"
+      alt="Logo Icesi">
 
     <!-- Título -->
     <div class="hola-de-nuevo">Crea tu cuenta</div>
 
     <!-- Formulario de registro -->
-    <form method="post">
+    <form method="POST" action="">
       {% csrf_token %}
 
       <!-- Nombre completo -->
@@ -28,6 +29,15 @@
           <input type="text" id="full_name" name="full_name" placeholder="Nombre completo" required>
         </div>
       </div>
+
+      <!-- Mensajes de error -->
+      {% if messages %}
+      <div class="messages">
+        {% for message in messages %}
+        <div class="message">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
 
       <!-- Email -->
       <div class="field">
@@ -44,7 +54,8 @@
       </div>
 
       <!-- Botón registrar -->
-      <div class="botn-agregar">
+      <div class="botn-agregar" id="registerButton">
+        <div class="botn-agregar-child"></div>
         <b class="b">Registrarse</b>
       </div>
     </form>
@@ -62,6 +73,15 @@
       </p>
     </div>
   </div>
+
+  <script>
+    var registerButton = document.getElementById("registerButton");
+    if (registerButton) {
+      registerButton.addEventListener("click", function () {
+        this.closest("form").submit(); // envía el formulario padre
+      });
+    }
+  </script>
 </body>
 
 </html>

@@ -60,24 +60,25 @@ body {
 }
 
 .botn-agregar {
-  width: 100%;
-  max-width: 100px;
-  margin: 1.5rem auto;
-  padding: 12px 18px;
-  border-radius: 20px;
-  background-color: #4db979;
-  font-size: 1.2rem;
-  font-weight: bold;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  transition: 0.3s;
+    width: 100%;
+    max-width: 100px;
+    margin: 1.5rem auto;
+    padding: 12px 18px;
+    border-radius: 20px;
+    background-color: #4db979;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    border: none;
+    transition: 0.3s;
 }
 
 .botn-agregar:hover {
-  opacity: 0.9;
+    opacity: 0.9;
 }
 
 .registrarse,
@@ -115,5 +116,19 @@ body {
     opacity: 0;
     max-height: 0; /* colapsa la altura */
     pointer-events: none;
+}
+
+.messages {
+    margin-bottom: 1rem;
+    text-align: center;
+}
+
+.message {
+    color: #ff6b6b; /* rojo para errores */
+    background-color: rgba(255, 255, 255, 0.1);
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
 }
 

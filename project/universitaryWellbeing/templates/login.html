@@ -16,21 +16,36 @@
 		<img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}"
 			alt="Logo Icesi">
 		<div class="hola-de-nuevo">¡Hola de nuevo!</div>
-		<div class="field" id="emailField">
-			<div class="value">
-				<input type="email" id="email" name="email" placeholder="E-mail" autocomplete="email">
+		<form method="POST" action="">
+			{% csrf_token %}
+
+			<div class="field" id="emailField">
+				<div class="value">
+					<input type="email" id="email" name="email" placeholder="E-mail" value="{{ email|default:'' }}">
+				</div>
 			</div>
-		</div>
-		<div class="field {% if not show_password %}hidden{% endif %}" id="passwordField">
-			<div class="value">
-				<input type="password" id="password" name="password" placeholder="Contraseña">
+
+			<div class="field {% if not show_password %}hidden{% endif %}" id="passwordField">
+				<div class="value">
+					<input type="password" id="password" name="password" placeholder="Contraseña">
+				</div>
 			</div>
-		</div>
-		<div class="botn-agregar">
-			<div class="botn-agregar-child">
+
+			<!-- Mensajes de error -->
+			{% if messages %}
+			<div class="messages">
+				{% for message in messages %}
+				<div class="message">{{ message }}</div>
+				{% endfor %}
 			</div>
-			<b class="b">Ingresar</b>
-		</div>
+			{% endif %}
+
+			<!-- Div usado como botón -->
+			<div class="botn-agregar" id="loginButton">
+				<div class="botn-agregar-child"></div>
+				<b class="b">Ingresar</b>
+			</div>
+		</form>
 		<b class="registrarse" id="registrarseText">Registrarse</b>
 
 		<div class="administrador" id="administradorText">Administrador</div>
@@ -62,6 +77,13 @@
 			}
 		});
 
+		var loginButton = document.getElementById("loginButton");
+		if (loginButton) {
+			loginButton.addEventListener("click", function () {
+				this.closest("form").submit(); // envía el formulario padre
+			});
+		}
+
 		var fieldContainer = document.getElementById("fieldContainer");
 		if (fieldContainer) {
 			fieldContainer.addEventListener("click", function (e) {
@@ -80,6 +102,7 @@
 		if (administradorText) {
 			administradorText.addEventListener("click", function (e) {
 				// Add your code here
+
 			});
 		}</script>
 </body>
