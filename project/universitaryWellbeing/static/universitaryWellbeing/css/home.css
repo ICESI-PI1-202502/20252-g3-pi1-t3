@@ -1,0 +1,560 @@
+.home{
+  	width: 100%;
+  	position: relative;
+  	background-color: #fff;
+  	height: 3870px;
+  	overflow-y: auto;
+  	text-align: center;
+  	font-size: 40px;
+  	color: #000;
+  	font-family: 'Plus Jakarta Sans';
+}
+.universidad-icesi-calle-container {
+  	position: absolute;
+  	top: 3568px;
+  	left: calc(50% - 373px);
+  	font-weight: 800;
+}
+.universidad-icesi-calle {
+  	margin: 0;
+}
+.modulo-1-rf3-14-ventanillaunicaicesieduco {
+  	color: inherit;
+}
+.calendario {
+  	position: absolute;
+  	top: 1273px;
+  	left: 73px;
+  	font-weight: 800;
+  	text-align: left;
+  	display: inline-block;
+  	width: 272px;
+}
+.blanco {
+  	position: absolute;
+  	top: 1298px;
+  	left: 339px;
+  	width: 33px;
+  	height: 18px;
+}
+.modulo-1-rf3-14-blanco {
+  	position: absolute;
+  	height: 100%;
+  	width: 100%;
+  	top: 0%;
+  	right: 0%;
+  	bottom: 0%;
+  	left: 0%;
+}
+.vector-icon {
+  	position: absolute;
+  	height: 100%;
+  	width: 100%;
+  	top: 0%;
+  	right: 0%;
+  	bottom: 0%;
+  	left: 0%;
+  	max-width: 100%;
+  	overflow: hidden;
+  	max-height: 100%;
+}
+.noticias {
+  	position: absolute;
+  	top: 1751px;
+  	left: 73px;
+  	font-weight: 800;
+  	text-align: left;
+  	display: inline-block;
+  	width: 272px;
+}
+.blanco-icon {
+  	position: absolute;
+  	top: 1772px;
+  	left: 348px;
+  	width: 18px;
+  	height: 33px;
+  	object-fit: contain;
+}
+.actividades {
+  	position: absolute;
+  	top: 864px;
+  	left: 73px;
+  	font-weight: 800;
+  	text-align: left;
+  	display: inline-block;
+  	width: 273px;
+}
+.modulo-1-rf3-14-blanco-icon {
+  	position: absolute;
+  	top: 872px;
+  	left: 346px;
+  	width: 18px;
+  	height: 33px;
+  	object-fit: contain;
+}
+.blanco-icon2 {
+  	position: absolute;
+  	top: 930px;
+  	left: 99px;
+  	width: 16px;
+  	height: 23px;
+  	object-fit: contain;
+}
+.judo {
+  	position: absolute;
+  	top: 917px;
+  	left: 172px;
+}
+.ajedrez {
+  	position: absolute;
+  	top: 988px;
+  	left: 172px;
+}
+.natacin {
+  	position: absolute;
+  	top: 1058px;
+  	left: 172px;
+}
+.blanco-icon3 {
+  	position: absolute;
+  	top: 1001px;
+  	left: 99px;
+  	width: 16px;
+  	height: 23px;
+  	object-fit: contain;
+}
+.blanco-icon4 {
+  	position: absolute;
+  	top: 1071px;
+  	left: 99px;
+  	width: 16px;
+  	height: 23px;
+  	object-fit: contain;
+}
+.arquero-de-ftbol {
+  	position: absolute;
+  	top: 1139px;
+  	left: 172px;
+}
+.blanco-icon5 {
+  	position: absolute;
+  	top: 1152px;
+  	left: 99px;
+  	width: 16px;
+  	height: 23px;
+  	object-fit: contain;
+}
+.modulo-1-rf3-14-child {
+  	position: absolute;
+  	top: 6.5px;
+  	left: 128.5px;
+  	border-right: 1px solid #000;
+  	box-sizing: border-box;
+  	width: 1px;
+  	height: 98px;
+}
+.logo-azul {
+  	position: absolute;
+  	top: 7.01px;
+  	left: 7px;
+  	width: 101px;
+  	height: 103px;
+  	object-fit: cover;
+}
+.image-34-icon {
+  	position: absolute;
+  	top: 207.01px;
+  	left: -29px;
+  	width: 1757px;
+  	height: 570px;
+  	object-fit: cover;
+}
+.hola-pablo-bienvenido {
+  	position: absolute;
+  	top: 694.01px;
+  	left: 60px;
+  	font-weight: 800;
+  	color: #fff;
+  	text-align: left;
+  	display: inline-block;
+  	width: 973px;
+}
+.modulo-1-rf3-14-item {
+  	position: absolute;
+  	top: 122.01px;
+  	left: 0px;
+  	background-color: #5454e9;
+  	width: 1728px;
+  	height: 91px;
+}
+.bienestar-universitario {
+  	position: absolute;
+  	top: 23.01px;
+  	left: 157px;
+  	font-size: 28px;
+  	display: inline-block;
+  	text-align: left;
+  	width: 174px;
+}
+.menu-icon {
+  	position: absolute;
+  	top: 28.01px;
+  	left: 1602px;
+  	width: 54px;
+  	height: 54px;
+  	object-fit: cover;
+  	cursor: pointer;
+}
+.pp-wrapper {
+  	position: absolute;
+  	top: 28.01px;
+  	left: 1510px;
+  	border-radius: 4px;
+  	background-color: #000091;
+  	width: 54px;
+  	height: 54px;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	justify-content: center;
+  	padding: 5px;
+  	box-sizing: border-box;
+  	font-size: 12px;
+  	color: #fff;
+  	font-family: Roboto;
+}
+.pp {
+  	position: relative;
+  	letter-spacing: 0.25px;
+  	line-height: 20px;
+}
+.modulo-1-rf3-14-inner {
+  	position: absolute;
+  	top: 27.01px;
+  	left: 1416px;
+  	width: 56px;
+  	height: 51px;
+}
+.calendar {
+  	position: absolute;
+  	top: 1385px;
+  	left: calc(50% - 791px);
+  	background-color: #fff;
+  	border-right: 1px solid #e0e0e0;
+  	border-bottom: 1px solid #e0e0e0;
+  	overflow: hidden;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: flex-start;
+  	text-align: left;
+  	font-size: 14px;
+  	color: #333;
+  	font-family: Inter;
+}
+.row {
+  	background-color: #fff;
+  	overflow: hidden;
+  	display: flex;
+  	align-items: flex-start;
+  	font-size: 12px;
+  	color: #666;
+}
+.header-cell {
+  	width: 48px;
+  	border-top: 1px solid #e0e0e0;
+  	border-left: 1px solid #e0e0e0;
+  	box-sizing: border-box;
+  	height: 32px;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+}
+.div {
+  	position: relative;
+}
+.modulo-1-rf3-14-row {
+  	background-color: #fff;
+  	overflow: hidden;
+  	display: flex;
+  	align-items: flex-start;
+}
+.cell {
+  	width: 48px;
+  	border-top: 1px solid #e0e0e0;
+  	border-left: 1px solid #e0e0e0;
+  	box-sizing: border-box;
+  	height: 48px;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	justify-content: center;
+}
+.inner {
+  	width: 36px;
+  	border-radius: 18px;
+  	height: 36px;
+  	overflow: hidden;
+  	flex-shrink: 0;
+  	display: flex;
+  	align-items: center;
+  	justify-content: center;
+}
+.modulo-1-rf3-14-cell {
+  	width: 48px;
+  	border-top: 1px solid #e0e0e0;
+  	border-left: 1px solid #e0e0e0;
+  	box-sizing: border-box;
+  	height: 48px;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	justify-content: center;
+  	cursor: pointer;
+}
+.row5 {
+  	background-color: #fff;
+  	overflow: hidden;
+  	display: flex;
+  	align-items: flex-start;
+  	color: #aaa;
+}
+.cell28 {
+  	width: 48px;
+  	border-top: 1px solid #e0e0e0;
+  	border-left: 1px solid #e0e0e0;
+  	box-sizing: border-box;
+  	height: 48px;
+  	display: flex;
+  	flex-direction: column;
+  	align-items: center;
+  	justify-content: center;
+  	color: #333;
+}
+.modulo-1-rf3-14-modulo-1-rf3-14-child {
+  	position: absolute;
+  	top: 1453px;
+  	left: 126px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child2 {
+  	position: absolute;
+  	top: 1500px;
+  	left: 126px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child3 {
+  	position: absolute;
+  	top: 1548px;
+  	left: 126px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child4 {
+  	position: absolute;
+  	top: 1596px;
+  	left: 126px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child5 {
+  	position: absolute;
+  	top: 1453px;
+  	left: 174px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child6 {
+  	position: absolute;
+  	top: 1500px;
+  	left: 174px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child7 {
+  	position: absolute;
+  	top: 1548px;
+  	left: 174px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child8 {
+  	position: absolute;
+  	top: 1596px;
+  	left: 174px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child9 {
+  	position: absolute;
+  	top: 1453px;
+  	left: 222px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child10 {
+  	position: absolute;
+  	top: 1500px;
+  	left: 222px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child11 {
+  	position: absolute;
+  	top: 1548px;
+  	left: 222px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child12 {
+  	position: absolute;
+  	top: 1596px;
+  	left: 222px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child13 {
+  	position: absolute;
+  	top: 1453px;
+  	left: 270px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child14 {
+  	position: absolute;
+  	top: 1500px;
+  	left: 270px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child15 {
+  	position: absolute;
+  	top: 1548px;
+  	left: 270px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child16 {
+  	position: absolute;
+  	top: 1596px;
+  	left: 270px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child17 {
+  	position: absolute;
+  	top: 1453px;
+  	left: 318px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child18 {
+  	position: absolute;
+  	top: 1500px;
+  	left: 318px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child19 {
+  	position: absolute;
+  	top: 1548px;
+  	left: 318px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child20 {
+  	position: absolute;
+  	top: 1596px;
+  	left: 318px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child21 {
+  	position: absolute;
+  	top: 1453px;
+  	left: 366px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child22 {
+  	position: absolute;
+  	top: 1500px;
+  	left: 366px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child23 {
+  	position: absolute;
+  	top: 1548px;
+  	left: 366px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child24 {
+  	position: absolute;
+  	top: 1596px;
+  	left: 366px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.modulo-1-rf3-14-child25 {
+  	position: absolute;
+  	top: 1642px;
+  	left: 126px;
+  	border-radius: 20px;
+  	max-height: 100%;
+  	width: 38px;
+}
+.image-32-icon {
+  	position: absolute;
+  	top: 1956px;
+  	left: calc(50% - 555px);
+  	border-radius: 20px;
+  	width: 1111px;
+  	height: 1389px;
+  	object-fit: cover;
+}
+.home-bariphone-15pro {
+  	position: absolute;
+  	bottom: 19px;
+  	left: calc(50% - 197px);
+  	width: 393px;
+  	height: 34px;
+  	overflow: hidden;
+}
+.home-bariphone-15pro-child {
+  	position: absolute;
+  	top: 21px;
+  	left: calc(50% - 69.5px);
+  	border-radius: 5px;
+  	background-color: #fff;
+  	width: 140px;
+  	height: 5px;
+  	overflow: hidden;
+}
+
