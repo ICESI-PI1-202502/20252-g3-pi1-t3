@@ -18,7 +18,8 @@ def user_login(request):
             validate_email(email)
         except ValidationError:
             messages.error(request, "El correo ingresado no es válido")
-            return render(request, "login.html", {"email": email})
+            return redirect('login')
+            #return render(request, "login.html", {"email": email})
 
         # Verificar si el usuario existe
         if not User.objects.filter(username=email).exists():
