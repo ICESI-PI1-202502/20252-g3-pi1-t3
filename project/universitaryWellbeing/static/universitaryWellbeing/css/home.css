@@ -1,38 +1,70 @@
 /* static/universitaryWellbeing/css/home.css */
 * {
     margin: 0;
-    padding: 20;
+    padding: 0px;
     box-sizing: border-box;
 }
 
 body {
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
+    min-height: 100vh;              /* ocupa toda la pantalla */
+    display: flex;                  /* activa flexbox */
+    flex-direction: column;         /* apila header, main y footer */
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: #000;
+    margin: 0;
 }
 
+main {
+    flex: 1;                        /* ocupa todo el espacio disponible */
+    margin-top: 70px;               /* evita que se superponga al header fijo */
+    padding: 20px;                  /* espacio interno */
+}
+
+footer {
+    background-color: #343a40;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* utilidades para centrar con flex */
+.flex-center {
+    display: flex  ;
+    justify-content: center  ;
+    align-items: center  ;
+}
+
+.flex-center-column {
+    display: flex  ;
+    flex-direction: column ;
+    justify-content: center  ;
+    align-items: center  ;
+    text-align: center;
+}
+
+
 .navbar {
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 1rem;  /* menos espacio vertical */
 }
 
 .navbar-brand {
-    font-size: 1.5rem;
-    font-weight: bold;
+    font-size: 1rem;
+     font-weight: 600;       /* Negrita moderada */
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 6px;               /* Menos espacio entre logo y texto */
 }
 
 .navbar-brand img {
-    height: 40px;
+    height: 100px;      /* fijo, no demasiado grande */
+    width: auto;       /* mantiene proporción */
+    margin-right: 8px; /* espacio con el texto */
     transition: transform 0.3s ease;
 }
 
+
 .navbar-brand:hover img {
-    transform: scale(1.1);
+    transform: scale(1.05); /* Hover más sutil */
 }
 
 .nav-link {

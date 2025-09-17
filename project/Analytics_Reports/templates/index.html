@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
-<div class="container mt-4">
+<div class="flex-center-column" style="padding-top: 50px;">
     <h2>Análisis</h2>
     <ul>
         <li><a href="{% url 'analytics_reports:analisis_comportamiento' %}">Análisis de comportamiento estudiantil</a></li>
@@ -9,7 +9,7 @@
         <li><a href="{% url 'analytics_reports:visualizacion' %}">Visualización y exportación</a></li>
         <li><a href="{% url 'analytics_reports:recomendaciones' %}">Recomendaciones automáticas</a></li>
         <li><a href="{% url 'analytics_reports:asistencia' %}">Gestión de asistencia y contingencia</a></li>
-
     </ul>
 </div>
+
 {% endblock %}
