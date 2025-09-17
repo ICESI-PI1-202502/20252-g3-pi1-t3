@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'universitaryWellbeing',
-    'Analytics_Reports',   
+    'Analytics_Reports'   
 
 ]
 
