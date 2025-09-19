@@ -1,5 +1,5 @@
 /* ==============================
-   RESET BÁSICO
+   BASIC RESET
    ============================== */
 * {
     margin: 0;
@@ -8,18 +8,18 @@
 }
 
 body {
-    min-height: 100vh;              /* ocupa toda la pantalla */
-    display: flex;                  /* activa flexbox */
-    flex-direction: column;         /* apila header, main y footer */
+    min-height: 100vh;              /* takes up the entire screen */
+    display: flex;                  /* enable flexbox */
+    flex-direction: column;         /* stack header, main and footer */
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: #000;
 }
 
 /* ==============================
-   HEADER PRINCIPAL (NAVBAR)
+   MAIN HEADER (NAVBAR)
    ============================== */
 .custom-navbar {
-    background-color: #FFFF; /* 🎨 cambia este color a tu gusto */
+    background-color: #FFFF; /*  change this color as you like */
     padding: 0.5rem 1rem;
 }
 
@@ -29,7 +29,7 @@ body {
     display: flex;
     align-items: center;
     gap: 6px;
-    color:#000; /* color del texto */
+    color:#000; /* text color */
 }
 
 .custom-navbar .navbar-brand img {
@@ -46,30 +46,30 @@ body {
 .custom-navbar .nav-link {
     font-size: 1rem;
     padding: 0.5rem 1rem;
-    color: #000 !important; /* texto de links en blanco */
+    color: #000 !important; /* link text color */
     transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .custom-navbar .nav-link:hover {
-    color: #ffd700 !important; /* hover en dorado */
+    color: #ffd700 !important; /* golden hover */
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
 }
 
 /* ==============================
-   SUBHEADER (barra secundaria)
+   SUBHEADER (secondary bar)
    ============================== */
 .sub-bar {
-    background-color: #5454E9; /* 🎨 azul */
+    background-color: #5454E9; /*  blue */
     padding: 8px 16px;
     position: fixed;
-    top: 86px; /* altura real del navbar */
+    top: 86px; /* actual navbar height */
     width: 100%;
     z-index: 1030;
 }
 
 .sub-bar a {
-    color: white; /* ✅ texto blanco sobre fondo azul */
+    color: white; /* ✅ white text on blue background */
     text-decoration: none;
     font-size: 1rem;
     font-weight: bold;
@@ -77,18 +77,18 @@ body {
 }
 
 .sub-bar a:hover {
-    color: #dcdcdc; /* gris claro en hover */
+    color: #dcdcdc; /* light gray on hover */
 }
 
 
 /* ==============================
-   CONTENIDO CENTRAL (MAIN)
+   MAIN CONTENT
    ============================== */
 main {
     flex: 1 0 auto;
     padding: 20px;
 
-    /* espacio para no chocar con navbar + sub-bar */
+    /* space to avoid overlapping navbar + sub-bar */
     margin-top: calc(86px + 40px); /* navbar (86px) + sub-bar (~40px) */
 }
 
@@ -97,7 +97,7 @@ main {
     margin: 0 auto;
 }
 
-/* listas */
+/* lists */
 ul {
     list-style: none;
     padding: 0;
@@ -119,7 +119,7 @@ ul li a:hover {
     text-decoration: underline;
 }
 
-/* tablas */
+/* tables */
 .table {
     width: 100%;
     margin-top: 20px;
@@ -141,7 +141,7 @@ footer {
 }
 
 /* ==============================
-   UTILIDADES
+   UTILITIES
    ============================== */
 .flex-center {
     display: flex;
@@ -158,7 +158,7 @@ footer {
 }
 
 /* ==============================
-   OCULTAR estilos viejos de home
+   HIDE old home styles
    ============================== */
 .home, .universidad-icesi-calle-container, .calendario, .noticias, .actividades,
 .blanco, .blanco-icon, .blanco-icon2, .blanco-icon3, .blanco-icon4, .blanco-icon5,
