@@ -1,7 +1,9 @@
-/* static/universitaryWellbeing/css/home.css */
+/* ==============================
+   RESET BÁSICO
+   ============================== */
 * {
     margin: 0;
-    padding: 0px;
+    padding: 0;
     box-sizing: border-box;
 }
 
@@ -11,86 +13,83 @@ body {
     flex-direction: column;         /* apila header, main y footer */
     font-family: 'Plus Jakarta Sans', sans-serif;
     color: #000;
-    margin: 0;
 }
 
-main {
-    flex: 1;                        /* ocupa todo el espacio disponible */
-    margin-top: 70px;               /* evita que se superponga al header fijo */
-    padding: 20px;                  /* espacio interno */
+/* ==============================
+   HEADER PRINCIPAL (NAVBAR)
+   ============================== */
+.custom-navbar {
+    background-color: #FFFF; /* 🎨 cambia este color a tu gusto */
+    padding: 0.5rem 1rem;
 }
 
-footer {
-    background-color: #343a40;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-}
-
-/* utilidades para centrar con flex */
-.flex-center {
-    display: flex  ;
-    justify-content: center  ;
-    align-items: center  ;
-}
-
-.flex-center-column {
-    display: flex  ;
-    flex-direction: column ;
-    justify-content: center  ;
-    align-items: center  ;
-    text-align: center;
-}
-
-
-.navbar {
-    padding: 0.5rem 1rem;  /* menos espacio vertical */
-}
-
-.navbar-brand {
+.custom-navbar .navbar-brand {
     font-size: 1rem;
-     font-weight: 600;       /* Negrita moderada */
+    font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 6px;               /* Menos espacio entre logo y texto */
+    gap: 6px;
+    color:#000; /* color del texto */
 }
 
-.navbar-brand img {
-    height: 100px;      /* fijo, no demasiado grande */
-    width: auto;       /* mantiene proporción */
-    margin-right: 8px; /* espacio con el texto */
+.custom-navbar .navbar-brand img {
+    height: 60px;
+    width: auto;
+    margin-right: 8px;
     transition: transform 0.3s ease;
 }
 
-
-.navbar-brand:hover img {
-    transform: scale(1.05); /* Hover más sutil */
+.custom-navbar .navbar-brand:hover img {
+    transform: scale(1.05);
 }
 
-.nav-link {
-    font-size: 1.1rem;
+.custom-navbar .nav-link {
+    font-size: 1rem;
     padding: 0.5rem 1rem;
+    color: #000 !important; /* texto de links en blanco */
     transition: color 0.3s ease, background-color 0.3s ease;
 }
 
-.nav-link:hover {
-    color: #f8f9fa !important;
+.custom-navbar .nav-link:hover {
+    color: #ffd700 !important; /* hover en dorado */
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
 }
 
-main {
-    margin-top: 100px; /* Aumentado para evitar superposición con el header */
-    flex: 1 0 auto;
-    padding: 20px;
+/* ==============================
+   SUBHEADER (barra secundaria)
+   ============================== */
+.sub-bar {
+    background-color: #5454E9; /* 🎨 azul */
+    padding: 8px 16px;
+    position: fixed;
+    top: 86px; /* altura real del navbar */
+    width: 100%;
+    z-index: 1030;
 }
 
-footer {
-    background-color: #343a40;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    flex-shrink: 0;
+.sub-bar a {
+    color: white; /* ✅ texto blanco sobre fondo azul */
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.sub-bar a:hover {
+    color: #dcdcdc; /* gris claro en hover */
+}
+
+
+/* ==============================
+   CONTENIDO CENTRAL (MAIN)
+   ============================== */
+main {
+    flex: 1 0 auto;
+    padding: 20px;
+
+    /* espacio para no chocar con navbar + sub-bar */
+    margin-top: calc(86px + 40px); /* navbar (86px) + sub-bar (~40px) */
 }
 
 .container {
@@ -98,7 +97,7 @@ footer {
     margin: 0 auto;
 }
 
-/* Estilos para la lista en index.html */
+/* listas */
 ul {
     list-style: none;
     padding: 0;
@@ -120,7 +119,7 @@ ul li a:hover {
     text-decoration: underline;
 }
 
-/* Estilos para la tabla (para analisis.html y otras páginas) */
+/* tablas */
 .table {
     width: 100%;
     margin-top: 20px;
@@ -130,7 +129,37 @@ ul li a:hover {
     text-align: center;
 }
 
-/* Ocultar estilos específicos de la página de inicio */
+/* ==============================
+   FOOTER
+   ============================== */
+footer {
+    background-color: #dadde0;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    flex-shrink: 0;
+}
+
+/* ==============================
+   UTILIDADES
+   ============================== */
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* ==============================
+   OCULTAR estilos viejos de home
+   ============================== */
 .home, .universidad-icesi-calle-container, .calendario, .noticias, .actividades,
 .blanco, .blanco-icon, .blanco-icon2, .blanco-icon3, .blanco-icon4, .blanco-icon5,
 .judo, .ajedrez, .natacin, .arquero-de-ftbol, .image-34-icon, .hola-pablo-bienvenido,

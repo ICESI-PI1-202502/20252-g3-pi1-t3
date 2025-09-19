@@ -1,39 +1,35 @@
 {% load static %}
 <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <!-- NAVBAR -->
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
         <div class="container-fluid">
-            <!-- Logo o título -->
             <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}" alt="Logo Icesi">
-
+                <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
                 Bienestar Universitario
             </a>
-            <!-- Botón para menú colapsable en móviles -->
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <!-- Menú de navegación -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'home' %}">Inicio</a>
-                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
                     {% if user.is_authenticated %}
                         {% if user.is_staff %}
-                            <li class="nav-item">
-                                <a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a>
-                            </li>
+                            <li class="nav-item"><a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a></li>
                         {% endif %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
                     {% else %}
-                        <li class="nav-item">
-                            <a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a>
-                        </li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+
+      <!-- SUBHEADER -->
+    <nav class="sub-bar">
+        <a href="javascript:history.back()"> Regresar</a>
+    </nav>
+
 </header>
