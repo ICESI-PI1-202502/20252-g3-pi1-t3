@@ -5,6 +5,10 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import redirect, render
+
 # Create your views here.
 
 def user_login(request):
@@ -77,28 +81,28 @@ def user_login(request):
 
 def register(request):
     if request.method == "POST":
-        username = request.POST.get("username", "")
-        email = request.POST.get("email", "")
-        password = request.POST.get("password", "")
+        full_name = request.POST.get("full_name")
+        email = request.POST.get("email")
+        password = request.POST.get("password")
 
-        # Validar formato de email
-        try:
-            validate_email(email)
-        except ValidationError:
-            messages.error(request, "El correo ingresado no es válido")
-            return render(request, "auth/register.html", {"username": username, "email": email})
-
-        # Validar usuario existente
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "El usuario ya existe")
-        else:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user_group, created = Group.objects.get_or_create(name="Usuarios")
-            user.groups.add(user_group)
-            login(request, user)
-            messages.success(request, "¡Registro exitoso!")
-            return redirect("preferences")
         
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "El email ya está registrado.")
+            return redirect("register")
+
+       
+        user = User.objects.create_user(
+            username=email,   
+            email=email,
+            password=password
+        )
+
+        user.first_name = full_name
+        user.save()
+
+        messages.success(request, "Cuenta creada exitosamente. Ahora puedes iniciar sesión.")
+        return redirect("login")
+
     return render(request, "auth/register.html")
 
 def user_logout(request):
@@ -120,6 +124,8 @@ def home(request):
 
 
 
+
+ 
 
 
 
