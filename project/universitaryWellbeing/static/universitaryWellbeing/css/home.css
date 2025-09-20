@@ -55,6 +55,41 @@ body {
     background-color: rgba(255, 255, 255, 0.1);
     border-radius: 5px;
 }
+ 
+
+
+
+
+
+
+
+/* campana en navbar */
+.navbar-option img {
+  height: 28px;        /* ajusta tamaño */
+  width: auto;
+  display: block;
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+
+/* pequeño efecto hover */
+.navbar-option img:hover {
+  transform: scale(1.08);
+}
+
+/* opcional: badge de notificaciones (pequeño círculo rojo) */
+.navbar-option .notif-badge {
+  position: relative;
+  display: inline-block;
+  margin-left: -18px; /* mueve el badge sobre la campana */
+  margin-top: -18px;
+  background: #dc3545;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  line-height: 1;
+}
 
 /* ==============================
    SUBHEADER (secondary bar)

@@ -1,35 +1,62 @@
 {% load static %}
 <header>
-    <!-- NAVBAR -->
-    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="{% url 'home' %}">
-                <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
-                Bienestar Universitario
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" 
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
-                    {% if user.is_authenticated %}
-                        {% if user.is_staff %}
-                            <li class="nav-item"><a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a></li>
-                        {% endif %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
-                    {% else %}
-                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
-                    {% endif %}
-                </ul>
-            </div>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="{% url 'home' %}">
+        <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+        Bienestar Universitario
+      </a>
+
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <!-- ADDED: wrapper que contiene nav-collapse + campana -->
+      <div class="d-flex align-items-center ms-auto">
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
+            {% if user.is_authenticated %}
+              {% if user.is_staff %}
+                <li class="nav-item"><a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a></li>
+              {% endif %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
+            {% else %}
+              <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
+            {% endif %}
+          </ul>
         </div>
-    </nav>
 
-      <!-- SUBHEADER -->
-    <nav class="sub-bar">
-        <a href="javascript:history.back()"> Regresar</a>
-    </nav>
+        <!-- ADDED: bell -->
+        <div class="navbar-option ms-3">
+            <a href="#" title="Notificaciones">
+                <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+            </a>
+            </div>
 
+            <div class="navbar-option ms-3">
+            <a href="#" title="Notificaciones">
+                <img src="{% static 'universitaryWellbeing/img/PP_option.png' %}" alt="Notificaciones" />
+            </a>
+            </div>
+            
+            <div class="navbar-option ms-3">
+            <a href="#" title="Notificaciones">
+                <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Notificaciones" />
+            </a>
+            </div>
+
+            
+
+      </div>
+      <!-- /ADDED -->
+    </div>
+  </nav>
+
+  <!-- SUBHEADER -->
+  <nav class="sub-bar">
+    <a href="javascript:history.back()"> Regresar</a>
+  </nav>
 </header>
