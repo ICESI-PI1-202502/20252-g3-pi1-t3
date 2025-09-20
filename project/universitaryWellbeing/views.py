@@ -10,36 +10,29 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 
 # Create your views here.
-
 def user_login(request):
-    email = ""
     if request.method == "POST":
-        email = request.POST.get("email", "")
+        cedula_input = request.POST.get("cedula", "").strip()
         password = request.POST.get("password", "")
 
-        # Validar formato de email
-        try:
-            validate_email(email)
-        except ValidationError:
-            messages.error(request, "El correo ingresado no es válido")
-            return redirect('login')
-            #return render(request, "login.html", {"email": email})
+        if not User.objects.filter(username=cedula_input).exists():
+            messages.error(request, "El usuario con esa cédula no existe")
+            return redirect("login")
 
-        # Verificar si el usuario existe
-        if not User.objects.filter(username=email).exists():
-            messages.error(request, "El usuario no existe")
+        user = authenticate(request, username=cedula_input, password=password)
+
+        if user is not None:
+            login(request, user)
+            if is_role_admin(user):
+                return redirect("admin:index")  # admin Django
+            return redirect("home")
         else:
-            user = authenticate(request, username=email, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect("home")
-            else:
-                messages.error(request, "Contraseña incorrecta")
-        # Redirige a login para limpiar POST y mostrar mensajes
-        return redirect('login')  # nombre de la url de login
+            messages.error(request, "Contraseña incorrecta")
+            return redirect("login")
 
-    # GET normal
-    return render(request, "login.html", {"email": ""})
+    # GET → mostrar formulario vacío
+    return render(request, "login.html", {})
+
 
 
 #Login descartado para 2 pantallas como en la secuencia de figma (NO Practico y poco elegante)
@@ -81,29 +74,25 @@ def user_login(request):
 
 def register(request):
     if request.method == "POST":
-        full_name = request.POST.get("full_name")
-        email = request.POST.get("email")
-        password = request.POST.get("password")
+        cedula_input = request.POST.get("cedula", "").strip()
+        email = request.POST.get("email", "").strip()
+        password = request.POST.get("password", "")
 
-        
-        if User.objects.filter(email=email).exists():
-            messages.error(request, "El email ya está registrado.")
+        if User.objects.filter(username=cedula_input).exists():
+            messages.error(request, "Ya existe un usuario con esa cédula")
             return redirect("register")
 
-       
         user = User.objects.create_user(
-            username=email,   
-            email=email,
-            password=password
+            username=cedula_input,
+            password=password,
+            email=email
         )
-
-        user.first_name = full_name
-        user.save()
-
-        messages.success(request, "Cuenta creada exitosamente. Ahora puedes iniciar sesión.")
+        messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
         return redirect("login")
 
     return render(request, "auth/register.html")
+
+
 
 def user_logout(request):
     logout(request)

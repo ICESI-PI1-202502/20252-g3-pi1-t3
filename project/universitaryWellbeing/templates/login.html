@@ -21,7 +21,8 @@
 
 			<div class="field" id="emailField">
 				<div class="value">
-					<input type="email" id="email" name="email" placeholder="E-mail" value="{{ email|default:'' }}">
+					<input type="text" id="cedula" name="cedula" placeholder="Cédula" value="{{ cedula|default:'' }}">
+
 				</div>
 			</div>
 
@@ -85,93 +86,94 @@
 
 
 	<script>
-		const emailInput = document.getElementById("email");
-		const passwordField = document.getElementById("passwordField");
+    const cedulaInput = document.getElementById("cedula");
+    const passwordField = document.getElementById("passwordField");
 
-		emailInput.addEventListener("input", function () {
-			if (emailInput.value.trim() !== "") {
-				passwordField.classList.remove("hidden");  // mostrar
-			} else {
-				passwordField.classList.add("hidden");     // ocultar
-			}
-		});
+    cedulaInput.addEventListener("input", function () {
+        if (cedulaInput.value.trim() !== "") {
+            passwordField.classList.remove("hidden");  // mostrar
+        } else {
+            passwordField.classList.add("hidden");     // ocultar
+        }
+    });
 
-		var loginButton = document.getElementById("loginButton");
-		if (loginButton) {
-			loginButton.addEventListener("click", function () {
-				this.closest("form").submit(); // envía el formulario padre
-			});
-		}
+    var loginButton = document.getElementById("loginButton");
+    if (loginButton) {
+        loginButton.addEventListener("click", function () {
+            this.closest("form").submit(); // envía el formulario padre
+        });
+    }
 
-		var fieldContainer = document.getElementById("fieldContainer");
-		if (fieldContainer) {
-			fieldContainer.addEventListener("click", function (e) {
-				// Add your code here JAVA SCRIPT NOpoasoaSOIosiaoiOS HELP DAMARALS
-			});
-		}
+    var fieldContainer = document.getElementById("fieldContainer");
+    if (fieldContainer) {
+        fieldContainer.addEventListener("click", function (e) {
+            // Add your code here JAVA SCRIPT NOpoasoaSOIosiaoiOS HELP DAMARALS
+        });
+    }
 
-		var registrarseText = document.getElementById("registrarseText");
-		if (registrarseText) {
-			registrarseText.addEventListener("click", function (e) {
-				window.location.href = "{% url 'register' %}";
-			});
-		}
+    var registrarseText = document.getElementById("registrarseText");
+    if (registrarseText) {
+        registrarseText.addEventListener("click", function (e) {
+            window.location.href = "{% url 'register' %}";
+        });
+    }
 
-		var administradorText = document.getElementById("administradorText");
-		if (administradorText) {
-			administradorText.addEventListener("click", function (e) {
-				// Add your code here
+    var administradorText = document.getElementById("administradorText");
+    if (administradorText) {
+        administradorText.addEventListener("click", function (e) {
+            // Add your code here
+        });
+    }
 
-			});
-		}
-		(function () {
-			const toggle = document.getElementById('togglePassword');
-			const pwd = document.getElementById('password');
-			const eye = toggle.querySelector('.icon-eye');
-			const eyeOff = toggle.querySelector('.icon-eye-off');
+    (function () {
+        const toggle = document.getElementById('togglePassword');
+        const pwd = document.getElementById('password');
+        const eye = toggle.querySelector('.icon-eye');
+        const eyeOff = toggle.querySelector('.icon-eye-off');
 
-			if (!toggle || !pwd) return;
+        if (!toggle || !pwd) return;
 
-			// initial state: hidden
-			toggle.setAttribute('data-visible', 'false');
+        // initial state: hidden
+        toggle.setAttribute('data-visible', 'false');
 
-			toggle.addEventListener('click', function () {
-				const start = pwd.selectionStart;
-				const end = pwd.selectionEnd;
+        toggle.addEventListener('click', function () {
+            const start = pwd.selectionStart;
+            const end = pwd.selectionEnd;
 
-				const isVisible = toggle.getAttribute('data-visible') === 'true';
-				if (isVisible) {
-					// ocultar contraseña
-					pwd.type = 'password';
-					toggle.setAttribute('data-visible', 'false');
-					toggle.setAttribute('aria-label', 'Mostrar contraseña');
-					toggle.title = 'Mostrar contraseña';
+            const isVisible = toggle.getAttribute('data-visible') === 'true';
+            if (isVisible) {
+                // ocultar contraseña
+                pwd.type = 'password';
+                toggle.setAttribute('data-visible', 'false');
+                toggle.setAttribute('aria-label', 'Mostrar contraseña');
+                toggle.title = 'Mostrar contraseña';
 
-					// cambiar íconos
-					eye.style.display = 'inline';
-					eyeOff.style.display = 'none';
-				} else {
-					// mostrar contraseña
-					pwd.type = 'text';
-					toggle.setAttribute('data-visible', 'true');
-					toggle.setAttribute('aria-label', 'Ocultar contraseña');
-					toggle.title = 'Ocultar contraseña';
+                // cambiar íconos
+                eye.style.display = 'inline';
+                eyeOff.style.display = 'none';
+            } else {
+                // mostrar contraseña
+                pwd.type = 'text';
+                toggle.setAttribute('data-visible', 'true');
+                toggle.setAttribute('aria-label', 'Ocultar contraseña');
+                toggle.title = 'Ocultar contraseña';
 
-					// cambiar íconos
-					eye.style.display = 'none';
-					eyeOff.style.display = 'inline';
-				}
+                // cambiar íconos
+                eye.style.display = 'none';
+                eyeOff.style.display = 'inline';
+            }
 
-				// restaurar caret
-				try {
-					pwd.setSelectionRange(start, end);
-					pwd.focus({ preventScroll: true });
-				} catch (err) {
-					pwd.focus();
-				}
-			});
-		})();
-	</script>
+            // restaurar caret
+            try {
+                pwd.setSelectionRange(start, end);
+                pwd.focus({ preventScroll: true });
+            } catch (err) {
+                pwd.focus();
+            }
+        });
+    })();
+</script>
+
 </body>
 
 </html>
