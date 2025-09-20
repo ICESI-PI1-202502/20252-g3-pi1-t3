@@ -203,3 +203,53 @@ footer {
 .modulo-1-rf3-14-child, .image-32-icon, .home-bariphone-15pro, .home-bariphone-15pro-child {
     display: none;
 }
+
+
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -280px; /* hide */
+  width: 280px;
+  height: 100%;
+  background-color: #5454E9;
+  color: white;
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 2000;
+}
+.sidebar.open {
+  right: 0;
+}
+.sidebar a {
+  display: block;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #FF6B35;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.sidebar a:hover {
+  background: #ff844f;
+}
+
+/* background */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1500;
+}
+.overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
