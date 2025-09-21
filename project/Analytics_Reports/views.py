@@ -56,3 +56,17 @@ def asistencia(request):
         .annotate(total=Count("id_asistencia"))
     )
     return render(request, "asistencia.html", {"data": data})
+
+
+def prueba_datos(request):
+    data = (
+        Participaciones.objects
+        .select_related("participantes_id_participante")
+        .values(
+            "participantes_id_participante__nombre",
+            "participantes_id_participante__facultad",
+            "participantes_id_participante__genero",
+            "participantes_id_participante__semestre",
+        )
+    )
+    return render(request, "prueba_datos.html", {"data": data})

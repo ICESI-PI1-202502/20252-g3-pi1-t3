@@ -13,20 +13,37 @@ class Actividades(models.Model):
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     lugar = models.CharField(max_length=150)
-    horario = models.DateField()
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
     requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
-    id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='id_tipo')
+    modalidad = models.CharField(max_length=1, blank=True, null=True)
+    aforo = models.FloatField(blank=True, null=True)
+    fecha_apertura_ins = models.DateField(blank=True, null=True)
+    fecha_cierre_ins = models.DateField(blank=True, null=True)
+    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo')
 
     class Meta:
         managed = False
         db_table = 'actividades'
 
 
+class AgendaPsicologos(models.Model):
+    id_agenda_slot = models.FloatField(primary_key=True)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    estado_slot = models.CharField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'agenda_psicologos'
+
+
 class Asistencias(models.Model):
     id_asistencia = models.FloatField(primary_key=True)
     fecha = models.DateField()
-    id_estado_asistencia = models.ForeignKey('EstadosAsistencia', models.DO_NOTHING, db_column='id_estado_asistencia')
-    id_participacion = models.ForeignKey('Participaciones', models.DO_NOTHING, db_column='id_participacion')
+    estados_asistencia_id_estado_asistencia = models.ForeignKey('EstadosAsistencia', models.DO_NOTHING, db_column='estados_asistencia_id_estado_asistencia')
+    participaciones_id_participacion = models.ForeignKey('Participaciones', models.DO_NOTHING, db_column='participaciones_id_participacion')
 
     class Meta:
         managed = False
@@ -102,18 +119,60 @@ class AuthUserUserPermissions(models.Model):
         unique_together = (('user', 'permission'),)
 
 
+class CalificacionesActividad(models.Model):
+    id_calificacion = models.FloatField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    estrellas = models.FloatField()
+    comentario = models.CharField(max_length=500, blank=True, null=True)
+    fecha = models.DateField()
+
+    class Meta:
+        managed = False
+        db_table = 'calificaciones_actividad'
+        unique_together = (('actividades_id_actividad', 'participantes_id_participante'),)
+
+
 class Citas(models.Model):
     id_cita = models.FloatField(primary_key=True)
     fecha = models.DateField()
     motivo = models.CharField(max_length=200, blank=True, null=True)
     observaciones = models.CharField(max_length=500, blank=True, null=True)
-    id_estado_cita = models.ForeignKey('EstadosCita', models.DO_NOTHING, db_column='id_estado_cita')
-    id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='id_participante')
-    id_psicologo = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='id_psicologo', related_name='citas_id_psicologo_set')
+    estados_cita_id_estado_cita = models.OneToOneField('EstadosCita', models.DO_NOTHING, db_column='estados_cita_id_estado_cita')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    participantes_id_participante1 = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante1', related_name='citas_participantes_id_participante1_set')
+    motivos_cita_id_motivo = models.OneToOneField('MotivosCita', models.DO_NOTHING, db_column='motivos_cita_id_motivo', blank=True, null=True)
+    agenda_psicologos_id_agenda_slot = models.ForeignKey(AgendaPsicologos, models.DO_NOTHING, db_column='agenda_psicologos_id_agenda_slot', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'citas'
+
+
+class Clasificaciones(models.Model):
+    pk = models.CompositePrimaryKey('torneos_id_torneo', 'equipos_id_equipo')
+    torneos_id_torneo = models.ForeignKey('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
+    equipos_id_equipo = models.ForeignKey('Equipos', models.DO_NOTHING, db_column='equipos_id_equipo')
+    pj = models.FloatField()
+    pg = models.FloatField()
+    pe = models.FloatField()
+    pp = models.FloatField()
+    gf = models.FloatField()
+    gc = models.FloatField()
+    pts = models.FloatField()
+
+    class Meta:
+        managed = False
+        db_table = 'clasificaciones'
+
+
+class Disciplinas(models.Model):
+    id_disciplina = models.FloatField(primary_key=True)
+    nombre = models.CharField(unique=True, max_length=80)
+
+    class Meta:
+        managed = False
+        db_table = 'disciplinas'
 
 
 class DjangoAdminLog(models.Model):
@@ -166,7 +225,10 @@ class Equipos(models.Model):
     nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateField()
     cantidad_personas = models.FloatField(blank=True, null=True)
-    responsable = models.ForeignKey('Participantes', models.DO_NOTHING)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina', blank=True, null=True)
+    capacidad_min = models.FloatField(blank=True, null=True)
+    capacidad_max = models.FloatField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -174,9 +236,9 @@ class Equipos(models.Model):
 
 
 class EquiposParticipantes(models.Model):
-    pk = models.CompositePrimaryKey('id_equipo', 'id_participante')
-    id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='id_equipo')
+    equipos_id_equipo = models.OneToOneField(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo', primary_key=True)
     id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='id_participante')
+    id_participante1 = models.FloatField()
 
     class Meta:
         managed = False
@@ -195,6 +257,7 @@ class EstadosAsistencia(models.Model):
 class EstadosCita(models.Model):
     id_estado_cita = models.FloatField(primary_key=True)
     nombre = models.CharField(max_length=30)
+    citas_id_cita = models.OneToOneField(Citas, models.DO_NOTHING, db_column='citas_id_cita')
 
     class Meta:
         managed = False
@@ -210,12 +273,95 @@ class EstadosParticipacion(models.Model):
         db_table = 'estados_participacion'
 
 
+class EstadosTorneo(models.Model):
+    id_estado_torneo = models.FloatField(primary_key=True)
+    nombre = models.CharField(unique=True, max_length=30)
+    torneos_id_torneo = models.OneToOneField('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
+
+    class Meta:
+        managed = False
+        db_table = 'estados_torneo'
+
+
+class FkProysocCoordinador(models.Model):
+    pk = models.CompositePrimaryKey('participantes_id_participante', 'proyectos_sociales_id_proyecto')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    proyectos_sociales_id_proyecto = models.ForeignKey('ProyectosSociales', models.DO_NOTHING, db_column='proyectos_sociales_id_proyecto')
+
+    class Meta:
+        managed = False
+        db_table = 'fk_proysoc_coordinador'
+
+
+class HistorialCitas(models.Model):
+    id_historial = models.FloatField(primary_key=True)
+    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column='citas_id_cita')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    fecha = models.DateField()
+    nota = models.CharField(max_length=2000)
+
+    class Meta:
+        managed = False
+        db_table = 'historial_citas'
+
+
+class HistorialParticipaciones(models.Model):
+    id_historial = models.FloatField(primary_key=True)
+    participaciones_id_participacion = models.ForeignKey('Participaciones', models.DO_NOTHING, db_column='participaciones_id_participacion')
+    fecha = models.DateField()
+    nota = models.CharField(max_length=1000)
+
+    class Meta:
+        managed = False
+        db_table = 'historial_participaciones'
+
+
+class HorariosParticipante(models.Model):
+    id_horario = models.FloatField(primary_key=True)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    titulo = models.CharField(max_length=150)
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    fuente_manual = models.CharField(max_length=1, blank=True, null=True)
+    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad', blank=True, null=True)
+    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column='citas_id_cita', blank=True, null=True)
+    partidos_id_partido = models.ForeignKey('Partidos', models.DO_NOTHING, db_column='partidos_id_partido', blank=True, null=True)
+    notas = models.CharField(max_length=500, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'horarios_participante'
+
+
+class InscripcionesPsu(models.Model):
+    id_inscripcion_psu = models.FloatField(primary_key=True)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    proyectos_sociales_id_proyecto = models.ForeignKey('ProyectosSociales', models.DO_NOTHING, db_column='proyectos_sociales_id_proyecto')
+    fecha_inscripcion = models.DateField()
+    estados_participacion_id_estado_participacion = models.ForeignKey(EstadosParticipacion, models.DO_NOTHING, db_column='estados_participacion_id_estado_participacion')
+
+    class Meta:
+        managed = False
+        db_table = 'inscripciones_psu'
+        unique_together = (('participantes_id_participante', 'proyectos_sociales_id_proyecto'),)
+
+
+class MotivosCita(models.Model):
+    id_motivo = models.FloatField(primary_key=True)
+    nombre = models.CharField(unique=True, max_length=80)
+    citas_id_cita = models.OneToOneField(Citas, models.DO_NOTHING, db_column='citas_id_cita', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'motivos_cita'
+
+
 class Notificaciones(models.Model):
     id_notificacion = models.FloatField(primary_key=True)
     mensaje = models.CharField(max_length=500)
     fecha = models.DateField()
-    id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='id_participante')
-    id_tipo = models.ForeignKey('TiposNotificacion', models.DO_NOTHING, db_column='id_tipo')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    tipos_notificacion_id_tipo_notificacion = models.ForeignKey('TiposNotificacion', models.DO_NOTHING, db_column='tipos_notificacion_id_tipo_notificacion')
 
     class Meta:
         managed = False
@@ -225,14 +371,16 @@ class Notificaciones(models.Model):
 class Participaciones(models.Model):
     id_participacion = models.FloatField(primary_key=True)
     fecha_inscripcion = models.DateField()
-    id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='id_participante')
-    id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='id_actividad')
-    id_rol_participacion = models.ForeignKey('RolesParticipacion', models.DO_NOTHING, db_column='id_rol_participacion')
-    estado = models.CharField(max_length=30)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')
+    roles_participacion_id_rol_participacion = models.ForeignKey('RolesParticipacion', models.DO_NOTHING, db_column='roles_participacion_id_rol_participacion')
+    estados_participacion_id_estado_participacion = models.ForeignKey(EstadosParticipacion, models.DO_NOTHING, db_column='estados_participacion_id_estado_participacion')
+    equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'participaciones'
+        unique_together = (('participantes_id_participante', 'actividades_id_actividad'),)
 
 
 class Participantes(models.Model):
@@ -242,11 +390,45 @@ class Participantes(models.Model):
     correo = models.CharField(unique=True, max_length=150)
     semestre = models.FloatField(blank=True, null=True)
     estado_activo = models.CharField(max_length=1, blank=True, null=True)
-    id_rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='id_rol')
+    roles_id_rol = models.ForeignKey('Roles', models.DO_NOTHING, db_column='roles_id_rol')
+    facultad = models.CharField(max_length=80, blank=True, null=True)
+    programa = models.CharField(max_length=120, blank=True, null=True)
+    genero = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'participantes'
+
+
+class Partidos(models.Model):
+    id_partido = models.FloatField(primary_key=True)
+    torneos_id_torneo = models.ForeignKey('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField(blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
+    equipos_id_equipo1 = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo1', related_name='partidos_equipos_id_equipo1_set')
+    marcador_a = models.FloatField(blank=True, null=True)
+    marcador_b = models.FloatField(blank=True, null=True)
+    estado = models.CharField(max_length=20, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'partidos'
+
+
+class ProyectosSociales(models.Model):
+    id_proyecto = models.FloatField(primary_key=True)
+    nombre = models.CharField(max_length=150)
+    descripcion = models.CharField(max_length=1000, blank=True, null=True)
+    coordinador_id = models.FloatField()
+    fecha_inicio = models.DateField(blank=True, null=True)
+    fecha_fin = models.DateField(blank=True, null=True)
+    aforo = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'proyectos_sociales'
 
 
 class Roles(models.Model):
@@ -283,3 +465,28 @@ class TiposNotificacion(models.Model):
     class Meta:
         managed = False
         db_table = 'tipos_notificacion'
+
+
+class Torneos(models.Model):
+    id_torneo = models.FloatField(primary_key=True)
+    nombre = models.CharField(max_length=150)
+    disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina')
+    fecha_inicio = models.DateField()
+    fecha_fin = models.DateField()
+    estados_torneo_id_estado_torneo = models.OneToOneField(EstadosTorneo, models.DO_NOTHING, db_column='estados_torneo_id_estado_torneo')
+    reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
+    aforo_equipos = models.FloatField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'torneos'
+
+
+class TorneosEquipos(models.Model):
+    pk = models.CompositePrimaryKey('torneos_id_torneo', 'equipos_id_equipo')
+    torneos_id_torneo = models.ForeignKey(Torneos, models.DO_NOTHING, db_column='torneos_id_torneo')
+    equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
+
+    class Meta:
+        managed = False
+        db_table = 'torneos_equipos'
