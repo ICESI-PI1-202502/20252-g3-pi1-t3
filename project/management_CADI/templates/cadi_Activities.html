@@ -1,57 +1,70 @@
-<!DOCTYPE html>
+{% extends "base.html" %}
+{% load static %}
 
-<html>
-    <head>
-        <link href="https://fonts.googleapis.com/css?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet" />
-        <link href="./css/main.css" rel="stylesheet" />
-        
-        <title>Document</title>
-    </head>
-    
-    <body>
-        
-        <div class="v2890_2619">
-            <span class="v2890_2626">Centro Artístico y Deportivo Icesi – CADI</span>
-                
-            <div class="v2890_2629"></div>
-            
-            <span class="v2890_2630">Deportes individuales</span>
-            <span class="v2890_2632">Deportes de conjunto</span>
-            <div class="v2890_2633">
-            
+{% block title %}
+   Actividades CADI
+{% endblock %}
+
+{% block content %}
+<center><h3>Centro Artístico y Deportivo Icesi - CADI</h3></center>
+
+    <center>
+
+        <!-- Table with four columns-->
+        <div class="container mt-4">
+
+            <div class="row text-center">
+
+                <div class="col-md-3">
+                <h6>Deportes individuales</h6>
+                <img src="{% static 'management_CADI/images/chess.png' %}" alt="Deportes individuales" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+
+                <div class="col-md-3">
+                <h6>Deportes de conjunto</h6>
+                <img src="{% static 'management_CADI/images/basketball.png' %}" alt="Deportes de conjunto" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+
+                <div class="col-md-3">
+                <h6>Artes musicales (Grupos)</h6>
+                <img src="{% static 'management_CADI/images/groupChoir.png' %}" alt="Deportes de conjunto" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+
+                <div class="col-md-3">
+                <h6>Talleres cortos</h6>
+                <img src="{% static 'management_CADI/images/kung-fu.png' %}" alt="Deportes de conjunto" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+
             </div>
-            
-            <span class="v2890_2634">Artes musicales (Grupos)</span>
-            
-            <div class="v2890_2635"></div>
-            
-            <span class="v2890_2636">Talleres cortos</span>
-            
-            <div class="v2890_2637"></div>
-            
-            <span class="v2890_2638">Artes musicales (Clases)</span>
-            <div class="v2890_2639"></div>
-            
-            <span class="v2890_2640">Artes escénicas</span>
-            
-            <div class="v2890_2641"></div><span class="v2890_2642">Artes plásticas</span>
-            
-            <div class="v2890_2643"></div>
-            <span class="v2890_2644">Artes visuales</span>
-            <div class="name"></div><div class="name">
 
-            </div><div class="name"></div>
-            <div class="v3041_13283"></div>
-            <span class="v3041_13284">Bienestar universitario</span>
-            <span class="v3041_13307">Regresar</span>
-            <div class="name"></div>
-            <div class="name"></div>
-            <div class="name"></div>
-            <div class="v2890_2631"></div>
-            <span class="v2890_2628">Universidad Icesi, Calle 18 No. 122-135 Pance, Cali – Colombia Teléfono: +57 (602) 555 2334 Celular: +57 300 910 8606 ventanillaunica@icesi.edu.co</span>
-                
-        <div class="name">
-            
-        </div></div>
-    </body>
-</html>
+            <div class="row text-center mt-4">
+                <div class="col-md-3">
+                <h6>Artes musicales (Clases)</h6>
+                <img src="{% static 'management_CADI/images/electricGuitar.png' %}" alt="Deportes de conjunto" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+                <div class="col-md-3">
+                <h6>Artes escénicas</h6>
+                <img src="{% static 'management_CADI/images/performingArt.png' %}" alt="Deportes de conjunto" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+                <div class="col-md-3">
+                <h6>Artes plásticas</h6>
+                <img src="{% static 'management_CADI/images/art.png' %}" alt="Artes plásticas" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+                <div class="col-md-3">
+                <h6>Artes visuales</h6>
+                <img src="{% static 'management_CADI/images/visualArts.png' %}" alt="Deportes de conjunto" class="img-fluid rounded" style="max-width:250px;">
+                </div>
+            </div>
+        </div>
+    </center>
+
+    <center class="mt-4">
+        <p>
+            Universidad Icesi, Calle 18 No. 122-135 <br>
+            Pance, Cali - Colombia <br>
+            Teléfono: +57 (602) 555 2334 <br>
+            Celular: +57 300 910 8606 <br>
+            ventanillaunica@icesi.edu.co
+        </p>
+    </center>
+{% endblock %}
