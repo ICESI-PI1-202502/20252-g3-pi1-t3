@@ -9,3 +9,6 @@ def is_admin(user):
 # @user_passes_test(is_admin)  # Uncomment if you want to restrict access
 def cadi_index(request):
     return render(request, "./cadi_Activities.html")
+
+def create_Clasification(request):
+    return render(request, "./form_Clasifications.html")

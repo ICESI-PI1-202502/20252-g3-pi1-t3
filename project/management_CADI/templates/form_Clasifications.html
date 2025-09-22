@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+   Crear clasificación
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'management_CADI/css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<center><h3>Añadir nueva clasificación</h3></center>
+
+<center>
+  <form class="container mt-4" method="post">
+    {% csrf_token %}
+
+    <div class="row text-center mb-4">
+      <!-- Nombre de clasificacion -->
+      <div class="col-md-6">
+        <h6>Nombre de clasificación</h6>
+        <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
+      </div>
+
+      <!-- Descripcion -->
+      <div class="col-md-6">
+        <h6>Descripción</h6>
+        <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="500" required></textarea>
+      </div>
+    </div>
+
+    <!-- Grupo de la clasifiacion -->
+    <div class="row text-center mb-4">
+      <div class="col-md-12">
+        <h6>Grupo de clasificación</h6>
+        <select name="grupo" class="form-select text-center" required>
+
+          <option value="" selected disabled>-- Seleccione un grupo --</option>
+
+          <option value="CADI">Actividades del Centro Artístico y Deportivo Icesi - CADI</option>
+
+          <option value="desarrollo">Desarrollo Humano y Promoción de la Salud</option>
+
+          <option value="PSU">Proyecto Social de Bienestar Universitario (PSU)</option>
+
+          <option value="estasEnCasa">Programa Estás en Casa</option>
+
+        </select>
+      </div>
+    </div>
+
+    <div class="col-md-6 text-center">
+        <h6>Imagen de la clasificación</h6>
+
+        <!-- Input file oculto -->
+        <input type="file" id="imagenClasificacion" name="imagenClasificacion" accept="image/*" hidden>
+
+        <!-- Cuadro clickeable -->
+        <label for="imagenClasificacion" class="upload-box">
+            <img src="{% static 'management_CADI/images/create/galery.png' %}" 
+                alt="Subir_imagen" class="upload-icon">
+        </label>
+    </div>
+
+
+
+    <!-- Botón -->
+    <div class="row text-center">
+      <div class="col-md-12">
+        <button type="submit" class="greenBotton_White">Confirmar</button>
+      </div>
+    </div>
+  </form>
+</center>
+
+<center class="mt-4">
+  <p>
+    Universidad Icesi, Calle 18 No. 122-135 <br>
+    Pance, Cali - Colombia <br>
+    Teléfono: +57 (602) 555 2334 <br>
+    Celular: +57 300 910 8606 <br>
+    ventanillaunica@icesi.edu.co
+  </p>
+</center>
+{% endblock %}

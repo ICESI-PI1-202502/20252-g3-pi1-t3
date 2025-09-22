@@ -253,3 +253,38 @@ footer {
   opacity: 1;
   visibility: visible;
 }
+
+
+/* Buttons */
+.yellowBotton_Black {
+  background-color: #E4EB60;
+  color: #000;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.greenBotton_Black {
+  background-color: #4DB979;
+  color: #000;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.greenBotton_White {
+  background-color: #4DB979;
+  color: #fff;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
