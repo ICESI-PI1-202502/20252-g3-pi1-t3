@@ -1,20 +1,16 @@
 {% load static %}
 <!DOCTYPE html>
 <html>
-
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="initial-scale=1, width=device-width">
-
   <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/login.css' %}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap">
 </head>
-
 <body>
   <div class="login-1">
     <!-- Logo -->
-    <img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}"
-      alt="Logo Icesi">
+    <img class="logo-icesi-blanco" src="{% static 'universitaryWellbeing/img/logo-icesi-blanco.png' %}" alt="Logo Icesi">
 
     <!-- Título -->
     <div class="hola-de-nuevo">Crea tu cuenta</div>
@@ -23,10 +19,10 @@
     <form method="POST" action="">
       {% csrf_token %}
 
-      <!-- Nombre completo -->
+      <!-- Cédula -->
       <div class="field">
         <div class="value">
-          <input type="text" id="full_name" name="full_name" placeholder="Nombre completo" required>
+          <input type="text" name="cedula" placeholder="Cédula" required>
         </div>
       </div>
 
@@ -39,37 +35,31 @@
       </div>
       {% endif %}
 
-      <!-- Email -->
-      <div class="field">
-        <div class="value">
-          <input type="email" id="email" name="email" placeholder="E-mail" required>
-        </div>
-      </div>
-
-      <!-- Password -->
+      <!-- Contraseña -->
       <div class="field">
         <div class="value">
           <input type="password" id="password" name="password" placeholder="Contraseña" required>
           <button type="button" class="password-toggle" id="togglePassword" aria-label="Mostrar contraseña"
-          title="Mostrar contraseña">
-						<!-- eye (visible) -->
-						<svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18"
-							height="18" aria-hidden="true">
-							<path fill="currentColor"
-								d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z">
-							</path>
-							<circle cx="12" cy="12" r="2.5" fill="currentColor"></circle>
-						</svg>
-						<!-- eye-off (hidden) -->
-						<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-							stroke="currentColor" class="icon-eye-off" width="24" height="24">
-							<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.5 12c2.25 
-           4.5 6.75 7.5 10.5 7.5 1.863 0 3.611-.54 5.094-1.477M6.228 
-           6.228A10.477 10.477 0 0 1 12 4.5c3.75 0 8.25 3 10.5 
-           7.5a10.477 10.477 0 0 1-4.06 4.374M6.228 6.228 3 3m3.228 
-           3.228L21 21" />
-						</svg>
-					</button>
+                  title="Mostrar contraseña">
+            <!-- eye (visible) -->
+            <svg class="icon-eye" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+              <path fill="currentColor"
+                    d="M12 5c-7 0-11 7-11 7s4 7 11 7 11-7 11-7-4-7-11-7zm0 12a5 5 0 1 1 0-10 5 5 0 0 1 0 10z">
+              </path>
+              <circle cx="12" cy="12" r="2.5" fill="currentColor"></circle>
+            </svg>
+            <!-- eye-off (hidden) -->
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+                 stroke="currentColor" class="icon-eye-off" width="24" height="24">
+              <path stroke-linecap="round" stroke-linejoin="round" 
+                    d="M3.98 8.223A10.477 10.477 0 0 0 1.5 12c2.25 
+                       4.5 6.75 7.5 10.5 7.5 1.863 0 3.611-.54 
+                       5.094-1.477M6.228 6.228A10.477 10.477 0 0 1 
+                       12 4.5c3.75 0 8.25 3 10.5 7.5a10.477 
+                       10.477 0 0 1-4.06 4.374M6.228 6.228 
+                       3 3m3.228 3.228L21 21" />
+            </svg>
+          </button>
         </div>
       </div>
 
@@ -103,53 +93,45 @@
     }
 
     (function () {
-			const toggle = document.getElementById('togglePassword');
-			const pwd = document.getElementById('password');
-			const eye = toggle.querySelector('.icon-eye');
-			const eyeOff = toggle.querySelector('.icon-eye-off');
+      const toggle = document.getElementById('togglePassword');
+      const pwd = document.getElementById('password');
+      const eye = toggle.querySelector('.icon-eye');
+      const eyeOff = toggle.querySelector('.icon-eye-off');
 
-			if (!toggle || !pwd) return;
+      if (!toggle || !pwd) return;
 
-			// initial state: hidden
-			toggle.setAttribute('data-visible', 'false');
+      // initial state: hidden
+      toggle.setAttribute('data-visible', 'false');
 
-			toggle.addEventListener('click', function () {
-				const start = pwd.selectionStart;
-				const end = pwd.selectionEnd;
+      toggle.addEventListener('click', function () {
+        const start = pwd.selectionStart;
+        const end = pwd.selectionEnd;
 
-				const isVisible = toggle.getAttribute('data-visible') === 'true';
-				if (isVisible) {
-					// ocultar contraseña
-					pwd.type = 'password';
-					toggle.setAttribute('data-visible', 'false');
-					toggle.setAttribute('aria-label', 'Mostrar contraseña');
-					toggle.title = 'Mostrar contraseña';
+        const isVisible = toggle.getAttribute('data-visible') === 'true';
+        if (isVisible) {
+          pwd.type = 'password';
+          toggle.setAttribute('data-visible', 'false');
+          toggle.setAttribute('aria-label', 'Mostrar contraseña');
+          toggle.title = 'Mostrar contraseña';
+          eye.style.display = 'inline';
+          eyeOff.style.display = 'none';
+        } else {
+          pwd.type = 'text';
+          toggle.setAttribute('data-visible', 'true');
+          toggle.setAttribute('aria-label', 'Ocultar contraseña');
+          toggle.title = 'Ocultar contraseña';
+          eye.style.display = 'none';
+          eyeOff.style.display = 'inline';
+        }
 
-					// cambiar íconos
-					eye.style.display = 'inline';
-					eyeOff.style.display = 'none';
-				} else {
-					// mostrar contraseña
-					pwd.type = 'text';
-					toggle.setAttribute('data-visible', 'true');
-					toggle.setAttribute('aria-label', 'Ocultar contraseña');
-					toggle.title = 'Ocultar contraseña';
-
-					// cambiar íconos
-					eye.style.display = 'none';
-					eyeOff.style.display = 'inline';
-				}
-
-				// restaurar caret
-				try {
-					pwd.setSelectionRange(start, end);
-					pwd.focus({ preventScroll: true });
-				} catch (err) {
-					pwd.focus();
-				}
-			});
-		})();
+        try {
+          pwd.setSelectionRange(start, end);
+          pwd.focus({ preventScroll: true });
+        } catch (err) {
+          pwd.focus();
+        }
+      });
+    })();
   </script>
 </body>
-
 </html>
