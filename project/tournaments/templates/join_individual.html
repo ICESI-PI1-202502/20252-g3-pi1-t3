@@ -1,62 +1,54 @@
 {% extends "base.html" %}
 {% load static %}
-
-{% block title %}Inscripción — {{ tournament.nombre|default:"Torneo individual" }}{% endblock %}
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
-{% endblock %}
-
 {% block content %}
-<a class="link-back" href="{% url 'tournaments:list' %}">← Regresar</a>
+<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
 
-<section class="join-card">
-  <header class="join-head">
-    <h2>Inscripción a torneo individual</h2>
-    {% if tournament %}
-      <p class="t-meta">
-        <b>{{ tournament.nombre }}</b> ·
-        {{ tournament.fecha_inicio|date:"d M" }} – {{ tournament.fecha_fin|date:"d M" }} ·
-        Disciplina: {{ tournament.disciplinas_id_disciplina.nombre }}
-      </p>
-    {% endif %}
-  </header>
+<div class="shell">
+  <h2 class="title">Inscripción – {{ tournament.nombre }}</h2>
 
-  {# Mensaje de "mock" cuando ok=True en el contexto #}
   {% if ok %}
-    <div class="alert success">
-      ✅ Inscripción registrada (vista de prueba).
-      <div class="small">
-        Participante: <b>{{ participante.nombre }} {{ participante.apellido }}</b> — {{ participante.correo }}
-      </div>
-      <p class="muted">Cuando exista la tabla Torneo↔Participante, aquí se guardará realmente.</p>
-      <a class="btn" href="{% url 'tournaments:detail' tournament.id %}">Volver al detalle</a>
+    <div class="success-box">
+      <h3>¡Inscripción registrada!</h3>
+      <p>Te inscribiste como <b>{{ nombre }} {{ apellido }}</b> ({{ correo }}).</p>
+      <a class="btn ghost" href="{% url 'tournaments:list' %}">Volver a torneos</a>
     </div>
   {% else %}
-    <form method="post" class="join-form">
+    <form class="form-shell" method="post" action="{% url 'tournaments:join_individual' tournament.id %}">
       {% csrf_token %}
-      {{ form.torneo }} {# hidden #}
-
-      <div class="field">
-        <label for="{{ form.correo.id_for_label }}">Correo institucional</label>
-        {{ form.correo }}
-        {% if form.correo.errors %}
-          <div class="error">{{ form.correo.errors|striptags }}</div>
-        {% endif %}
+      <div class="grid-2">
+        <label>Nombre
+          <input name="nombre" required>
+          {% if errors.nombre %}<span class="err">{{ errors.nombre }}</span>{% endif %}
+        </label>
+        <label>Apellido
+          <input name="apellido" required>
+          {% if errors.apellido %}<span class="err">{{ errors.apellido }}</span>{% endif %}
+        </label>
       </div>
 
-      <div class="help">
-        * Ingresa el correo con el que estás registrado en Bienestar.
+      <div class="grid-2">
+        <label>Cédula
+          <input name="cedula" inputmode="numeric" pattern="\d{10}" maxlength="10" placeholder="10 dígitos" required>
+          {% if errors.cedula %}<span class="err">{{ errors.cedula }}</span>{% endif %}
+        </label>
+        <label>Correo institucional
+          <input type="email" name="correo" placeholder="usuario@uni.edu.co" required>
+          {% if errors.correo %}<span class="err">{{ errors.correo }}</span>{% endif %}
+        </label>
       </div>
 
-      <div class="actions">
-        <button type="submit" class="btn primary">Inscribirme</button>
-        <a href="{% url 'tournaments:list' %}" class="btn ghost">Cancelar</a>
-      </div>
+      <label>Género
+        <select name="genero" required>
+          <option value="" selected disabled>Selecciona…</option>
+          <option>Femenino</option>
+          <option>Masculino</option>
+          <option>Otro</option>
+        </select>
+        {% if errors.genero %}<span class="err">{{ errors.genero }}</span>{% endif %}
+      </label>
 
-      {% if form.non_field_errors %}
-        <div class="error mt">{{ form.non_field_errors|striptags }}</div>
-      {% endif %}
+      <button class="btn primary" type="submit">Inscribirme</button>
     </form>
   {% endif %}
-</section>
+</div>
 {% endblock %}

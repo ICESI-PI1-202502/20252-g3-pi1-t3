@@ -1,9 +1,60 @@
 {% extends "base.html" %}
+{% load static %}
 {% block content %}
-<h2>Crear equipo</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Crear equipo</button>
-</form>
+<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
+
+<div class="shell">
+  <h2 class="title">Crear equipo – {{ tournament.nombre }}</h2>
+
+  {% if ok %}
+    <div class="success-box">
+      <h3>¡Equipo creado!</h3>
+      <p>Tu equipo <b>{{ nombre_equipo }}</b> quedó registrado (demo).</p>
+      <a class="btn ghost" href="{% url 'tournaments:list' %}">Volver a torneos</a>
+    </div>
+  {% else %}
+    <form class="form-shell" method="post" action="{% url 'tournaments:create_team' tournament.id %}">
+      {% csrf_token %}
+
+      <label>Nombre del equipo
+        <input name="nombre_equipo" required>
+        {% if errors.nombre_equipo %}<span class="err">{{ errors.nombre_equipo }}</span>{% endif %}
+      </label>
+
+      <div class="grid-2">
+        <label>Fecha de creación
+          <input type="date" name="fecha_creacion" required>
+          {% if errors.fecha_creacion %}<span class="err">{{ errors.fecha_creacion }}</span>{% endif %}
+        </label>
+        <label>Cantidad de personas (opcional)
+          <input type="number" min="0" name="cantidad_personas" placeholder="0">
+          {% if errors.cantidad_personas %}<span class="err">{{ errors.cantidad_personas }}</span>{% endif %}
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>Capacidad mínima
+          <input type="number" min="1" name="capacidad_min" required>
+          {% if errors.capacidad_min %}<span class="err">{{ errors.capacidad_min }}</span>{% endif %}
+        </label>
+        <label>Capacidad máxima
+          <input type="number" min="1" name="capacidad_max" required>
+          {% if errors.capacidad_max %}<span class="err">{{ errors.capacidad_max }}</span>{% endif %}
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>Disciplina
+          <input name="disciplina" value="{{ tournament.disciplina }}" readonly>
+        </label>
+        <label>ID del responsable
+          <input name="id_responsable" inputmode="numeric" pattern="\d+" required>
+          {% if errors.id_responsable %}<span class="err">{{ errors.id_responsable }}</span>{% endif %}
+        </label>
+      </div>
+
+      <button class="btn primary" type="submit">Crear equipo</button>
+    </form>
+  {% endif %}
+</div>
 {% endblock %}
