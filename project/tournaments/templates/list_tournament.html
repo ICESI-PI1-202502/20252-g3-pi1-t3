@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+
+<div class="torneos-wrap">
+  <div class="torneos-toolbar">
+    <form method="get" action="">
+      <div class="searchbox">
+        <input type="text" name="q" value="{{ search }}" placeholder="Buscar torneos o disciplinas">
+        <button type="submit">Buscar</button>
+      </div>
+    </form>
+  </div>
+
+  <div class="tournament-grid">
+    {% for t in tournaments %}
+      <article class="tournament-card">
+        <h3 class="title">{{ t.nombre }}</h3>
+
+        <p class="meta"><b>Fecha:</b>
+          {{ t.fecha_inicio|date:"d M" }} – {{ t.fecha_fin|date:"d M" }}
+        </p>
+
+        <p class="meta"><b>Disciplina:</b>
+          {{ t.disciplinas_id_disciplina.nombre }}
+        </p>
+
+        <p class="meta"><b>Tipo:</b>
+          {{ t.tiene_equipos|yesno:"Equipo,Individual" }}
+        </p>
+
+        <a class="btn" href="{% url 'tournaments:detail' t.pk %}">Detalles</a>
+      </article>
+    {% empty %}
+      <p>No hay torneos disponibles.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

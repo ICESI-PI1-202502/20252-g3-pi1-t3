@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'universitaryWellbeing',
     'Analytics_Reports',   
     'management_CADI',
+    'tournaments',
 
 ]
 

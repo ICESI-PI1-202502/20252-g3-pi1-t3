@@ -1,0 +1,46 @@
+/* Contenedor general */
+.torneos-wrap { max-width: 1150px; margin: 0 auto; padding: 16px 20px 40px; }
+
+/* Toolbar + búsqueda */
+.torneos-toolbar { margin: 12px 0 18px; }
+.searchbox { display: flex; gap: 8px; align-items: center; }
+.searchbox input[type="text"] {
+  flex: 1; height: 40px; border: 1px solid #d9d9e3; border-radius: 10px;
+  padding: 0 12px; outline: none;
+}
+.searchbox button {
+  height: 40px; padding: 0 14px; border: 0; border-radius: 10px;
+  background: #5b5bd6; color: white; cursor: pointer; font-weight: 600;
+}
+
+/* Grilla de tarjetas */
+.tournament-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+@media (max-width: 1024px) {
+  .tournament-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 640px) {
+  .tournament-grid { grid-template-columns: 1fr; }
+}
+
+/* Tarjeta */
+.tournament-card {
+  background: #f7f7ff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 6px 16px rgba(0,0,0,.07);
+  display: flex; flex-direction: column; gap: 6px;
+}
+.tournament-card .title {
+  font-size: 18px; margin: 0 0 6px; font-weight: 700;
+}
+.tournament-card .meta { margin: 0; color: #2e2e3a; }
+.tournament-card .btn {
+  align-self: flex-end; margin-top: 12px;
+  display: inline-block; padding: 8px 16px;
+  background: #5b5bd6; color: #fff; border-radius: 24px; text-decoration: none; font-weight: 600;
+}
+.tournament-card .btn:hover { filter: brightness(0.95); }

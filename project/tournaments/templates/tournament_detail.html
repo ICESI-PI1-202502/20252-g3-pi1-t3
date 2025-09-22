@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ tournament.nombre }}</h2>
+<p><b>Descripción:</b> {{ tournament.descripcion }}</p>
+<p><b>Fechas:</b> {{ tournament.fecha_inicio }} – {{ tournament.fecha_fin }}</p>
+<p><b>Cupos:</b> {{ tournament.cupos_ocupados }}/{{ tournament.cupos_totales }}</p>
+
+<h3>Equipos registrados</h3>
+<ul>
+  {% for team in teams %}
+    <li><a href="{% url 'tournaments:team_detail' team.pk %}">{{ team.nombre }}</a></li>
+  {% empty %}
+    <li>Aún no hay equipos.</li>
+  {% endfor %}
+</ul>
+
+<h3>Inscríbete</h3>
+<form method="post" action="{% url 'tournaments:join_team' %}?t={{ tournament.pk }}">
+  {% csrf_token %}
+  {{ join_form.as_p }}
+  <button type="submit">Inscribirme ahora</button>
+</form>
+{% endblock %}

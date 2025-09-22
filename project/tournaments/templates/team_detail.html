@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>{{ team.nombre }}</h2>
+<p><b>Tag:</b> {{ team.tag }}</p>
+<p><b>Torneo:</b> {{ team.torneo.nombre }}</p>
+
+<h3>Integrantes</h3>
+<ul>
+  {% for u in team.miembros.all %}
+    <li>{{ u.get_full_name|default:u.username }}</li>
+  {% empty %}
+    <li>Sin integrantes</li>
+  {% endfor %}
+</ul>
+{% endblock %}
