@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User,AbstractUser
 
 
 class Actividades(models.Model):
@@ -471,6 +471,7 @@ class EquiposParticipantes(models.Model):
         managed = False
 
         db_table = 'equipos_participantes'
+        unique_together = ('equipo', 'participante')
 
 
 
@@ -977,3 +978,22 @@ class Preferences(models.Model):
         indexes = [
             models.Index(fields=['user', 'category']),
         ]
+
+class CustomUser(AbstractUser):
+    cedula = models.CharField(max_length=20, unique=True)
+    nombre = models.CharField(max_length=100)
+
+    # Añadimos related_name para evitar el conflicto con el User original
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',  # Relaciona con una nueva colección para CustomUser
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',  # Relaciona con una nueva colección para CustomUser
+        blank=True
+    )
+
+    def __str__(self):
+        return self.nombre

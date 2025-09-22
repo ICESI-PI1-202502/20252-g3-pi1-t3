@@ -2,7 +2,7 @@
 :root {
     --primary-color: #4db979;
     --secondary-color: #5454e9;
-    --font-family: 'Plus Jakarta Sans', sans-serif;
+    --font-family: 'Plus Jakarta Sans';
     --font-size-large: 40px;
     --font-size-medium: 28px;
     --font-weight-bold: 800;
@@ -19,6 +19,7 @@ body {
     padding: 0;
     box-sizing: border-box;
     background-color: #f7f7f7; /* Color de fondo suave */
+	margin-top: 70px;
 }
 
 /* Contenedor principal de la lista de preferencias */
@@ -31,6 +32,8 @@ body {
     font-size: var(--font-size-large);
     color: #000;
     padding-top: var(--spacing-medium);
+	font-weight: bold;
+	
 }
 
 /* Estilos para el botón de agregar */
@@ -113,6 +116,7 @@ form {
     margin-left: auto;
     margin-right: auto;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+	
 }
 
 form h2 {
@@ -140,6 +144,7 @@ form button {
     cursor: pointer;
     margin-top: var(--spacing-medium);
     transition: background-color 0.3s ease;
+	font-family: var(--font-family);
 }
 
 form button:hover {
@@ -152,7 +157,6 @@ footer.universidad-icesi {
     font-size: var(--font-size-medium);
     margin-top: 50px;
     padding-top: var(--spacing-medium);
-    background-color: #f7f7f7;
 }
 
 footer.universidad-icesi address p {
@@ -176,17 +180,33 @@ footer.universidad-icesi address p {
     transform: translateX(-50%);
     width: 100%;
     height: 2px;
-    background-color: #ddd;
     margin-top: var(--spacing-medium);
 }
 
 /* Logo */
-.logo-azul {
-    position: absolute;
-    top: -7.99px;
-    left: 7px;
-    width: 101px;
-    height: 103px;
+.header-container {
+    display: flex;
+    align-items: center;        /* Centra verticalmente el logo y el texto */
+    justify-content: flex-start; /* Alineación horizontal desde la izquierda */
+    gap: 10px;                  /* Espacio entre el logo y el texto */
+	position: absolute; /* Lo fija en la parte superior */
+    top: 0; /* Posiciona el contenedor en el borde superior */
+    left: 20px; /* Un poco de margen desde el borde izquierdo */
+    margin: 0;
+    padding: 0;
+    z-index: 1000;
+}
+
+.bienestar-universitario {
+    font-size: 20px;
+    font-weight: bold;
+    color: #000;
+    margin: 0;
+    padding: 0;
+}
+.logo-icesi {
+    width: 80px;
+    height: 80px;
     object-fit: cover;
 }
 
@@ -197,22 +217,13 @@ footer.universidad-icesi address p {
     left: 0;
     background-color: var(--secondary-color);
     width: 100%;
-    height: 91px;
 }
 
 /* Texto y enlaces de la universidad */
-.bienestar-universitario {
-    font-size: var(--font-size-medium);
-    text-align: center;
-    position: absolute;
-    bottom: 150px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100%;
-}
+
 
 /* Perfil y menú */
-.pp-wrapper {
+.profile-wrapper {
     position: absolute;
     top: 13px;
     right: 30px;
@@ -233,11 +244,11 @@ footer.universidad-icesi address p {
     transition: background-color 0.3s ease;
 }
 
-.pp-wrapper:hover {
+.profile-wrapper:hover {
     background-color: #343db1;
 }
 
-.pp {
+.initials {
     font-size: 16px;
     font-weight: bold;
     letter-spacing: 0.25px;
@@ -248,8 +259,43 @@ footer.universidad-icesi address p {
 .frame-icon {
     position: absolute;
     bottom: 10px;
-    right: 15px;
+    right: 40px;
     width: 40px;
     height: 40px;
     object-fit: contain;
+}
+
+footer.universidad-icesi address {
+    font-style: normal;
+	font-weight: var(--font-weight-bold);
+}
+
+footer.universidad-icesi address a {
+    color: inherit;
+}
+
+/* Barra blanca superior */
+.header-wrapper {
+    position: fixed; /* Fija la barra en la parte superior */
+    top: 0;
+    left: 0;
+    width: 100%;
+    background-color: #fff; /* Fondo blanco */
+    padding: var(--spacing-small) 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 1000; /* Asegura que se quede encima de otros elementos */
+	height: 70px;
+}
+
+/* Subbarra azul debajo de la barra blanca */
+.subheader {
+    position: fixed;
+    top: 60px; /* Justo debajo de la barra blanca */
+    left: 0;
+    width: 100%;
+    background-color: var(--secondary-color); /* Azul */
+    height: 50px; /* Altura de la subbarra */
+    z-index: 999; /* Asegura que esté debajo de la barra blanca */
 }

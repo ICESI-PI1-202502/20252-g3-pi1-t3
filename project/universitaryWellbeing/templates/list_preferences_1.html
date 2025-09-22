@@ -1,94 +1,96 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Preferencias de Actividades</title>
-    <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/preferences.css' %}">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<title>Preferencias de Actividades</title>
+	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/preferences.css' %}">
 </head>
+
 <body>
-    <!-- Contenedor principal de la lista de preferencias -->
-    <section class="list_preferences">
-        
-        <!-- Botón de agregar y acción de continuar -->
-        <div class="botn-agregar" id="botnAgregarContainer" role="button" aria-label="Agregar preferencia">
-            <div class="botn-agregar-child"></div>
-            <div class="div">Continuar</div>
-        </div>
+	<!-- Contenedor principal de la lista de preferencias -->
+	<section class="list_preferences">
 
-        <!-- Título y descripción -->
-        <h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
-        <p class="esto-nos-ayudar">
-            Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
-        </p>
+		<!-- Logo -->
+		<div class="header-wrapper">
+			<div class="header-container">
+				<img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Universidad Icesi"
+					class="logo-icesi">
+				<!-- Texto de Bienestar Universitario -->
+				<b class="bienestar-universitario">Bienestar Universitario</b>
+			</div>
 
-        <!-- Formulario de selección de categorías -->
-        <form method="POST">
-            {% csrf_token %}
-            <h2>Selecciona tus categorías</h2>
-            
-            <!-- Recorrido de las categorías y creación de checkboxes -->
-            {% for category in categories %}
-                <label>
-                    <input type="checkbox" name="categories" value="{{ category }}"> {{ category }}
-                </label><br>
-            {% endfor %}
-            
-            <!-- Botón para enviar el formulario -->
-            <button type="submit">Siguiente</button>
-        </form>
+			<!-- Menú y perfil -->
+			<div class="profile-wrapper">
+				<span class="initials">JP</span>
+			</div>
+		</div>
+		<!-- Subbarra azul -->
+		<div class="subheader"></div>
+
+		<!-- Título y descripción -->
+		<h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
+		<p class="esto-nos-ayudar">
+			Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
+		</p>
+
+		<!-- Formulario de selección de categorías -->
+		<form method="POST">
+			{% csrf_token %}
+			<h2>Selecciona tus categorías</h2>
+
+			<!-- Recorrido de las categorías y creación de checkboxes -->
+			{% for category in categories %}
+			<label>
+				<input type="checkbox" name="categories" value="{{ category }}"> {{ category }}
+			</label><br>
+			{% endfor %}
+
+			<!-- Botón para enviar el formulario -->
+			<button type="submit">Continuar</button>
+		</form>
 
 
-        <!-- Información de contacto -->
-        <footer class="universidad-icesi">
-            <address>
-                <p>Universidad Icesi, Calle 18 No. 122-135, Pance, Cali – Colombia</p>
-                <p>Teléfono: +57 (602) 555 2334</p>
-                <p>Celular: +57 300 910 8606</p>
-                <p>
-                    <a href="mailto:ventanillaunica@icesi.edu.co" target="_blank" class="email-link">
-                        ventanillaunica@icesi.edu.co
-                    </a>
-                </p>
-            </address>
-        </footer>
+		<!-- Información de contacto -->
+		<footer class="universidad-icesi">
+			<address>
+				<p>Universidad Icesi, Calle 18 No. 122-135 </p>
+				<p>Pance, Cali - Colombia</p>
+				<p>Teléfono: +57 (602) 555 2334</p>
+				<p>Celular: +57 300 910 8606</p>
+				<p>
+					<a href="mailto:ventanillaunica@icesi.edu.co" target="_blank" class="email-link">
+						ventanillaunica@icesi.edu.co
+					</a>
+				</p>
+			</address>
+		</footer>
 
-        <!-- Línea de separación -->
-        <div class="line-div"></div>
+		<!-- Línea de separación -->
+		<div class="line-div"></div>
 
-        <!-- Logo -->
-        <img src="{% static 'universitaryWellbeing/images/logo-azul.png' %}" alt="Logo Universidad Icesi" class="logo-azul">
+	</section>
 
-        <!-- Barra inferior -->
-        <div class="rectangle-div"></div>
-        <b class="bienestar-universitario">Bienestar Universitario</b>
+	<!-- Script para interacción de botones -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const botnAgregarContainer = document.getElementById("botnAgregarContainer");
+			if (botnAgregarContainer) {
+				botnAgregarContainer.addEventListener("click", function () {
+					// Lógica para continuar
+				});
+			}
 
-        <!-- Menú y perfil -->
-        <div class="pp-wrapper">
-            <b class="pp">PP</b>
-        </div>
-        <img src="{% static 'universitaryWellbeing/images/frame-icon.png' %}" alt="Icono del menú" class="frame-icon">
-
-    </section>
-
-    <!-- Script para interacción de botones -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const botnAgregarContainer = document.getElementById("botnAgregarContainer");
-            if (botnAgregarContainer) {
-                botnAgregarContainer.addEventListener("click", function () {
-                    // Lógica para continuar
-                });
-            }
-
-            const menuImage = document.getElementById("menuImage");
-            if (menuImage) {
-                menuImage.addEventListener("click", function () {
-                    // Lógica para menú
-                });
-            }
-        });
-    </script>
+			const menuImage = document.getElementById("menuImage");
+			if (menuImage) {
+				menuImage.addEventListener("click", function () {
+					// Lógica para menú
+				});
+			}
+		});
+	</script>
 </body>
+
 </html>

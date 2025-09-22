@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -29,7 +29,7 @@ def user_login(request):
             return redirect("home")
         else:
             messages.error(request, "Contraseña incorrecta")
-            return redirect("login")
+            return redirect("user_login")
 
     # GET → mostrar formulario vacío
     return render(request, "login.html", {})
@@ -37,19 +37,39 @@ def user_login(request):
 
 def register(request):
     if request.method == "POST":
+        # Recupera todos los parámetros del POST
         cedula_input = request.POST.get("cedula", "").strip()
+        name = request.POST.get("nombre", "").strip()
         email = request.POST.get("email", "").strip()
-        password = request.POST.get("password", "")
+        password = request.POST.get("password", "").strip()
 
-        if User.objects.filter(username=cedula_input).exists():
+        # Verifica si ya existe un usuario con esa cédula
+        if get_user_model().objects.filter(cedula=cedula_input).exists():
             messages.error(request, "Ya existe un usuario con esa cédula")
             return redirect("register")
+        
+          # Validación del correo electrónico usando `validate_email`
+        try:
+            validate_email(email)  # Intentamos validar el email
+        except ValidationError:
+            messages.error(request, "El correo electrónico no es válido.")
+            return redirect("register")
+        
+        # Verifica si el correo electrónico ya está registrado
+        if get_user_model().objects.filter(email=email).exists():
+            messages.error(request, "Este correo electrónico ya está registrado.")
+            return redirect("register")
+        
 
-        user = User.objects.create_user(
-            username=cedula_input,
+        # Crea un nuevo usuario con todos los campos necesarios
+        user = get_user_model().objects.create_user(
+            username=cedula_input,  # Usamos cédula como username
             password=password,
-            email=email
+            email=email,
+            cedula=cedula_input,
+            nombre=name,
         )
+        
         messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
         return redirect("login")
 
