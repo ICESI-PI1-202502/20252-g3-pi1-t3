@@ -5,101 +5,56 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-# Create your views here.
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.shortcuts import redirect, render
 
+# Create your views here.
 def user_login(request):
-    email = ""
     if request.method == "POST":
-        email = request.POST.get("email", "")
+        cedula_input = request.POST.get("cedula", "").strip()
         password = request.POST.get("password", "")
 
-        # Validar formato de email
-        try:
-            validate_email(email)
-        except ValidationError:
-            messages.error(request, "El correo ingresado no es válido")
-            return redirect('login')
-            #return render(request, "login.html", {"email": email})
+        if not User.objects.filter(username=cedula_input).exists():
+            messages.error(request, "El usuario con esa cédula no existe")
+            return redirect("login")
 
-        # Verificar si el usuario existe
-        if not User.objects.filter(username=email).exists():
-            messages.error(request, "El usuario no existe")
-        else:
-            user = authenticate(request, username=email, password=password)
-            if user is not None:
-                login(request, user)
-                return redirect("home")
-            else:
-                messages.error(request, "Contraseña incorrecta")
-        # Redirige a login para limpiar POST y mostrar mensajes
-        return redirect('login')  # nombre de la url de login
+        user = authenticate(request, username=cedula_input, password=password)
 
-    # GET normal
-    return render(request, "login.html", {"email": ""})
-
-
-#Login descartado para 2 pantallas como en la secuencia de figma (NO Practico y poco elegante)
-#def user_login_step1(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-
-        if User.objects.filter(username=username).exists():
-            # Guardar en la sesión
-            request.session["partial_username"] = username
-            return redirect("login-step2")
-        else:
-            messages.error(request, "El usuario no existe")
-
-    return render(request, "login_1.html")
-
-
-#def user_login_step2(request):
-    username = request.session.get("partial_username", None)
-
-    if not username:
-        # Si alguien entra directo sin pasar por step1
-        return redirect("login-step1")
-
-    if request.method == "POST":
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
-
-        if user:
+        if user is not None:
             login(request, user)
-            # Limpio la sesión temporal
-            del request.session["partial_username"]
-            return redirect("")
+            if is_role_admin(user):
+                return redirect("admin:index")  # admin Django
+            return redirect("home")
         else:
             messages.error(request, "Contraseña incorrecta")
+            return redirect("login")
 
-    return render(request, "login_2.html", {"username": username})
+    # GET → mostrar formulario vacío
+    return render(request, "login.html", {})
 
 
 def register(request):
     if request.method == "POST":
-        username = request.POST.get("username", "")
-        email = request.POST.get("email", "")
+        cedula_input = request.POST.get("cedula", "").strip()
+        email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
 
-        # Validar formato de email
-        try:
-            validate_email(email)
-        except ValidationError:
-            messages.error(request, "El correo ingresado no es válido")
-            return render(request, "auth/register.html", {"username": username, "email": email})
+        if User.objects.filter(username=cedula_input).exists():
+            messages.error(request, "Ya existe un usuario con esa cédula")
+            return redirect("register")
 
-        # Validar usuario existente
-        if User.objects.filter(username=username).exists():
-            messages.error(request, "El usuario ya existe")
-        else:
-            user = User.objects.create_user(username=username, email=email, password=password)
-            user_group, created = Group.objects.get_or_create(name="Usuarios")
-            user.groups.add(user_group)
-            login(request, user)
-            messages.success(request, "¡Registro exitoso!")
-            return redirect("preferences")
-        
+        user = User.objects.create_user(
+            username=cedula_input,
+            password=password,
+            email=email
+        )
+        messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
+        return redirect("login")
+
     return render(request, "auth/register.html")
+
+
 
 def user_logout(request):
     logout(request)
@@ -116,3 +71,22 @@ def preferences(request):
 
 def home(request):
   return render(request, 'home.html')
+
+
+
+
+
+ 
+
+
+
+
+
+
+
+
+
+
+
+
+

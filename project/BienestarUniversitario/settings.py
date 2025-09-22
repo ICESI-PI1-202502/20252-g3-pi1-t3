@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'universitaryWellbeing',
+    'Analytics_Reports',   
+
 ]
 
 MIDDLEWARE = [
@@ -113,12 +115,27 @@ USE_I18N = True
 USE_TZ = True
 
 
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
 
+
+
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# ------------------------------
+# Configuración de login/logout
+# ------------------------------
+LOGIN_URL = "/"              # login view
+LOGIN_REDIRECT_URL = "/home/"   # where to send after login
+LOGOUT_REDIRECT_URL = "/"       # where to send after logout

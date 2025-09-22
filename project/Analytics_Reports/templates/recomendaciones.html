@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Recomendaciones automáticas</h2>
+<p>Estudiantes con poca asistencia:</p>
+<ul>
+  {% for row in data %}
+    <li>{{ row.id_participacion__id_participante__nombre }} → {{ row.total }} asistencias</li>
+  {% endfor %}
+</ul>
+{% endblock %}

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Gestión de asistencia y contingencia</h2>
+<table border="1">
+  <tr><th>Estado de asistencia</th><th>Total</th></tr>
+  {% for row in data %}
+    <tr>
+      <td>{{ row.id_estado_asistencia__nombre }}</td>
+      <td>{{ row.total }}</td>
+    </tr>
+  {% endfor %}
+</table>
+{% endblock %}
