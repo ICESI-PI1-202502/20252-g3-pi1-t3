@@ -4,8 +4,8 @@
 
 <head>
 	<meta charset="utf-8">
-	<meta name="viewport" content="initial-scale=1, width=device-width">
-
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<title>Iniciar Sesión</title>
 	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/login.css' %}">
 
 </head>
@@ -19,7 +19,7 @@
 		<form method="POST" action="">
 			{% csrf_token %}
 
-			<div class="field" id="emailField">
+			<div class="field" id="idField">
 				<div class="value">
 					<input type="text" id="cedula" name="cedula" placeholder="Cédula" value="{{ cedula|default:'' }}">
 
