@@ -34,44 +34,6 @@ def user_login(request):
     return render(request, "login.html", {})
 
 
-
-#Login descartado para 2 pantallas como en la secuencia de figma (NO Practico y poco elegante)
-#def user_login_step1(request):
-    if request.method == "POST":
-        username = request.POST.get("username")
-
-        if User.objects.filter(username=username).exists():
-            # Guardar en la sesión
-            request.session["partial_username"] = username
-            return redirect("login-step2")
-        else:
-            messages.error(request, "El usuario no existe")
-
-    return render(request, "login_1.html")
-
-
-#def user_login_step2(request):
-    username = request.session.get("partial_username", None)
-
-    if not username:
-        # Si alguien entra directo sin pasar por step1
-        return redirect("login-step1")
-
-    if request.method == "POST":
-        password = request.POST.get("password")
-        user = authenticate(request, username=username, password=password)
-
-        if user:
-            login(request, user)
-            # Limpio la sesión temporal
-            del request.session["partial_username"]
-            return redirect("")
-        else:
-            messages.error(request, "Contraseña incorrecta")
-
-    return render(request, "login_2.html", {"username": username})
-
-
 def register(request):
     if request.method == "POST":
         cedula_input = request.POST.get("cedula", "").strip()
