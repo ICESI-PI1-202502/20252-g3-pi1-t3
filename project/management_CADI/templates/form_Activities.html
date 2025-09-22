@@ -1,0 +1,30 @@
+{% extends "form_base.html" %}
+{% load static %}
+
+{% block title %}Crear Actividad{% endblock %}
+{% block form_title %}Añadir nueva actividad{% endblock %}
+
+{% block form_fields %}
+  <div class="row text-center mb-4">
+    <div class="col-md-6">
+      <h6>Nombre de actividad</h6>
+      <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
+    </div>
+
+    <div class="col-md-6">
+      <h6>Descripción</h6>
+      <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="500" required></textarea>
+    </div>
+  </div>
+
+  
+
+  <div class="col-md-6 text-center">
+    <h6>Imagen</h6>
+    <input type="file" id="imagenActividad" name="imagenActividad" accept="image/*" hidden>
+    <label for="imagenActividad" class="upload-box">
+      <img src="{% static 'management_CADI/images/create/galery.png' %}" 
+           alt="Subir imagen" class="upload-icon">
+    </label>
+  </div>
+{% endblock %}

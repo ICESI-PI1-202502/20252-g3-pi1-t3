@@ -1,94 +1,96 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-<head>
-  	<meta charset="utf-8">
-  	<meta name="viewport" content="initial-scale=1, width=device-width">
-  	
-  	<link rel="stylesheet"  href="./index.css" />
-  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=[object Object]&display=swap" />
-  	<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=[object Object]&display=swap" />
-  	
-  	
-  	
-</head>
-<body>
-  	
-  	<div class="list_preferences">
-    		<div class="botn-agregar" id="botnAgregarContainer">
-      			<div class="botn-agregar-child">
-      			</div>
-      			<div class="div">Continuar</div>
-    		</div>
-    		<div class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</div>
-    		<b class="esto-nos-ayudar">Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.</b>
-    		<div class="mdulo-1-rf2-1-child">
-    		</div>
-    		<div class="msica">Música</div>
-    		<div class="deportes">Deportes</div>
-    		<div class="mdulo-1-rf2-1-item">
-    		</div>
-    		<div class="mdulo-1-rf2-1-inner">
-    		</div>
-    		<div class="proyeccin-social">Proyección social</div>
-    		<div class="artes-visuales-y">Artes visuales y plásticas</div>
-    		<div class="frame-div">
-    		</div>
-    		<div class="mdulo-1-rf2-1-mdulo-1-rf2-1-child">
-    		</div>
-    		<div class="actividad-fsica-y">Actividad física y bienestar</div>
-    		<div class="bienestar-y-desarrollo"> Bienestar y desarrollo humano</div>
-    		<div class="mdulo-1-rf2-1-child2">
-    		</div>
-    		<div class="mdulo-1-rf2-1-child3">
-    		</div>
-    		<div class="artes-escnicas-y">Artes escénicas y danza</div>
-    		<div class="programa-ests-en">Programa "Estás en Casa"</div>
-    		<div class="mdulo-1-rf2-1-child4">
-    		</div>
-    		<div class="universidad-icesi-calle-container">
-      			<span class="mdulo-1-rf2-1-universidad-icesi-calle-container">
-        				<p class="universidad-icesi-calle">Universidad Icesi, Calle 18 No. 122-135</p>
-        				<p class="universidad-icesi-calle">Pance, Cali – Colombia</p>
-        				<p class="universidad-icesi-calle">Teléfono: +57 (602) 555 2334</p>
-        				<p class="universidad-icesi-calle">Celular: +57 300 910 8606</p>
-        				<p class="universidad-icesi-calle">
-          					<a class="mdulo-1-rf2-1-ventanillaunicaicesieduco" href="mailto:ventanillaunica@icesi.edu.co" target="_blank">
-            						<span class="ventanillaunicaicesieduco2">ventanillaunica@icesi.edu.co</span>
-          					</a>
-        				</p>
-      			</span>
-    		</div>
-    		<div class="line-div">
-    		</div>
-    		<img class="logo-azul" alt="">
-    		
-    		<div class="rectangle-div">
-    		</div>
-    		<b class="bienestar-universitario">Bienestar universitario</b>
-    		<img class="menu-icon" alt="" id="menuImage">
-    		
-    		<div class="pp-wrapper">
-      			<b class="pp">PP</b>
-    		</div>
-    		<img class="frame-icon" alt="">
+<html lang="es">
 
-  	</div>
-  	
-  	
-  	
-  	
-  	<script>
-    		var botnAgregarContainer = document.getElementById("botnAgregarContainer");
-    		if(botnAgregarContainer) {
-      			botnAgregarContainer.addEventListener("click", function (e) {
-        				// Add your code here
-      			});
-    		}
-    		
-    		var menuImage = document.getElementById("menuImage");
-    		if(menuImage) {
-      			menuImage.addEventListener("click", function (e) {
-        				// Add your code here
-      			});
-    		}</script></body>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=0.8">
+	<title>Preferencias de Actividades</title>
+	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/preferences.css' %}">
+</head>
+
+<body>
+	<!-- Contenedor principal de la lista de preferencias -->
+	<section class="list_preferences">
+
+		<!-- Logo -->
+		<div class="header-wrapper">
+			<div class="header-container">
+				<img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Universidad Icesi"
+					class="logo-icesi">
+				<!-- Texto de Bienestar Universitario -->
+				<b class="bienestar-universitario">Bienestar Universitario</b>
+			</div>
+
+			<!-- Menú y perfil -->
+			<div class="profile-wrapper">
+				<span class="initials">JP</span>
+			</div>
+		</div>
+		<!-- Subbarra azul -->
+		<div class="subheader"></div>
+
+		<!-- Título y descripción -->
+		<h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
+		<p class="esto-nos-ayudar">
+			Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
+		</p>
+
+		<!-- Formulario de selección de categorías -->
+		<form method="POST">
+			{% csrf_token %}
+			<h2>Selecciona tus categorías</h2>
+
+			<!-- Recorrido de las categorías y creación de checkboxes -->
+			{% for category in categories %}
+			<label>
+				<input type="checkbox" name="categories" value="{{ category }}"> {{ category }}
+			</label><br>
+			{% endfor %}
+
+			<!-- Botón para enviar el formulario -->
+			<button type="submit">Continuar</button>
+		</form>
+
+
+		<!-- Información de contacto -->
+		<footer class="universidad-icesi">
+			<address>
+				<p>Universidad Icesi, Calle 18 No. 122-135 </p>
+				<p>Pance, Cali - Colombia</p>
+				<p>Teléfono: +57 (602) 555 2334</p>
+				<p>Celular: +57 300 910 8606</p>
+				<p>
+					<a href="mailto:ventanillaunica@icesi.edu.co" target="_blank" class="email-link">
+						ventanillaunica@icesi.edu.co
+					</a>
+				</p>
+			</address>
+		</footer>
+
+		<!-- Línea de separación -->
+		<div class="line-div"></div>
+
+	</section>
+
+	<!-- Script para interacción de botones -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const botnAgregarContainer = document.getElementById("botnAgregarContainer");
+			if (botnAgregarContainer) {
+				botnAgregarContainer.addEventListener("click", function () {
+					// Lógica para continuar
+				});
+			}
+
+			const menuImage = document.getElementById("menuImage");
+			if (menuImage) {
+				menuImage.addEventListener("click", function () {
+					// Lógica para menú
+				});
+			}
+		});
+	</script>
+</body>
+
 </html>

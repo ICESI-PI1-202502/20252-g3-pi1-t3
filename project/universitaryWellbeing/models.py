@@ -1,18 +1,5 @@
-# This is an auto-generated Django model module.
-
-# You'll have to do the following manually to clean this up:
-
-#   * Rearrange models' order
-
-#   * Make sure each model has one field with primary_key=True
-
-#   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
-
-#   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
-
-# Feel free to rename the models, but don't rename db_table values or field names.
-
 from django.db import models
+from django.contrib.auth.models import User,AbstractUser
 
 
 class Actividades(models.Model):
@@ -484,6 +471,7 @@ class EquiposParticipantes(models.Model):
         managed = False
 
         db_table = 'equipos_participantes'
+        ##unique_together = ('equipo', 'participante')
 
 
 
@@ -970,11 +958,42 @@ class TorneosEquipos(models.Model):
     torneos_id_torneo = models.ForeignKey(Torneos, models.DO_NOTHING, db_column='torneos_id_torneo')
 
     equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
-
-
-
-class Meta:
+    
+    class Meta:
 
         managed = False
 
         db_table = 'torneos_equipos'
+
+
+class Preferences(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="preference")
+    category = models.CharField(max_length=255)  # Mayor tamaño para Oracle
+    subcategory = models.CharField(max_length=255)  # También mayor tamaño para Oracle
+
+    def __str__(self):
+        return f"Preferences of {self.user.username} - {self.category} - {self.subcategory}"
+
+    class Meta:
+        indexes = [
+            models.Index(fields=['user', 'category']),
+        ]
+
+class CustomUser(AbstractUser):
+    cedula = models.CharField(max_length=20, unique=True)
+    nombre = models.CharField(max_length=100)
+
+    # Añadimos related_name para evitar el conflicto con el User original
+    groups = models.ManyToManyField(
+        'auth.Group',
+        related_name='customuser_set',  # Relaciona con una nueva colección para CustomUser
+        blank=True
+    )
+    user_permissions = models.ManyToManyField(
+        'auth.Permission',
+        related_name='customuser_set',  # Relaciona con una nueva colección para CustomUser
+        blank=True
+    )
+
+    def __str__(self):
+        return self.nombre
