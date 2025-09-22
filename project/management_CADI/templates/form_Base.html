@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block subheaderBar %}
+  <a href="javascript:history.back()">Regresar</a>
+{% endblock %}
+
+{% block title %}
+   Formulario
+{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'management_CADI/css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<center><h3>{% block form_title %}Formulario{% endblock %}</h3></center>
+
+<center>
+  <form class="container mt-4" method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    {% block form_fields %}
+    <!-- Aquí cada formulario mete sus inputs -->
+    {% endblock %}
+
+    <br>
+    <div class="row text-center">
+      <div class="col-md-12">
+        <button type="submit" class="greenBotton_White">Confirmar</button>
+      </div>
+    </div>
+  </form>
+</center>
+
+{% endblock %}

@@ -471,7 +471,7 @@ class EquiposParticipantes(models.Model):
         managed = False
 
         db_table = 'equipos_participantes'
-        unique_together = ('equipo', 'participante')
+        ##unique_together = ('equipo', 'participante')
 
 
 
