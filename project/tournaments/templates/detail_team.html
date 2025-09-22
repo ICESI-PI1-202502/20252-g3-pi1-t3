@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+
+<div class="tournament-detail">
+  <section class="tournament-info">
+    <h2 class="page-title">{{ tournament.nombre }}</h2>
+
+    <p class="meta"><b>Fechas:</b> {{ tournament.fecha_inicio|date:"d M Y" }} – {{ tournament.fecha_fin|date:"d M Y" }}</p>
+    <p class="meta"><b>Disciplina:</b> {{ tournament.disciplina }}</p>
+    {% if tournament.aforo_equipos %}
+      <p class="meta"><b>Aforo de equipos:</b> {{ tournament.aforo_equipos }}</p>
+    {% endif %}
+
+    <h3 class="section-title">Equipos registrados</h3>
+    <ul class="list">
+      {% for team in teams %}
+        <li>{{ team.nombre }}</li>
+      {% empty %}
+        <li>Aún no hay equipos.</li>
+      {% endfor %}
+    </ul>
+
+    <div class="actions">
+      <a class="btn" href="{% url 'tournaments:join_team' tournament.id %}">Unirme a un equipo</a>
+      <a class="btn outline" href="{% url 'tournaments:create_team' tournament.id %}">Crear equipo</a>
+    </div>
+  </section>
+
+  <aside class="tournament-hero">
+    <img src="{% static 'tournaments/images/futsala.jpg' %}" alt="Imagen del torneo {{ tournament.nombre }}">
+  </aside>
+</div>
+{% endblock %}

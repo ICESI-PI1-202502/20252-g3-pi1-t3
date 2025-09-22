@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Inscripción — {{ tournament.nombre|default:"Torneo individual" }}{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
+{% endblock %}
+
+{% block content %}
+<a class="link-back" href="{% url 'tournaments:list' %}">← Regresar</a>
+
+<section class="join-card">
+  <header class="join-head">
+    <h2>Inscripción a torneo individual</h2>
+    {% if tournament %}
+      <p class="t-meta">
+        <b>{{ tournament.nombre }}</b> ·
+        {{ tournament.fecha_inicio|date:"d M" }} – {{ tournament.fecha_fin|date:"d M" }} ·
+        Disciplina: {{ tournament.disciplinas_id_disciplina.nombre }}
+      </p>
+    {% endif %}
+  </header>
+
+  {# Mensaje de "mock" cuando ok=True en el contexto #}
+  {% if ok %}
+    <div class="alert success">
+      ✅ Inscripción registrada (vista de prueba).
+      <div class="small">
+        Participante: <b>{{ participante.nombre }} {{ participante.apellido }}</b> — {{ participante.correo }}
+      </div>
+      <p class="muted">Cuando exista la tabla Torneo↔Participante, aquí se guardará realmente.</p>
+      <a class="btn" href="{% url 'tournaments:detail' tournament.id %}">Volver al detalle</a>
+    </div>
+  {% else %}
+    <form method="post" class="join-form">
+      {% csrf_token %}
+      {{ form.torneo }} {# hidden #}
+
+      <div class="field">
+        <label for="{{ form.correo.id_for_label }}">Correo institucional</label>
+        {{ form.correo }}
+        {% if form.correo.errors %}
+          <div class="error">{{ form.correo.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="help">
+        * Ingresa el correo con el que estás registrado en Bienestar.
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn primary">Inscribirme</button>
+        <a href="{% url 'tournaments:list' %}" class="btn ghost">Cancelar</a>
+      </div>
+
+      {% if form.non_field_errors %}
+        <div class="error mt">{{ form.non_field_errors|striptags }}</div>
+      {% endif %}
+    </form>
+  {% endif %}
+</section>
+{% endblock %}

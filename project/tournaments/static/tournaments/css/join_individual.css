@@ -1,0 +1,15 @@
+.join-card{max-width:720px;margin:16px auto;background:#fff;border-radius:16px;padding:24px;box-shadow:0 6px 24px rgba(0,0,0,.08)}
+.join-head h2{margin:0 0 6px}
+.t-meta{margin:0;color:#555}
+.field{display:flex;flex-direction:column;margin:14px 0 8px}
+.field input{height:44px;border:1px solid #d8dbe6;border-radius:10px;padding:0 12px;font-size:15px}
+.help{font-size:13px;color:#666;margin-top:2px}
+.actions{display:flex;gap:10px;margin-top:16px}
+.btn{display:inline-block;padding:10px 16px;border-radius:12px;text-decoration:none}
+.btn.primary{background:#535bf2;color:#fff}
+.btn.ghost{background:#f2f3ff;color:#3b3f9f}
+.link-back{display:inline-block;margin:4px 0 8px;color:#3b3f9f}
+.alert{border-radius:12px;padding:14px 16px;margin:10px 0}
+.alert.success{background:#eefdf3;border:1px solid #b8f0c9;color:#0d7a3a}
+.error{color:#b00020;margin-top:6px}
+.muted{color:#666;font-size:13px;margin-top:6px}

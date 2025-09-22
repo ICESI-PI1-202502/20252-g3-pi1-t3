@@ -23,15 +23,13 @@
           {{ t.fecha_inicio|date:"d M" }} – {{ t.fecha_fin|date:"d M" }}
         </p>
 
-        <p class="meta"><b>Disciplina:</b>
-          {{ t.disciplinas_id_disciplina.nombre }}
-        </p>
+        <p class="meta"><b>Disciplina:</b> {{ t.disciplina }}</p>
 
         <p class="meta"><b>Tipo:</b>
           {{ t.tiene_equipos|yesno:"Equipo,Individual" }}
         </p>
 
-        <a class="btn" href="{% url 'tournaments:detail' t.pk %}">Detalles</a>
+        <a class="btn" href="{% url 'tournaments:detail' t.id %}">Detalles</a>
       </article>
     {% empty %}
       <p>No hay torneos disponibles.</p>

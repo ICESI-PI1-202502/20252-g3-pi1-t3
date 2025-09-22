@@ -40,3 +40,16 @@ class InscripcionForm(forms.Form):
                    .filter(torneos_id_torneo=torneo)
                    .values_list("equipos_id_equipo", flat=True))
             self.fields["team"].queryset = Equipos.objects.filter(pk__in=ids)
+
+class JoinIndividualForm(forms.Form):
+    correo = forms.EmailField(label="Correo institucional")
+
+    torneo = forms.ModelChoiceField(
+        queryset=Torneos.objects.all(),
+        widget=forms.HiddenInput()
+    )
+
+    def __init__(self, *args, torneo=None, **kwargs):
+        super().__init__(*args, **kwargs)
+        if torneo:
+            self.fields["torneo"].initial = torneo

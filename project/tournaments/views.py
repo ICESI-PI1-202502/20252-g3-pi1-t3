@@ -1,198 +1,94 @@
-# tournaments/views.py
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import ListView, DetailView, CreateView, FormView
-from django.shortcuts import redirect, render
-from django.db import transaction
-from django.db.models import Q, Exists, OuterRef
+from datetime import date
+from django.shortcuts import render, redirect
+from django.http import Http404
+from django.contrib import messages
+from django.contrib.auth.decorators import login_required
 
-# IMPORTA DESDE ESTA APP (tu models genérico está dentro de tournaments/models.py)
-from .models import (
-    Torneos,
-    Equipos,
-    TorneosEquipos,
-    EquiposParticipantes,
-    Participantes,
-)
+# ===== Datos MOCK para la demo UI =====
+DEMO_TOURNAMENTS = [
+    {
+        "id": 1,
+        "nombre": "Torneo de Ajedrez",
+        "disciplina": "Ajedrez",
+        "fecha_inicio": date(2025, 10, 1),
+        "fecha_fin": date(2025, 10, 10),
+        "tiene_equipos": False,
+        "descripcion": "Competencia individual, rondas suizas y final a 2 partidas.",
+        "coordinador": "María Pérez · mperez@uni.edu.co",
+    },
+    {
+        "id": 2,
+        "nombre": "Futsala Interfacultades",
+        "disciplina": "Futsala",
+        "fecha_inicio": date(2025, 11, 5),
+        "fecha_fin": date(2025, 11, 20),
+        "tiene_equipos": True,
+        "aforo_equipos": 16,
+        "descripcion": "Fase de grupos + playoffs. Cancha techada.",
+        "coordinador": "Juan Rojas · jrojas@uni.edu.co",
+        "teams": [
+            {"id": 501, "nombre": "Los Cracks"},
+            {"id": 502, "nombre": "FC Campus"},
+        ],
+    },
+]
 
-from .forms import TeamCreateForm, InscripcionForm
+def _get(id_: int):
+    for t in DEMO_TOURNAMENTS:
+        if t["id"] == id_:
+            return t
+    raise Http404("Torneo no encontrado")
 
+# Historia 1: lista
+def lista_torneos(request):
+    q = (request.GET.get("q") or "").strip().lower()
+    items = DEMO_TOURNAMENTS
+    if q:
+        items = [t for t in DEMO_TOURNAMENTS if q in t["nombre"].lower() or q in t["disciplina"].lower()]
+    return render(request, "list_tournament.html", {"tournaments": items, "search": request.GET.get("q", "")})
 
-class TournamentListView(ListView):
-    model = Torneos
-    template_name = "list_tournament.html"
-    context_object_name = "tournaments"
+# Historia 2: detalle -> elige template según tiene_equipos
+def detalle_torneo(request, id: int):
+    t = _get(id)
+    ctx = {"tournament": t, "teams": t.get("teams", []) if t["tiene_equipos"] else []}
+    template = "detail_team.html" if t["tiene_equipos"] else "detail_individual.html"
+    return render(request, template, ctx)
 
-    def get_queryset(self):
-        q = self.request.GET.get("q", "")
-        qs = (
-            Torneos.objects
-            .select_related("disciplinas_id_disciplina")
-            .annotate(
-                tiene_equipos=Exists(
-                    TorneosEquipos.objects.filter(torneos_id_torneo=OuterRef("pk"))
-                )
-            )
-            .order_by("fecha_inicio")
-        )
-        if q:
-            qs = qs.filter(
-                Q(nombre__icontains=q) |
-                Q(disciplinas_id_disciplina__nombre__icontains=q)
-            )
-        return qs
+# Historia 3: inscripción individual (demo)
+@login_required
+def inscripcion_individual(request, id: int):
+    torneo = _get(id)
+    if torneo["tiene_equipos"]:
+        raise Http404("Este torneo no es individual.")
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["search"] = self.request.GET.get("q", "")
-        return ctx
+    if request.method == "POST":
+        correo = (request.POST.get("correo") or "").strip()
+        if not correo:
+            messages.error(request, "Ingresa tu correo institucional.")
+        else:
+            messages.success(request, f"Inscripción registrada para {correo} (demo).")
+            return redirect("tournaments:detail", id=id)
 
+    return render(request, "join_individual.html", {"tournament": torneo})
 
-class TournamentDetailView(DetailView):
-    model = Torneos
-    template_name = "tournament_detail.html"
-    context_object_name = "tournament"
+# Historia 4: crear equipo (demo)
+@login_required
+def crear_equipo(request, id: int):
+    torneo = _get(id)
+    if not torneo["tiene_equipos"]:
+        raise Http404("Este torneo no es por equipos.")
+    if request.method == "POST":
+        messages.success(request, "Equipo creado (demo).")
+        return redirect("tournaments:detail", id=id)
+    return render(request, "create_team.html", {"tournament": torneo})
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        torneo = self.object
-
-        equipos_ids = (
-            TorneosEquipos.objects
-            .filter(torneos_id_torneo=torneo)
-            .values_list("equipos_id_equipo", flat=True)
-        )
-        ctx["teams"] = Equipos.objects.filter(pk__in=equipos_ids)
-
-        ctx["join_form"] = InscripcionForm(torneo=torneo)
-        return ctx
-
-
-class TeamCreateView(LoginRequiredMixin, CreateView):
-    form_class = TeamCreateForm
-    template_name = "create_team.html"
-
-    def form_valid(self, form):
-        team = form.save(commit=False)
-        team.save()
-        return redirect("tournaments:team_detail", pk=team.pk)
-
-
-class TeamDetailView(DetailView):
-    model = Equipos
-    template_name = "team_detail.html"
-    context_object_name = "team"
-
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        team = self.object
-        miembros = []
-
-        # En tu modelo actual: una fila por equipo con 2 slots:
-        #   - id_participante (FK)
-        #   - id_participante1 (FloatField con el id)
-        try:
-            ep = EquiposParticipantes.objects.get(equipos_id_equipo=team)
-            if ep.id_participante_id:
-                try:
-                    miembros.append(Participantes.objects.get(pk=ep.id_participante_id))
-                except Participantes.DoesNotExist:
-                    pass
-            if ep.id_participante1:
-                try:
-                    miembros.append(Participantes.objects.get(pk=ep.id_participante1))
-                except Participantes.DoesNotExist:
-                    pass
-        except EquiposParticipantes.DoesNotExist:
-            pass
-
-        ctx["members"] = miembros
-        return ctx
-
-
-class JoinTeamView(LoginRequiredMixin, FormView):
-    """
-    - Si el torneo tiene equipos: añade el participante a EquiposParticipantes (hasta 2 slots).
-    - Si es individual (sin equipos asociados): muestra aviso (no hay tabla Torneo↔Participante).
-    """
-    form_class = InscripcionForm
-    template_name = "join_team.html"
-
-    def get_form_kwargs(self):
-        kwargs = super().get_form_kwargs()
-        t_id = self.request.GET.get("t")
-        if t_id:
-            try:
-                kwargs["torneo"] = Torneos.objects.get(pk=t_id)
-            except Torneos.DoesNotExist:
-                pass
-        return kwargs
-
-    @transaction.atomic
-    def form_valid(self, form):
-        torneo = form.cleaned_data["torneo"]
-        correo = form.cleaned_data["correo"]
-
-        # Participante por correo
-        try:
-            participante = Participantes.objects.get(correo=correo)
-        except Participantes.DoesNotExist:
-            form.add_error("correo", "No existe un participante con ese correo.")
-            return self.form_invalid(form)
-
-        # ¿El torneo tiene equipos?
-        equipos_ids = (
-            TorneosEquipos.objects
-            .filter(torneos_id_torneo=torneo)
-            .values_list("equipos_id_equipo", flat=True)
-        )
-        hay_equipos = Equipos.objects.filter(pk__in=equipos_ids).exists()
-
-        if hay_equipos:
-            equipo = form.cleaned_data.get("team")
-            if equipo is None:
-                form.add_error("team", "Debes seleccionar un equipo.")
-                return self.form_invalid(form)
-
-            # Validar pertenencia del equipo al torneo
-            if not TorneosEquipos.objects.filter(
-                torneos_id_torneo=torneo, equipos_id_equipo=equipo
-            ).exists():
-                form.add_error("team", "Este equipo no pertenece a este torneo.")
-                return self.form_invalid(form)
-
-            # Fila única por equipo con dos slots
-            ep, _ = EquiposParticipantes.objects.get_or_create(
-                equipos_id_equipo=equipo,
-                defaults={"id_participante": None, "id_participante1": None},
-            )
-
-            # ¿ya está?
-            if ep.id_participante_id == participante.pk or ep.id_participante1 == participante.pk:
-                form.add_error(None, "Este participante ya está en el equipo.")
-                return self.form_invalid(form)
-
-            # ocupar slot A o B
-            if ep.id_participante_id is None:
-                ep.id_participante = participante
-                ep.save()
-            elif not ep.id_participante1:
-                ep.id_participante1 = float(participante.pk)  # segundo slot es FloatField
-                ep.save()
-            else:
-                form.add_error(None, "El equipo está lleno.")
-                return self.form_invalid(form)
-
-            return redirect("tournaments:team_detail", pk=equipo.pk)
-
-        # MODO INDIVIDUAL: aún no hay tabla Torneo↔Participante en la BD
-        context = {
-            "tournament": torneo,
-            "teams": [],
-            "join_form": InscripcionForm(torneo=torneo),
-            "warning_individual": (
-                "Torneo detectado como INDIVIDUAL, pero no existe una tabla de inscripciones "
-                "Torneo↔Participante en la BD. Sugerencia: crear 'torneos_participantes' "
-                "(PK compuesta: torneos_id_torneo + id_participante, o surrogate key)."
-            ),
-        }
-        return render(self.request, "tournament_detail.html", context)
+# Historia 5: unirse a equipo (demo)
+@login_required
+def unirse_equipo(request, id: int):
+    torneo = _get(id)
+    if not torneo["tiene_equipos"]:
+        raise Http404("Este torneo no es por equipos.")
+    if request.method == "POST":
+        messages.success(request, "Solicitud enviada (demo).")
+        return redirect("tournaments:detail", id=id)
+    return render(request, "join_team.html", {"tournament": torneo, "teams": torneo.get("teams", [])})
