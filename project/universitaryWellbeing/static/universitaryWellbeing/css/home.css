@@ -168,7 +168,7 @@ ul li a:hover {
    FOOTER
    ============================== */
 footer {
-    background-color: #dadde0;
+    background-color: #5454e9;
     color: white;
     text-align: center;
     padding: 1rem;
@@ -287,4 +287,8 @@ footer {
   border-radius: 10px;
   cursor: pointer;
   transition: transform 0.2s, background-color 0.3s;
+}
+
+html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table, th, td {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
 }

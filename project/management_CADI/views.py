@@ -12,3 +12,6 @@ def cadi_index(request):
 
 def create_Clasification(request):
     return render(request, "./form_Clasifications.html")
+
+def create_Activities(request):
+    return render(request, "./form_Activities.html")
