@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -8,7 +9,7 @@
 	<title>Preferencias de Actividades</title>
 	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/preferences.css' %}">
 </head>
-
+{% block content %}
 <body>
 	<!-- Contenedor principal de la lista de preferencias -->
 	<section class="list_preferences">
@@ -92,5 +93,6 @@
 		});
 	</script>
 </body>
+{% endblock %}
 
 </html>
