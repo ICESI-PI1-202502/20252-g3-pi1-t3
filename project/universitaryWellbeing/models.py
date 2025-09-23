@@ -997,3 +997,11 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.nombre
+    
+
+class GrupoClasificacion(models.Model):
+    id_grupo = models.AutoField(primary_key=True)
+    nombre = models.CharField(max_length=50, unique=True)
+
+    class Meta:
+        db_table = 'grupo_clasificacion'

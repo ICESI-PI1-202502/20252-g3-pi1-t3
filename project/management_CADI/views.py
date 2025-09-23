@@ -1,6 +1,6 @@
 
 from django.db.models import Count  # Import correction
-from .models import Participaciones, Asistencias, Actividades, Notificaciones
+from  universitaryWellbeing.models import Participaciones, Asistencias, Actividades, Notificaciones
 from django.shortcuts import render
 
 def is_admin(user):
