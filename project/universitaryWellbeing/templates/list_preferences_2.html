@@ -1,107 +1,68 @@
-{% load static %}
 {% extends "base.html" %}
-<!DOCTYPE html>
-<html lang="es">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="initial-scale=1, width=device-width">
-    <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/preferences.css' %}">
-    <title>Preferencias de Actividades</title>
-</head>
-<body>
+{% load static %}
 
-    <!-- Header -->
-    <header>
-        <h1>Bienestar Universitario</h1>
-        <img class="menu-icon" alt="Menú" id="menuImage">
-    </header>
+{% block title %}
+ ¡Preferencias!
+{% endblock %}
 
-    <!-- Main Content -->
-    <main>
-        <section class="preferences">
-            <h2>Ahora seleccionemos tus 3 actividades favoritas</h2>
-            <p>Aquí podrás elegir específicamente tus actividades favoritas.</p>
-            <h3>Centro Artístico y Deportivo Icesi - CADI</h3>
+{% block subheaderBar %}
+  <a href="javascript:history.back()" class="back-link">
+    <i class="bi bi-arrow-left"></i> Regresar
+  </a>
+{% endblock %}
 
-            <h4>Deportes de conjunto</h4>
-            <ul>
-                <li>Voleibol</li>
-                <li>Porrismo</li>
-                <li>Baloncesto</li>
-                <li>Fútbol masculino</li>
-                <li>Disco volador (Ultimate)</li>
-                <li>Fútbol sala</li>
-                <li>Fútbol femenino</li>
-            </ul>
+{% block extra_css %}
+  	{{ block.super }}
+	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
+{% endblock %}
 
-            <h4>Deportes individuales</h4>
-            <ul>
-                <li>Música (clases)</li>
-                <li>Grupos musicales</li>
-                <li>Judo</li>
-                <li>Ajedrez</li>
-                <li>Natación</li>
-                <li>Tiro con arco</li>
-                <li>Tenis de mesa</li>
-                <li>Kung fu</li>
-                <li>Atletismo</li>
-                <li>Arqueros de fútbol</li>
-                <li>Tenis de campo</li>
-            </ul>
+{% block content %}
+	<!-- Contenedor principal de la lista de preferencias -->
+	<section class="list-preferences">
 
-            <h4>Música</h4>
-            <ul>
-                <li>Bajo</li>
-                <li>Piano</li>
-                <li>Percusión</li>
-                <li>Tiple y ukelele</li>
-                <li>Saxofón y flauta traversa</li>
-                <li>Batería</li>
-                <li>Técnica vocal</li>
-                <li>Violín, viola, violonchelo y contrabajo</li>
-                <li>Guitarra (acústica, clásica, eléctrica)</li>
-                <li>Coro ICESI</li>
-            </ul>
+		<!-- Título y descripción -->
+		<h2>Ahora seleccionemos tus 3 actividades favoritas</h2>
+        <p>Aquí podrás elegir específicamente tus actividades favoritas.</p>
 
-            <h4>Grupos musicales</h4>
-            <ul>
-                <li>Grupo de pop</li>
-                <li>Grupo Acústico</li>
-                <li>Grupo tambores</li>
-                <li>Grupo de rock</li>
-                <li>Orquesta Son de la U</li>
-                <li>Grupo de son cubano</li>
-                <li>Grupo de música latinoamericana</li>
-                <li>Grupo de música andina colombiana “Samán Ensamble”</li>
-                <li>Grupo de música de cámara</li>
-            </ul>
+		<!-- Formulario de selección de categorías -->
+  		<form method="POST">
+            <!--
+    		{% csrf_token %}
+    		<div class="categories-grid">
+				{% for category in categories %}
+					<label class="category-item">
+						<input type="checkbox" name="categories" value="{{ category }}"> {{ category }}
+					</label>
+				{% endfor %}
+    		</div>
+            --> 
 
-            <button class="continue-btn">Continuar</button>
-        </section>
-    </main>
+			<!-- Botón para enviar el formulario -->
+			<button class="greenBotton_White">Continuar</button>
+		</form>
 
-    <!-- Footer -->
-    <footer>
-        <address>
-            <p>Universidad Icesi, Calle 18 No. 122-135</p>
-            <p>Pance, Cali - Colombia</p>
-            <p>Teléfono: +57 (602) 555 2334</p>
-            <p>Celular: +57 300 910 8606</p>
-            <p>
-                <a href="mailto:ventanillaunica@icesi.edu.co" target="_blank">ventanillaunica@icesi.edu.co</a>
-            </p>
-        </address>
-    </footer>
+		<!-- Línea de separación -->
+		<div class="line-div"></div>
 
-    <!-- Script -->
-    <script>
-        var menuImage = document.getElementById("menuImage");
-        if (menuImage) {
-            menuImage.addEventListener("click", function (e) {
-                // Agrega tu código aquí
-            });
-        }
-    </script>
+	</section>
 
-</body>
-</html>
+	<!-- Script para interacción de botones -->
+	<script>
+		document.addEventListener('DOMContentLoaded', function () {
+			const botnAgregarContainer = document.getElementById("botnAgregarContainer");
+			if (botnAgregarContainer) {
+				botnAgregarContainer.addEventListener("click", function () {
+					// Lógica para continuar
+				});
+			}
+
+			const menuImage = document.getElementById("menuImage");
+			if (menuImage) {
+				menuImage.addEventListener("click", function () {
+					// Lógica para menú
+				});
+			}
+		});
+	</script>
+    
+{% endblock %}

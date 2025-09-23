@@ -1,35 +1,18 @@
 {% extends "base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=0.8">
-	<title>Preferencias de Actividades</title>
-	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/preferences.css' %}">
-</head>
+{% block title %}
+ ¡Bienvenido!
+{% endblock %}
+
+{% block extra_css %}
+	{{ block.super }}
+	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
+{% endblock %}
+
 {% block content %}
-<body>
 	<!-- Contenedor principal de la lista de preferencias -->
-	<section class="list_preferences">
-
-		<!-- Logo -->
-		<div class="header-wrapper">
-			<div class="header-container">
-				<img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Universidad Icesi"
-					class="logo-icesi">
-				<!-- Texto de Bienestar Universitario -->
-				<b class="bienestar-universitario">Bienestar Universitario</b>
-			</div>
-
-			<!-- Menú y perfil -->
-			<div class="profile-wrapper">
-				<span class="initials">JP</span>
-			</div>
-		</div>
-		<!-- Subbarra azul -->
-		<div class="subheader"></div>
+	<section class="list-preferences">
 
 		<!-- Título y descripción -->
 		<h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
@@ -38,36 +21,19 @@
 		</p>
 
 		<!-- Formulario de selección de categorías -->
-		<form method="POST">
-			{% csrf_token %}
-			<h2>Selecciona tus categorías</h2>
-
-			<!-- Recorrido de las categorías y creación de checkboxes -->
-			{% for category in categories %}
-			<label>
-				<input type="checkbox" name="categories" value="{{ category }}"> {{ category }}
-			</label><br>
-			{% endfor %}
+  		<form method="POST">
+    		{% csrf_token %}
+    		<div class="categories-grid">
+				{% for category in categories %}
+					<label class="category-item">
+						<input type="checkbox" name="categories" value="{{ category }}"> {{ category }}
+					</label>
+				{% endfor %}
+    		</div>
 
 			<!-- Botón para enviar el formulario -->
-			<button type="submit">Continuar</button>
+			<button class="greenBotton_White">Continuar</button>
 		</form>
-
-
-		<!-- Información de contacto -->
-		<footer class="universidad-icesi">
-			<address>
-				<p>Universidad Icesi, Calle 18 No. 122-135 </p>
-				<p>Pance, Cali - Colombia</p>
-				<p>Teléfono: +57 (602) 555 2334</p>
-				<p>Celular: +57 300 910 8606</p>
-				<p>
-					<a href="mailto:ventanillaunica@icesi.edu.co" target="_blank" class="email-link">
-						ventanillaunica@icesi.edu.co
-					</a>
-				</p>
-			</address>
-		</footer>
 
 		<!-- Línea de separación -->
 		<div class="line-div"></div>
@@ -92,7 +58,5 @@
 			}
 		});
 	</script>
-</body>
+    
 {% endblock %}
-
-</html>

@@ -1,0 +1,13 @@
+{% if user.is_authenticated %}
+  {% with first=user.first_name|default:user.username %}
+  {% with last=user.last_name|default:"" %}
+    <div class="user-avatar" title="{{ user.get_full_name|default:user.username }}">
+      <span class="user-initials">
+        {{ first|slice:":1"|upper }}{% if last %}{{ last|slice:":1"|upper }}{% endif %}
+      </span>
+    </div>
+  {% endwith %}
+  {% endwith %}
+{% else %}
+  <a href="{% url 'login' %}" class="btn btn-link text-light">Iniciar</a>
+{% endif %}

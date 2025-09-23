@@ -141,8 +141,12 @@ def preferences2(request):
 
 
 
-def home(request):
-  return render(request, 'home.html')
+def home_user(request):
+  return render(request, 'home_user.html')
+
+def home_admin(request):
+    return render(request, "home_admin.html")
+
 
 
 
