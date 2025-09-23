@@ -24,3 +24,15 @@
   border-color: #007bff;     
   background-color: #cdf0f7;
 }
+
+.category-item {
+    background: #f8f9fa;
+    border-radius: 12px;
+    padding: 12px;
+    transition: 0.3s;
+    cursor: pointer;
+  }
+
+  .category-item:hover {
+    background: #e4ebff;
+  }
