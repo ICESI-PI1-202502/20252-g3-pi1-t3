@@ -8,6 +8,6 @@ urlpatterns = [
     path("home/", views.home, name="home"),
     path("register/", views.register, name="register"),
     path("preferences/", views.preferences, name="preferences"),
-    path("analytics-reports/", include("Analytics_Reports.urls", namespace="analytics_reports")),
+     
     path("management-cadi/", include("management_CADI.urls", namespace="management_cadi")),
 ]
