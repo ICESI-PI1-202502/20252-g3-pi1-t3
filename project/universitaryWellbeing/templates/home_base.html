@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+   Inicio
+{% endblock %}
+
+{% block extra_css %}
+	{{ block.super }}
+<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/home_base.css' %}">
+{% endblock %}
+
+{% block content %}
+	<div class="hero-section">
+		<div class="hero-overlay">
+			{% if user.is_authenticated %}
+			<h2>Hola, {{ user.first_name|default:user.username }}, <br>bienvenido a Bienestar Universitario</h2>
+			{% else %}
+			<h2>Bienvenido a Bienestar Universitario</h2>
+			{% endif %}
+		</div>
+	</div>
+{% endblock %}
