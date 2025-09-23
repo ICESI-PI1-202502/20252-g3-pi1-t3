@@ -10,5 +10,8 @@ urlpatterns = [
     path("visualizacion/", views.visualizacion, name="visualizacion"),
     path("recomendaciones/", views.recomendaciones, name="recomendaciones"),
     path("asistencia/", views.asistencia, name="asistencia"),
-    path("prueba-datos/", views.prueba_datos, name="prueba_datos"),
+
+    path('participantes/', views.participantes_list, name="participantes_list"),  # NUEVA VISTA
+
+ 
 ]

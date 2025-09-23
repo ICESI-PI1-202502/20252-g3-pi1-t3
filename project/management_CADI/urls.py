@@ -1,0 +1,8 @@
+from django.urls import path
+from . import views
+
+app_name = "management_cadi"   
+
+urlpatterns = [
+    path("", views.cadi_index, name="management_index"),
+]

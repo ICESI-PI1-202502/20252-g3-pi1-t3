@@ -13,45 +13,48 @@
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <!-- ADDED: wrapper que contiene nav-collapse + campana -->
+      <!-- NAVBAR COLLAPSE + opciones -->
       <div class="d-flex align-items-center ms-auto">
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
             {% if user.is_authenticated %}
               {% if user.is_staff %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'analytics_reports:index' %}">Analítica</a></li>
               {% endif %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
+              <li class="nav-item">
+                <form action="{% url 'logout' %}" method="post"  >
+                  {% csrf_token %}
+                  <button type="submit" class="nav-link btn btn-link" style="padding: 0; border: none; background: none;">
+                    Cerrar sesión
+                  </button>
+                </form>
+              </li>
             {% else %}
               <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
             {% endif %}
           </ul>
         </div>
 
-        <!-- ADDED: bell -->
+        <!-- ICONOS EXTRA -->
         <div class="navbar-option ms-3">
-            <a href="#" title="Notificaciones">
-                <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
-            </a>
-            </div>
+          <a href="#" title="Notificaciones">
+            <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+          </a>
+        </div>
 
-            <div class="navbar-option ms-3">
-            <a href="#" title="Notificaciones">
-                <img src="{% static 'universitaryWellbeing/img/PP_option.png' %}" alt="Notificaciones" />
-            </a>
-            </div>
+        <div class="navbar-option ms-3">
+          <a href="#" title="Perfil">
+            <img src="{% static 'universitaryWellbeing/img/PP_option.png' %}" alt="Perfil" />
+          </a>
+        </div>
             
-            <div class="navbar-option ms-3">
-            <a href="#" title="Notificaciones">
-                <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Notificaciones" />
-            </a>
-            </div>
-
-            
-
+        <div class="navbar-option ms-3">
+          <a href="#" title="Menú">
+            <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+          </a>
+        </div>
       </div>
-      <!-- /ADDED -->
     </div>
   </nav>
 
