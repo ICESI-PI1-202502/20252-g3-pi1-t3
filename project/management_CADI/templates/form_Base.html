@@ -2,21 +2,24 @@
 {% load static %}
 
 {% block subheaderBar %}
-  <a href="javascript:history.back()" class="back-link">
-    <i class="bi bi-arrow-left"></i> Regresar
-  </a>
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
 {% endblock %}
 
 {% block title %}
-   Formulario
+Formulario
 {% endblock %}
 
 {% block extra_css %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static 'management_CADI/css/main.css' %}">
 {% endblock %}
 
 {% block content %}
-<center><h3>{% block form_title %}Formulario{% endblock %}</h3></center>
+<center>
+  <h3>{% block form_title %}Formulario{% endblock %}</h3>
+</center>
 
 <center>
   <form class="container mt-4" method="post" enctype="multipart/form-data">
@@ -27,11 +30,13 @@
     {% endblock %}
 
     <br>
+    {% block form_button %}
     <div class="row text-center">
       <div class="col-md-12">
         <button type="submit" class="greenBotton_White">Confirmar</button>
       </div>
     </div>
+    {% endblock %}
   </form>
 </center>
 

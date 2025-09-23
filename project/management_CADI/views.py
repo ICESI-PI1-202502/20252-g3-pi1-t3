@@ -15,3 +15,8 @@ def create_Clasification(request):
 
 def create_Activities(request):
     return render(request, "./form_Activities.html")
+
+def add_schedule(request):
+    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
+    horas = ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"]
+    return render(request, "schedule.html", {"dias_semana": dias_semana, "horas": horas})

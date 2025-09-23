@@ -5,6 +5,8 @@
 {% block form_title %}Añadir nueva actividad{% endblock %}
 
 {% block form_fields %}
+
+  
   <div class="row text-center mb-4">
     <div class="col-md-6">
       <h6>Nombre de actividad</h6>
@@ -12,19 +14,24 @@
     </div>
 
     <div class="col-md-6">
-      <h6>Descripción</h6>
-      <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="500" required></textarea>
+      <h6>Espacio</h6>
+      <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="50" required></textarea>
     </div>
   </div>
 
-  
+  <div class="col-md-6">
+      <h6>Horario</h6>
+      <textarea name="descripcion" class="form-control text-center" rows="3" maxlength="50" required></textarea>
+    </div>
+  </div>
 
-  <div class="col-md-6 text-center">
-    <h6>Imagen</h6>
-    <input type="file" id="imagenActividad" name="imagenActividad" accept="image/*" hidden>
-    <label for="imagenActividad" class="upload-box">
-      <img src="{% static 'management_CADI/images/create/galery.png' %}" 
-           alt="Subir imagen" class="upload-icon">
-    </label>
+
+    <br>
+    <div class="row text-center">
+    <div class="col-md-12">
+      <a href="{% url 'management_cadi:form_Activities-2' %}" target="_blank" class="yellowBotton_Black">
+        Agregar horario
+      </a>
+    </div>
   </div>
 {% endblock %}
