@@ -16,10 +16,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from universitaryWellbeing import views
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path("", include("universitaryWellbeing.urls")),
-    path('logout/', views.user_logout, name='logout'),
-    #path("accounts/", include("django.contrib.auth.urls")), 
+    
 ]

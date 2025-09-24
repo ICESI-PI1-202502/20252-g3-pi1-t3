@@ -1,12 +1,12 @@
 # Analytics_Reports/views.py
-from django.db.models import Count  # Import correction
-from .models import Participaciones, Asistencias, Actividades, Notificaciones
+from django.db.models import Count
+from universitaryWellbeing.models import Participaciones, Asistencias, Actividades, Notificaciones
 from django.shortcuts import render
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
-# @user_passes_test(is_admin)  # Uncomment if you want to restrict access
+# @user_passes_test(is_admin)
 def analytics_index(request):
     return render(request, "index.html")  # Relative path to Analytics_Reports/templates/
 
@@ -14,9 +14,11 @@ def analytics_index(request):
 def analisis_comportamiento(request):
     data = (
         Participaciones.objects
-        .values("id_participante__semestre")
+        .values("participantes_id_participante__nombre",
+                "participantes_id_participante__semestre",
+                "id_actividad__nombre")
         .annotate(total=Count("id_participacion"))
-        .order_by("id_participante__semestre")
+        .order_by("participantes_id_participante__semestre")
     )
     return render(request, "analisis.html", {"data": data})
 
@@ -24,7 +26,8 @@ def analisis_comportamiento(request):
 def comparaciones(request):
     data = (
         Participaciones.objects
-        .values("id_participante__id_rol")
+        .values("participantes_id_participante__roles_id_rol")  # objeto rol
+        # .values("participantes_id_participante__roles_id_rol_id")  # solo ID
         .annotate(total=Count("id_participacion"))
     )
     return render(request, "comparaciones.html", {"data": data})
@@ -33,7 +36,7 @@ def comparaciones(request):
 def visualizacion(request):
     data = (
         Participaciones.objects
-        .values("id_actividad__nombre")
+        .values("actividades_id_actividad__nombre")
         .annotate(total=Count("id_participacion"))
     )
     return render(request, "visualizacion.html", {"data": data})
@@ -42,7 +45,7 @@ def visualizacion(request):
 def recomendaciones(request):
     poca_asistencia = (
         Asistencias.objects
-        .values("id_participacion__id_participante__nombre")
+        .values("participantes_id_participante__nombre")
         .annotate(total=Count("id_asistencia"))
         .filter(total__lt=2)
     )
@@ -57,7 +60,7 @@ def asistencia(request):
     )
     return render(request, "asistencia.html", {"data": data})
 
-
+# Story 6: Data testing / debugging
 def prueba_datos(request):
     data = (
         Participaciones.objects

@@ -1,9 +1,56 @@
-<!-- Analytics_Reports/templates/analisis.html -->
 {% extends "base.html" %}
 {% load static %}
 {% block content %}
 <div class="container mt-4">
-    <h2>Prueba de renderizado</h2>
-    <p>Este texto debería aparecer en la página.</p>
+    <h2>Análisis del Comportamiento Estudiantil</h2>
+    <p>Registra y segmenta la participación de los usuarios en función de frecuencia y tipo de actividad.</p>
+
+    <!-- Buscador -->
+    <form method="GET" action="{% url 'analytics_reports:analisis_comportamiento' %}" class="mb-3">
+        <div class="row g-2">
+            <div class="col-md-4">
+                <input type="text" name="usuario" class="form-control" placeholder="Nombre del usuario" value="{{ request.GET.usuario|default:'' }}">
+            </div>
+            <div class="col-md-4">
+                <select name="tipo_actividad" class="form-select">
+                    <option value="">-- Tipo de actividad --</option>
+                    {% for tipo in tipos_actividad %}
+                        <option value="{{ tipo.id_tipo }}" {% if request.GET.tipo_actividad == tipo.id_tipo|stringformat:"s" %}selected{% endif %}>
+                            {{ tipo.nombre_tipo }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Tabla de resultados -->
+    <table class="table table-striped mt-3">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Semestre</th>
+                <th>Tipo de actividad</th>
+                <th>Total Participaciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in data %}
+                <tr>
+                    <td>{{ item.id_participante__nombre }}</td>
+                    <td>{{ item.id_participante__semestre }}</td>
+                    <td>{{ item.id_actividad__nombre }}</td>
+                    <td>{{ item.total }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center">No se encontraron resultados</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 {% endblock %}
