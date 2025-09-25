@@ -29,7 +29,7 @@ def user_login(request):
             return redirect("home")
         else:
             messages.error(request, "Contraseña incorrecta")
-            return redirect("user_login")
+            return redirect("login")
 
     # GET → mostrar formulario vacío
     return render(request, "login.html", {})
@@ -86,7 +86,7 @@ def is_role_admin(user):
     return user.groups.filter(name="admin").exists() or user.is_superuser
 
 
-#@login_required
+@login_required
 def preferences(request):
     if request.method == 'POST':
         # Obtener las categorías seleccionadas del formulario
@@ -102,44 +102,6 @@ def preferences(request):
     categories = ['Música','Deportes', 'Proyección Social','Tecnología', 'Artes Escenicas y Danza'
                   , 'Artes Visuales y Plásticas','Programa"Estás en Casa"','Actividad Física y Bienestar', 'Bienestar y Desarrollo Humano']
     return render(request, 'list_preferences_1.html', {'categories': categories})
-
-#@login_required
-def preferences2(request):
-    if request.method == 'POST':
-        # Obtener las subcategorías seleccionadas del formulario
-        selected_subcategories = request.POST.getlist('subcategories')  # Lista de subcategorías seleccionadas
-        
-        # Obtener las categorías seleccionadas de la sesión
-        selected_categories = request.session.get('selected_categories', [])
-        
-        # Guardar las preferencias del usuario
-        preference, created = Preferences.objects.get_or_create(user=request.user)
-        preference.category = ', '.join(selected_categories)  # Guardamos las categorías como una cadena
-        preference.subcategory = ', '.join(selected_subcategories)  # Guardamos las subcategorías
-        preference.save()
-
-        # Redirigir a la siguiente página, por ejemplo, a recomendaciones
-        return redirect('recommendations')  # Cambia a la vista donde mostrarás las recomendaciones
-
-    # Si el método es GET, mostramos el formulario para las subcategorías
-    selected_categories = request.session.get('selected_categories', [])
-    
-    # Aquí debes definir las subcategorías para cada categoría seleccionada
-    subcategories = {
-        'Deportes': ['Fútbol', 'Basketball', 'Tennis'],
-        'Tecnología': ['Computadoras', 'Móviles', 'Electrónica'],
-        'Arte': ['Pintura', 'Escultura', 'Fotografía'],
-        'Música': ['Rock', 'Pop', 'Jazz'],
-    }
-    
-    # Filtrar las subcategorías basadas en las categorías seleccionadas
-    available_subcategories = []
-    for category in selected_categories:
-        available_subcategories.extend(subcategories.get(category, []))
-    
-    return render(request, 'list_preferences_2.html', {'subcategories': available_subcategories})
-
-
 
 def home_user(request):
     data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
