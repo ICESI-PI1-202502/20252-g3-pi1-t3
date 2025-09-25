@@ -23,7 +23,7 @@
                 <li class="nav-item"><a class="nav-link" href="{% url 'analytics_reports:index' %}">Analítica</a></li>
               {% endif %}
               <li class="nav-item">
-                <form action="{% url 'logout' %}" method="post"  >
+                <a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a>
                   {% csrf_token %}
                   <button type="submit" class="nav-link btn btn-link" style="padding: 0; border: none; background: none;">
                     Cerrar sesión

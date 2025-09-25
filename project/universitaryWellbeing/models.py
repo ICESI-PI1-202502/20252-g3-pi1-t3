@@ -12,19 +12,31 @@ class Actividades(models.Model):
     id_actividad = models.FloatField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
-    lugar = models.CharField(max_length=150)
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    fecha_inicio = models.DateField(blank=True, null=True)
+    fecha_fin = models.DateField(blank=True, null=True)
     requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
     modalidad = models.CharField(max_length=1, blank=True, null=True)
     aforo = models.FloatField(blank=True, null=True)
     fecha_apertura_ins = models.DateField(blank=True, null=True)
     fecha_cierre_ins = models.DateField(blank=True, null=True)
-    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo')
+    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
+    id_tipo = models.FloatField(blank=True, null=True)
+    actividades_grupos_id_actividad_grupo = models.ForeignKey('ActividadesGrupos', models.DO_NOTHING, db_column='actividades_grupos_id_actividad_grupo', blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'actividades'
+
+
+class ActividadesGrupos(models.Model):
+    id_actividad_grupo = models.FloatField(primary_key=True)
+    grupos_actividad_id_grupo_actividad = models.OneToOneField('GruposActividad', models.DO_NOTHING, db_column='grupos_actividad_id_grupo_actividad')
+    actividades_id_actividad = models.FloatField()
+
+    class Meta:
+        managed = False
+        db_table = 'actividades_grupos'
 
 
 class AgendaPsicologos(models.Model):
@@ -140,7 +152,7 @@ class Citas(models.Model):
     observaciones = models.CharField(max_length=500, blank=True, null=True)
     estados_cita_id_estado_cita = models.OneToOneField('EstadosCita', models.DO_NOTHING, db_column='estados_cita_id_estado_cita')
     participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    participantes_id_participante1 = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante1', related_name='citas_participantes_id_participante1_set')
+    participantes_id_participante2 = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante2', related_name='citas_participantes_id_participante2_set')
     motivos_cita_id_motivo = models.OneToOneField('MotivosCita', models.DO_NOTHING, db_column='motivos_cita_id_motivo', blank=True, null=True)
     agenda_psicologos_id_agenda_slot = models.ForeignKey(AgendaPsicologos, models.DO_NOTHING, db_column='agenda_psicologos_id_agenda_slot', blank=True, null=True)
 
@@ -237,7 +249,7 @@ class Equipos(models.Model):
 
 class EquiposParticipantes(models.Model):
     equipos_id_equipo = models.OneToOneField(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo', primary_key=True)
-    id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='id_participante')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
     id_participante1 = models.FloatField()
 
     class Meta:
@@ -293,6 +305,26 @@ class FkProysocCoordinador(models.Model):
         db_table = 'fk_proysoc_coordinador'
 
 
+class Grupos(models.Model):
+    id_grupo = models.FloatField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+
+    class Meta:
+        managed = False
+        db_table = 'grupos'
+
+
+class GruposActividad(models.Model):
+    id_grupo_actividad = models.FloatField(primary_key=True)
+    grupos_id_grupo = models.ForeignKey(Grupos, models.DO_NOTHING, db_column='grupos_id_grupo')
+    nombre = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=500, blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'grupos_actividad'
+
+
 class HistorialCitas(models.Model):
     id_historial = models.FloatField(primary_key=True)
     citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column='citas_id_cita')
@@ -331,6 +363,7 @@ class HorariosParticipante(models.Model):
     class Meta:
         managed = False
         db_table = 'horarios_participante'
+        unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
 
 
 class InscripcionesPsu(models.Model):
@@ -407,7 +440,7 @@ class Partidos(models.Model):
     fecha_fin = models.DateField(blank=True, null=True)
     lugar = models.CharField(max_length=150, blank=True, null=True)
     equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
-    equipos_id_equipo1 = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo1', related_name='partidos_equipos_id_equipo1_set')
+    equipos_id_equipo2 = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo2', related_name='partidos_equipos_id_equipo2_set')
     marcador_a = models.FloatField(blank=True, null=True)
     marcador_b = models.FloatField(blank=True, null=True)
     estado = models.CharField(max_length=20, blank=True, null=True)
@@ -415,6 +448,27 @@ class Partidos(models.Model):
     class Meta:
         managed = False
         db_table = 'partidos'
+
+
+class Preferencias(models.Model):
+    id_preferencia = models.FloatField(primary_key=True)
+    participantes_id_participante = models.OneToOneField(Participantes, models.DO_NOTHING, db_column='participantes_id_participante')
+    fecha_registro = models.DateField(blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'preferencias'
+
+
+class PreferenciasActividades(models.Model):
+    id_preferencia_actividad = models.FloatField(primary_key=True)
+    preferencias_id_preferencia = models.ForeignKey(Preferencias, models.DO_NOTHING, db_column='preferencias_id_preferencia')
+    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')
+
+    class Meta:
+        managed = False
+        db_table = 'preferencias_actividades'
+        unique_together = (('preferencias_id_preferencia', 'actividades_id_actividad'),)
 
 
 class ProyectosSociales(models.Model):
@@ -451,7 +505,7 @@ class RolesParticipacion(models.Model):
 
 class TiposActividad(models.Model):
     id_tipo = models.FloatField(primary_key=True)
-    nombre_tipo = models.CharField(max_length=50)
+    nombre_tipo = models.CharField(max_length=100)
 
     class Meta:
         managed = False

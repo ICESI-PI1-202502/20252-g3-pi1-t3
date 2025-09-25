@@ -136,3 +136,15 @@ def participantes_list(request):
     
     return render(request, "participantes.html", {"participantes": participantes})
 
+##def crear_participante(request):
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+        semestre = request.POST.get("semestre")
+
+        # Insertar en la BD
+        Participantes.objects.create(nombre=nombre, semestre=semestre)
+
+        return redirect("participantes_list")  # redirigir después de guardar
+
+    # Si es GET, solo mostramos el formulario
+    return render(request, "crear_participante.html")
