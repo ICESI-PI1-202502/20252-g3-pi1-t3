@@ -8,7 +8,7 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .models import Preferences, Actividades
+from .models import Preferencias, Actividades
 
 # Create your views here.
 def user_login(request):
