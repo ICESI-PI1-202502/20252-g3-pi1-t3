@@ -1,25 +1,47 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}
-   Actividades CADI
-{% endblock %}
+{% block title %}Actividades - {{ grupo.nombre }}{% endblock %}
 
-<!-- 
-{% block extra_css %}
-<link rel="stylesheet" href="{% static 'management_CADI/css/main.css' %}">
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
 {% endblock %}
--->
-
 
 {% block content %}
-<center><h3>Centro Artístico y Deportivo Icesi - CADI</h3></center>
+<div class="container mt-4">
+    <h2 class="text-center">{{ grupo.nombre }}</h2>
+    <p class="text-center">{{ descripcion }}</p>
 
-    <p>En el Centro Artístico y Deportivo (CADI) de la Universidad Icesi, promovemos tu salud y bienestar integral, enfocándonos en desarrollar y mejorar tus capacidades físicas y motrices. Aquí, encontrarás el apoyo y las oportunidades necesarias para mantenerte activo a través de actividades artísticas y deportivas, contribuyendo a tu bienestar general. Estamos comprometidos con acompañarte en cada paso de tu camino universitario.</p>
+    {% if grupos_actividad %}
+    <table class="table table-bordered mt-4">
+        <thead class="table-dark">
+            <tr>
+                <th>Nombre</th>
+                <th>Descripción</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for g in grupos_actividad %}
+            <tr>
+                <td>{{ g.nombre }}</td>
+                <td>{{ g.descripcion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-center mt-4">No hay grupos de actividades aún.</p>
+    {% endif %}
 
-    <!-- ><center><button class="yellowBotton">Agregar clasificación</button></center> -->
+    <br>
+    <br>
+    <center>
+        <a href="{% url 'management_cadi:crear_grupo_actividad' '-' grupo.id_grupo %}" class="yellowBotton_Black">
+            Agregar grupo
+        </a>
+    </center>
 
-    <center><button class="yellowBotton_Black">Agregar clasificación</button></center>
-
-    
+</div>
 {% endblock %}
