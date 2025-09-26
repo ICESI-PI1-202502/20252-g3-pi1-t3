@@ -6,7 +6,8 @@
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+from django.utils.text import slugify
+import os
 
 class Actividades(models.Model):
     id_actividad = models.FloatField(primary_key=True)
@@ -314,11 +315,24 @@ class Grupos(models.Model):
         db_table = 'grupos'
 
 
+def actividad_upload_to(instance, filename):
+    # id del grupo (ejemplo: 3)
+    grupo_id = instance.grupos_id_grupo.id_grupo
+    # slug del nombre (ejemplo: futbol)
+    actividad_slug = slugify(instance.nombre)
+    # extensión original
+    ext = filename.split('.')[-1]
+    # nombre de archivo fijo
+    filename = f"{actividad_slug}.{ext}"
+    # ruta final: media/<grupo_id>/<actividad_slug>/<actividad_slug>.ext
+    return os.path.join(str(grupo_id), actividad_slug, filename)
+
 class GruposActividad(models.Model):
     id_grupo_actividad = models.FloatField(primary_key=True)
     grupos_id_grupo = models.ForeignKey(Grupos, models.DO_NOTHING, db_column='grupos_id_grupo')
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
+    imagen = models.ImageField(upload_to=actividad_upload_to, blank=True, null=True)
 
     class Meta:
         managed = False

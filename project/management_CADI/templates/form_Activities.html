@@ -6,32 +6,44 @@
 
 {% block form_fields %}
 
-  
-  <div class="row text-center mb-4">
-    <div class="col-md-6">
-      <h6>Nombre de actividad</h6>
-      <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
-    </div>
-
-    <div class="col-md-6">
-      <h6>Espacio</h6>
-      <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="50" required></textarea>
-    </div>
+<div class="row text-center mb-4">
+  <div class="col-md-6">
+    <h6>Nombre de actividad</h6>
+    <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
   </div>
 
   <div class="col-md-6">
-      <h6>Horario</h6>
-      <textarea name="descripcion" class="form-control text-center" rows="3" maxlength="50" required></textarea>
-    </div>
+    <h6>Espacio</h6>
+    <textarea name="espacio" class="form-control text-center" rows="1" maxlength="50" required></textarea>
+  </div>
+</div>
+
+<div class="row text-center mb-4">
+
+  <div class="col-md-6">
+    <h6>Tipo de Actividad</h6>
+    <select name="tipo" class="form-control text-center" required>
+      <option value="" disabled selected>Seleccione un tipo</option>
+      {% for t in tipos %}
+      <option value="{{ t.id_tipo }}">{{ t.nombre_tipo }}</option>
+      {% endfor %}
+    </select>
   </div>
 
+  <div class="col-md-6">
+    <h6>Horario</h6>
+    <textarea name="horario" class="form-control text-center" rows="3" maxlength="50" required></textarea>
 
-    <br>
-    <div class="row text-center">
-    <div class="col-md-12">
-      <a href="{% url 'management_cadi:form_Activities-2' %}" target="_blank" class="yellowBotton_Black">
-        Agregar horario
-      </a>
-    </div>
   </div>
+</div>
+
+<br>
+<div class="row text-center">
+  <div class="col-md-12">
+    <a href="{% url 'management_cadi:form_Activities-2' %}" target="_blank" class="yellowBotton_Black">
+      Agregar horario
+    </a>
+  </div>
+</div>
+
 {% endblock %}

@@ -1,6 +1,6 @@
 
 from django.db.models import Count  # Import correction
-from  universitaryWellbeing.models import Participaciones, Asistencias, Actividades, Notificaciones, GruposActividad, Grupos
+from  universitaryWellbeing.models import Participaciones, Asistencias, Actividades, TiposActividad, GruposActividad, Grupos
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.db.models import Max
@@ -13,17 +13,25 @@ def is_admin(user):
 def cadi_index(request):
     grupo = get_object_or_404(Grupos, pk=1)  # por ejemplo, CADI con id=1
     grupos_actividad = GruposActividad.objects.filter(grupos_id_grupo=grupo)
-    return render(request, "cadi_Activities.html", {
+    return render(request, "listar_grupos_actividades.html", {
         "grupo": grupo,
         "grupos_actividad": grupos_actividad
     })
 
-
-def create_GruposActividades(request):
-    return render(request, "./form_gruposActivi.html")
-
 def create_Activities(request):
-    return render(request, "./form_Activities.html")
+    tipos = TiposActividad.objects.all().order_by("id_tipo")  # ordenados por id
+
+    if request.method == "POST":
+        nombre = request.POST.get("nombre")
+        espacio = request.POST.get("espacio")
+        horario = request.POST.get("horario")
+        tipo_id = request.POST.get("tipo")
+
+        # ejemplo de cómo podrías guardarlo (si tu modelo Actividad tiene tipo):
+        # tipo = TiposActividad.objects.get(pk=tipo_id)
+        # Actividad.objects.create(nombre=nombre, espacio=espacio, horario=horario, tipo=tipo)
+
+    return render(request, "form_activities.html", {"tipos": tipos})
 
 def add_schedule(request):
     dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
@@ -47,13 +55,11 @@ def listar_grupos_actividad(request, grupo_nombre, grupo_id):
 
     descripcion = descripciones.get(grupo.id_grupo, "")
 
-    return render(request, "cadi_Activities.html", {
+    return render(request, "listar_grupos_actividades.html", {
         "grupo": grupo,
         "grupos_actividad": grupos_actividad,
         "descripcion": descripcion,
     })
-
-
 
 def crear_grupo_actividad(request, grupo_nombre, grupo_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
@@ -65,27 +71,19 @@ def crear_grupo_actividad(request, grupo_nombre, grupo_id):
     if request.method == "POST":
         nombre = request.POST.get("nombre")
         descripcion = request.POST.get("descripcion")
-        
-        
-        ultimo_actividad = GruposActividad.objects.aggregate(Max('id_grupo_actividad'))['id_grupo_actividad__max']
-        
-        
-        if ultimo_actividad is not None:
-            nuevo_id = ultimo_actividad + 1
-        else:
-            
-            nuevo_id = 1
-        
-        
+        imagen_file = request.FILES.get("imagenActividad")
+
+        ultimo_actividad = GruposActividad.objects.aggregate(Max("id_grupo_actividad"))["id_grupo_actividad__max"]
+        nuevo_id = (ultimo_actividad or 0) + 1
+
         GruposActividad.objects.create(
             id_grupo_actividad=nuevo_id,
             grupos_id_grupo=grupo,
             nombre=nombre,
-            descripcion=descripcion
+            descripcion=descripcion,
+            imagen=imagen_file
         )
-        
+
         return redirect("management_cadi:listar_grupos_actividad", grupo_nombre=slug_real, grupo_id=grupo.id_grupo)
 
     return render(request, "form_gruposActivi.html", {"grupo": grupo})
-
-
