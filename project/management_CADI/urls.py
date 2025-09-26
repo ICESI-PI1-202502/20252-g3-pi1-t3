@@ -7,7 +7,6 @@ urlpatterns = [
     path("", views.cadi_index, name="management_index"),
     path("cadi-home/<slug:grupo_nombre>/<int:grupo_id>/", views.listar_grupos_actividad, name="listar_grupos_actividad"),
     path("cadi-home/<slug:grupo_nombre>/<int:grupo_id>/crear/", views.crear_grupo_actividad, name="crear_grupo_actividad"),
-    path("crear-grupo-actividades/", views.create_GruposActividades, name="form_gruposActivi"),
     path("crear-actividad/", views.create_Activities, name="form_Activities"),
     path("añadir-horario/", views.add_schedule, name="form_Activities-2"),
 ]

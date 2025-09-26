@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Actividades - {{ grupo.nombre }}{% endblock %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">{{ grupo.nombre }}</h2>
+    <p class="text-center">{{ descripcion }}</p>
+
+    {% if grupos_actividad %}
+    <div class="row mt-4">
+        {% for g in grupos_actividad %}
+        <div class="col-md-3 text-center mb-4">
+            {% if g.imagen %}
+                <img src="{{ g.imagen.url }}" 
+                     alt="{{ g.nombre }}" 
+                     class="img-fluid rounded shadow" 
+                     style="max-height:200px; object-fit:cover;">
+            {% else %}
+                <img src="{% static 'management_CADI/images/create/galery.png' %}" 
+                     alt="Sin imagen" 
+                     class="img-fluid rounded shadow" 
+                     style="max-height:200px; object-fit:cover;">
+            {% endif %}
+            <h6 class="mt-2">{{ g.nombre }}</h6>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p class="text-center mt-4">No hay grupos de actividades aún.</p>
+    {% endif %}
+
+    <br><br>
+    <center>
+        <a href="{% url 'management_cadi:crear_grupo_actividad' '-' grupo.id_grupo %}" 
+           class="yellowBotton_Black">
+            Agregar grupo
+        </a>
+    </center>
+</div>
+{% endblock %}
