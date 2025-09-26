@@ -1,6 +1,6 @@
 
 from django.db.models import Count  # Import correction
-from  universitaryWellbeing.models import Participaciones, Asistencias, Actividades, TiposActividad, GruposActividad, Grupos
+from  universitaryWellbeing.models import Participaciones, HorarioActividad, Actividades, TiposActividad, GruposActividad, Grupos
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.db.models import Max
@@ -18,25 +18,55 @@ def cadi_index(request):
         "grupos_actividad": grupos_actividad
     })
 
-def create_Activities(request):
-    tipos = TiposActividad.objects.all().order_by("id_tipo")  # ordenados por id
+def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
+    grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
+    tipos = TiposActividad.objects.all().order_by("id_tipo")
 
     if request.method == "POST":
         nombre = request.POST.get("nombre")
-        espacio = request.POST.get("espacio")
-        horario = request.POST.get("horario")
+        lugar = request.POST.get("espacio")
         tipo_id = request.POST.get("tipo")
+        tipo = TiposActividad.objects.filter(pk=tipo_id).first()
 
-        # ejemplo de cómo podrías guardarlo (si tu modelo Actividad tiene tipo):
-        # tipo = TiposActividad.objects.get(pk=tipo_id)
-        # Actividad.objects.create(nombre=nombre, espacio=espacio, horario=horario, tipo=tipo)
+        actividad = Actividades.objects.create(
+            nombre=nombre,
+            lugar=lugar,
+            tipos_actividad_id_tipo=tipo,
+            actividades_grupos=grupo_actividad
+        )
 
-    return render(request, "form_activities.html", {"tipos": tipos})
+        return redirect(
+            "management_cadi:listar_actividades",
+            grupo_nombre=grupo_nombre,
+            grupo_id=grupo_id,
+            grupo_actividad_id=grupo_actividad.id_grupo_actividad
+        )
 
-def add_schedule(request):
-    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
-    horas = ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"]
-    return render(request, "schedule.html", {"dias_semana": dias_semana, "horas": horas})
+    return render(
+        request, 
+        "form_activities.html", 
+        {"tipos": tipos, "grupo_actividad": grupo_actividad}
+    )
+
+
+def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
+    grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
+    actividades = Actividades.objects.filter(actividades_grupos=grupo_actividad)
+
+    slug_real = slugify(grupo_actividad.nombre)
+    if grupo_nombre != slug_real:
+        return redirect(
+        "management_cadi:listar_actividades",
+        grupo_nombre=slug_real,
+        grupo_id=grupo_id,
+        grupo_actividad_id=grupo_actividad_id
+    )
+
+    return render(request, "listar_actividades.html", {
+        "grupo_actividad": grupo_actividad,
+        "actividades": actividades
+    })
+
 
 def listar_grupos_actividad(request, grupo_nombre, grupo_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
@@ -87,3 +117,39 @@ def crear_grupo_actividad(request, grupo_nombre, grupo_id):
         return redirect("management_cadi:listar_grupos_actividad", grupo_nombre=slug_real, grupo_id=grupo.id_grupo)
 
     return render(request, "form_gruposActivi.html", {"grupo": grupo})
+
+
+def add_schedule(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id):
+    actividad = get_object_or_404(Actividades, pk=actividad_id)
+
+    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
+    horas = [f"{h:02d}:00" for h in range(7, 22)]  # ejemplo: 07:00 - 21:00
+
+    if request.method == "POST":
+        profesor = request.POST.get("nombre")
+        hora_inicio = request.POST.get("hora_inicio")
+        hora_fin = request.POST.get("hora_fin")
+        dias = request.POST.getlist("dias")  # lista de días seleccionados
+
+        for dia in dias:
+            HorarioActividad.objects.create(
+                actividad=actividad,
+                dia=dia,
+                hora_inicio=hora_inicio,
+                hora_fin=hora_fin,
+                espacio=actividad.lugar,  # puedes modificar si quieres otro campo
+                profesor=profesor
+            )
+
+        return redirect(
+            "management_cadi:listar_actividades",
+            grupo_nombre=grupo_nombre,
+            grupo_id=grupo_id,
+            grupo_actividad_id=grupo_actividad_id
+        )
+
+    return render(request, "schedule.html", {
+        "actividad": actividad,
+        "dias_semana": dias_semana,
+        "horas": horas
+    })

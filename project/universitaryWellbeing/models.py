@@ -10,25 +10,50 @@ from django.utils.text import slugify
 import os
 
 class Actividades(models.Model):
-    id_actividad = models.FloatField(primary_key=True)
+    id_actividad = models.AutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     lugar = models.CharField(max_length=150, blank=True, null=True)
     fecha_inicio = models.DateField(blank=True, null=True)
     fecha_fin = models.DateField(blank=True, null=True)
-    requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
+    requiere_inscripcion = models.BooleanField(default=False)  # 👈 booleano
     modalidad = models.CharField(max_length=1, blank=True, null=True)
     aforo = models.FloatField(blank=True, null=True)
     fecha_apertura_ins = models.DateField(blank=True, null=True)
     fecha_cierre_ins = models.DateField(blank=True, null=True)
-    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
-    id_tipo = models.FloatField(blank=True, null=True)
-    actividades_grupos_id_actividad_grupo = models.ForeignKey('ActividadesGrupos', models.DO_NOTHING, db_column='actividades_grupos_id_actividad_grupo', blank=True, null=True)
+    tipos_actividad_id_tipo = models.ForeignKey(
+        'TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True
+    )
+    actividades_grupos = models.ForeignKey(  # 👈 más claro
+        'GruposActividad',
+        models.DO_NOTHING,
+        db_column='GRUPOS_ACTIVIDAD_ID',
+        related_name='actividades',
+        blank=True,
+        null=True
+    )
 
     class Meta:
-        managed = False
+        managed = False  # porque la tabla ya existe
         db_table = 'actividades'
 
+
+class HorarioActividad(models.Model):
+    id_horario = models.AutoField(primary_key=True)
+    actividad = models.ForeignKey(
+        Actividades,
+        on_delete=models.PROTECT,   
+        related_name='horarios'
+    )
+    dia = models.CharField(max_length=50)  # Ej: "Martes y Jueves"
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    espacio = models.CharField(max_length=150)
+    profesor = models.CharField(max_length=150)
+
+    class Meta:
+        managed = True
+        db_table = 'horarios_actividad'
 
 class ActividadesGrupos(models.Model):
     id_actividad_grupo = models.FloatField(primary_key=True)
@@ -316,14 +341,15 @@ class Grupos(models.Model):
 
 
 def actividad_upload_to(instance, filename):
-    # id del grupo (ejemplo: 3)
+
     grupo_id = instance.grupos_id_grupo.id_grupo
-    # slug del nombre (ejemplo: futbol)
+
     actividad_slug = slugify(instance.nombre)
-    # extensión original
+
     ext = filename.split('.')[-1]
-    # nombre de archivo fijo
+
     filename = f"{actividad_slug}.{ext}"
+    
     # ruta final: media/<grupo_id>/<actividad_slug>/<actividad_slug>.ext
     return os.path.join(str(grupo_id), actividad_slug, filename)
 
