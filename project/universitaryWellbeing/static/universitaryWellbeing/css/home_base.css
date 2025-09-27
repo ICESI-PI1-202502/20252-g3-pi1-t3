@@ -1,0 +1,59 @@
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 300px; /* puedes ajustar el alto */
+  background: url("/static/universitaryWellbeing/img/home_image.png") no-repeat center center;
+  background-size: cover;
+  display: flex;
+  border: 1px solid #fff;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-overlay {
+  background: rgba(0, 0, 0, 0.35);
+  width: 100%;
+  height: 100%;
+  display: flex;
+  border-radius: 20px;
+  align-items: center;
+  justify-content: center;
+  padding: 0 1rem;
+}
+
+.hero-overlay h2 {
+  color: white;
+  font-size: clamp(1.2rem, 4vw, 2rem);
+  text-align: center;
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.image-container {
+    position: relative;
+    width: 100%;           /* ocupa 80% del ancho del contenedor padre */
+    max-width: 500px;     /* tamaño máximo de la imagen */
+    height: 300px;        /* altura fija que puedes ajustar */
+    overflow: hidden;
+    border-radius: 10px;
+    margin: 0 auto;       /* centra el contenedor */
+}
+
+.image-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;    
+}
+
+.center-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 20px;
+    font-weight: bold;
+    text-align: center;
+    text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
+}

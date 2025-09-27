@@ -8,25 +8,12 @@
         Bienestar Universitario
       </a>
 
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
-              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-      </button>
+      
 
       <!-- ADDED: wrapper que contiene nav-collapse + campana -->
       <div class="d-flex align-items-center ms-auto">
         <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
-            {% if user.is_authenticated %}
-              {% if user.is_staff %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a></li>
-              {% endif %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
-            {% else %}
-              <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Iniciar sesión</a></li>
-            {% endif %}
-          </ul>
+          
         </div>
 
         <!-- ADDED: bell -->
@@ -36,17 +23,25 @@
             </a>
             </div>
 
+              <!-- en lugar del bloque <div class="navbar-option ms-3"> con la imagen PP -->
+              <div class="navbar-option ms-3">
+                {% include 'includes/user_avatar.html' %}
+              </div>
+
+            <!--
             <div class="navbar-option ms-3">
             <a href="#" title="Notificaciones">
                 <img src="{% static 'universitaryWellbeing/img/PP_option.png' %}" alt="Notificaciones" />
             </a>
             </div>
+            -->
             
             <div class="navbar-option ms-3">
-            <a href="#" title="Notificaciones">
-                <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Notificaciones" />
-            </a>
+              <a href="#" id="menu-btn" title="Menú">
+                <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+              </a>
             </div>
+
 
             
 
@@ -55,8 +50,4 @@
     </div>
   </nav>
 
-  <!-- SUBHEADER -->
-  <nav class="sub-bar">
-    <a href="javascript:history.back()"> Regresar</a>
-  </nav>
 </header>

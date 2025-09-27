@@ -2,11 +2,17 @@
 {% load static %}
 
 {% block title %}
- ¡Bienvenido!
+ ¡Preferencias!
+{% endblock %}
+
+{% block subheaderBar %}
+  <a href="javascript:history.back()" class="back-link">
+    <i class="bi bi-arrow-left"></i> Regresar
+  </a>
 {% endblock %}
 
 {% block extra_css %}
-	{{ block.super }}
+  	{{ block.super }}
 	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
 {% endblock %}
 
@@ -15,13 +21,12 @@
 	<section class="list-preferences">
 
 		<!-- Título y descripción -->
-		<h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
-		<p class="esto-nos-ayudar">
-			Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
-		</p>
+		<h2>Ahora seleccionemos tus 3 actividades favoritas</h2>
+        <p>Aquí podrás elegir específicamente tus actividades favoritas.</p>
 
 		<!-- Formulario de selección de categorías -->
   		<form method="POST">
+            <!--
     		{% csrf_token %}
     		<div class="categories-grid">
 				{% for category in categories %}
@@ -30,6 +35,7 @@
 					</label>
 				{% endfor %}
     		</div>
+            --> 
 
 			<!-- Botón para enviar el formulario -->
 			<button class="greenBotton_White">Continuar</button>

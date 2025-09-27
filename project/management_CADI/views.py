@@ -1,6 +1,6 @@
 
 from django.db.models import Count  # Import correction
-from .models import Participaciones, Asistencias, Actividades, Notificaciones
+from  universitaryWellbeing.models import Participaciones, Asistencias, Actividades, Notificaciones
 from django.shortcuts import render
 
 def is_admin(user):
@@ -9,3 +9,14 @@ def is_admin(user):
 # @user_passes_test(is_admin)  # Uncomment if you want to restrict access
 def cadi_index(request):
     return render(request, "./cadi_Activities.html")
+
+def create_Clasification(request):
+    return render(request, "./form_Clasifications.html")
+
+def create_Activities(request):
+    return render(request, "./form_Activities.html")
+
+def add_schedule(request):
+    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"]
+    horas = ["07:00","08:00","09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00"]
+    return render(request, "schedule.html", {"dias_semana": dias_semana, "horas": horas})

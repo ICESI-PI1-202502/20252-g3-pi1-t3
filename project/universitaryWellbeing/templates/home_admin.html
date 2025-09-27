@@ -1,0 +1,73 @@
+{% extends "home_base.html" %}
+{% load static %}
+
+{% block content %}
+
+    {{ block.super }}
+
+    <center>
+        <table border="0" width="85%" style="border-spacing: 0 50px; border-collapse: separate;" cellpadding="10">
+            <tr>
+                <td align="center">
+                    <div class="offer-card">
+                        <div class="image-container position-relative text-center">
+                            <img src="{% static 'universitaryWellbeing/img/offer/image1.png' %}" class="img-fluid" alt="CADI">
+                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
+                                Centro Artístico y Deportivo Icesi - CADI
+                            </h3>
+                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+                                Gestionar actividades
+                            </button>
+                        </div>
+                    </div>
+                </td>
+
+                <td align="center">
+                    <div class="offer-card">
+                        <div class="image-container position-relative text-center">
+                            <img src="{% static 'universitaryWellbeing/img/offer/image2.png' %}" class="img-fluid" alt="CADI">
+                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
+                                Desarrollo Humano y Promoción de la Salud
+                            </h3>
+                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+                                Gestionar actividades
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td align="center">
+                    <div class="offer-card">
+                        <div class="image-container position-relative text-center">
+                            <img src="{% static 'universitaryWellbeing/img/offer/image3.png' %}" class="img-fluid" alt="CADI">
+                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
+                                Proyecto Social de Bienestar Universitario (PSU)
+                            </h3>
+                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+                                Gestionar actividades
+                            </button>
+                        </div>
+                    </div>
+                </td>
+
+                <td align="center">
+                    <div class="offer-card">
+                        <div class="image-container position-relative text-center">
+                            <img src="{% static 'universitaryWellbeing/img/offer/image4.png' %}" class="img-fluid" alt="CADI">
+                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
+                                Programa Estás en Casa
+                            </h3>
+                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+                                Gestionar actividades
+                            </button>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </center>
+
+
+{% endblock %}

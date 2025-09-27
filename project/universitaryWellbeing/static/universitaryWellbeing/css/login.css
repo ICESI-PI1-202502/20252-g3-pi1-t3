@@ -175,3 +175,11 @@ body {
 /* when password is hidden (default), show eye and hide eye-off */
 .password-toggle[data-visible="false"] .icon-eye { display: inline; }
 .password-toggle[data-visible="false"] .icon-eye-off { display: none; }
+
+
+/* Forzar la fuente en todos los elementos */
+html, body, h1, h2, h3, h4, h5, h6,
+p, a, button, input, textarea, select,
+.message, .botn-agregar, .registrarse, .administrador {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}

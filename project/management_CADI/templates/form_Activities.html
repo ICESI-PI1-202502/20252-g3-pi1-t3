@@ -1,0 +1,37 @@
+{% extends "form_base.html" %}
+{% load static %}
+
+{% block title %}Crear Actividad{% endblock %}
+{% block form_title %}Añadir nueva actividad{% endblock %}
+
+{% block form_fields %}
+
+  
+  <div class="row text-center mb-4">
+    <div class="col-md-6">
+      <h6>Nombre de actividad</h6>
+      <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
+    </div>
+
+    <div class="col-md-6">
+      <h6>Espacio</h6>
+      <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="50" required></textarea>
+    </div>
+  </div>
+
+  <div class="col-md-6">
+      <h6>Horario</h6>
+      <textarea name="descripcion" class="form-control text-center" rows="3" maxlength="50" required></textarea>
+    </div>
+  </div>
+
+
+    <br>
+    <div class="row text-center">
+    <div class="col-md-12">
+      <a href="{% url 'management_cadi:form_Activities-2' %}" target="_blank" class="yellowBotton_Black">
+        Agregar horario
+      </a>
+    </div>
+  </div>
+{% endblock %}
