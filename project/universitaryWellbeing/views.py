@@ -1,6 +1,6 @@
 from datetime import date
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout, get_user_model
+from django.contrib.auth import login, logout
 from django.contrib.auth.models import User, Group
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -10,92 +10,75 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect, render
 from django.contrib.auth.views import LoginView
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles
+from .forms import UserLoginForm, UserRegisterForm
 
 def user_login(request):
     if request.method == "POST":
-        cedula_input = request.POST.get("cedula", "").strip()
-        password = request.POST.get("password", "")
-
-        if not User.objects.filter(username=cedula_input).exists():
-            messages.error(request, "El usuario con esa cédula no existe")
-            return redirect("user_login")
-
-        user = authenticate(request, username=cedula_input, password=password)
-
-        if user is not None:
-            login(request, user)
-            participante = getattr(user, "participante", None)
-            if is_role_admin(user):
-                return redirect("admin:index")  # admin Django
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            login(request, form.user)
+            if is_role_admin(form.user):
+                return redirect("admin:index")
             return redirect("home")
         else:
-            messages.error(request, "Contraseña incorrecta")
+            for error in form.errors.values():
+                messages.error(request, error)
             return redirect("login")
-
-    # GET → mostrar formulario vacío
-    return render(request, "login.html", {})
-
+    else:
+        form = UserLoginForm()
+    return render(request, "login.html", {'form': form})
 
 def register(request):
     if request.method == "POST":
-        cedula_input = request.POST.get("cedula", "").strip()
-        name = request.POST.get("nombre_completo", "").strip()
-        email = request.POST.get("email", "").strip()
-        password = request.POST.get("password", "")
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            cedula = form.cleaned_data['cedula']
+            nombre_completo = form.cleaned_data['nombre_completo']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
 
-        if not cedula_input.isdigit():
-            messages.error(request, "La cédula debe contener solo números.")
-            return redirect("register")
+            if " " in nombre_completo:
+                first_name, last_name = nombre_completo.split(" ", 1)
+            else:
+                first_name, last_name = nombre_completo, ""
 
-        # Verifica si ya existe un usuario con esa cédula
-        if get_user_model().objects.filter(username=cedula_input).exists():
-            messages.error(request, "Este número de cédula ya está registrado.")
-            return redirect("register")
-        
-          # Validación del correo electrónico usando `validate_email`
-        try:
-            validate_email(email)  # Intentamos validar el email
-        except ValidationError:
-            messages.error(request, "El correo electrónico no es válido.")
-            return redirect("register")
-        
-        # Verifica si el correo electrónico ya está registrado
-        if get_user_model().objects.filter(email=email).exists():
-            messages.error(request, "Este correo electrónico ya está registrado.")
-            return redirect("register")
-        
-        # Divide el nombre completo en 'first_name' y 'last_name'
-        if " " in name:
-            first_name, last_name = name.split(" ", 1)  # Dividimos solo en el primer espacio
+            user = User.objects.create_user(
+                username=cedula,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+
+            rol = Roles.objects.get(nombre_rol='Estudiante')
+            Participantes.objects.create(
+                user=user,
+                nombre=first_name,
+                apellido=last_name,
+                correo=email,
+                semestre=None,
+                facultad="",
+                programa="",
+                genero="",
+                estado_activo="S",  # o lo que necesites por defecto
+                roles_id_rol=rol
+            )
+
+            if rol.grupo_d:
+                user.groups.add(rol.grupo_d)
+
+            messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
+            return redirect("login")
         else:
-            first_name, last_name = name, ""  # Si no hay espacio, todo es 'first_name'
-        
-        # Crear el usuario
-        user = get_user_model().objects.create_user(
-            username=cedula_input,
-            password=password,
-            email=email,
-            first_name=first_name,
-            last_name=last_name
-        )
+            for error in form.errors.values():
+                messages.error(request, error)
+            return redirect("register")
+    else:
+        form = UserRegisterForm()
 
-         # Crear el participante enlazado
-        Participantes.objects.create(
-            user=user,
-            nombre=first_name,
-            apellido=last_name,
-            correo=email,
-            semestre=None,
-            facultad="",
-            programa=""
-        )
-        messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
-        return redirect("login")
-
-    return render(request, "auth/register.html")
-
-class AdminLoginView(LoginView):
+    return render(request, "auth/register.html", {'form': form})
+#class AdminLoginView(LoginView):
     template_name = 'login.html'
 
     def form_valid(self, form):

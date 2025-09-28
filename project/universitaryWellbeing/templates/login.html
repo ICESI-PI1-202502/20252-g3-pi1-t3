@@ -19,8 +19,8 @@
 		<div class="hola-de-nuevo">¡Hola de nuevo!</div>
 		<form method="POST" action="">
 			{% csrf_token %}
-
-			<div class="field" id="emailField">
+            <!-- Cédula -->
+			<div class="field" id="ccField">
 				<div class="value">
 					<input type="text" id="cedula" name="cedula" placeholder="Cédula" value="{{ cedula|default:'' }}">
 
@@ -71,9 +71,6 @@
 		</form>
 		<a class="registrarse" href="{% url 'register' %}">Registrarse</a>
 
-		<div class="administrador" id="administradorText">
-         <a href="{% url 'admin_login' %}" id="adminLink">Administrador</a>
-        </div>
 		<div class="universidad-icesi-calle-container">
 			<p class="universidad-icesi-calle">Universidad Icesi, Calle 18 No. 122-135</p>
 			<p class="universidad-icesi-calle">Pance, Cali - Colombia</p>

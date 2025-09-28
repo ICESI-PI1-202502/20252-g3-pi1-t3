@@ -30,13 +30,6 @@ const cedulaInput = document.getElementById("cedula");
         });
     }
 
-    var administradorText = document.getElementById("administradorText");
-    if (administradorText) {
-        administradorText.addEventListener("click", function (e) {
-            // Add your code here
-        });
-    }
-
     (function () {
         const toggle = document.getElementById('togglePassword');
         const pwd = document.getElementById('password');
