@@ -147,6 +147,10 @@ def preferences(request):
 
 def home_user(request):
     data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
+    return render(request, 'home_user.html', {'actividades': data})
+
+#def home_user(request):
+    data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
     user_email = request.user.email
 
     try:
