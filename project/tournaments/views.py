@@ -1,7 +1,7 @@
 # Gestionar equipo (demo)
 from django.views.decorators.csrf import csrf_exempt
 import datetime
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
@@ -9,45 +9,77 @@ from django.db import connection, transaction
 from django.contrib import messages
 from django.db.models import Max
 from universitaryWellbeing.models import (
- Torneos, Disciplinas, EstadosTorneo, Equipos
+ Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos
 )
 from django.http import Http404
 
-##ALL OF THIS IS JUST DEMO / MOCKUP DATA - NO PERSISTENCE
-DEMO_TOURNAMENTS = [
-    {
-        "id": 1,
-        "nombre": "Torneo de Valorant",
-        "fecha_inicio": ...,
-        "fecha_fin": ...,
-        "disciplina": "Valorant",
-        "tiene_equipos": True,
-        "teams": [
-            {
-                "id": 101,
-                "nombre": "Team Alpha",
-                "participants": [
-                    {"id": 1001, "nombre": "Juan Perez"},
-                    {"id": 1002, "nombre": "Ana Gomez"},
-                ]
-            },
-            # more teams...
-        ],
-    },
-    # more tournaments...
-]
-##ALL OF THIS IS JUST DEMO / MOCKUP DATA - NO PERSISTENCE
+def get_torneo_or_404(id_: int):
+    t = get_object_or_404(
+        Torneos.objects.select_related("disciplinas_id_disciplina"),
+        pk=id_
+    )
 
+    data = {
+        "id": t.id_torneo,
+        "nombre": t.nombre,
+        "fecha_inicio": t.fecha_inicio,
+        "fecha_fin": t.fecha_fin,
+        "disciplina": getattr(t.disciplinas_id_disciplina, "nombre", "") or "",
+        "aforo_equipos": t.aforo_equipos,
+        "tiene_equipos": bool(t.aforo_equipos),
+    }
 
-def _get(id_: int):
-    for t in DEMO_TOURNAMENTS:
-        if t["id"] == id_:
-            return t
-    raise Http404("Torneo no encontrado")
+    teams = []
+    if data["tiene_equipos"]:
+        teams = list(
+            Equipos.objects
+            .filter(torneosequipos__torneos_id_torneo=id_)   # ✅ through table
+            .values("id_equipo", "nombre")
+            .distinct()
+        )
 
-# Historia 1: lista
+    return data, teams
+
+# Historia : Crear Torneo
+def crear_torneo(request):
+    disciplinas = Disciplinas.objects.all().order_by("id_disciplina")
+    print("Disciplinas count:", disciplinas.count())
+
+    if request.method == "POST":
+        nombre        = (request.POST.get("nombre") or "").strip()
+        disciplina_id = (request.POST.get("disciplina") or "").strip()
+        fecha_inicio  = (request.POST.get("fecha_inicio") or "").strip() 
+        fecha_fin     = (request.POST.get("fecha_fin") or "").strip()
+        aforo         = (request.POST.get("aforo") or "").strip()
+
+        # Validations
+        if not nombre or not disciplina_id or not fecha_inicio or not fecha_fin:
+            messages.error(request, "Completa nombre, disciplina y fechas.")
+            return redirect("tournaments:create")
+
+        try:
+            Torneos.objects.create(
+                nombre=nombre,
+                disciplinas_id_disciplina_id=disciplina_id,
+                fecha_inicio=fecha_inicio,
+                fecha_fin=fecha_fin,
+                estados_torneo_id_estado_torneo_id=1,  
+                reglas_elegibilidad=None,
+                aforo_equipos=(aforo or None),
+            )
+        except Exception as e:
+            print("Error creating torneo:", e)
+            messages.error(request, f"No se pudo crear el torneo: {e}")
+            return redirect("tournaments:create")
+        
+        messages.success(request, "Torneo creado correctamente.")
+        return redirect("tournaments:list")
+    # GET
+    return render(request, "create_tournament.html", {"disciplinas": disciplinas})     
+
+# Historia : lista
 def lista_torneos(request):
-    q = (request.GET.get("q") or "").strip().lower()
+    q = (request.GET.get("q") or "").strip().lower()   # ← not request.get
 
     # Fetch tournaments from DB
     rows = (
@@ -71,30 +103,19 @@ def lista_torneos(request):
         }
         if not q or q in item["nombre"].lower() or q in item["disciplina"].lower():
             items.append(item)
-
-    # If no tournaments in DB, use demo tournaments
-    if not items:
-        for t in DEMO_TOURNAMENTS:
-            if not q or q in t["nombre"].lower() or q in t["disciplina"].lower():
-                items.append(t)
-
-    return render(
-        request,
-        "list_tournament.html",
-        {"tournaments": items, "search": request.GET.get("q", "")},
+    return render(request,"list_tournament.html",{"tournaments": items, "search": request.GET.get("q", "")},
     )
 
-# Historia 2: detalle -> elige template según tiene_equipos
+# Historia : detalle
 def detalle_torneo(request, id: int):
-    t = _get(id)
-    ctx = {"tournament": t, "teams": t.get("teams", []) if t["tiene_equipos"] else []}
+    t, teams = get_torneo_or_404(id)
     template = "detail_team.html" if t["tiene_equipos"] else "detail_individual.html"
-    return render(request, template, ctx)
+    return render(request, template, {"tournament": t, "teams": teams})
 
 # Historia 3: inscripción individual (demo)
 #@login_required
 def inscripcion_individual(request, id: int):
-    torneo = _get(id)
+    torneo, _ = get_torneo_or_404(id)
     if torneo["tiene_equipos"]:
         raise Http404("Este torneo no es individual.")
 
@@ -128,7 +149,7 @@ def inscripcion_individual(request, id: int):
 # Historia 4: crear equipo (demo)
 #@login_required
 def crear_equipo(request, id: int):
-    torneo = _get(id)
+    torneo, _ = get_torneo_or_404(id)
     if not torneo["tiene_equipos"]:
         raise Http404("Este torneo no es por equipos.")
 
@@ -175,16 +196,16 @@ def crear_equipo(request, id: int):
 # Historia 5: unirse a equipo (demo)
 #@login_required
 def unirse_equipo(request, id: int):
-    torneo = _get(id)
+    torneo, teams = get_torneo_or_404(id)
     if not torneo["tiene_equipos"]:
         raise Http404("Este torneo no es por equipos.")
 
-    ctx = {"tournament": torneo, "teams": torneo.get("teams", []), "ok": False, "errors": {}}
+    ctx = {"tournament": torneo, "teams": teams, "ok": False, "errors": {}}
 
     if request.method == "POST":
         team_id = (request.POST.get("team_id") or "").strip()
-        correo = (request.POST.get("correo") or "").strip()
-        cedula = (request.POST.get("cedula") or "").strip()
+        correo  = (request.POST.get("correo") or "").strip()
+        cedula  = (request.POST.get("cedula") or "").strip()
 
         if not team_id:
             ctx["errors"]["team_id"] = "Selecciona un equipo"
@@ -196,104 +217,11 @@ def unirse_equipo(request, id: int):
             ctx["errors"]["cedula"] = "La cédula debe tener exactamente 10 dígitos"
 
         if not ctx["errors"]:
-            # demo ok
-            elegido = next((t for t in torneo.get("teams", []) if str(t["id"]) == team_id), None)
+            elegido = next((t for t in teams if str(t["id_equipo"]) == team_id), None)
             ctx.update(ok=True, team=elegido, correo=correo)
 
     return render(request, "join_team.html", ctx)
 
 
-    ##historia mis cojones
-@csrf_exempt
-def gestionar_equipo(request, team_id):
-    # Demo: Find team in DEMO_TOURNAMENTS
-    team = None
-    tournament = None
-    for t in DEMO_TOURNAMENTS:
-        for tm in t.get("teams", []):
-            if tm["id"] == int(team_id):
-                team = tm
-                tournament = t
-                break
-        if team:
-            break
-    if not team:
-        raise Http404("Equipo no encontrado")
 
-    # Demo: Add extra info for mockup
-    team_details = {
-        "nombre": team.get("nombre", ""),
-        "tag": team.get("tag", "LPL"),
-        "invite_link": "bienestar.edu/join/4F9KQ2",
-        "integrantes_count": len(team.get("participants", [])),
-        "integrantes_max": 5,
-        "qr_url": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + team.get("invite_link", "bienestar.edu/join/4F9KQ2"),
-    }
-
-    integrantes = []
-    for idx, p in enumerate(team.get("participants", [])):
-        integrantes.append({
-            "id": p["id"],
-            "nombre": p["nombre"],
-            "rol": "Lider" if idx == 0 else "Titular"
-        })
-
-    # Handle POST actions (remove/promote)
-    if request.method == "POST":
-        remove_id = request.POST.get("remove_id")
-        promote_id = request.POST.get("promote_id")
-        if remove_id:
-            team["participants"] = [p for p in team["participants"] if str(p["id"]) != remove_id]
-            return redirect(request.path)
-        if promote_id:
-            # Demo: promote participant to leader (move to first position)
-            idx = next((i for i, p in enumerate(team["participants"]) if str(p["id"]) == promote_id), None)
-            if idx is not None:
-                team["participants"].insert(0, team["participants"].pop(idx))
-            return redirect(request.path)
-
-    return render(request, "team_details.html", {
-        "team": team_details,
-        "tournament": tournament,
-        "integrantes": integrantes,
-    })
-
-# Historia 6: Crear Torneo ()
-def crear_torneo(request):
-    disciplinas = Disciplinas.objects.all().order_by("id_disciplina")
-    print("Disciplinas count:", disciplinas.count())
-
-    if request.method == "POST":
-        nombre        = (request.POST.get("nombre") or "").strip()
-        disciplina_id = (request.POST.get("disciplina") or "").strip()
-        fecha_inicio  = (request.POST.get("fecha_inicio") or "").strip()  # input type=date → 'YYYY-MM-DD'
-        fecha_fin     = (request.POST.get("fecha_fin") or "").strip()
-        aforo         = (request.POST.get("aforo") or "").strip()
-
-        # Validations
-        if not nombre or not disciplina_id or not fecha_inicio or not fecha_fin:
-            messages.error(request, "Completa nombre, disciplina y fechas.")
-            return redirect("tournaments:create")
-        
-        next_id = (Torneos.objects.aggregate(Max("id_torneo"))["id_torneo__max"] or 0) + 1
-
-        try:
-            Torneos.objects.create(
-                nombre=nombre,
-                disciplinas_id_disciplina_id=disciplina_id,
-                fecha_inicio=fecha_inicio,
-                fecha_fin=fecha_fin,
-                estados_torneo_id_estado_torneo_id=1,  
-                reglas_elegibilidad=None,
-                aforo_equipos=(aforo or None),
-            )
-        except Exception as e:
-            print("Error creating torneo:", e)
-            messages.error(request, f"No se pudo crear el torneo: {e}")
-            return redirect("tournaments:create")
-        
-        messages.success(request, "Torneo creado correctamente.")
-        return redirect("tournaments:list")
-    # GET
-    return render(request, "create_tournament.html", {"disciplinas": disciplinas}) 
   
