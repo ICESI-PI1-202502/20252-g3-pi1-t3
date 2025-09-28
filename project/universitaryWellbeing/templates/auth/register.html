@@ -3,7 +3,8 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="initial-scale=1, width=device-width">
+  <meta name="viewport" content="width=device-width, initial-scale=0.8">
+  <title>Registrarse</title>
   <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/login.css' %}">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap">
 </head>
@@ -23,6 +24,20 @@
       <div class="field">
         <div class="value">
           <input type="text" name="cedula" placeholder="Cédula" required>
+        </div>
+      </div>
+
+      <!-- Nombre Completo -->
+      <div class="field">
+        <div class="value">
+          <input type="text" name=" nombre_completo" placeholder="Nombre Completo" required>
+        </div>
+      </div>
+
+      <!-- E-mail -->
+      <div class="field">
+        <div class="value">
+          <input type="text" name="email" placeholder="E-mail" required>
         </div>
       </div>
 
@@ -84,54 +99,6 @@
     </div>
   </div>
 
-  <script>
-    var registerButton = document.getElementById("registerButton");
-    if (registerButton) {
-      registerButton.addEventListener("click", function () {
-        this.closest("form").submit(); // envía el formulario padre
-      });
-    }
-
-    (function () {
-      const toggle = document.getElementById('togglePassword');
-      const pwd = document.getElementById('password');
-      const eye = toggle.querySelector('.icon-eye');
-      const eyeOff = toggle.querySelector('.icon-eye-off');
-
-      if (!toggle || !pwd) return;
-
-      // initial state: hidden
-      toggle.setAttribute('data-visible', 'false');
-
-      toggle.addEventListener('click', function () {
-        const start = pwd.selectionStart;
-        const end = pwd.selectionEnd;
-
-        const isVisible = toggle.getAttribute('data-visible') === 'true';
-        if (isVisible) {
-          pwd.type = 'password';
-          toggle.setAttribute('data-visible', 'false');
-          toggle.setAttribute('aria-label', 'Mostrar contraseña');
-          toggle.title = 'Mostrar contraseña';
-          eye.style.display = 'inline';
-          eyeOff.style.display = 'none';
-        } else {
-          pwd.type = 'text';
-          toggle.setAttribute('data-visible', 'true');
-          toggle.setAttribute('aria-label', 'Ocultar contraseña');
-          toggle.title = 'Ocultar contraseña';
-          eye.style.display = 'none';
-          eyeOff.style.display = 'inline';
-        }
-
-        try {
-          pwd.setSelectionRange(start, end);
-          pwd.focus({ preventScroll: true });
-        } catch (err) {
-          pwd.focus();
-        }
-      });
-    })();
-  </script>
+  <script src="{% static 'universitaryWellbeing/js/register.js' %}"></script>
 </body>
 </html>

@@ -1,4 +1,4 @@
- var registerButton = document.getElementById("registerButton");
+  var registerButton = document.getElementById("registerButton");
     if (registerButton) {
       registerButton.addEventListener("click", function () {
         this.closest("form").submit(); // envía el formulario padre
