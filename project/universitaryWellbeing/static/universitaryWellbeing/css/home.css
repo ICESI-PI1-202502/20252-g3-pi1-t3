@@ -344,3 +344,24 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   text-transform:uppercase;
   cursor: pointer;
 }
+
+
+
+
+
+
+/* Solo aplica dentro de estadísticas */
+.estadisticas-page .tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.estadisticas-page .tabla th,
+.estadisticas-page .tabla td {
+  border: 1px solid #ddd;
+  padding: 8px;
+}
+
+.estadisticas-page form {
+  margin-bottom: 20px;
+}

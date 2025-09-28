@@ -8,10 +8,10 @@
     <!-- Buscador / Filtros -->
     <form method="GET" action="{% url 'analytics_reports:analisis_comportamiento' %}" class="mb-3">
         <div class="row g-2">
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <input type="number" name="min_frecuencia" class="form-control" placeholder="Frecuencia mínima" value="{{ request.GET.min_frecuencia|default:'' }}">
             </div>
-            <div class="col-md-4">
+            <div class="col-md-3">
                 <select name="tipo_actividad" class="form-select">
                     <option value="">-- Tipo de actividad --</option>
                     {% for tipo in tipos_actividad %}
@@ -21,36 +21,196 @@
                     {% endfor %}
                 </select>
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
                 <button type="submit" class="btn btn-primary w-100">Buscar</button>
+            </div>
+            <div class="col-md-3">
+                <a href="?{% for key, value in request.GET.items %}{% if key != 'export' %}{{ key }}={{ value }}&{% endif %}{% endfor %}export=csv" 
+                   class="btn btn-success w-100">
+                    Descargar CSV
+                </a>
             </div>
         </div>
     </form>
 
-    <!-- Tabla de resultados administrativos -->
-    <table class="table table-striped mt-3">
-        <thead>
-            <tr>
-                <th>Usuario</th>
-                <th>Semestre</th>
-                <th>Tipo de actividad</th>
-                <th>Total Participaciones</th>
-            </tr>
-        </thead>
-        <tbody>
-            {% for item in data %}
-            <tr>
-                <td>{{ item.participantes_id_participante__nombre }}</td>
-                <td>{{ item.participantes_id_participante__semestre }}</td>
-                <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo }}</td>
-                <td>{{ item.total }}</td>
-            </tr>
-            {% empty %}
-            <tr>
-                <td colspan="4" class="text-center">No se encontraron resultados</td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <!-- Resumen estadístico -->
+    {% if data %}
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-primary">{{ data|length }}</h4>
+                    <p class="card-text">Total registros</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-success">
+                        {% with data|length as total %}
+                            {% if total > 0 %}
+                                {{ data.0.total|floatformat:0 }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        {% endwith %}
+                    </h4>
+                    <p class="card-text">Participaciones promedio</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-info">
+                        {% regroup data by participantes_id_participante__roles_id_rol__nombre_rol as roles_agrupados %}
+                        {{ roles_agrupados|length }}
+                    </h4>
+                    <p class="card-text">Tipos de usuarios</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4 class="text-warning">
+                        {% regroup data by actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo as tipos_agrupados %}
+                        {{ tipos_agrupados|length }}
+                    </h4>
+                    <p class="card-text">Tipos de actividades</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Tabla de resultados -->
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Resultados del Análisis</h5>
+            {% if data %}
+                <span class="badge bg-primary">{{ data|length }} registros encontrados</span>
+            {% endif %}
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Semestre</th>
+                            <th>Facultad</th>
+                            <th>Rol</th>
+                            <th>Tipo de actividad</th>
+                            <th>Total Participaciones</th>
+                            <th>Frecuencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.participantes_id_participante__nombre }}</strong>
+                                <br>
+                                <small class="text-muted">{{ item.participantes_id_participante__correo }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ item.participantes_id_participante__semestre|default:"N/A" }}
+                                </span>
+                            </td>
+                            <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
+                                </span>
+                            </td>
+                            <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo|default:"Sin especificar" }}</td>
+                            <td>
+                                <span class="badge bg-primary fs-6">{{ item.total }}</span>
+                            </td>
+                            <td>
+                                {% if item.total >= 5 %}
+                                    <span class="badge bg-success">Alta</span>
+                                {% elif item.total >= 2 %}
+                                    <span class="badge bg-warning">Media</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Baja</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-4">
+                                <i class="fas fa-search mb-2"></i>
+                                <br>
+                                No se encontraron resultados con los filtros aplicados
+                                <br>
+                                <small>Intenta ajustar los criterios de búsqueda</small>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información adicional -->
+    {% if data %}
+    <div class="mt-4">
+        <div class="alert alert-info">
+            <h6><i class="fas fa-info-circle"></i> Información sobre la frecuencia:</h6>
+            <ul class="mb-0">
+                <li><strong>Alta:</strong> 5 o más participaciones</li>
+                <li><strong>Media:</strong> 2-4 participaciones</li>
+                <li><strong>Baja:</strong> 1 participación</li>
+            </ul>
+        </div>
+    </div>
+    {% endif %}
 </div>
+
+<style>
+.card {
+    border: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.badge {
+    font-size: 0.8em;
+}
+
+.btn-success {
+    background: linear-gradient(45deg, #28a745, #20c997);
+    border: none;
+}
+
+.btn-success:hover {
+    background: linear-gradient(45deg, #218838, #1ea885);
+    transform: translateY(-1px);
+}
+
+.card-body h4 {
+    font-weight: bold;
+    font-size: 1.8em;
+}
+
+.table-responsive {
+    border-radius: 8px;
+}
+
+.alert-info {
+    border-left: 4px solid #17a2b8;
+    background-color: #f8f9fa;
+}
+</style>
 {% endblock %}

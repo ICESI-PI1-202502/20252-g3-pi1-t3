@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h2>Configurar Notificaciones Automáticas</h2>
+    
+    <form method="post" class="row g-3">
+        {% csrf_token %}
+        
+        <div class="col-md-6">
+            <label for="umbral_asistencia" class="form-label">Umbral de Asistencias Mínimas</label>
+            <input type="number" class="form-control" id="umbral_asistencia" name="umbral_asistencia" 
+                   value="3" min="1" max="20">
+            <div class="form-text">Estudiantes con menos asistencias generarán alerta</div>
+        </div>
+        
+        <div class="col-md-6">
+            <label for="dias_inactividad" class="form-label">Días de Inactividad</label>
+            <input type="number" class="form-control" id="dias_inactividad" name="dias_inactividad" 
+                   value="14" min="1" max="60">
+            <div class="form-text">Días sin asistir para considerar inactivo</div>
+        </div>
+        
+        <div class="col-12">
+            <div class="form-check">
+                <input class="form-check-input" type="checkbox" id="envio_automatico" name="envio_automatico" checked>
+                <label class="form-check-label" for="envio_automatico">
+                    Envío automático de notificaciones por email
+                </label>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <label for="frecuencia_envio" class="form-label">Frecuencia de Envío</label>
+            <select class="form-select" id="frecuencia_envio" name="frecuencia_envio">
+                <option value="diario">Diario</option>
+                <option value="semanal" selected>Semanal</option>
+                <option value="quincenal">Quincenal</option>
+            </select>
+        </div>
+        
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Guardar Configuración</button>
+            <a href="{% url 'analytics_reports:recomendaciones' %}" class="btn btn-secondary">Volver</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -20,9 +20,11 @@ class Actividades(models.Model):
     aforo = models.FloatField(blank=True, null=True)
     fecha_apertura_ins = models.DateField(blank=True, null=True)
     fecha_cierre_ins = models.DateField(blank=True, null=True)
-    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
+    tipos_actividad_id_tipo = models.ForeignKey(
+        'TiposActividad', models.DO_NOTHING,
+        db_column='tipos_actividad_id_tipo', blank=True, null=True
+    )
     id_tipo = models.FloatField(blank=True, null=True)
-    actividades_grupos_id_actividad_grupo = models.ForeignKey('ActividadesGrupos', models.DO_NOTHING, db_column='actividades_grupos_id_actividad_grupo', blank=True, null=True)
 
     class Meta:
         managed = False
