@@ -44,6 +44,10 @@ def register(request):
         email = request.POST.get("email", "").strip()
         password = request.POST.get("password", "")
 
+        if not cedula_input.isdigit():
+            messages.error(request, "La cédula debe contener solo números.")
+            return redirect("register")
+
         # Verifica si ya existe un usuario con esa cédula
         if get_user_model().objects.filter(username=cedula_input).exists():
             messages.error(request, "Este número de cédula ya está registrado.")

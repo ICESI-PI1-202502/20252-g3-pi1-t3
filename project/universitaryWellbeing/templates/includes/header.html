@@ -20,7 +20,7 @@
             <li class="nav-item"><a class="nav-link" href="{% url 'home' %}">Inicio</a></li>
             {% if user.is_authenticated %}
               {% if user.is_staff %}
-                <li class="nav-item"><a class="nav-link" href="{% url 'analytics_index' %}">Analítica</a></li>
+                <li class="nav-item"><a class="nav-link" href="{% url 'analytics_reports:analytics_index' %}">Analítica</a></li>
               {% endif %}
               <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Cerrar sesión</a></li>
             {% else %}
