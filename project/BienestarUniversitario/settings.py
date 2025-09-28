@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'universitaryWellbeing',
     'Analytics_Reports',   
     'management_CADI',
+    'tournaments',
 
 ]
 
@@ -86,9 +87,6 @@ DATABASES = {
         'PORT': '5432',
    }
 }
-
-#AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

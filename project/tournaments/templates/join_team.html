@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
+
+<div class="shell">
+  <h2 class="title">Unirme a un equipo – {{ tournament.nombre }}</h2>
+
+  {% if ok %}
+    <div class="success-box">
+      <h3>¡Solicitud enviada!</h3>
+      <p>Te uniste a <b>{{ team.nombre }}</b>. Te contactaremos a {{ correo }} (demo).</p>
+      <a class="btn ghost" href="{% url 'tournaments:list' %}">Volver a torneos</a>
+    </div>
+  {% else %}
+    <form class="form-shell" method="post" action="{% url 'tournaments:join_team' tournament.id %}">
+      {% csrf_token %}
+      <label>Equipo
+        <select name="team_id" required>
+          <option value="" selected disabled>Selecciona un equipo…</option>
+          {% for t in teams %}
+            <option value="{{ t.id }}">{{ t.nombre }}</option>
+          {% endfor %}
+        </select>
+        {% if errors.team_id %}<span class="err">{{ errors.team_id }}</span>{% endif %}
+      </label>
+
+      <div class="grid-2">
+        <label>Correo
+          <input type="email" name="correo" required>
+          {% if errors.correo %}<span class="err">{{ errors.correo }}</span>{% endif %}
+        </label>
+        <label>Cédula
+          <input name="cedula" inputmode="numeric" pattern="\d{10}" maxlength="10" placeholder="10 dígitos" required>
+          {% if errors.cedula %}<span class="err">{{ errors.cedula }}</span>{% endif %}
+        </label>
+      </div>
+
+      <button class="btn primary" type="submit">Unirme</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}

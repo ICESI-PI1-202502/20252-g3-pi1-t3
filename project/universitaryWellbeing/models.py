@@ -249,13 +249,15 @@ class Equipos(models.Model):
 
 
 class EquiposParticipantes(models.Model):
-    equipos_id_equipo = models.OneToOneField(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo', primary_key=True)
+    id = models.BigAutoField(primary_key=True) 
+    equipos_id_equipo = models.ForeignKey('Equipos', models.DO_NOTHING, db_column='equipos_id_equipo')
     participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    id_participante1 = models.FloatField()
-
+    id_participante1 = models.BigIntegerField()  
     class Meta:
         managed = False
         db_table = 'equipos_participantes'
+        unique_together = (('equipos_id_equipo', 'participantes_id_participante'),)
+
 
 
 class EstadosAsistencia(models.Model):
@@ -289,8 +291,6 @@ class EstadosParticipacion(models.Model):
 class EstadosTorneo(models.Model):
     id_estado_torneo = models.FloatField(primary_key=True)
     nombre = models.CharField(unique=True, max_length=30)
-    torneos_id_torneo = models.OneToOneField('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
-
     class Meta:
         managed = False
         db_table = 'estados_torneo'
@@ -536,14 +536,15 @@ class TiposNotificacion(models.Model):
 
 
 class Torneos(models.Model):
-    id_torneo = models.FloatField(primary_key=True)
+    id_torneo = models.BigAutoField(db_column="id_torneo", primary_key=True) 
     nombre = models.CharField(max_length=150)
     disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina')
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
-    estados_torneo_id_estado_torneo = models.OneToOneField(EstadosTorneo, models.DO_NOTHING, db_column='estados_torneo_id_estado_torneo')
+    fecha_inicio = models.DateTimeField()
+    fecha_fin    = models.DateTimeField()
+    estados_torneo_id_estado_torneo = models.ForeignKey(EstadosTorneo,models.DO_NOTHING,db_column='estados_torneo_id_estado_torneo'
+)
     reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
-    aforo_equipos = models.FloatField(blank=True, null=True)
+    aforo_equipos = models.BigIntegerField(null=True, blank=True)
 
     class Meta:
         managed = False
@@ -551,10 +552,11 @@ class Torneos(models.Model):
 
 
 class TorneosEquipos(models.Model):
-    pk = models.CompositePrimaryKey('torneos_id_torneo', 'equipos_id_equipo')
-    torneos_id_torneo = models.ForeignKey(Torneos, models.DO_NOTHING, db_column='torneos_id_torneo')
-    equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
+    id = models.BigAutoField(primary_key=True)  # NEW surrogate PK
+    torneos_id_torneo = models.ForeignKey('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
+    equipos_id_equipo = models.ForeignKey('Equipos', models.DO_NOTHING, db_column='equipos_id_equipo')
 
     class Meta:
         managed = False
         db_table = 'torneos_equipos'
+        unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
