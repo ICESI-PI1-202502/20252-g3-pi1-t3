@@ -457,7 +457,7 @@ class Participaciones(models.Model):
 
 
 class Participantes(models.Model):
-    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, primary_key=True)
+    user = models.OneToOneField(AuthUser, on_delete=models.CASCADE, related_name="participante")
     id_participante = models.FloatField(primary_key=True)
     nombre = models.CharField(max_length=100)
     apellido = models.CharField(max_length=100)

@@ -1,0 +1,346 @@
+/* ==============================
+   BASIC RESET
+   ============================== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;              /* takes up the entire screen */
+    display: flex;                  /* enable flexbox */
+    flex-direction: column;         /* stack header, main and footer */
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    color: #000;
+}
+
+/* ==============================
+   MAIN HEADER (NAVBAR)
+   ============================== */
+.custom-navbar {
+    background-color: #FFFF; /*  change this color as you like */
+    padding: 0.5rem 1rem;
+}
+
+.custom-navbar .navbar-brand {
+    font-size: 1rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color:#000; /* text color */
+}
+
+.custom-navbar .navbar-brand img {
+    height: 60px;
+    width: auto;
+    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.custom-navbar .navbar-brand:hover img {
+    transform: scale(1.05);
+}
+
+.custom-navbar .nav-link {
+    font-size: 1rem;
+    padding: 0.5rem 1rem;
+    color: #000 !important; /* link text color */
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+.custom-navbar .nav-link:hover {
+    color: #ffd700 !important; /* golden hover */
+    background-color: rgba(255, 255, 255, 0.1);
+    border-radius: 5px;
+}
+ 
+
+
+
+
+
+
+
+/* campana en navbar */
+.navbar-option img {
+  height: 28px;        /* ajusta tamaño */
+  width: auto;
+  display: block;
+  cursor: pointer;
+  transition: transform .15s ease;
+}
+
+/* pequeño efecto hover */
+.navbar-option img:hover {
+  transform: scale(1.08);
+}
+
+/* opcional: badge de notificaciones (pequeño círculo rojo) */
+.navbar-option .notif-badge {
+  position: relative;
+  display: inline-block;
+  margin-left: -18px; /* mueve el badge sobre la campana */
+  margin-top: -18px;
+  background: #dc3545;
+  color: #fff;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  line-height: 1;
+}
+
+/* ==============================
+   SUBHEADER (secondary bar)
+   ============================== */
+.sub-bar {
+    background-color: #5454E9; /*  blue */
+    padding: 8px 16px;
+    position: fixed;
+    top: 86px; /* actual navbar height */
+    width: 100%;
+    z-index: 1030;
+}
+
+.sub-bar a {
+    color: white; /* ✅ white text on blue background */
+    text-decoration: none;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: color 0.2s ease;
+}
+
+.sub-bar a:hover {
+    color: #dcdcdc; /* light gray on hover */
+}
+
+
+/* ==============================
+   MAIN CONTENT
+   ============================== */
+main {
+    flex: 1 0 auto;
+    padding: 20px;
+
+    /* space to avoid overlapping navbar + sub-bar */
+    margin-top: calc(86px + 40px); /* navbar (86px) + sub-bar (~40px) */
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* lists */
+ul {
+    list-style: none;
+    padding: 0;
+}
+
+ul li {
+    margin-bottom: 10px;
+}
+
+ul li a {
+    text-decoration: none;
+    color: #007bff;
+    font-size: 1.2rem;
+    transition: color 0.3s ease;
+}
+
+ul li a:hover {
+    color: #0056b3;
+    text-decoration: underline;
+}
+
+/* tables */
+.table {
+    width: 100%;
+    margin-top: 20px;
+}
+
+.table th, .table td {
+    text-align: center;
+}
+
+/* ==============================
+   FOOTER
+   ============================== */
+.footer {
+    background-color: #5454e9;
+    color: white;
+    text-align: center;
+    padding: 1rem;
+    flex-shrink: 0;
+}
+
+/* ==============================
+   UTILITIES
+   ============================== */
+.flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.flex-center-column {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+/* ==============================
+   HIDE old home styles
+   ============================== */
+.home, .universidad-icesi-calle-container, .calendario, .noticias, .actividades,
+.blanco, .blanco-icon, .blanco-icon2, .blanco-icon3, .blanco-icon4, .blanco-icon5,
+.judo, .ajedrez, .natacin, .arquero-de-ftbol, .image-34-icon, .hola-pablo-bienvenido,
+.modulo-1-rf3-14-item, .bienestar-universitario, .menu-icon, .pp-wrapper, .pp,
+.modulo-1-rf3-14-inner, .calendar, .row, .header-cell, .cell, .inner, .cell28,
+.modulo-1-rf3-14-child, .image-32-icon, .home-bariphone-15pro, .home-bariphone-15pro-child {
+    display: none;
+}
+
+
+
+/* Sidebar */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: -280px; /* hide */
+  width: 280px;
+  height: 100%;
+  background-color: #5454E9;
+  color: white;
+  padding: 20px;
+  transition: right 0.3s ease;
+  z-index: 2000;
+}
+.sidebar.open {
+  right: 0;
+}
+.sidebar a {
+  display: block;
+  padding: 12px;
+  margin-bottom: 10px;
+  background: #FF6B35;
+  color: white;
+  text-decoration: none;
+  border-radius: 8px;
+  font-weight: 600;
+}
+.sidebar a:hover {
+  background: #ff844f;
+}
+
+/* background */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.4);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease;
+  z-index: 1500;
+}
+.overlay.show {
+  opacity: 1;
+  visibility: visible;
+}
+
+
+/* Buttons */
+
+.back-link {
+  color: white;
+  font-weight: bold;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;   /* separación entre flecha y texto */
+}
+
+.back-link:hover {
+  color: #dcdcdc; /* mismo hover que tu subheader */
+}
+
+
+.yellowBotton_Black {
+  background-color: #E4EB60;
+  color: #000;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.greenBotton_Black {
+  background-color: #4DB979;
+  color: #000;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.greenBotton_White {
+  background-color: #4DB979;
+  color: #fff;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+/* Hover States */
+.yellowBotton_Black:hover {
+  background-color: #d9df55; /* un poco más oscuro */
+  transform: scale(1.05);
+}
+
+.greenBotton_Black:hover {
+  background-color: #3fa468; /* más oscuro */
+  transform: scale(1.05);
+}
+
+.greenBotton_White:hover {
+  background-color: #3fa468; /* más oscuro */
+  transform: scale(1.05);
+}
+
+
+/*---------------Para el tipo de fuente--------------------*/
+
+html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table, th, td {
+  font-family: 'Plus Jakarta Sans', sans-serif !important;
+}
+
+/*---------------Para el tipo de fuente--------------------*/
+
+.user-avatar { 
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:36px;
+  height:36px;
+  border-radius:8px;   /* cuadrado con bordes redondeados */
+  background-color:#0b2ea6; /* ajusta color */
+  color:#fff;
+  font-weight:700;
+  font-size:14px;
+  line-height:1;
+  text-transform:uppercase;
+  cursor: pointer;
+}
