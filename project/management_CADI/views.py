@@ -1,14 +1,25 @@
 
-from django.db.models import Count  # Import correction
-from  universitaryWellbeing.models import Participaciones, HorarioActividad, Actividades, TiposActividad, GruposActividad, Grupos
+from django.db.models import Count
+from django.db import transaction, IntegrityError  # Import correction
+from  universitaryWellbeing.models import ActividadesGrupos, Actividades, TiposActividad, GruposActividad, Grupos
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
+from django.urls import reverse
 from django.db.models import Max
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
 # @user_passes_test(is_admin)  # Uncomment if you want to restrict access
+
+DRAFT_KEY_BASE = "cadi_draft_base_{ga}"
+DRAFT_KEY_SCHED = "cadi_draft_sched_{ga}"
+
+def _draft_keys(grupo_actividad_id):
+    return (
+        DRAFT_KEY_BASE.format(ga=grupo_actividad_id),
+        DRAFT_KEY_SCHED.format(ga=grupo_actividad_id),
+    )
 
 def cadi_index(request):
     grupo = get_object_or_404(Grupos, pk=1)  # por ejemplo, CADI con id=1
@@ -20,52 +31,187 @@ def cadi_index(request):
 
 def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
+    slug_real = slugify(grupo_actividad.grupos_id_grupo.nombre)
     tipos = TiposActividad.objects.all().order_by("id_tipo")
 
+    k_base, k_sched = _draft_keys(grupo_actividad_id)
+
     if request.method == "POST":
-        nombre = request.POST.get("nombre")
-        lugar = request.POST.get("espacio")
-        tipo_id = request.POST.get("tipo")
-        tipo = TiposActividad.objects.filter(pk=tipo_id).first()
+        action = request.POST.get("action")  # "schedule" o "confirm"
 
-        actividad = Actividades.objects.create(
-            nombre=nombre,
-            lugar=lugar,
-            tipos_actividad_id_tipo=tipo,
-            actividades_grupos=grupo_actividad
-        )
+        # guarda borrador base siempre que venga un POST
+        base = {
+            "nombre": request.POST.get("nombre") or "",
+            "espacio": request.POST.get("espacio") or "",
+            "tipo_id": request.POST.get("tipo") or "",
+            "aforo": request.POST.get("aforo") or "",
+            "descripcion": request.POST.get("descripcion") or "",
+            "requiere": request.POST.get("requiere_inscripcion") or "",
+            "fecha_apertura_ins": request.POST.get("fecha_apertura_ins") or "",
+            "fecha_cierre_ins": request.POST.get("fecha_cierre_ins") or "",
+        }
+        request.session[k_base] = base
+        request.session.modified = True
 
-        return redirect(
-            "management_cadi:listar_actividades",
-            grupo_nombre=grupo_nombre,
-            grupo_id=grupo_id,
-            grupo_actividad_id=grupo_actividad.id_grupo_actividad
-        )
+        if action == "schedule":
+            # ir a añadir/editar horario en borrador
+            return redirect(
+                "management_cadi:schedule_draft",
+                grupo_nombre=slug_real,
+                grupo_id=grupo_actividad.grupos_id_grupo.id_grupo,
+                grupo_actividad_id=grupo_actividad.id_grupo_actividad,
+            )
 
+        if action == "confirm":
+            sched = request.session.get(k_sched) or {}
+            if not base.get("nombre") or not base.get("espacio") or not base.get("tipo_id"):
+                # faltan campos mínimos
+                return render(request, "form_activities.html", {
+                    "tipos": tipos,
+                    "grupo_actividad": grupo_actividad,
+                    "draft": base,
+                    "sched": sched,
+                    "error": "Por favor completa Nombre, Espacio y Tipo.",
+                })
+
+            tipo = TiposActividad.objects.filter(pk=base["tipo_id"]).first()
+            requiere_char = "S" if base.get("requiere") == "si" else "N"
+            aforo_val = float(base["aforo"]) if base.get("aforo") else None
+
+            try:
+                # Crear definitivamente dentro de transacción
+                with transaction.atomic():
+                    ultimo_id = Actividades.objects.aggregate(Max("id_actividad"))["id_actividad__max"]
+                    nuevo_id = int((ultimo_id or 0) + 1)
+
+                    actividad = Actividades.objects.create(
+                        id_actividad=nuevo_id,
+                        nombre=base["nombre"],
+                        descripcion=base["descripcion"],
+                        lugar=base["espacio"],
+                        requiere_inscripcion=requiere_char,
+                        modalidad=None,
+                        aforo=aforo_val,
+                        fecha_apertura_ins=base.get("fecha_apertura_ins") or None,
+                        fecha_cierre_ins=base.get("fecha_cierre_ins") or None,
+                        tipos_actividad_id_tipo=tipo,
+                        profesor=sched.get("profesor") or None,
+                        dias_semana=", ".join(sched.get("dias", [])) or None,
+                        fecha_inicio=None,
+                        fecha_fin=None,
+                    )
+
+                    # Verificar si ya existe la relación entre grupo y actividad
+                    if not ActividadesGrupos.objects.filter(
+                        grupos_actividad=grupo_actividad,
+                        actividad=actividad
+                    ).exists():
+                        # 1) calcular nuevo id de la tabla puente
+                        ultimo_puente = ActividadesGrupos.objects.aggregate(
+                            Max("id_actividad_grupo")
+                        )["id_actividad_grupo__max"] or 0
+                        nuevo_id_puente = int(ultimo_puente) + 1
+
+                        # 2) crear la relación
+                        puente = ActividadesGrupos.objects.create(
+                            grupos_actividad=grupo_actividad,
+                            actividad=actividad,
+                            id_actividad_grupo=nuevo_id_puente,
+                        )
+                    else:
+                        # Si ya existe la relación, se recupera sin intentar crear una nueva
+                        puente = ActividadesGrupos.objects.get(
+                            grupos_actividad=grupo_actividad,
+                            actividad=actividad
+                        )
+
+                    # 3) setear el FK en Actividades y guardar
+                    actividad.actividades_grupos_id_actividad_grupo = puente
+                    actividad.save(update_fields=["actividades_grupos_id_actividad_grupo"])
+
+            except IntegrityError as e:
+                # Si ocurre el error de integridad, muestra un mensaje o maneja el error
+                return render(request, "form_activities.html", {
+                    "tipos": tipos,
+                    "grupo_actividad": grupo_actividad,
+                    "draft": base,
+                    "sched": sched,
+                    "error": f"Se produjo un error al guardar la actividad: {e}. Puede que ya exista una actividad con este grupo.",
+                })
+
+            # limpiar borradores
+            request.session.pop(k_base, None)
+            request.session.pop(k_sched, None)
+            request.session.modified = True
+
+            return redirect(
+                "management_cadi:listar_actividades",
+                grupo_nombre=slug_real,
+                grupo_id=grupo_actividad.grupos_id_grupo.id_grupo,
+                grupo_actividad_id=grupo_actividad.id_grupo_actividad,
+            )
+
+    # GET: precargar con borradores
+    base = request.session.get(k_base, {})
+    sched = request.session.get(k_sched, {})
     return render(
-        request, 
-        "form_activities.html", 
-        {"tipos": tipos, "grupo_actividad": grupo_actividad}
+        request,
+        "form_activities.html",
+        {"tipos": tipos, "grupo_actividad": grupo_actividad, "draft": base, "sched": sched},
     )
 
-
 def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
-    grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
-    actividades = Actividades.objects.filter(actividades_grupos=grupo_actividad)
+    # Grupo padre (1..4)
+    grupo = get_object_or_404(Grupos, pk=grupo_id)
 
-    slug_real = slugify(grupo_actividad.nombre)
+    # Grupo de actividad perteneciente a ese grupo
+    grupo_actividad = get_object_or_404(
+        GruposActividad,
+        pk=grupo_actividad_id,
+        grupos_id_grupo=grupo
+    )
+
+    # Canonicalizar slug en URL
+    slug_real = slugify(grupo.nombre)
     if grupo_nombre != slug_real:
         return redirect(
-        "management_cadi:listar_actividades",
-        grupo_nombre=slug_real,
-        grupo_id=grupo_id,
-        grupo_actividad_id=grupo_actividad_id
+            "management_cadi:listar_actividades",
+            slug_real,
+            grupo.id_grupo,
+            grupo_actividad.id_grupo_actividad
+        )
+    
+    crear_url = reverse(
+        "management_cadi:crear_actividad",
+        kwargs={
+            "grupo_nombre": slug_real,
+            "grupo_id": grupo.id_grupo,
+            "grupo_actividad_id": grupo_actividad.id_grupo_actividad,
+        },
+    )
+
+    # IDs de actividades desde la tabla puente
+    # IDs de actividades desde la tabla puente
+    actividades_ids = ActividadesGrupos.objects.filter(
+        grupos_actividad_id=grupo_actividad_id
+    ).values_list("actividad_id", flat=True)
+
+    # Traer solo columnas necesarias para listar (evita el FK largo)
+    actividades = list(
+        Actividades.objects
+        .filter(id_actividad__in=actividades_ids)
+        .values("id_actividad", "nombre", "dias_semana", "lugar", "profesor")
+        .order_by("nombre")
     )
 
     return render(request, "listar_actividades.html", {
+        "grupo": grupo,
         "grupo_actividad": grupo_actividad,
-        "actividades": actividades
+        "actividades": actividades,  # es una lista de dicts
+        "crear_url": crear_url,
     })
+
+
 
 
 def listar_grupos_actividad(request, grupo_nombre, grupo_id):
@@ -119,37 +265,38 @@ def crear_grupo_actividad(request, grupo_nombre, grupo_id):
     return render(request, "form_gruposActivi.html", {"grupo": grupo})
 
 
-def add_schedule(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id):
-    actividad = get_object_or_404(Actividades, pk=actividad_id)
+def schedule_draft(request, grupo_nombre, grupo_id, grupo_actividad_id):
+    grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
+    slug_real = slugify(grupo_actividad.grupos_id_grupo.nombre)
 
-    dias_semana = ["Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado", "Domingo"]
-    horas = [f"{h:02d}:00" for h in range(7, 22)]  # ejemplo: 07:00 - 21:00
+    k_base, k_sched = _draft_keys(grupo_actividad_id)
+    horas = [f"{h:02d}:00" for h in range(7, 22)]
 
     if request.method == "POST":
-        profesor = request.POST.get("nombre")
-        hora_inicio = request.POST.get("hora_inicio")
-        hora_fin = request.POST.get("hora_fin")
-        dias = request.POST.getlist("dias")  # lista de días seleccionados
+        profesor = request.POST.get("nombre") or ""
+        h_ini = request.POST.get("hora_inicio") or ""
+        h_fin = request.POST.get("hora_fin") or ""
+        dias = request.POST.getlist("dias") or []
 
-        for dia in dias:
-            HorarioActividad.objects.create(
-                actividad=actividad,
-                dia=dia,
-                hora_inicio=hora_inicio,
-                hora_fin=hora_fin,
-                espacio=actividad.lugar,  # puedes modificar si quieres otro campo
-                profesor=profesor
-            )
+        request.session[k_sched] = {
+            "profesor": profesor,
+            "hora_inicio": h_ini,
+            "hora_fin": h_fin,
+            "dias": dias,
+        }
+        request.session.modified = True
 
+        # volver a la pantalla de crear actividad (sin crear nada)
         return redirect(
-            "management_cadi:listar_actividades",
-            grupo_nombre=grupo_nombre,
-            grupo_id=grupo_id,
-            grupo_actividad_id=grupo_actividad_id
+            "management_cadi:crear_actividad",
+            grupo_nombre=slug_real,
+            grupo_id=grupo_actividad.grupos_id_grupo.id_grupo,
+            grupo_actividad_id=grupo_actividad.id_grupo_actividad,
         )
 
+    sched = request.session.get(k_sched, {})
     return render(request, "schedule.html", {
-        "actividad": actividad,
-        "dias_semana": dias_semana,
-        "horas": horas
+        "horas": horas,
+        "dias_semana": ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"],
+        "draft": sched,
     })

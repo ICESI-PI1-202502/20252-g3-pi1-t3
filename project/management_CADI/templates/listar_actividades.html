@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Actividades - {{ grupo.nombre }}{% endblock %}
+{% block title %}Actividades - {{ grupo_actividad.nombre }}{% endblock %}
 
 {% block subheaderBar %}
 <a href="javascript:history.back()" class="back-link">
@@ -11,40 +11,30 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h2 class="text-center">{{ grupo.nombre }}</h2>
-    <p class="text-center">{{ descripcion }}</p>
+  <h2 class="text-center">{{ grupo_actividad.nombre }}</h2>
+  <p class="text-center">{{ grupo_actividad.descripcion }}</p>
 
-    {% if actividades %}
-<div class="row mt-4">
-    {% for a in actividades %}
-    <div class="col-md-3 text-center mb-4">
-        {% if a.imagen %}
-                        <a href="{% url 'management_cadi:form_Activities' grupo_nombre=grupo_actividad.nombre|slugify grupo_id=grupo_actividad.grupos_id_grupo.id_grupo grupo_actividad_id=grupo_actividad.id_grupo_actividad %}">
-                            <img src="{{ a.imagen.url }}" 
-                                alt="{{ a.nombre }}" 
-                                class="img-fluid rounded shadow" 
-                                style="max-height:200px; object-fit:cover;">
-                        </a>
-                    {% else %}
-                        <img src="{% static 'management_CADI/images/create/galery.png' %}" 
-                            alt="Sin imagen" 
-                            class="img-fluid rounded shadow" 
-                            style="max-height:200px; object-fit:cover;">
-                    {% endif %}
-                    <h6 class="mt-2">{{ a.nombre }}</h6>
-                </div>
-                {% endfor %}
-            </div>
-            {% else %}
-            <p class="text-center mt-4">No hay actividades aún.</p>
-        {% endif %}
+  {% if actividades %}
+    <div class="row mt-4">
+      {% for a in actividades %}
+        <div class="col-md-4 text-center mb-4">
+          <div class="card shadow-sm p-3">
+            <h5 class="mt-2">{{ a.nombre }}</h5>
+            <p><strong>Días:</strong> {{ a.dias_semana|default:"—" }}</p>
+            <p><strong>Espacio:</strong> {{ a.lugar|default:"—" }}</p>
+            <p><strong>Profesor:</strong> {{ a.profesor|default:"—" }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center mt-4">Aún no hay actividades.</p>
+  {% endif %}
 
-    <br><br>
-    <center>
-        <a href="{% url 'management_cadi:crear_grupo_actividad' '-' grupo.id_grupo %}" 
-           class="yellowBotton_Black">
-            Agregar grupo
-        </a>
-    </center>
+  <!-- El botón puede quedarse visible siempre; cuando pases a crear, esta URL ya estará correcta -->
+  <br><br>
+  <center>
+  <a href="{{ crear_url }}" class="yellowBotton_Black">Agregar actividad</a>
+  </center>
 </div>
 {% endblock %}

@@ -10,59 +10,50 @@ from django.utils.text import slugify
 import os
 
 class Actividades(models.Model):
-    id_actividad = models.AutoField(primary_key=True)
+    id_actividad = models.FloatField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     lugar = models.CharField(max_length=150, blank=True, null=True)
     fecha_inicio = models.DateField(blank=True, null=True)
     fecha_fin = models.DateField(blank=True, null=True)
-    requiere_inscripcion = models.BooleanField(default=False)  # 👈 booleano
+    requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
     modalidad = models.CharField(max_length=1, blank=True, null=True)
     aforo = models.FloatField(blank=True, null=True)
     fecha_apertura_ins = models.DateField(blank=True, null=True)
     fecha_cierre_ins = models.DateField(blank=True, null=True)
-    tipos_actividad_id_tipo = models.ForeignKey(
-        'TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True
-    )
-    actividades_grupos = models.ForeignKey(  # 👈 más claro
-        'GruposActividad',
+    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
+    id_tipo = models.FloatField(blank=True, null=True)
+    actividades_grupos_id_actividad_grupo = models.ForeignKey(
+        'ActividadesGrupos',
         models.DO_NOTHING,
-        db_column='GRUPOS_ACTIVIDAD_ID',
-        related_name='actividades',
-        blank=True,
-        null=True
+        db_column='ACT_GRUP_ID',   # <- antes: actividades_grupos_id_actividad_grupo (oracle no acepta nombres con más de 30 caracteres)
+        blank=True, null=True
     )
 
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    dias_semana = models.CharField(max_length=150, blank=True, null=True)
+
     class Meta:
-        managed = False  # porque la tabla ya existe
+        managed = False
         db_table = 'actividades'
 
-
-class HorarioActividad(models.Model):
-    id_horario = models.AutoField(primary_key=True)
-    actividad = models.ForeignKey(
-        Actividades,
-        on_delete=models.PROTECT,   
-        related_name='horarios'
-    )
-    dia = models.CharField(max_length=50)  # Ej: "Martes y Jueves"
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    espacio = models.CharField(max_length=150)
-    profesor = models.CharField(max_length=150)
-
-    class Meta:
-        managed = True
-        db_table = 'horarios_actividad'
-
 class ActividadesGrupos(models.Model):
-    id_actividad_grupo = models.FloatField(primary_key=True)
-    grupos_actividad_id_grupo_actividad = models.OneToOneField('GruposActividad', models.DO_NOTHING, db_column='grupos_actividad_id_grupo_actividad')
-    actividades_id_actividad = models.FloatField()
+    id_actividad_grupo = models.IntegerField(primary_key=True)
+    grupos_actividad = models.ForeignKey(
+        'GruposActividad',
+        models.DO_NOTHING,
+        db_column='GRP_ACT_ID'     # <- antes: grupos_actividad_id_grupo_actividad
+    )
+    actividad = models.ForeignKey(
+        'Actividades',
+        models.DO_NOTHING,
+        db_column='ACTIVIDADES_ID_ACTIVIDAD'
+    )
 
     class Meta:
         managed = False
         db_table = 'actividades_grupos'
+
 
 
 class AgendaPsicologos(models.Model):

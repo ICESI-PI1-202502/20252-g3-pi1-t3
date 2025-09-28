@@ -113,7 +113,7 @@ def preferences2(request):
         selected_categories = request.session.get('selected_categories', [])
         
         # Guardar las preferencias del usuario
-        preference, created = Preferences.objects.get_or_create(user=request.user)
+        preference, created = Preferencias.objects.get_or_create(user=request.user)
         preference.category = ', '.join(selected_categories)  # Guardamos las categorías como una cadena
         preference.subcategory = ', '.join(selected_subcategories)  # Guardamos las subcategorías
         preference.save()
