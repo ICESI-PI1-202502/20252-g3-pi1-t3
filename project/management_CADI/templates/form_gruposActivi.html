@@ -1,16 +1,14 @@
 {% extends "form_base.html" %}
 {% load static %}
 
-{% block title %}Crear Clasificacion{% endblock %}
+{% block title %}Crear nuevo grupo{% endblock %}
 
-{% block form_title %}Añadir nueva clasificación{% endblock %}
-
-
+{% block form_title %}Añadir nuevo grupo de actividades{% endblock %}
 
 {% block form_fields %}
   <div class="row text-center mb-4">
     <div class="col-md-6">
-      <h6>Nombre de actividad</h6>
+      <h6>Nombre de grupo</h6>
       <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
     </div>
 
@@ -20,14 +18,17 @@
     </div>
   </div>
 
-  
-
   <div class="col-md-6 text-center">
     <h6>Imagen</h6>
-    <input type="file" id="imagenActividad" name="imagenActividad" accept="image/*" hidden>
+    <input type="file" id="imagenActividad" name="imagenActividad" accept="image/*" hidden onchange="previewImage(event)">
     <label for="imagenActividad" class="upload-box">
-      <img src="{% static 'management_CADI/images/create/galery.png' %}" 
-           alt="Subir imagen" class="upload-icon">
+      <img id="preview" 
+           src="{% static 'management_CADI/images/create/galery.png' %}" 
+           alt="Subir imagen" 
+           class="upload-icon"
+           style="max-height:200px; object-fit:cover;">
     </label>
   </div>
+
+  <script src="{% static 'management_CADI/js/preview.js' %}"></script>
 {% endblock %}

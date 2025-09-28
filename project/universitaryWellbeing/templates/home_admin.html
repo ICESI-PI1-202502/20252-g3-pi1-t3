@@ -2,72 +2,74 @@
 {% load static %}
 
 {% block content %}
+{{ block.super }}
 
-    {{ block.super }}
+<div class="container my-5">
+  <div class="row g-4">
+    <!-- Card 1 -->
+    <div class="col-12 col-md-6">
+      <div class="offer-card">
+        <div class="image-container position-relative text-center">
+          <img src="{% static 'universitaryWellbeing/img/offer/image1.png' %}" class="img-fluid w-100" alt="CADI">
+          <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
+            Centro Artístico y Deportivo Icesi - CADI
+          </h3>
+          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 1 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+            Gestionar actividades
+          </a>
+        </div>
+      </div>
+    </div>
 
-    <center>
-        <table border="0" width="85%" style="border-spacing: 0 50px; border-collapse: separate;" cellpadding="10">
-            <tr>
-                <td align="center">
-                    <div class="offer-card">
-                        <div class="image-container position-relative text-center">
-                            <img src="{% static 'universitaryWellbeing/img/offer/image1.png' %}" class="img-fluid" alt="CADI">
-                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
-                                Centro Artístico y Deportivo Icesi - CADI
-                            </h3>
-                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-                                Gestionar actividades
-                            </button>
-                        </div>
-                    </div>
-                </td>
+    <!-- Card 2 -->
+    <div class="col-12 col-md-6">
+      <div class="offer-card">
+        <div class="image-container position-relative text-center">
+          <img src="{% static 'universitaryWellbeing/img/offer/image2.png' %}" class="img-fluid w-100" alt="Desarrollo Humano">
+          <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
+            Desarrollo Humano y Promoción de la Salud
+          </h3>
+          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 2 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+            Gestionar actividades
+          </a>
+        </div>
+      </div>
+    </div>
 
-                <td align="center">
-                    <div class="offer-card">
-                        <div class="image-container position-relative text-center">
-                            <img src="{% static 'universitaryWellbeing/img/offer/image2.png' %}" class="img-fluid" alt="CADI">
-                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
-                                Desarrollo Humano y Promoción de la Salud
-                            </h3>
-                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-                                Gestionar actividades
-                            </button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
+    <!-- Card 3 -->
+    <div class="col-12 col-md-6">
+      <div class="offer-card">
+        <div class="image-container position-relative text-center">
+          <img src="{% static 'universitaryWellbeing/img/offer/image3.png' %}" class="img-fluid w-100" alt="PSU">
+          <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
+            Proyecto Social de Bienestar Universitario (PSU)
+          </h3>
+          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 3 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+            Gestionar actividades
+          </a>
+        </div>
+      </div>
+    </div>
 
-            <tr>
-                <td align="center">
-                    <div class="offer-card">
-                        <div class="image-container position-relative text-center">
-                            <img src="{% static 'universitaryWellbeing/img/offer/image3.png' %}" class="img-fluid" alt="CADI">
-                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
-                                Proyecto Social de Bienestar Universitario (PSU)
-                            </h3>
-                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-                                Gestionar actividades
-                            </button>
-                        </div>
-                    </div>
-                </td>
-
-                <td align="center">
-                    <div class="offer-card">
-                        <div class="image-container position-relative text-center">
-                            <img src="{% static 'universitaryWellbeing/img/offer/image4.png' %}" class="img-fluid" alt="CADI">
-                            <h3 class="center-text position-absolute top-50 start-50 translate-middle">
-                                Programa Estás en Casa
-                            </h3>
-                            <button class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-                                Gestionar actividades
-                            </button>
-                        </div>
-                    </div>
-                </td>
-            </tr>
-        </table>
-    </center>
-
+    <!-- Card 4 -->
+    <div class="col-12 col-md-6">
+      <div class="offer-card">
+        <div class="image-container position-relative text-center">
+          <img src="{% static 'universitaryWellbeing/img/offer/image4.png' %}" class="img-fluid w-100" alt="Programa Estás en Casa">
+          <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
+            Programa Estás en Casa
+          </h3>
+          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 4 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+            Gestionar actividades
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 {% endblock %}
