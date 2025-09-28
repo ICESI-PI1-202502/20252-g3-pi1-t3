@@ -520,7 +520,7 @@ class TiposNotificacion(models.Model):
 
 
 class Torneos(models.Model):
-    id_torneo = models.FloatField(primary_key=True)
+    id_torneo = models.BigAutoField(db_column="id_torneo", primary_key=True) 
     nombre = models.CharField(max_length=150)
     disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina')
     fecha_inicio = models.DateField()

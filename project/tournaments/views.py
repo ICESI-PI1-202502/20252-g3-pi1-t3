@@ -279,7 +279,6 @@ def crear_torneo(request):
 
         try:
             Torneos.objects.create(
-                id_torneo=next_id,
                 nombre=nombre,
                 disciplinas_id_disciplina_id=disciplina_id,
                 fecha_inicio=fecha_inicio,
