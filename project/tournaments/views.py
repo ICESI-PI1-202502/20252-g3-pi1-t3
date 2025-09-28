@@ -2,14 +2,15 @@
 from django.views.decorators.csrf import csrf_exempt
 import datetime
 from django.shortcuts import get_object_or_404, render, redirect
+from django.utils.timezone import make_aware, get_current_timezone
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-from django.db import connection, transaction
+from django.db import transaction, IntegrityError, connection
 from django.contrib import messages
 from django.db.models import Max
 from universitaryWellbeing.models import (
- Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos
+ Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos, EquiposParticipantes
 )
 from django.http import Http404
 
@@ -33,12 +34,25 @@ def get_torneo_or_404(id_: int):
     if data["tiene_equipos"]:
         teams = list(
             Equipos.objects
-            .filter(torneosequipos__torneos_id_torneo=id_)   # ✅ through table
+            .filter(torneosequipos__torneos_id_torneo=id_) 
             .values("id_equipo", "nombre")
             .distinct()
         )
 
     return data, teams
+
+def _parse_date_or_datetime(s: str):
+    if not s:
+        return None
+    # accept "YYYY-MM-DD" or full ISO; store timezone-aware
+    try:
+        if len(s) == 10:
+            dt = datetime.strptime(s, "%Y-%m-%d")
+        else:
+            dt = datetime.fromisoformat(s)
+        return make_aware(dt, get_current_timezone())
+    except Exception:
+        return None
 
 # Historia : Crear Torneo
 def crear_torneo(request):
@@ -79,7 +93,7 @@ def crear_torneo(request):
 
 # Historia : lista
 def lista_torneos(request):
-    q = (request.GET.get("q") or "").strip().lower()   # ← not request.get
+    q = (request.GET.get("q") or "").strip().lower()  
 
     # Fetch tournaments from DB
     rows = (
@@ -112,7 +126,8 @@ def detalle_torneo(request, id: int):
     template = "detail_team.html" if t["tiene_equipos"] else "detail_individual.html"
     return render(request, template, {"tournament": t, "teams": teams})
 
-# Historia 3: inscripción individual (demo)
+
+# NOT TAKING THIS ONE INTO ACCOUNT
 #@login_required
 def inscripcion_individual(request, id: int):
     torneo, _ = get_torneo_or_404(id)
@@ -147,51 +162,105 @@ def inscripcion_individual(request, id: int):
 
 
 # Historia 4: crear equipo (demo)
-#@login_required
-def crear_equipo(request, id: int):
-    torneo, _ = get_torneo_or_404(id)
-    if not torneo["tiene_equipos"]:
-        raise Http404("Este torneo no es por equipos.")
+def crear_equipo_en_torneo(request, torneo_id: int):
+    torneo = get_object_or_404(
+        Torneos.objects.select_related("disciplinas_id_disciplina"),
+        pk=torneo_id
+    )
 
-    ctx = {"tournament": torneo, "ok": False, "errors": {}}
+    # Only allow teams if this tournament is de equipos
+    if not torneo.aforo_equipos:
+        messages.error(request, "Este torneo es individual; no permite equipos.")
+        return redirect("tournaments:detail", torneo_id)
 
-    if request.method == "POST":
-        nombre_equipo     = (request.POST.get("nombre_equipo") or "").strip()
-        fecha_creacion    = (request.POST.get("fecha_creacion") or "").strip()
-        cantidad_personas = (request.POST.get("cantidad_personas") or "").strip()
-        capacidad_min     = (request.POST.get("capacidad_min") or "").strip()
-        capacidad_max     = (request.POST.get("capacidad_max") or "").strip()
-        id_responsable    = (request.POST.get("id_responsable") or "").strip()
+    if request.method == "GET":
+        return render(request, "create_team.html", {
+            "tournament": torneo,
+            "disciplinas": Disciplinas.objects.all().order_by("nombre"),
+            "today": datetime.date.today().isoformat(),
+        })
 
-     
-        if not nombre_equipo:
-            ctx["errors"]["nombre_equipo"] = "Requerido"
+    # POST
+    nombre  = (request.POST.get("nombre_equipo") or "").strip()
+    resp_id = (request.POST.get("responsable_id") or "").strip()     # Participantes.id_participante del líder
+    disc_id = (request.POST.get("disciplina_id") or "").strip()      # opcional
+    cap_min = (request.POST.get("capacidad_min") or "").strip()
+    cap_max = (request.POST.get("capacidad_max") or "").strip()
+    f_crea  = (request.POST.get("fecha_creacion") or "").strip()
 
-        if not fecha_creacion:
-            ctx["errors"]["fecha_creacion"] = "Requerida"
+    errors = {}
+    if not nombre: errors["nombre_equipo"] = "Nombre requerido."
+    if not resp_id.isdigit(): errors["responsable_id"] = "ID responsable inválido."
+    if cap_min and not cap_min.isdigit(): errors["capacidad_min"] = "Debe ser entero."
+    if cap_max and not cap_max.isdigit(): errors["capacidad_max"] = "Debe ser entero."
+    if cap_min and cap_max and int(cap_min) > int(cap_max):
+        errors["capacidad_max"] = "Máximo debe ser ≥ mínimo."
+    fecha_creacion = _parse_date_or_datetime(f_crea) or make_aware(datetime.combine(date.today(), datetime.min.time()))
 
-        if not capacidad_min.isdigit() or int(capacidad_min) < 1:
-            ctx["errors"]["capacidad_min"] = "Debe ser un entero ≥ 1"
+    if errors:
+        for e in errors.values(): messages.error(request, e)
+        return redirect("tournaments:create_team", torneo_id)
 
-        if not capacidad_max.isdigit() or int(capacidad_max) < 1:
-            ctx["errors"]["capacidad_max"] = "Debe ser un entero ≥ 1"
+    try:
+        with transaction.atomic():
+            new_team_id = None
 
-        if capacidad_min.isdigit() and capacidad_max.isdigit():
-            if int(capacidad_min) > int(capacidad_max):
-                ctx["errors"]["capacidad_max"] = "Máximo debe ser ≥ mínimo"
+            # Try ORM first (works if Equipos.id_equipo is AutoField/identity).
+            try:
+                team = Equipos.objects.create(
+                    nombre=nombre,
+                    fecha_creacion=fecha_creacion,
+                    cantidad_personas=None,
+                    participantes_id_participante_id=int(resp_id),
+                    disciplinas_id_disciplina_id=(int(disc_id) if disc_id else None),
+                    capacidad_min=(int(cap_min) if cap_min else None),
+                    capacidad_max=(int(cap_max) if cap_max else None),
+                )
+                new_team_id = getattr(team, "id_equipo", None) or getattr(team, "id", None)
+            except Exception:
+                # Fallback: raw SQL with RETURNING for cases where model PK isn't AutoField
+                with connection.cursor() as cur:
+                    cur.execute("""
+                        INSERT INTO equipos
+                            (nombre, fecha_creacion, cantidad_personas,
+                             participantes_id_participante, disciplinas_id_disciplina,
+                             capacidad_min, capacidad_max)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s)
+                        RETURNING id_equipo
+                    """, [
+                        nombre, fecha_creacion, None,
+                        int(resp_id),
+                        (int(disc_id) if disc_id else None),
+                        (int(cap_min) if cap_min else None),
+                        (int(cap_max) if cap_max else None),
+                    ])
+                    new_team_id = cur.fetchone()[0]
 
-        if cantidad_personas:
-            if not cantidad_personas.isdigit() or int(cantidad_personas) < 0:
-                ctx["errors"]["cantidad_personas"] = "Debe ser entero ≥ 0"
+            # Link team ↔ tournament (idempotent thanks to UNIQUE)
+            TorneosEquipos.objects.get_or_create(
+                torneos_id_torneo_id=torneo.id_torneo,
+                equipos_id_equipo_id=new_team_id
+            )
 
-        if not id_responsable.isdigit():
-            ctx["errors"]["id_responsable"] = "Debe ser numérico (ID del participante)"
+            # Add the responsible as a member (idempotent thanks to UNIQUE)
+            try:
+                EquiposParticipantes.objects.create(
+                    equipos_id_equipo_id=new_team_id,
+                    participantes_id_participante_id=int(resp_id),
+                    id_participante1=int(resp_id),  # keep value; column exists in DB
+                )
+            except IntegrityError:
+                pass
 
-        # Si todo ok -> “éxito” (demo, sin persistir todavía)
-        if not ctx["errors"]:
-            ctx.update(ok=True, nombre_equipo=nombre_equipo)
+        messages.success(request, "Equipo creado y vinculado al torneo.")
+        return redirect("tournaments:detail", torneo.id_torneo)
 
-    return render(request, "create_team.html", ctx)
+    except Exception as e:
+        print("crear_equipo_en_torneo error:", e)
+        messages.error(request, "No se pudo crear el equipo.")
+        return redirect("tournaments:create_team", torneo_id)
+
+
 
 # Historia 5: unirse a equipo (demo)
 #@login_required
