@@ -525,7 +525,8 @@ class Torneos(models.Model):
     disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina')
     fecha_inicio = models.DateField()
     fecha_fin = models.DateField()
-    estados_torneo_id_estado_torneo = models.OneToOneField(EstadosTorneo, models.DO_NOTHING, db_column='estados_torneo_id_estado_torneo')
+    estados_torneo_id_estado_torneo = models.ForeignKey(EstadosTorneo,models.DO_NOTHING,db_column='estados_torneo_id_estado_torneo'
+)
     reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
     aforo_equipos = models.FloatField(blank=True, null=True)
 

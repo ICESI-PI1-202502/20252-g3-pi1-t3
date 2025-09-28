@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="team-details-container" style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 40px;">
+    <!-- Left side: Team and tournament info -->
+    <div style="width: 45%; text-align: center;">
+        <h2>Detalles de equipo</h2>
+        <p><strong>Nombre del equipo:</strong> {{ team.nombre }}</p>
+        <p><strong>Torneo:</strong> {{ tournament.nombre }}</p>
+        <p><strong>Disciplina:</strong> {{ tournament.disciplina }}</p>
+        <p><strong>Fechas:</strong> {{ tournament.fecha_inicio|date:"d M Y" }} – {{ tournament.fecha_fin|date:"d M Y" }}</p>
+        {% if tournament.aforo_equipos %}
+          <p><strong>Aforo de equipos:</strong> {{ tournament.aforo_equipos }}</p>
+        {% endif %}
+        <p><strong>Progreso:</strong> Integrantes {{ team.integrantes_count }}/{{ team.integrantes_max }}</p>
+    </div>
+    <!-- Right side: Team members -->
+    <div style="width: 45%; text-align: center;">
+        <h3>Integrantes</h3>
+        {% for integrante in integrantes %}
+        <div class="integrante-card" style="background: #f8f8f8; margin-bottom: 10px; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+            <span style="flex: 1; text-align: left;">{{ integrante.nombre }}<br><small>{{ integrante.id }}</small></span>
+            <form method="post" style="margin-left: 10px;">
+                {% csrf_token %}
+                <input type="hidden" name="remove_id" value="{{ integrante.id }}" />
+                <button type="submit" class="btn btn-danger">Quitar</button>
+            </form>
+        </div>
+        {% empty %}
+        <p>No hay integrantes en este equipo.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

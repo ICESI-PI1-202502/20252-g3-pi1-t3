@@ -25,6 +25,9 @@
     <div class="actions">
       <a class="btn" href="{% url 'tournaments:join_team' tournament.id %}">Unirme a un equipo</a>
       <a class="btn outline" href="{% url 'tournaments:create_team' tournament.id %}">Crear equipo</a>
+      {% if teams and teams.0.id %}
+        <a class="btn outline" href="{% url 'tournaments:manage_team' teams.0.id %}">Gestionar equipo</a>
+      {% endif %}
     </div>
   </section>
 

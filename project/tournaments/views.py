@@ -1,3 +1,5 @@
+# Gestionar equipo (demo)
+from django.views.decorators.csrf import csrf_exempt
 import datetime
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
@@ -11,6 +13,30 @@ from universitaryWellbeing.models import (
 )
 from django.http import Http404
 
+##ALL OF THIS IS JUST DEMO / MOCKUP DATA - NO PERSISTENCE
+DEMO_TOURNAMENTS = [
+    {
+        "id": 1,
+        "nombre": "Torneo de Valorant",
+        "fecha_inicio": ...,
+        "fecha_fin": ...,
+        "disciplina": "Valorant",
+        "tiene_equipos": True,
+        "teams": [
+            {
+                "id": 101,
+                "nombre": "Team Alpha",
+                "participants": [
+                    {"id": 1001, "nombre": "Juan Perez"},
+                    {"id": 1002, "nombre": "Ana Gomez"},
+                ]
+            },
+            # more teams...
+        ],
+    },
+    # more tournaments...
+]
+##ALL OF THIS IS JUST DEMO / MOCKUP DATA - NO PERSISTENCE
 
 
 def _get(id_: int):
@@ -23,7 +49,7 @@ def _get(id_: int):
 def lista_torneos(request):
     q = (request.GET.get("q") or "").strip().lower()
 
-    # Traemos SOLO columnas válidas y el nombre de la disciplina
+    # Fetch tournaments from DB
     rows = (
         Torneos.objects
         .values(
@@ -41,11 +67,16 @@ def lista_torneos(request):
             "fecha_inicio": r["fecha_inicio"],
             "fecha_fin": r["fecha_fin"],
             "disciplina": r["disciplinas_id_disciplina__nombre"] or "",
-            # Heurística simple: si tiene aforo_equipos, lo tratamos como torneo por equipos
             "tiene_equipos": bool(r["aforo_equipos"]),
         }
         if not q or q in item["nombre"].lower() or q in item["disciplina"].lower():
             items.append(item)
+
+    # If no tournaments in DB, use demo tournaments
+    if not items:
+        for t in DEMO_TOURNAMENTS:
+            if not q or q in t["nombre"].lower() or q in t["disciplina"].lower():
+                items.append(t)
 
     return render(
         request,
@@ -170,6 +201,62 @@ def unirse_equipo(request, id: int):
             ctx.update(ok=True, team=elegido, correo=correo)
 
     return render(request, "join_team.html", ctx)
+
+
+    ##historia mis cojones
+@csrf_exempt
+def gestionar_equipo(request, team_id):
+    # Demo: Find team in DEMO_TOURNAMENTS
+    team = None
+    tournament = None
+    for t in DEMO_TOURNAMENTS:
+        for tm in t.get("teams", []):
+            if tm["id"] == int(team_id):
+                team = tm
+                tournament = t
+                break
+        if team:
+            break
+    if not team:
+        raise Http404("Equipo no encontrado")
+
+    # Demo: Add extra info for mockup
+    team_details = {
+        "nombre": team.get("nombre", ""),
+        "tag": team.get("tag", "LPL"),
+        "invite_link": "bienestar.edu/join/4F9KQ2",
+        "integrantes_count": len(team.get("participants", [])),
+        "integrantes_max": 5,
+        "qr_url": "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + team.get("invite_link", "bienestar.edu/join/4F9KQ2"),
+    }
+
+    integrantes = []
+    for idx, p in enumerate(team.get("participants", [])):
+        integrantes.append({
+            "id": p["id"],
+            "nombre": p["nombre"],
+            "rol": "Lider" if idx == 0 else "Titular"
+        })
+
+    # Handle POST actions (remove/promote)
+    if request.method == "POST":
+        remove_id = request.POST.get("remove_id")
+        promote_id = request.POST.get("promote_id")
+        if remove_id:
+            team["participants"] = [p for p in team["participants"] if str(p["id"]) != remove_id]
+            return redirect(request.path)
+        if promote_id:
+            # Demo: promote participant to leader (move to first position)
+            idx = next((i for i, p in enumerate(team["participants"]) if str(p["id"]) == promote_id), None)
+            if idx is not None:
+                team["participants"].insert(0, team["participants"].pop(idx))
+            return redirect(request.path)
+
+    return render(request, "team_details.html", {
+        "team": team_details,
+        "tournament": tournament,
+        "integrantes": integrantes,
+    })
 
 # Historia 6: Crear Torneo ()
 def crear_torneo(request):
