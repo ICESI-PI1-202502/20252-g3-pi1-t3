@@ -23,7 +23,7 @@
                 <p><i class="bi bi-person-vcard"></i> <strong>Cédula:</strong> {{ participante.user.username }}</p>
                 <p><i class="bi bi-people"></i> <strong>Rol:</strong>
                     {% if participante.roles_id_rol %}
-                    {{ participante.roles_id_rol.nombre }}
+                    {{ participante.roles_id_rol.nombre_rol }}
                     {% else %}
                     Sin rol asignado
                     {% endif %}
