@@ -20,8 +20,7 @@ urlpatterns = [
 
     path('gestion-asistencia/', views.gestion_asistencia, name='gestion_asistencia'),
    path('registrar-asistencia/', views.registrar_asistencia_manual, name='registrar_asistencia_manual'),
-   path('registro-masivo/', views.registro_masivo_asistencia, name='registro_masivo_asistencia'),
-   path('historial/<int:participante_id>/', views.historial_participante, name='historial_participante'),
+    path('historial/<int:participante_id>/', views.historial_participante, name='historial_participante'),
    path('api/participantes-actividad/', views.obtener_participantes_actividad, name='obtener_participantes_actividad'),
 
 ]
