@@ -16,6 +16,10 @@ from universitaryWellbeing.models import (
 )
 from django.http import Http404
 
+def _current_participante(user):
+    # Your schema has FK participantes.user → auth_user.id (not OneToOne), so pick the first.
+    return Participantes.objects.filter(user_id=user.id).order_by("id_participante").first()
+
 def get_torneo_or_404(id_: int):
     t = get_object_or_404(
         Torneos.objects.select_related("disciplinas_id_disciplina"),
@@ -158,8 +162,7 @@ def inscripcion_individual(request, id: int):
     return render(request, "join_individual.html", ctx)
 
 
-# Historia 4: crear equipo (demo)
-# Historia 4: crear equipo (real)
+# Historia : crear equipo 
 def crear_equipo_en_torneo(request, torneo_id: int):
     torneo = get_object_or_404(
         Torneos.objects.select_related("disciplinas_id_disciplina"),
@@ -281,35 +284,175 @@ def crear_equipo_en_torneo(request, torneo_id: int):
         return redirect("tournaments:create_team", torneo_id)
 
 
-# Historia 5: unirse a equipo (demo)
+def _current_participante(user):
+    # With FK we may have multiple; take the first. If you enforced UNIQUE(user), this is exactly one.
+    return Participantes.objects.filter(user_id=user.id).order_by("id_participante").first()
+
+
+# Historia : unirse a equipo (demo)
 #@login_required
+@login_required
 def unirse_equipo(request, id: int):
-    torneo, teams = get_torneo_or_404(id)
-    if not torneo["tiene_equipos"]:
-        raise Http404("Este torneo no es por equipos.")
+    # 1) Torneo must accept teams
+    torneo = get_object_or_404(Torneos.objects.select_related("disciplinas_id_disciplina"), pk=id)
+    if not torneo.aforo_equipos:
+        messages.error(request, "Este torneo es individual; no permite equipos.")
+        return redirect("tournaments:detail", id)
 
-    ctx = {"tournament": torneo, "teams": teams, "ok": False, "errors": {}}
+    # 2) Teams that belong to this tournament (for dropdown)
+    teams = list(
+        Equipos.objects
+        .filter(torneosequipos__torneos_id_torneo=id)
+        .values("id_equipo", "nombre", "capacidad_max", "disciplinas_id_disciplina")
+        .order_by("nombre")
+    )
 
+    # 3) Resolve current participante from logged-in user
+    participante = _current_participante(request.user)
+    if not participante:
+        messages.error(request, "Tu usuario no está vinculado a un participante.")
+        return redirect("tournaments:detail", id)
+
+    if request.method == "GET":
+        return render(
+            request,
+            "join_team.html",
+            {
+                "tournament": {
+                    "id": torneo.id_torneo,
+                    "nombre": torneo.nombre,
+                    "disciplina": getattr(torneo.disciplinas_id_disciplina, "nombre", "") or "",
+                },
+                "teams": teams,
+            },
+        )
+
+    # POST
+    team_id_raw = (request.POST.get("team_id") or "").strip()
+    if not team_id_raw.isdigit():
+        messages.error(request, "Selecciona un equipo válido.")
+        return redirect("tournaments:join_team", id)
+    team_id = int(team_id_raw)
+
+    # 4) Validate the team belongs to the tournament
+    if not TorneosEquipos.objects.filter(
+        torneos_id_torneo_id=id, equipos_id_equipo_id=team_id
+    ).exists():
+        messages.error(request, "El equipo seleccionado no pertenece a este torneo.")
+        return redirect("tournaments:join_team", id)
+
+    # Optional checks: capacity & discipline
+    team = get_object_or_404(Equipos, pk=team_id)
+
+    if team.capacidad_max:
+        miembros = EquiposParticipantes.objects.filter(
+            equipos_id_equipo_id=team_id
+        ).count()
+        if miembros >= int(team.capacidad_max):
+            messages.error(request, "Este equipo ya alcanzó su capacidad máxima.")
+            return redirect("tournaments:join_team", id)
+
+    if team.disciplinas_id_disciplina_id and torneo.disciplinas_id_disciplina_id:
+        if int(team.disciplinas_id_disciplina_id) != int(torneo.disciplinas_id_disciplina_id):
+            messages.error(request, "La disciplina del equipo no coincide con la del torneo.")
+            return redirect("tournaments:join_team", id)
+
+    # 5) Join (idempotent thanks to UNIQUE (equipo, participante))
+    try:
+        with transaction.atomic():
+            _, created = EquiposParticipantes.objects.get_or_create(
+                equipos_id_equipo_id=team_id,
+                participantes_id_participante_id=int(participante.id_participante),
+                defaults={"id_participante1": int(participante.id_participante)},  # legacy column
+            )
+        if created:
+            messages.success(request, "Te uniste al equipo.", extra_tags="tournaments")
+        else:
+            messages.info(request, "Ya eres miembro de este equipo.", extra_tags="tournaments")
+        return redirect("tournaments:detail", id)
+    except IntegrityError as e:
+        messages.error(request, "No se pudo crear el equipo.", extra_tags="tournaments")
+        return redirect("tournaments:join_team", id)
+
+
+# Historia : gestionar equipo 
+
+@login_required
+def gestionar_equipo(request, torneo_id: int, team_id: int):
+    # Torneo + equipo
+    torneo = get_object_or_404(
+        Torneos.objects.select_related("disciplinas_id_disciplina"),
+        pk=torneo_id
+    )
+    team = get_object_or_404(
+        Equipos.objects.select_related("disciplinas_id_disciplina", "participantes_id_participante"),
+        pk=team_id
+    )
+
+    # Validar pertenencia del equipo al torneo
+    if not TorneosEquipos.objects.filter(
+        torneos_id_torneo_id=torneo_id, equipos_id_equipo_id=team_id
+    ).exists():
+        raise Http404("El equipo no pertenece a este torneo.")
+
+    # Miembros (nombre + id)
+    miembros = list(
+        EquiposParticipantes.objects
+        .filter(equipos_id_equipo_id=team_id)
+        .select_related("participantes_id_participante")
+        .values(
+            "id",
+            "participantes_id_participante",
+            "participantes_id_participante__nombre",
+            "participantes_id_participante__apellido",
+        )
+        .order_by("participantes_id_participante__nombre")
+    )
+
+    # Marcar líder (responsable del equipo)
+    lider_id = getattr(getattr(team, "participantes_id_participante", None), "id_participante", None)
+    for m in miembros:
+        m["is_leader"] = (lider_id and int(m["participantes_id_participante"]) == int(lider_id))
+
+    # Acción: quitar integrante
     if request.method == "POST":
-        team_id = (request.POST.get("team_id") or "").strip()
-        correo  = (request.POST.get("correo") or "").strip()
-        cedula  = (request.POST.get("cedula") or "").strip()
+        remove_id = (request.POST.get("remove_id") or "").strip()
+        if not remove_id.isdigit():
+            messages.error(request, "ID inválido.", extra_tags="tournaments")
+            return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
 
-        if not team_id:
-            ctx["errors"]["team_id"] = "Selecciona un equipo"
-        try:
-            validate_email(correo)
-        except ValidationError:
-            ctx["errors"]["correo"] = "Formato de correo inválido"
-        if not (cedula.isdigit() and len(cedula) == 10):
-            ctx["errors"]["cedula"] = "La cédula debe tener exactamente 10 dígitos"
+        pid = int(remove_id)
+        if lider_id and pid == int(lider_id):
+            messages.error(request, "No puedes quitar al líder del equipo desde aquí.", extra_tags="tournaments")
+            return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
 
-        if not ctx["errors"]:
-            elegido = next((t for t in teams if str(t["id_equipo"]) == team_id), None)
-            ctx.update(ok=True, team=elegido, correo=correo)
+        with transaction.atomic():
+            EquiposParticipantes.objects.filter(
+                equipos_id_equipo_id=team_id, participantes_id_participante_id=pid
+            ).delete()
+        messages.success(request, "Miembro eliminado.", extra_tags="tournaments")
+        return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
 
-    return render(request, "join_team.html", ctx)
+    # Contexto para plantilla
+    integrantes_count = len(miembros)
+    integrantes_max = int(team.capacidad_max) if team.capacidad_max else None
 
-
+    context = {
+        "torneo": {
+            "id": torneo.id_torneo,
+            "nombre": torneo.nombre,
+            "disciplina": getattr(torneo.disciplinas_id_disciplina, "nombre", "") or "",
+        },
+        "team": {
+            "id": team.id_equipo,
+            "nombre": team.nombre,
+            "tag": (team.nombre[:3].upper() if team.nombre else "TAG"),
+            "integrantes_count": integrantes_count,
+            "integrantes_max": integrantes_max,
+            "invite_link": f"bienestar.edu/join/{team.id_equipo}",  # placeholder
+        },
+        "miembros": miembros,
+    }
+    return render(request, "team_details.html", context)
 
   
