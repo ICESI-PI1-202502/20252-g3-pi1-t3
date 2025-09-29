@@ -209,43 +209,81 @@ def comparaciones(request):
 
 
  # views.py - Sistema completo de recomendaciones  
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
 from django.shortcuts import render, redirect
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
-from django.db.models import Count, Avg, Q, F, Case, When, IntegerField
+from django.db.models import Count, Q, F, Value, IntegerField, ExpressionWrapper
 from django.utils import timezone
-from datetime import datetime, timedelta
+from datetime import timedelta
 from universitaryWellbeing.models import Asistencias, Participaciones, Actividades, Participantes
+import os
+
+
+def obtener_estudiantes_activos(dias_actividad=14):
+    """
+    Devuelve estudiantes que han tenido al menos una asistencia en los últimos `dias_actividad` días.
+    """
+    fecha_limite = timezone.now().date() - timedelta(days=dias_actividad)
+    return (
+        Participaciones.objects
+        .annotate(
+            asistencias_recientes=Count(
+                'asistencias',
+                filter=Q(asistencias__fecha__gte=fecha_limite),
+                distinct=True
+            )
+        )
+        .filter(asistencias_recientes__gte=1)
+        .select_related('participantes_id_participante', 'actividades_id_actividad')
+        .order_by('-asistencias_recientes')
+    )
+
+
+LOG_EMAILS_FILE = os.path.join(settings.BASE_DIR, "emails_enviados.txt")
+
+def log_email(destinatarios, asunto):
+    """Guarda en un TXT los destinatarios y el asunto del correo enviado"""
+    with open(LOG_EMAILS_FILE, "a", encoding="utf-8") as f:
+        linea = f"{timezone.now().strftime('%Y-%m-%d %H:%M:%S')} | {asunto} | {', '.join(destinatarios)}\n"
+        f.write(linea)
+
+def enviar_email(asunto, mensaje, destinatarios):
+    """Envía un email y lo registra en el log"""
+    if not destinatarios:
+        return
+    send_mail(
+        asunto,
+        mensaje,
+        settings.DEFAULT_FROM_EMAIL,
+        destinatarios,
+        fail_silently=True
+    )
+    log_email(destinatarios, asunto)
 
 def recomendaciones(request):
     """Vista principal para mostrar recomendaciones automáticas"""
-    
-    # 1. Estudiantes con poca asistencia (menos de 50% de sesiones)
     poca_asistencia = obtener_estudiantes_poca_asistencia()
-    
-    # 2. Estudiantes próximos a reconocimientos
     proximos_reconocimientos = obtener_proximos_reconocimientos()
-    
-    # 3. Estudiantes inactivos (sin asistir últimas 2 semanas)
     estudiantes_inactivos = obtener_estudiantes_inactivos()
-    
-    # 4. Estudiantes destacados (alta participación)
     estudiantes_destacados = obtener_estudiantes_destacados()
-    
-    # 5. Alertas de riesgo académico
     alertas_riesgo = obtener_alertas_riesgo()
-    
+    estudiantes_activos = obtener_estudiantes_activos()  
     context = {
         'poca_asistencia': poca_asistencia,
         'proximos_reconocimientos': proximos_reconocimientos,
         'estudiantes_inactivos': estudiantes_inactivos,
         'estudiantes_destacados': estudiantes_destacados,
         'alertas_riesgo': alertas_riesgo,
+        'estudiantes_activos': estudiantes_activos, 
         'fecha_actualizacion': timezone.now()
     }
     
-    # Si se solicita envío automático de notificaciones
     if request.GET.get('enviar_notificaciones'):
         enviar_notificaciones_automaticas(context)
         messages.success(request, 'Notificaciones enviadas correctamente.')
@@ -253,7 +291,6 @@ def recomendaciones(request):
     return render(request, "recomendaciones.html", context)
 
 def obtener_estudiantes_poca_asistencia(umbral_asistencias=3):
-    """Identifica estudiantes con pocas asistencias"""
     return (
         Participaciones.objects
         .annotate(total_asistencias=Count('asistencias'))
@@ -263,32 +300,36 @@ def obtener_estudiantes_poca_asistencia(umbral_asistencias=3):
     )
 
 def obtener_proximos_reconocimientos():
-    """Identifica estudiantes próximos a obtener reconocimientos"""
-    # Ejemplo: estudiantes con 8-9 asistencias (próximos a 10 para reconocimiento)
     return (
         Participaciones.objects
-        .annotate(total_asistencias=Count('asistencias'))
+        .annotate(
+            total_asistencias=Count('asistencias', distinct=True),
+            asistencias_faltantes=ExpressionWrapper(
+                10 - Count('asistencias', distinct=True),
+                output_field=IntegerField()
+            )
+        )
         .filter(total_asistencias__gte=8, total_asistencias__lt=10)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
         .order_by('-total_asistencias')
     )
 
 def obtener_estudiantes_inactivos(dias_inactividad=14):
-    """Identifica estudiantes sin actividad reciente"""
     fecha_limite = timezone.now().date() - timedelta(days=dias_inactividad)
-    
     return (
         Participaciones.objects
-        .filter(
-            Q(asistencias__fecha__lt=fecha_limite) |
-            Q(asistencias__isnull=True)
+        .annotate(
+            asistencias_recientes=Count(
+                'asistencias',
+                filter=Q(asistencias__fecha__gte=fecha_limite),
+                distinct=True
+            )
         )
-        .distinct()
+        .filter(asistencias_recientes=0)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
     )
 
 def obtener_estudiantes_destacados():
-    """Identifica estudiantes con rendimiento destacado"""
     return (
         Participaciones.objects
         .annotate(total_asistencias=Count('asistencias'))
@@ -298,104 +339,76 @@ def obtener_estudiantes_destacados():
     )
 
 def obtener_alertas_riesgo():
-    """Genera alertas de riesgo académico basadas en múltiples factores"""
     fecha_limite = timezone.now().date() - timedelta(days=7)
-    
     return (
         Participaciones.objects
         .annotate(
             asistencias_recientes=Count(
                 'asistencias',
-                filter=Q(asistencias__fecha__gte=fecha_limite)
+                filter=Q(asistencias__fecha__gte=fecha_limite),
+                distinct=True
             ),
             total_asistencias=Count('asistencias')
         )
-        .filter(
-            Q(asistencias_recientes=0) &  # Sin asistencias recientes
-            Q(total_asistencias__lt=5)    # Y pocas asistencias totales
-        )
+        .filter(Q(asistencias_recientes=0) & Q(total_asistencias__lt=5))
         .select_related('participantes_id_participante', 'actividades_id_actividad')
     )
 
 def enviar_notificaciones_automaticas(context):
     """Envía notificaciones automáticas por email"""
-    
-    # Notificar sobre estudiantes con poca asistencia
     if context['poca_asistencia']:
         enviar_alerta_poca_asistencia(context['poca_asistencia'])
-    
-    # Notificar sobre reconocimientos próximos
     if context['proximos_reconocimientos']:
         enviar_notificacion_reconocimientos(context['proximos_reconocimientos'])
-    
-    # Notificar sobre estudiantes inactivos
     if context['estudiantes_inactivos']:
         enviar_alerta_inactividad(context['estudiantes_inactivos'])
 
 def enviar_alerta_poca_asistencia(estudiantes):
-    """Envía alertas por poca asistencia"""
+    """Envía alertas por poca asistencia al staff"""
     asunto = f"Alerta: {len(estudiantes)} estudiantes con baja asistencia"
-    
     mensaje = "Estudiantes que requieren intervención por baja asistencia:\n\n"
     for est in estudiantes:
         mensaje += f"• {est.participantes_id_participante.nombre} {est.participantes_id_participante.apellido} - {est.total_asistencias} asistencias\n"
         mensaje += f"  Actividad: {est.actividades_id_actividad.nombre}\n\n"
-    
     enviar_email_staff(asunto, mensaje)
 
 def enviar_notificacion_reconocimientos(estudiantes):
-    """Envía notificaciones sobre reconocimientos próximos"""
+    """Envía notificaciones sobre reconocimientos próximos a los participantes (por correo)."""
     for est in estudiantes:
         nombre_completo = f"{est.participantes_id_participante.nombre} {est.participantes_id_participante.apellido}"
         asunto = f"¡Estás cerca de un reconocimiento, {est.participantes_id_participante.nombre}!"
         mensaje = f"""
-        Hola {nombre_completo},
-        
-        ¡Felicidades! Tienes {est.total_asistencias} asistencias en {est.actividades_id_actividad.nombre}.
-        Solo necesitas {10 - est.total_asistencias} más para obtener tu reconocimiento.
-        
-        ¡Sigue así!
-        """
-        
-        if est.participantes_id_participante.correo:
-            send_mail(
-                asunto,
-                mensaje,
-                settings.DEFAULT_FROM_EMAIL,
-                [est.participantes_id_participante.correo],
-                fail_silently=True
-            )
+Hola {nombre_completo},
+
+¡Felicidades! Tienes {est.total_asistencias} asistencias en {est.actividades_id_actividad.nombre}.
+Solo necesitas {10 - est.total_asistencias} más para obtener tu reconocimiento.
+
+¡Sigue así!
+"""
+        correo = est.participantes_id_participante.correo
+        if correo:
+            enviar_email(asunto, mensaje, [correo])
 
 def enviar_alerta_inactividad(estudiantes):
-    """Envía alertas sobre estudiantes inactivos"""
+    """Envía alertas sobre estudiantes inactivos al staff"""
     asunto = f"Alerta: {len(estudiantes)} estudiantes inactivos"
-    
     mensaje = "Estudiantes que no han asistido recientemente:\n\n"
     for est in estudiantes:
         mensaje += f"• {est.participantes_id_participante.nombre} {est.participantes_id_participante.apellido} - Actividad: {est.actividades_id_actividad.nombre}\n"
-    
     enviar_email_staff(asunto, mensaje)
 
 def enviar_email_staff(asunto, mensaje):
     """Envía email al personal administrativo"""
     staff_emails = ['admin@academia.com', 'coordinador@academia.com']
-    
-    send_mail(
-        asunto,
-        mensaje,
-        settings.DEFAULT_FROM_EMAIL,
-        staff_emails,
-        fail_silently=True
-    )
+    enviar_email(asunto, mensaje, staff_emails)
 
 def generar_encuesta_feedback():
     """Genera y envía encuestas de retroalimentación automáticas"""
-    # Estudiantes que completaron un programa recientemente
     estudiantes_completaron = (
         Participaciones.objects
         .filter(fecha_finalizacion__isnull=False)
         .filter(fecha_finalizacion__gte=timezone.now() - timedelta(days=7))
-        .select_related('id_participante')
+        .select_related('participantes_id_participante', 'actividades_id_actividad')
     )
     
     for participacion in estudiantes_completaron:
@@ -405,36 +418,25 @@ def enviar_encuesta_feedback(participacion):
     """Envía encuesta de feedback individual"""
     nombre_completo = f"{participacion.participantes_id_participante.nombre} {participacion.participantes_id_participante.apellido}"
     asunto = f"Tu opinión es importante - {participacion.actividades_id_actividad.nombre}"
-    
-    # URL de encuesta (podría ser Google Forms, Typeform, etc.)
     url_encuesta = f"https://forms.gle/encuesta?id={participacion.id_participacion}"
-    
     mensaje = f"""
-    Hola {nombre_completo},
-    
-    Gracias por participar en {participacion.actividades_id_actividad.nombre}.
-    
-    Tu experiencia es muy valiosa para nosotros. Por favor, tómate unos minutos 
-    para completar esta breve encuesta:
-    
-    {url_encuesta}
-    
-    ¡Gracias por tu tiempo!
-    """
-    
-    if participacion.participantes_id_participante.correo:
-        send_mail(
-            asunto,
-            mensaje,
-            settings.DEFAULT_FROM_EMAIL,
-            [participacion.participantes_id_participante.correo],
-            fail_silently=True
-        )
+Hola {nombre_completo},
 
-# Vista para configurar notificaciones automáticas
+Gracias por participar en {participacion.actividades_id_actividad.nombre}.
+
+Tu experiencia es muy valiosa para nosotros. Por favor, tómate unos minutos 
+para completar esta breve encuesta:
+
+{url_encuesta}
+
+¡Gracias por tu tiempo!
+"""
+    correo = participacion.participantes_id_participante.correo
+    if correo:
+        enviar_email(asunto, mensaje, [correo])
+
 def configurar_notificaciones(request):
     """Permite configurar parámetros de las notificaciones automáticas"""
-    
     if request.method == 'POST':
         configuracion = {
             'umbral_asistencia': int(request.POST.get('umbral_asistencia', 50)),
@@ -442,13 +444,21 @@ def configurar_notificaciones(request):
             'envio_automatico': request.POST.get('envio_automatico') == 'on',
             'frecuencia_envio': request.POST.get('frecuencia_envio', 'semanal')
         }
-        
-        # Guardar configuración (podrías usar un modelo de configuración)
-        # ConfiguracionNotificaciones.objects.update_or_create(...)
-        
         messages.success(request, 'Configuración guardada correctamente.')
-    
     return render(request, 'configurar_notificaciones.html')
+
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+
+
+
+
+
 
 
 

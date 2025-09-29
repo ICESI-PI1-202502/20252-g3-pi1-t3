@@ -56,6 +56,7 @@ class Asistencias(models.Model):
     estados_asistencia_id_estado_asistencia = models.ForeignKey('EstadosAsistencia', models.DO_NOTHING, db_column='estados_asistencia_id_estado_asistencia')
     participaciones_id_participacion = models.ForeignKey('Participaciones', models.DO_NOTHING, db_column='participaciones_id_participacion')
 
+    
     class Meta:
         managed = False
         db_table = 'asistencias'

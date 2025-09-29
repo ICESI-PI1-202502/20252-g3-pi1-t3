@@ -1,0 +1,88 @@
+2025-09-29 14:17:14 | Alerta: 140 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:17:16 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:17:23 | Alerta: 140 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:17:26 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:22:30 | Alerta: 140 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:22:33 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:23:59 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:24:02 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:25:50 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:25:52 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:30:57 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:31:00 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:34:18 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:34:21 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:39:27 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:39:29 | Alerta: 139 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:46:06 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:46:09 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:47:35 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:47:37 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:48:41 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:48:43 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:48:49 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:48:52 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:49:05 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:49:07 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:49:37 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:49:39 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:54:44 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:54:46 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:18 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:21 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:21 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:24 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:32 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:32 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:33 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:33 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:34 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:35 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:35 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:36 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:55 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 14:58:58 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:04:04 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:04:06 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:09:11 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:09:13 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:14:19 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:14:21 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:19:26 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:19:29 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:24:34 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:24:37 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:29:18 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:29:20 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:34:26 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:34:28 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:37:56 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:37:58 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:43:03 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:43:06 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:44:12 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:44:14 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:49:22 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:49:24 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:58:38 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:58:39 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:58:41 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:58:41 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 15:58:54 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 15:58:57 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:04:02 | Alerta: 139 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 16:04:05 | Alerta: 138 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:05:57 | Alerta: 186 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 16:05:59 | Alerta: 185 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:07:18 | Alerta: 189 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 16:07:20 | Alerta: 188 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:09:28 | Alerta: 26 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:14:34 | Alerta: 26 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:16:37 | Alerta: 26 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:21:43 | Alerta: 26 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:22:50 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:22:58 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:26:37 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:26:45 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:27:36 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 16:27:38 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
