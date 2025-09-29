@@ -168,15 +168,16 @@ def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     base = request.session.get(k_base, {})
     sched = request.session.get(k_sched, {})
     return render(
-        request,
-        "form_activities.html",
-        {
-            "tipos": tipos,
-            "grupo_actividad": grupo_actividad,
-            "draft": base,
-            "sched": sched,
-        },
-    )
+    request,
+    "form_activities.html",
+    {
+        "tipos": tipos,
+        "grupo_actividad": grupo_actividad,
+        "draft": base,          # o {}
+        "sched": sched,         # o {}
+        "modo": "create",
+    },
+)
 
 
 def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
@@ -341,7 +342,6 @@ def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, activi
                     actividad.requiere_inscripcion = requiere_char
                     actividad.aforo = aforo_val
 
-                    # --- NUEVO: convertir fechas del input date ---
                     actividad.fecha_apertura_ins = date_input_to_dt(base.get("fecha_apertura_ins"))
                     actividad.fecha_cierre_ins = date_input_to_dt(base.get("fecha_cierre_ins"))
 
@@ -471,6 +471,8 @@ def schedule_draft(request, grupo_nombre, grupo_id, grupo_actividad_id, activida
     grupo = grupo_actividad.grupos_id_grupo
     slug_real = slugify(grupo.nombre)
 
+
+    modo = "edit" if actividad_id else "create"
     if grupo_nombre != slug_real:
         if actividad_id:
             return redirect("management_cadi:schedule_draft_edit", slug_real, grupo.id_grupo, grupo_actividad.id_grupo_actividad, actividad_id)
@@ -529,5 +531,6 @@ def schedule_draft(request, grupo_nombre, grupo_id, grupo_actividad_id, activida
             "hora_fin": sched.get("hora_fin", ""),
             "dias": sched.get("dias", []),
         },
+        "modo": modo,
     })
 
