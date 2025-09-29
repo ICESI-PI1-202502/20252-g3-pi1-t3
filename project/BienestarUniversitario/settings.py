@@ -85,8 +85,15 @@ DATABASES = {
         'PASSWORD': 'h9TZan8icTf3hjsn',
         'HOST': 'db.xlknciyujekwbhysmamn.supabase.co',
         'PORT': '5432',
+        'CONN_MAX_AGE': 60,
+        'OPTIONS': {'sslmode': 'require'},
    }
 }
+
+
+
+#AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
