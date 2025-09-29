@@ -1,16 +1,18 @@
 # Gestionar equipo (demo)
+import traceback
 from django.views.decorators.csrf import csrf_exempt
-import datetime
+import datetime as dt
+from django.utils import timezone 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.timezone import make_aware, get_current_timezone
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
+from django.db import transaction, IntegrityError, DataError, DatabaseError, ProgrammingError, connection
 from django.core.exceptions import ValidationError
-from django.db import transaction, IntegrityError, connection
 from django.contrib import messages
 from django.db.models import Max
 from universitaryWellbeing.models import (
- Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos, EquiposParticipantes
+ Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos, EquiposParticipantes, Participantes
 )
 from django.http import Http404
 
@@ -41,16 +43,11 @@ def get_torneo_or_404(id_: int):
 
     return data, teams
 
-def _parse_date_or_datetime(s: str):
+def _parse_date(s: str):
     if not s:
         return None
-    # accept "YYYY-MM-DD" or full ISO; store timezone-aware
     try:
-        if len(s) == 10:
-            dt = datetime.strptime(s, "%Y-%m-%d")
-        else:
-            dt = datetime.fromisoformat(s)
-        return make_aware(dt, get_current_timezone())
+        return dt.datetime.strptime(s, "%Y-%m-%d").date()  # input type=date
     except Exception:
         return None
 
@@ -162,13 +159,14 @@ def inscripcion_individual(request, id: int):
 
 
 # Historia 4: crear equipo (demo)
+# Historia 4: crear equipo (real)
 def crear_equipo_en_torneo(request, torneo_id: int):
     torneo = get_object_or_404(
         Torneos.objects.select_related("disciplinas_id_disciplina"),
         pk=torneo_id
     )
 
-    # Only allow teams if this tournament is de equipos
+    # Solo equipos si hay aforo_equipos definido (team-based)
     if not torneo.aforo_equipos:
         messages.error(request, "Este torneo es individual; no permite equipos.")
         return redirect("tournaments:detail", torneo_id)
@@ -177,13 +175,16 @@ def crear_equipo_en_torneo(request, torneo_id: int):
         return render(request, "create_team.html", {
             "tournament": torneo,
             "disciplinas": Disciplinas.objects.all().order_by("nombre"),
-            "today": datetime.date.today().isoformat(),
+            "today": dt.date.today().isoformat(),
         })
+
+    # ---- DEBUG: ver payload entrante
+    print("POST payload:", dict(request.POST))
 
     # POST
     nombre  = (request.POST.get("nombre_equipo") or "").strip()
-    resp_id = (request.POST.get("responsable_id") or "").strip()     # Participantes.id_participante del líder
-    disc_id = (request.POST.get("disciplina_id") or "").strip()      # opcional
+    resp_id = (request.POST.get("responsable_id") or "").strip()
+    disc_id = (request.POST.get("disciplina_id") or "").strip()
     cap_min = (request.POST.get("capacidad_min") or "").strip()
     cap_max = (request.POST.get("capacidad_max") or "").strip()
     f_crea  = (request.POST.get("fecha_creacion") or "").strip()
@@ -195,30 +196,43 @@ def crear_equipo_en_torneo(request, torneo_id: int):
     if cap_max and not cap_max.isdigit(): errors["capacidad_max"] = "Debe ser entero."
     if cap_min and cap_max and int(cap_min) > int(cap_max):
         errors["capacidad_max"] = "Máximo debe ser ≥ mínimo."
-    fecha_creacion = _parse_date_or_datetime(f_crea) or make_aware(datetime.combine(date.today(), datetime.min.time()))
+    fecha_creacion = _parse_date(f_crea) or dt.date.today()
+    disc_fk = int(disc_id) if disc_id.isdigit() else None
+
+    # ---- FK prechecks (errores humanos más claros que un FK violation)
+    if resp_id.isdigit() and not Participantes.objects.filter(pk=int(resp_id)).exists():
+        errors["responsable_fk"] = f"Participante {resp_id} no existe."
+    if disc_fk and not Disciplinas.objects.filter(pk=disc_fk).exists():
+        errors["disciplina_fk"] = f"Disciplina {disc_fk} no existe."
 
     if errors:
-        for e in errors.values(): messages.error(request, e)
+        for e in errors.values():
+            messages.error(request, e)
         return redirect("tournaments:create_team", torneo_id)
 
     try:
         with transaction.atomic():
             new_team_id = None
 
-            # Try ORM first (works if Equipos.id_equipo is AutoField/identity).
+            # 1) Crear equipo con un savepoint interno
             try:
-                team = Equipos.objects.create(
-                    nombre=nombre,
-                    fecha_creacion=fecha_creacion,
-                    cantidad_personas=None,
-                    participantes_id_participante_id=int(resp_id),
-                    disciplinas_id_disciplina_id=(int(disc_id) if disc_id else None),
-                    capacidad_min=(int(cap_min) if cap_min else None),
-                    capacidad_max=(int(cap_max) if cap_max else None),
-                )
-                new_team_id = getattr(team, "id_equipo", None) or getattr(team, "id", None)
-            except Exception:
-                # Fallback: raw SQL with RETURNING for cases where model PK isn't AutoField
+                with transaction.atomic():  # savepoint
+                    team = Equipos.objects.create(
+                        nombre=nombre,
+                        fecha_creacion=fecha_creacion,             # DateField
+                        cantidad_personas=None,
+                        participantes_id_participante_id=int(resp_id),
+                        disciplinas_id_disciplina_id=disc_fk,
+                        capacidad_min=(int(cap_min) if cap_min else None),
+                        capacidad_max=(int(cap_max) if cap_max else None),
+                    )
+                    new_team_id = getattr(team, "id_equipo", None) or getattr(team, "id", None)
+                    print("ORM team created:", new_team_id)
+            except Exception as orm_err:
+                # El fallo del bloque interno NO envenena la transacción externa
+                print("ORM insert failed:", repr(orm_err))
+                print(traceback.format_exc())
+                # 1b) Fallback: SQL crudo con RETURNING
                 with connection.cursor() as cur:
                     cur.execute("""
                         INSERT INTO equipos
@@ -229,37 +243,42 @@ def crear_equipo_en_torneo(request, torneo_id: int):
                         RETURNING id_equipo
                     """, [
                         nombre, fecha_creacion, None,
-                        int(resp_id),
-                        (int(disc_id) if disc_id else None),
+                        int(resp_id), disc_fk,
                         (int(cap_min) if cap_min else None),
                         (int(cap_max) if cap_max else None),
                     ])
                     new_team_id = cur.fetchone()[0]
+                    print("SQL team created:", new_team_id)
 
-            # Link team ↔ tournament (idempotent thanks to UNIQUE)
-            TorneosEquipos.objects.get_or_create(
-                torneos_id_torneo_id=torneo.id_torneo,
-                equipos_id_equipo_id=new_team_id
-            )
+            # 2) Vincular torneo ↔ equipo (savepoint opcional)
+            with transaction.atomic():
+                obj, created = TorneosEquipos.objects.get_or_create(
+                    torneos_id_torneo_id=torneo.id_torneo,
+                    equipos_id_equipo_id=new_team_id
+                )
+                print("Linked Torneo-Equipo:", obj.id, "created:", created)
 
-            # Add the responsible as a member (idempotent thanks to UNIQUE)
-            try:
-                EquiposParticipantes.objects.create(
+            # 3) Añadir responsable como miembro (idempotente por UNIQUE)
+            with transaction.atomic():
+                ep_obj, ep_created = EquiposParticipantes.objects.get_or_create(
                     equipos_id_equipo_id=new_team_id,
                     participantes_id_participante_id=int(resp_id),
-                    id_participante1=int(resp_id),  # keep value; column exists in DB
+                    defaults={"id_participante1": int(resp_id)},
                 )
-            except IntegrityError:
-                pass
+                print("Added responsable:", ep_obj.id, "created:", ep_created)
 
         messages.success(request, "Equipo creado y vinculado al torneo.")
         return redirect("tournaments:detail", torneo.id_torneo)
 
-    except Exception as e:
-        print("crear_equipo_en_torneo error:", e)
-        messages.error(request, "No se pudo crear el equipo.")
+    except (IntegrityError, DataError, ProgrammingError, DatabaseError, Exception) as e:
+        tb = traceback.format_exc()
+        print("crear_equipo_en_torneo error:", repr(e))
+        print(tb)
+        messages.error(request, f"No se pudo crear el equipo: {e}")
+        last = tb.strip().splitlines()[-1] if tb.strip().splitlines() else ""
+        if last:
+            messages.error(request, last)
         return redirect("tournaments:create_team", torneo_id)
-
 
 
 # Historia 5: unirse a equipo (demo)
