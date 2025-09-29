@@ -1,55 +1,74 @@
 {% extends "form_base.html" %}
 {% load static %}
 
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link text-decoration-none d-inline-flex align-items-center gap-2">
+  <i class="bi bi-arrow-left"></i> <span>Regresar</span>
+</a>
+{% endblock %}
+
 {% block title %}Crear Torneo{% endblock %}
 {% block form_title %}Añadir nuevo torneo{% endblock %}
 
 {% block form_fields %}
-{% if messages %}
-  <div>
-    {% for message in messages %}
-      <div class="alert alert-{{ message.tags }}">{{ message }}</div>
-    {% endfor %}
-  </div>
-{% endif %}
+<div class="d-flex align-items-center justify-content-center" style="min-height:70vh;">
+  <div class="w-100" style="max-width:960px; transform: translateY(-6vh);">
 
-<div class="row text-center mb-4">
-  <div class="col-md-6">
-    <h6>Nombre del torneo</h6>
-    <input type="text" name="nombre" class="form-control text-center" maxlength="150" required>
-  </div>
+    {% if messages %}
+      <div class="mb-3">
+        {% for message in messages %}
+          <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
+        {% endfor %}
+      </div>
+    {% endif %}
 
-  <div class="col-md-6">
-    <h6>Disciplina</h6>
-    <select name="disciplina" class="form-control text-center" required>
-      <option value="" disabled selected>Seleccione una disciplina</option>
-      {% for d in disciplinas %}
-        <option value="{{ d.id_disciplina|floatformat:0 }}">{{ d.nombre }}</option>
-      {% endfor %}
-    </select>
+    <div class="row text-center mb-4">
+      <div class="col-md-6">
+        <h6>Nombre del torneo</h6>
+        <input type="text" name="nombre" class="form-control text-center" maxlength="150" required>
+      </div>
+
+      <div class="col-md-6">
+        <h6>Disciplina</h6>
+        <select name="disciplina" class="form-control text-center" required>
+          <option value="" disabled selected>Seleccione una disciplina</option>
+          {% for d in disciplinas %}
+            <option value="{{ d.id_disciplina|floatformat:0 }}">{{ d.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
+    <div class="row text-center mb-4">
+      <div class="col-md-6">
+        <h6>Fecha inicio</h6>
+        <input type="date" name="fecha_inicio" class="form-control text-center" required>
+      </div>
+
+      <div class="col-md-6">
+        <h6>Fecha fin</h6>
+        <input type="date" name="fecha_fin" class="form-control text-center" required>
+      </div>
+    </div>
+
+    <div class="row text-center mb-4">
+      <div class="col-md-6">
+        <h6>Aforo de equipos</h6>
+        <input type="number" name="aforo" class="form-control text-center" min="0" step="1" placeholder="ej. 16">
+      </div>
+    </div>
+
+    <div class="row text-center mb-4">
+      <div class="col-md-6">
+        <h6>Fecha y hora límite de inscripción</h6>
+        <input type="datetime-local" name="limite_inscripcion" class="form-control text-center">
+      </div>
+    </div>
+
   </div>
 </div>
-
-<div class="row text-center mb-4">
-  <div class="col-md-6">
-    <h6>Fecha inicio</h6>
-    <input type="date" name="fecha_inicio" class="form-control text-center" required>
-  </div>
-
-  <div class="col-md-6">
-    <h6>Fecha fin</h6>
-    <input type="date" name="fecha_fin" class="form-control text-center" required>
-  </div>
-</div>
-
-<div class="row text-center mb-4">
-  <div class="col-md-6">
-    <h6>Aforo de equipos (opcional)</h6>
-    <input type="number" name="aforo" class="form-control text-center" min="0" step="1" placeholder="ej. 16">
-  </div>
-</div>
-
 {% endblock %}
+
 {% block form_submit %}Crear torneo{% endblock %}
 {% block form_action %}{% url 'tournaments:create' %}{% endblock %}
 {% block form_cancel_url %}{% url 'tournaments:list' %}{% endblock %}

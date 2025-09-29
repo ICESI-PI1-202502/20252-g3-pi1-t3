@@ -1,49 +1,80 @@
+Gotchu — same fields, just glow-up. Here’s a prettier version using Bootstrap (card, spacing, inputs, and a tidy layout), without adding or removing any form fields:
+
+```django
 {% extends "base.html" %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link text-decoration-none d-inline-flex align-items-center gap-2">
+  <i class="bi bi-arrow-left"></i> <span>Regresar</span>
+</a>
+{% endblock %}
+
 {% block content %}
+<div class="d-flex justify-content-center align-items-center" style="min-height:70vh;">
+  <div class="container" style="max-width:720px; transform: translateY(-6vh);">
 
-{% if messages %}
-  <ul class="alerts">
-    {% for message in messages %}
-      <li class="alert {{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+    {% if messages %}
+      <div class="mb-3">
+        <ul class="list-unstyled m-0">
+          {% for message in messages %}
+            <li class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      </div>
+    {% endif %}
 
-<h2>Crear equipo para {{ tournament.nombre }}</h2>
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h2 class="h4 text-center mb-3">Crear equipo para {{ tournament.nombre }}</h2>
 
-<form method="post">
-  {% csrf_token %}
+        <form method="post" class="mt-2">
+          {% csrf_token %}
 
-  <label>Nombre del equipo</label>
-  <input name="nombre_equipo" required>
+          <div class="mb-3">
+            <label class="form-label">Nombre del equipo</label>
+            <input name="nombre_equipo" class="form-control" required>
+          </div>
 
-  <label>ID responsable (participante)</label>
-  <input name="responsable_id" required>
+          <div class="mb-3">
+            <label class="form-label">ID responsable (participante)</label>
+            <input name="responsable_id" class="form-control" required>
+          </div>
 
-  <label>Disciplina (opcional)</label>
-  <select name="disciplina_id">
-    <option value="">—</option>
-    {% for d in disciplinas %}
-      <option value="{{ d.id_disciplina }}" {% if d.id_disciplina == tournament.disciplinas_id_disciplina_id %}selected{% endif %}>
-        {{ d.nombre }}
-      </option>
-    {% endfor %}
-  </select>
+          <div class="mb-3">
+            <label class="form-label">Disciplina</label>
+            <select name="disciplina_id" class="form-select">
+              <option value="">—</option>
+              {% for d in disciplinas %}
+                <option value="{{ d.id_disciplina }}" {% if d.id_disciplina == tournament.disciplinas_id_disciplina_id %}selected{% endif %}>
+                  {{ d.nombre }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
 
-  <div style="display:flex; gap:12px">
-    <div>
-      <label>Capacidad mínima</label>
-      <input name="capacidad_min" type="number" min="0">
+          <div class="row g-3 mb-3">
+            <div class="col-md-6">
+              <label class="form-label">Capacidad mínima</label>
+              <input name="capacidad_min" type="number" min="0" class="form-control">
+            </div>
+            <div class="col-md-6">
+              <label class="form-label">Capacidad máxima</label>
+              <input name="capacidad_max" type="number" min="0" class="form-control">
+            </div>
+          </div>
+
+          <div class="mb-4">
+            <label class="form-label">Fecha creación</label>
+            <input name="fecha_creacion" type="date" value="{{ today }}" class="form-control">
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-primary" type="submit">Crear equipo</button>
+          </div>
+        </form>
+      </div>
     </div>
-    <div>
-      <label>Capacidad máxima</label>
-      <input name="capacidad_max" type="number" min="0">
-    </div>
+
   </div>
-
-  <label>Fecha creación</label>
-  <input name="fecha_creacion" type="date" value="{{ today }}">
-
-  <button class="btn">Crear equipo</button>
-</form>
+</div>
 {% endblock %}
