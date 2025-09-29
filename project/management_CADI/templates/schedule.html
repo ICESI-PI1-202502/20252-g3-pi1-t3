@@ -1,8 +1,8 @@
 {% extends "form_base.html" %}
 {% load static %}
 
-{% block title %}Añadir horario{% endblock %}
-{% block form_title %}Añadir horario{% endblock %}
+{% block title %}{% if modo == 'edit' %}Editar horario{% else %}Añadir horario{% endif %}{% endblock %}
+{% block form_title %}{% if modo == 'edit' %}Editar horario{% else %}Añadir horario{% endif %}{% endblock %}
 
 {% block form_fields %}
 <div class="row text-center mb-4">
@@ -74,9 +74,7 @@
 {% endblock %}
 
 {% block form_button %}
-<div class="row text-center mt-4">
-  <div class="col-md-12">
-    <button type="submit" class="yellowBotton_Black">Guardar horario y volver</button>
-  </div>
-</div>
+<button type="submit" class="yellowBotton_Black">
+  {% if modo == 'edit' %}Actualizar horario{% else %}Guardar horario y volver{% endif %}
+</button>
 {% endblock %}
