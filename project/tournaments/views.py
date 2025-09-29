@@ -34,6 +34,7 @@ def get_torneo_or_404(id_: int):
         "disciplina": getattr(t.disciplinas_id_disciplina, "nombre", "") or "",
         "aforo_equipos": t.aforo_equipos,
         "tiene_equipos": bool(t.aforo_equipos),
+        "limite_inscripcion": t.limite_inscripcion,
     }
 
     teams = []
@@ -66,6 +67,16 @@ def crear_torneo(request):
         fecha_inicio  = (request.POST.get("fecha_inicio") or "").strip() 
         fecha_fin     = (request.POST.get("fecha_fin") or "").strip()
         aforo         = (request.POST.get("aforo") or "").strip()
+        limite_raw    = (request.POST.get("limite_inscripcion") or "").strip()
+        # '2025-10-01T12:30' -> datetime(2025,10,1,12,30)
+        limite_inscripcion = None
+        if limite_raw:
+            try:
+                limite_inscripcion = dt.datetime.fromisoformat(limite_raw)
+            except ValueError:
+                # No bloqueamos creación; simplemente lo ignoramos por ahora
+                pass
+
 
         # Validations
         if not nombre or not disciplina_id or not fecha_inicio or not fecha_fin:
@@ -81,6 +92,7 @@ def crear_torneo(request):
                 estados_torneo_id_estado_torneo_id=1,  
                 reglas_elegibilidad=None,
                 aforo_equipos=(aforo or None),
+                limite_inscripcion=limite_inscripcion,
             )
         except Exception as e:
             print("Error creating torneo:", e)

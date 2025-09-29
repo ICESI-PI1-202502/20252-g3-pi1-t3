@@ -11,6 +11,24 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import sys, os
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
+# ---------------------
+# Use a different database for tests (faster).
+if 'test' in sys.argv:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': os.path.join(BASE_DIR, 'testdb.sqlite3'),  # or ':memory:'
+        }
+    }
+    # Disable migrations (Django will do a "syncdb" for managed models).
+    class _DisableMigrations(dict):
+        def __contains__(self, item): return True
+        def __getitem__(self, item): return None
+    MIGRATION_MODULES = _DisableMigrations()
+# ---------------------
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

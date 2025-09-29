@@ -1,27 +1,51 @@
 {% extends "base.html" %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link text-decoration-none d-inline-flex align-items-center gap-2">
+  <i class="bi bi-arrow-left"></i> <span>Regresar</span>
+</a>
+{% endblock %}
+
 {% block content %}
-<h2>Unirme a un equipo – {{ tournament.nombre }}</h2>
+<div class="d-flex justify-content-center align-items-center" style="min-height:70vh;">
+  <div class="container" style="max-width:720px; transform: translateY(-6vh);">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
 
-{% if messages %}
-  <ul class="alerts">
-    {% for message in messages %}
-      <li class="alert {{ message.tags }}">{{ message }}</li>
-    {% endfor %}
-  </ul>
-{% endif %}
+        <h2 class="h4 text-center mb-3">
+          Unirme a un equipo – {{ tournament.nombre }}
+        </h2>
 
-<form method="post">
-  {% csrf_token %}
-  <label for="team_id">Equipo</label>
-  <select id="team_id" name="team_id" required>
-    <option value="">-- Selecciona --</option>
-    {% for t in teams %}
-      <option value="{{ t.id_equipo }}">
-        {{ t.nombre }}{% if t.capacidad_max %} (máx: {{ t.capacidad_max }}){% endif %}
-      </option>
-    {% endfor %}
-  </select>
+        {% if messages %}
+          <ul class="list-unstyled mb-3">
+            {% for message in messages %}
+              <li class="alert alert-{{ message.tags|default:'info' }} mb-2">{{ message }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
 
-  <button class="btn" type="submit">Unirme</button>
-</form>
+        <form method="post" class="mt-2">
+          {% csrf_token %}
+
+          <div class="mb-3">
+            <label for="team_id" class="form-label">Equipo</label>
+            <select id="team_id" name="team_id" class="form-select" required>
+              <option value="">-- Selecciona --</option>
+              {% for t in teams %}
+                <option value="{{ t.id_equipo }}">
+                  {{ t.nombre }}{% if t.capacidad_max %} (máx: {{ t.capacidad_max }}){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="d-grid">
+            <button class="btn btn-primary" type="submit">Unirme</button>
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</div>
 {% endblock %}
