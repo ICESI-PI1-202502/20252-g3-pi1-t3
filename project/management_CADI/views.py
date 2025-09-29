@@ -115,7 +115,7 @@ def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
 
             try:
                 with transaction.atomic():
-                    # 1) crear actividad (NO asignes id_actividad)
+                    # 1) crear actividad
                     actividad = Actividades.objects.create(
                         nombre=base["nombre"],
                         descripcion=base["descripcion"] or None,
@@ -138,12 +138,8 @@ def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
                         actividad=actividad,
                     )
 
-                    # (opcional) si tu modelo de Actividades NO mapea act_grup_id, no intentes setearlo:
-                    # actividad.act_grup_id = ...
-                    # actividad.save(...)
-
             except IntegrityError:
-                # Por índice único (nombre CI) u otro choque
+
                 return render(
                     request,
                     "form_activities.html",
@@ -183,8 +179,6 @@ def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     )
 
 
-
-# management_CADI/views.py (listar_actividades)
 def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id, grupos_id_grupo=grupo)
@@ -207,7 +201,7 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
         Actividades.objects
         .filter(id_actividad__in=actividades_ids)
         .values("id_actividad", "nombre", "dias_semana", "lugar", "profesor",
-                "fecha_inicio", "fecha_fin")  # <- añade estos dos
+                "fecha_inicio", "fecha_fin")
         .order_by("nombre")
     )
 
@@ -309,7 +303,33 @@ def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, activi
                     "error": "Por favor completa Nombre, Espacio y Tipo.",
                 })
 
-            tipo = TiposActividad.objects.filter(pk=base["tipo_id"]).first()
+            # --- NUEVO: parseo de tipo_id y fechas de inscripción ---
+            import datetime as dt
+
+            def date_input_to_dt(s: str | None):
+                if not s:
+                    return None
+                # 'YYYY-MM-DD' -> datetime YYYY-MM-DD 00:00
+                return dt.datetime.combine(dt.date.fromisoformat(s), dt.time(0, 0))
+
+            # Convertimos el select de tipo (string) a int (id del FK)
+            try:
+                tipo_id_int = int(base["tipo_id"])
+            except ValueError:
+                return render(request, "form_activities.html", {
+                    "tipos": tipos,
+                    "grupo_actividad": grupo_actividad,
+                    "draft": base,
+                    "sched": {
+                        "profesor": profesor,
+                        "dias": dias,
+                        "hora_inicio": sched.get("hora_inicio",""),
+                        "hora_fin": sched.get("hora_fin","")
+                    },
+                    "modo": "edit",
+                    "error": "Tipo de actividad inválido.",
+                })
+
             requiere_char = "S" if base.get("requiere") == "si" else "N"
             aforo_val = int(base["aforo"]) if base.get("aforo") else None
 
@@ -320,9 +340,14 @@ def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, activi
                     actividad.lugar = base["espacio"]
                     actividad.requiere_inscripcion = requiere_char
                     actividad.aforo = aforo_val
-                    actividad.fecha_apertura_ins = base.get("fecha_apertura_ins") or None
-                    actividad.fecha_cierre_ins = base.get("fecha_cierre_ins") or None
-                    actividad.tipos_actividad_id_tipo = tipo
+
+                    # --- NUEVO: convertir fechas del input date ---
+                    actividad.fecha_apertura_ins = date_input_to_dt(base.get("fecha_apertura_ins"))
+                    actividad.fecha_cierre_ins = date_input_to_dt(base.get("fecha_cierre_ins"))
+
+                    f = Actividades._meta.get_field("tipos_actividad_id_tipo")
+                    setattr(actividad, f.attname, tipo_id_int)
+
                     actividad.profesor = profesor or None
                     actividad.dias_semana = ", ".join(dias) or None
                     actividad.fecha_inicio = dt_ini
@@ -361,9 +386,13 @@ def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, activi
         "aforo": actividad.aforo or "",
         "descripcion": actividad.descripcion or "",
         "requiere": "si" if (actividad.requiere_inscripcion or "").strip() == "S" else "no",
-        "fecha_apertura_ins": actividad.fecha_apertura_ins or "",
-        "fecha_cierre_ins": actividad.fecha_cierre_ins or "",
+        # --- NUEVO: convertir a 'YYYY-MM-DD' para el input date ---
+        "fecha_apertura_ins": (actividad.fecha_apertura_ins.date().isoformat()
+                            if actividad.fecha_apertura_ins else ""),
+        "fecha_cierre_ins": (actividad.fecha_cierre_ins.date().isoformat()
+                            if actividad.fecha_cierre_ins else ""),
     }
+
     dias_list = [d.strip() for d in (actividad.dias_semana or "").split(",") if d.strip()]
 
     sched = request.session.get(k_sched) or {}
@@ -381,8 +410,6 @@ def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, activi
         "sched": resumen_sched,
         "modo": "edit",
     })
-
-
 
 
 def listar_grupos_actividad(request, grupo_nombre, grupo_id):
@@ -421,11 +448,7 @@ def crear_grupo_actividad(request, grupo_nombre, grupo_id):
         descripcion = request.POST.get("descripcion")
         imagen_file = request.FILES.get("imagenActividad")
 
-        # ❌ eliminar:
-        # ultimo_actividad = GruposActividad.objects.aggregate(Max("id_grupo_actividad"))["id_grupo_actividad__max"]
-        # nuevo_id = (ultimo_actividad or 0) + 1
-
-        # ✅ dejar que Postgres genere el id
+        # El Postgres genera el id
         ga = GruposActividad.objects.create(
             grupos_id_grupo=grupo,
             nombre=nombre,
@@ -468,7 +491,7 @@ def schedule_draft(request, grupo_nombre, grupo_id, grupo_actividad_id, activida
         if not sched.get("dias"):
             sched["dias"] = [d.strip() for d in (actividad.dias_semana or "").split(",") if d.strip()]
 
-        # NUEVO: precargar horas si no están en sesión
+        #Precargar horas si no están en sesión
         if not sched.get("hora_inicio") and actividad.fecha_inicio:
             sched["hora_inicio"] = actividad.fecha_inicio.strftime("%H:%M")
         if not sched.get("hora_fin") and actividad.fecha_fin:

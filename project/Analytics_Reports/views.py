@@ -1,9 +1,7 @@
-# Analytics_Reports/views.py
 
 from django.db.models import Count
 from django.db.models import Count  # Import correction
 from universitaryWellbeing.models import Participaciones, Asistencias, Actividades, Notificaciones, Participantes, TiposActividad
-
 from django.shortcuts import render
 
 def is_admin(user):

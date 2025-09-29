@@ -3,12 +3,13 @@ from . import views
 
 urlpatterns = [
     path("", views.user_login, name="login"),
-    path("", include("management_CADI.urls", namespace="management_cadi")),
+    path('logout/', views.user_logout, name='logout'),
+    path("cadi/", include("management_CADI.urls", namespace="management_cadi")),
     path("home/", views.home_user, name="home"),
     path("cadi-home/", views.home_admin, name="cadi_admin"),
     path("register/", views.register, name="register"),
     path("preferences/", views.preferences, name="preferences"),
-    path("preferences2/", views.preferences2, name="preferences_2"),
+    # path("preferences2/", views.preferences2, name="preferences_2"),
     # ❌ QUITAR ESTA LÍNEA (era el duplicado):
     # path("analytics-reports/", include("Analytics_Reports.urls", namespace="analytics_reports")),
 ]

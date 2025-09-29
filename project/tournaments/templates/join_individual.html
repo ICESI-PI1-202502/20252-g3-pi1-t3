@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
+
+<div class="shell">
+  <h2 class="title">Inscripción – {{ tournament.nombre }}</h2>
+
+  {% if ok %}
+    <div class="success-box">
+      <h3>¡Inscripción registrada!</h3>
+      <p>Te inscribiste como <b>{{ nombre }} {{ apellido }}</b> ({{ correo }}).</p>
+      <a class="btn ghost" href="{% url 'tournaments:list' %}">Volver a torneos</a>
+    </div>
+  {% else %}
+    <form class="form-shell" method="post" action="{% url 'tournaments:join_individual' tournament.id %}">
+      {% csrf_token %}
+      <div class="grid-2">
+        <label>Nombre
+          <input name="nombre" required>
+          {% if errors.nombre %}<span class="err">{{ errors.nombre }}</span>{% endif %}
+        </label>
+        <label>Apellido
+          <input name="apellido" required>
+          {% if errors.apellido %}<span class="err">{{ errors.apellido }}</span>{% endif %}
+        </label>
+      </div>
+
+      <div class="grid-2">
+        <label>Cédula
+          <input name="cedula" inputmode="numeric" pattern="\d{10}" maxlength="10" placeholder="10 dígitos" required>
+          {% if errors.cedula %}<span class="err">{{ errors.cedula }}</span>{% endif %}
+        </label>
+        <label>Correo institucional
+          <input type="email" name="correo" placeholder="usuario@uni.edu.co" required>
+          {% if errors.correo %}<span class="err">{{ errors.correo }}</span>{% endif %}
+        </label>
+      </div>
+
+      <label>Género
+        <select name="genero" required>
+          <option value="" selected disabled>Selecciona…</option>
+          <option>Femenino</option>
+          <option>Masculino</option>
+          <option>Otro</option>
+        </select>
+        {% if errors.genero %}<span class="err">{{ errors.genero }}</span>{% endif %}
+      </label>
+
+      <button class="btn primary" type="submit">Inscribirme</button>
+    </form>
+  {% endif %}
+</div>
+{% endblock %}
