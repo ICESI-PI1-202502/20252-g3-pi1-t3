@@ -193,36 +193,6 @@ def get_user_calendar(user):
     except Participantes.DoesNotExist:
         return []
 
-          
-#def home_user(request):
-    data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
-    user_email = request.user.email
-
-    try:
-        participante = Participantes.objects.get(correo=user_email)
-        preferencia = Preferencias.objects.get(participantes_id_participante=participante)
-
-        recomendaciones_ids = PreferenciasActividades.objects.filter(
-            preferencias_id_preferencia=preferencia
-        ).values_list('actividades_id_actividad', flat=True)
-
-        recomendaciones = Actividades.objects.filter(id_actividad__in=recomendaciones_ids)
-
-    except (Participantes.DoesNotExist, Preferencias.DoesNotExist):
-        recomendaciones = []
-
-    # Actividades generales para mostrar el objeto completo con sus atributos
-   # actividades = Actividades.objects.all()
-
-   #calendario idk
-   #noticias idk
-
-    return render(request, 'home.html', {
-        'actividades': data,
-        'recomendaciones': recomendaciones
-    })
-
-
 @login_required
 def home_admin(request):
     return render(request, "home_admin.html")
