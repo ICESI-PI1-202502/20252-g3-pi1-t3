@@ -1,45 +1,48 @@
 .list-preferences {
-    max-width: 700px;
-    margin: 40px auto;
-    background: #fff;
-    border-radius: 16px;
-    padding: 2rem;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-    text-align: center;
-  }
+  max-width: 900px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
 
-  .list-preferences h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin-bottom: 0.5rem;
-    color: #000;
-  }
+.list-preferences h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  color: #000;
+}
 
-  .list-preferences p {
-    color: #000;
-    margin-bottom: 2rem;
-  }
+.list-preferences p {
+  color: #000;
+  margin-bottom: 2rem;
+}
 
-  .categories-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 1rem;
-    margin-bottom: 2rem;
-    text-align: left;
-  }
+/* Aquí fijo la grilla en 4 columnas */
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr); /* siempre 4 columnas */
+  gap: 1rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
 
-  .category-item {
-    background: #f8f9fa;
-    border-radius: 12px;
-    padding: 12px;
-    transition: 0.3s;
-    cursor: pointer;
-  }
+.category-item {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 12px;
+  transition: 0.3s;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+}
 
-  .category-item:hover {
-    background: #e4ebff;
-  }
+.category-item:hover {
+  background: #e4ebff;
+}
 
-  .category-item input {
-    margin-right: 8px;
+.category-item input {
+  margin-right: 8px;
 }

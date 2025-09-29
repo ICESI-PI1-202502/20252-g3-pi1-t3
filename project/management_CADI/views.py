@@ -533,4 +533,3 @@ def schedule_draft(request, grupo_nombre, grupo_id, grupo_actividad_id, activida
         },
         "modo": modo,
     })
-
