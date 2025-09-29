@@ -59,7 +59,7 @@ ROOT_URLCONF = 'BienestarUniversitario.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -85,8 +85,15 @@ DATABASES = {
         'PASSWORD': 'h9TZan8icTf3hjsn',
         'HOST': 'db.xlknciyujekwbhysmamn.supabase.co',
         'PORT': '5432',
+        'CONN_MAX_AGE': 60,
+        'OPTIONS': {'sslmode': 'require'},
    }
 }
+
+
+
+#AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -143,6 +150,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "/"              # login view
 LOGIN_REDIRECT_URL = "/home/"   # where to send after login
 LOGOUT_REDIRECT_URL = "/"       # where to send after logout
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
+
 
 
 

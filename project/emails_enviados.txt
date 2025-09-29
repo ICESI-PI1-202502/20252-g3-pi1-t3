@@ -86,3 +86,92 @@
 2025-09-29 16:26:45 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
 2025-09-29 16:27:36 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
 2025-09-29 16:27:38 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 16:32:44 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 16:32:46 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:22:00 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:22:02 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:27:08 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:27:10 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:32:15 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:32:17 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:35:12 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:35:14 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:35:19 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:35:21 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:36:02 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:36:04 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:36:13 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:36:15 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:36:56 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:36:58 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:41:39 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:41:41 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:46:45 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:46:47 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:47:16 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:47:18 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:49:21 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:49:23 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 17:49:25 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:54:30 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:54:31 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 17:54:34 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:59:06 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:59:07 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 17:59:09 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 17:59:11 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 17:59:30 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 17:59:32 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 17:59:34 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 17:59:35 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:04:43 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:04:45 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:04:47 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:04:49 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:06:48 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:06:50 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:06:52 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:06:53 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:06:55 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:07:25 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:07:26 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:07:28 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:07:30 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:07:32 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:12:37 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:12:38 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:12:40 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:12:42 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:12:44 | Alerta: 27 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:13:22 | Alerta: 4 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:13:24 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:13:26 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:13:28 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:13:30 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:14:41 | Alerta: 5 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:14:42 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:14:44 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:14:45 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:14:48 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:16:46 | Alerta: 5 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:16:47 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:16:49 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:16:50 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:16:52 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:21:33 | Alerta: 5 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:21:34 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:21:59 | Alerta: 5 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:22:00 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:22:02 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:22:04 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:22:06 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:27:11 | Alerta: 5 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:27:13 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:27:14 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:27:16 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:27:18 | Alerta: 28 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-09-29 18:29:28 | Alerta: 8 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-09-29 18:29:30 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-09-29 18:29:32 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-09-29 18:29:34 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-09-29 18:29:36 | Alerta: 29 estudiantes inactivos | admin@academia.com, coordinador@academia.com

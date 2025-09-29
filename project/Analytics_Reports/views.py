@@ -314,6 +314,12 @@ def obtener_proximos_reconocimientos():
         .order_by('-total_asistencias')
     )
 
+
+
+
+
+
+
 def obtener_estudiantes_inactivos(dias_inactividad=14):
     fecha_limite = timezone.now().date() - timedelta(days=dias_inactividad)
     return (

@@ -1,6 +1,12 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
 {% block extra_css %}
 <style>
     .alert-card {

@@ -1,5 +1,17 @@
 {% extends "base.html" %}
 {% load static %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/analisis_comportamiento.css' %}">
+{% endblock %}
+
 {% block content %}
 <div class="flex-center-column" style="padding-top: 50px;">
     <h2>Análisis</h2>

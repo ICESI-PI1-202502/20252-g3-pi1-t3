@@ -1,7 +1,14 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
 {% block extra_css %}
+{{ block.super }}
 <link rel="stylesheet" href="{% static 'css/gestion_asistencia.css' %}">
 {% endblock %}
 

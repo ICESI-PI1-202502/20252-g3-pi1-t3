@@ -1,169 +1,217 @@
+from datetime import date
 from django.shortcuts import render, redirect
-from django.contrib.auth import authenticate, login, logout, get_user_model
-from django.contrib.auth.models import User, Group
+from django.contrib.auth import login, logout
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .models import Preferencias, Actividades
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
+from .forms import UserLoginForm, UserRegisterForm
 
-# Create your views here.
 def user_login(request):
     if request.method == "POST":
-        cedula_input = request.POST.get("cedula", "").strip()
-        password = request.POST.get("password", "")
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            login(request, form.user)
 
-        if not User.objects.filter(username=cedula_input).exists():
-            messages.error(request, "El usuario con esa cédula no existe")
-            return redirect("login")
+            # Si es admin -> redirige al home_admin
+            if is_role_admin(form.user):
+                return redirect("cadi_admin") 
 
-        user = authenticate(request, username=cedula_input, password=password)
+            # Obtener el participante relacionado con el usuario
+            try:
+                participante = Participantes.objects.get(user=form.user)
+            except Participantes.DoesNotExist:
+                participante = None
 
-        if user is not None:
-            login(request, user)
-            if is_role_admin(user):
-                return redirect("admin:index")  # admin Django
+            # Si el participante no tiene preferencias, redirigir a la función 'preferences'
+            if participante:
+                tiene_preferencias = Preferencias.objects.filter(
+                    participantes_id_participante=participante
+                ).exists()
+                if not tiene_preferencias:
+                    return redirect("preferences")
+
+            # Si tiene preferencias o no es admin -> home normal
             return redirect("home")
-        else:
-            messages.error(request, "Contraseña incorrecta")
-            return redirect("user_login")
 
-    # GET → mostrar formulario vacío
-    return render(request, "login.html", {})
+        else:
+            for error in form.errors.values():
+                messages.error(request, error) # type: ignore
+            return redirect("login")
+    else:
+        form = UserLoginForm()
+    return render(request, "login.html", {"form": form})
+
+
+def is_role_admin(user):
+    return user.groups.filter(name="admin").exists() or user.is_superuser
 
 
 def register(request):
     if request.method == "POST":
-        # Recupera todos los parámetros del POST
-        cedula_input = request.POST.get("cedula", "").strip()
-        name = request.POST.get("nombre", "").strip()
-        email = request.POST.get("email", "").strip()
-        password = request.POST.get("password", "").strip()
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            cedula = form.cleaned_data['cedula']
+            nombre_completo = form.cleaned_data['nombre_completo']
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
 
-        # Verifica si ya existe un usuario con esa cédula
-        if get_user_model().objects.filter(cedula=cedula_input).exists():
-            messages.error(request, "Ya existe un usuario con esa cédula")
+            if " " in nombre_completo:
+                first_name, last_name = nombre_completo.split(" ", 1)
+            else:
+                first_name, last_name = nombre_completo, ""
+
+            user = User.objects.create_user(
+                username=cedula,
+                password=password,
+                email=email,
+                first_name=first_name,
+                last_name=last_name
+            )
+
+            rol = Roles.objects.get(nombre_rol='Estudiante')
+            Participantes.objects.create(
+                user=user,
+                id_participante=cedula,
+                nombre=first_name,
+                apellido=last_name,
+                correo=email,
+                semestre=None,
+                facultad="",
+                programa="",
+                genero="",
+                estado_activo="S",  # o lo que necesites por defecto
+                roles_id_rol=rol
+            )
+
+            if rol.grupo_d:
+                user.groups.add(rol.grupo_d)
+
+            messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
+            return redirect("login")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error) # type: ignore
             return redirect("register")
-        
-          # Validación del correo electrónico usando `validate_email`
-        try:
-            validate_email(email)  # Intentamos validar el email
-        except ValidationError:
-            messages.error(request, "El correo electrónico no es válido.")
-            return redirect("register")
-        
-        # Verifica si el correo electrónico ya está registrado
-        if get_user_model().objects.filter(email=email).exists():
-            messages.error(request, "Este correo electrónico ya está registrado.")
-            return redirect("register")
-        
+    else:
+        form = UserRegisterForm()
 
-        # Crea un nuevo usuario con todos los campos necesarios
-        user = get_user_model().objects.create_user(
-            username=cedula_input,  # Usamos cédula como username
-            password=password,
-            email=email,
-            cedula=cedula_input,
-            nombre=name,
-        )
-        
-        messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
-        return redirect("login")
-
-    return render(request, "auth/register.html")
+    return render(request, "auth/register.html", {'form': form})
 
 
+#class AdminLoginView(LoginView):
+    template_name = 'login.html'
+
+    def form_valid(self, form):
+        user = form.get_user()
+        
+        if is_role_admin(user):
+            return redirect('home_admin')
+        else:
+            messages.error(self.request, 'No tienes permisos de administrador')
+            return redirect('login')
+
+    def form_invalid(self, form):
+        messages.error(self.request, 'Credenciales incorrectas')
+        return super().form_invalid(form)
 
 def user_logout(request):
     logout(request)
     messages.success(request, "Sesión cerrada correctamente")
     return redirect("login")
 
-def is_role_admin(user):
-    return user.groups.filter(name="admin").exists() or user.is_superuser
 
-
-#@login_required
+@login_required 
 def preferences(request):
+    participante = Participantes.objects.get(user=request.user)
+    # Verificar si ya existen preferencias
+    if hasattr(participante, 'preferencias'):
+        return redirect('home')  # Ya las completó
+
+    categorias = TiposActividad.objects.all()
+
     if request.method == 'POST':
-        # Obtener las categorías seleccionadas del formulario
-        selected_categories = request.POST.getlist('categories')  # Esto obtiene una lista de categorías seleccionadas
-        
-        # Guardar las categorías seleccionadas en la sesión para usarlas en la siguiente vista
-        request.session['selected_categories'] = selected_categories
-        
-        # Redirigir a la vista de selección de subcategorías
-        return redirect('preferences2')
+        seleccionadas = request.POST.getlist('categories')
 
-    # Si el método es GET, simplemente mostramos el formulario de categorías
-    categories = ['Música','Deportes', 'Proyección Social','Tecnología', 'Artes Escenicas y Danza'
-                  , 'Artes Visuales y Plásticas','Programa"Estás en Casa"','Actividad Física y Bienestar', 'Bienestar y Desarrollo Humano']
-    return render(request, 'list_preferences_1.html', {'categories': categories})
+        # Crear la preferencia solo si no existe
+        pref = Preferencias.objects.create(
+            participantes_id_participante=participante,
+            fecha_registro=date.today()
+        )
 
-#@login_required
-def preferences2(request):
-    if request.method == 'POST':
-        # Obtener las subcategorías seleccionadas del formulario
-        selected_subcategories = request.POST.getlist('subcategories')  # Lista de subcategorías seleccionadas
-        
-        # Obtener las categorías seleccionadas de la sesión
-        selected_categories = request.session.get('selected_categories', [])
-        
-        # Guardar las preferencias del usuario
-        preference, created = preferences.objects.get_or_create(user=request.user)
-        preference.category = ', '.join(selected_categories)  # Guardamos las categorías como una cadena
-        preference.subcategory = ', '.join(selected_subcategories)  # Guardamos las subcategorías
-        preference.save()
-
-        # Redirigir a la siguiente página, por ejemplo, a recomendaciones
-        return redirect('recommendations')  # Cambia a la vista donde mostrarás las recomendaciones
-
-    # Si el método es GET, mostramos el formulario para las subcategorías
-    selected_categories = request.session.get('selected_categories', [])
-    
-    # Aquí debes definir las subcategorías para cada categoría seleccionada
-    subcategories = {
-        'Deportes': ['Fútbol', 'Basketball', 'Tennis'],
-        'Tecnología': ['Computadoras', 'Móviles', 'Electrónica'],
-        'Arte': ['Pintura', 'Escultura', 'Fotografía'],
-        'Música': ['Rock', 'Pop', 'Jazz'],
-    }
-    
-    # Filtrar las subcategorías basadas en las categorías seleccionadas
-    available_subcategories = []
-    for category in selected_categories:
-        available_subcategories.extend(subcategories.get(category, []))
-    
-    return render(request, 'list_preferences_2.html', {'subcategories': available_subcategories})
+        for cat_id in seleccionadas:
+            PreferenciasActividades.objects.create(
+                preferencia=pref,
+                tipo_actividad=TiposActividad.objects.get(pk=cat_id)
+        )
 
 
+        return redirect('home')
 
+    return render(request, 'list_preferences.html', {'categorias': categorias})
+
+@login_required
 def home_user(request):
-    data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
-    return render(request, 'home_user.html', {"actividades": data})
+    user = request.user
+    actividades = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
+    actividades_recomendadas = get_recommendations_for_user(user)
+    horario = get_user_schedule(user)
+    calendario = get_user_calendar(user)
 
+    context = {
+        "actividades_recomendadas": actividades_recomendadas,
+        "horario": horario,
+        "calendario": calendario,
+        "actividades": actividades,
+    }
+
+    return render(request, "home_user.html", context)
+
+def get_recommendations_for_user(user):
+    try:
+        participante = Participantes.objects.get(user=user)
+        preferencias = Preferencias.objects.get(participantes_id_participante=participante)
+        tipos_preferidos = PreferenciasActividades.objects.filter(
+            preferencia=preferencias
+        ).values_list('tipo_actividad', flat=True)
+
+        return Actividades.objects.filter(tipos_actividad_id_tipo__in=tipos_preferidos)
+    except (Participantes.DoesNotExist, Preferencias.DoesNotExist):
+        return []
+    
+def get_user_schedule(user):
+    try:
+        participante = Participantes.objects.get(user=user)
+        return HorariosParticipante.objects.filter(participantes_id_participante=participante)
+    except Participantes.DoesNotExist:
+        return []
+    
+def get_user_calendar(user):
+    try:
+        participante = Participantes.objects.get(user=user)
+        return Citas.objects.filter(participantes_id_participante=participante)
+    except Participantes.DoesNotExist:
+        return []
+
+@login_required
 def home_admin(request):
     return render(request, "home_admin.html")
 
+@login_required
+def profile(request):
+    participante = Participantes.objects.get(user=request.user)
+    try:
+        preferencia = Preferencias.objects.get(participantes_id_participante=participante)
+        actividades = preferencia.preferenciasactividades_set.all() # type: ignore
+    except Participantes.DoesNotExist:
+        actividades = None
 
-
-
-
-
- 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    context = {
+        "participante": participante,
+        "actividades": actividades,
+    }
+    return render(request, "profile.html", context)

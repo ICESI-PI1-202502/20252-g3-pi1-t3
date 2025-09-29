@@ -1,60 +1,49 @@
 {% extends "base.html" %}
-{% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'tournaments/css/join_individual.css' %}">
 
-<div class="shell">
-  <h2 class="title">Crear equipo – {{ tournament.nombre }}</h2>
+{% if messages %}
+  <ul class="alerts">
+    {% for message in messages %}
+      <li class="alert {{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
 
-  {% if ok %}
-    <div class="success-box">
-      <h3>¡Equipo creado!</h3>
-      <p>Tu equipo <b>{{ nombre_equipo }}</b> quedó registrado (demo).</p>
-      <a class="btn ghost" href="{% url 'tournaments:list' %}">Volver a torneos</a>
+<h2>Crear equipo para {{ tournament.nombre }}</h2>
+
+<form method="post">
+  {% csrf_token %}
+
+  <label>Nombre del equipo</label>
+  <input name="nombre_equipo" required>
+
+  <label>ID responsable (participante)</label>
+  <input name="responsable_id" required>
+
+  <label>Disciplina (opcional)</label>
+  <select name="disciplina_id">
+    <option value="">—</option>
+    {% for d in disciplinas %}
+      <option value="{{ d.id_disciplina }}" {% if d.id_disciplina == tournament.disciplinas_id_disciplina_id %}selected{% endif %}>
+        {{ d.nombre }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <div style="display:flex; gap:12px">
+    <div>
+      <label>Capacidad mínima</label>
+      <input name="capacidad_min" type="number" min="0">
     </div>
-  {% else %}
-    <form class="form-shell" method="post" action="{% url 'tournaments:create_team' tournament.id %}">
-      {% csrf_token %}
+    <div>
+      <label>Capacidad máxima</label>
+      <input name="capacidad_max" type="number" min="0">
+    </div>
+  </div>
 
-      <label>Nombre del equipo
-        <input name="nombre_equipo" required>
-        {% if errors.nombre_equipo %}<span class="err">{{ errors.nombre_equipo }}</span>{% endif %}
-      </label>
+  <label>Fecha creación</label>
+  <input name="fecha_creacion" type="date" value="{{ today }}">
 
-      <div class="grid-2">
-        <label>Fecha de creación
-          <input type="date" name="fecha_creacion" required>
-          {% if errors.fecha_creacion %}<span class="err">{{ errors.fecha_creacion }}</span>{% endif %}
-        </label>
-        <label>Cantidad de personas (opcional)
-          <input type="number" min="0" name="cantidad_personas" placeholder="0">
-          {% if errors.cantidad_personas %}<span class="err">{{ errors.cantidad_personas }}</span>{% endif %}
-        </label>
-      </div>
-
-      <div class="grid-2">
-        <label>Capacidad mínima
-          <input type="number" min="1" name="capacidad_min" required>
-          {% if errors.capacidad_min %}<span class="err">{{ errors.capacidad_min }}</span>{% endif %}
-        </label>
-        <label>Capacidad máxima
-          <input type="number" min="1" name="capacidad_max" required>
-          {% if errors.capacidad_max %}<span class="err">{{ errors.capacidad_max }}</span>{% endif %}
-        </label>
-      </div>
-
-      <div class="grid-2">
-        <label>Disciplina
-          <input name="disciplina" value="{{ tournament.disciplina }}" readonly>
-        </label>
-        <label>ID del responsable
-          <input name="id_responsable" inputmode="numeric" pattern="\d+" required>
-          {% if errors.id_responsable %}<span class="err">{{ errors.id_responsable }}</span>{% endif %}
-        </label>
-      </div>
-
-      <button class="btn primary" type="submit">Crear equipo</button>
-    </form>
-  {% endif %}
-</div>
+  <button class="btn">Crear equipo</button>
+</form>
 {% endblock %}
