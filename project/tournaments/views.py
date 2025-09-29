@@ -123,9 +123,26 @@ def lista_torneos(request):
 
 # Historia : detalle
 def detalle_torneo(request, id: int):
+    # still reuse your helper
     t, teams = get_torneo_or_404(id)
+
+    # find the team of the logged-in participant in this tournament (if any)
+    my_team_id = None
+    if t["tiene_equipos"]:
+        p = _current_participante(request.user)
+        if p:
+            my_team_id = (
+                EquiposParticipantes.objects
+                .filter(
+                    participantes_id_participante_id=p.id_participante,
+                    equipos_id_equipo__torneosequipos__torneos_id_torneo=id,
+                )
+                .values_list("equipos_id_equipo_id", flat=True)
+                .first()
+            )
+
     template = "detail_team.html" if t["tiene_equipos"] else "detail_individual.html"
-    return render(request, template, {"tournament": t, "teams": teams})
+    return render(request, template, {"tournament": t, "teams": teams, "my_team_id": my_team_id})
 
 
 # NOT TAKING THIS ONE INTO ACCOUNT
@@ -379,23 +396,39 @@ def unirse_equipo(request, id: int):
 
 @login_required
 def gestionar_equipo(request, torneo_id: int, team_id: int):
-    # Torneo + equipo
     torneo = get_object_or_404(
-        Torneos.objects.select_related("disciplinas_id_disciplina"),
-        pk=torneo_id
+        Torneos.objects.select_related("disciplinas_id_disciplina"), pk=torneo_id
     )
     team = get_object_or_404(
         Equipos.objects.select_related("disciplinas_id_disciplina", "participantes_id_participante"),
         pk=team_id
     )
 
-    # Validar pertenencia del equipo al torneo
+    # The team must belong to the tournament
     if not TorneosEquipos.objects.filter(
         torneos_id_torneo_id=torneo_id, equipos_id_equipo_id=team_id
     ).exists():
         raise Http404("El equipo no pertenece a este torneo.")
 
-    # Miembros (nombre + id)
+    participante = _current_participante(request.user)
+    if not participante:
+        messages.error(request, "Tu usuario no está vinculado a un participante.", extra_tags="tournaments")
+        return redirect("tournaments:detail", torneo_id)
+
+    # ✅ enforce membership
+    is_member = EquiposParticipantes.objects.filter(
+        equipos_id_equipo_id=team_id,
+        participantes_id_participante_id=participante.id_participante
+    ).exists()
+    if not is_member:
+        messages.error(request, "No perteneces a este equipo.", extra_tags="tournaments")
+        return redirect("tournaments:detail", torneo_id)
+
+    # leader (responsable) is the team.participantes_id_participante
+    leader_id = getattr(getattr(team, "participantes_id_participante", None), "id_participante", None)
+    i_am_leader = (leader_id and int(leader_id) == int(participante.id_participante))
+
+    # Members list
     miembros = list(
         EquiposParticipantes.objects
         .filter(equipos_id_equipo_id=team_id)
@@ -408,36 +441,50 @@ def gestionar_equipo(request, torneo_id: int, team_id: int):
         )
         .order_by("participantes_id_participante__nombre")
     )
-
-    # Marcar líder (responsable del equipo)
-    lider_id = getattr(getattr(team, "participantes_id_participante", None), "id_participante", None)
     for m in miembros:
-        m["is_leader"] = (lider_id and int(m["participantes_id_participante"]) == int(lider_id))
+        m["is_leader"] = (leader_id and int(m["participantes_id_participante"]) == int(leader_id))
+        m["is_me"] = (int(m["participantes_id_participante"]) == int(participante.id_participante))
 
-    # Acción: quitar integrante
+    # Actions
     if request.method == "POST":
-        remove_id = (request.POST.get("remove_id") or "").strip()
-        if not remove_id.isdigit():
+        remove_id_raw = (request.POST.get("remove_id") or "").strip()
+        if not remove_id_raw.isdigit():
             messages.error(request, "ID inválido.", extra_tags="tournaments")
             return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
 
-        pid = int(remove_id)
-        if lider_id and pid == int(lider_id):
-            messages.error(request, "No puedes quitar al líder del equipo desde aquí.", extra_tags="tournaments")
+        remove_id = int(remove_id_raw)
+
+        # rules:
+        # - nobody can delete the leader (use another flow to transfer leadership)
+        if leader_id and remove_id == int(leader_id):
+            messages.error(request, "No puedes quitar al líder del equipo.", extra_tags="tournaments")
+            return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
+
+        # - only the leader can remove others; anyone can remove themselves (“Salir del equipo”)
+        removing_self = (remove_id == int(participante.id_participante))
+        if not removing_self and not i_am_leader:
+            messages.error(request, "Solo el líder puede quitar a otros integrantes.", extra_tags="tournaments")
             return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
 
         with transaction.atomic():
             EquiposParticipantes.objects.filter(
-                equipos_id_equipo_id=team_id, participantes_id_participante_id=pid
+                equipos_id_equipo_id=team_id,
+                participantes_id_participante_id=remove_id
             ).delete()
-        messages.success(request, "Miembro eliminado.", extra_tags="tournaments")
-        return redirect("tournaments:manage_team", torneo_id=torneo_id, team_id=team_id)
 
-    # Contexto para plantilla
+        messages.success(
+            request,
+            "Saliste del equipo." if removing_self else "Miembro eliminado.",
+            extra_tags="tournaments",
+        )
+        return redirect("tournaments:detail", torneo_id) if removing_self else redirect(
+            "tournaments:manage_team", torneo_id=torneo_id, team_id=team_id
+        )
+
     integrantes_count = len(miembros)
     integrantes_max = int(team.capacidad_max) if team.capacidad_max else None
 
-    context = {
+    ctx = {
         "torneo": {
             "id": torneo.id_torneo,
             "nombre": torneo.nombre,
@@ -446,13 +493,12 @@ def gestionar_equipo(request, torneo_id: int, team_id: int):
         "team": {
             "id": team.id_equipo,
             "nombre": team.nombre,
-            "tag": (team.nombre[:3].upper() if team.nombre else "TAG"),
             "integrantes_count": integrantes_count,
             "integrantes_max": integrantes_max,
-            "invite_link": f"bienestar.edu/join/{team.id_equipo}",  # placeholder
+            "invite_link": f"bienestar.edu/join/{team.id_equipo}",
         },
         "miembros": miembros,
+        "i_am_leader": i_am_leader,
     }
-    return render(request, "team_details.html", context)
-
+    return render(request, "manage_team.html", ctx)
   

@@ -13,7 +13,9 @@
         {% if fi and ff %}{{ fi|date:"d M Y" }} – {{ ff|date:"d M Y" }}{% else %}—{% endif %}
       </p>
     {% endwith %}
+
     <p class="meta"><b>Disciplina:</b> {{ tournament.disciplina|default:"—" }}</p>
+
     {% if tournament.aforo_equipos %}
       <p class="meta"><b>Aforo de equipos:</b> {{ tournament.aforo_equipos }}</p>
     {% endif %}
@@ -27,10 +29,21 @@
       {% endfor %}
     </ul>
 
-  <div class="actions">
-    <a class="btn" href="{% url 'tournaments:join_team' tournament.id %}">Unirme a un equipo</a>
-    <a class="btn outline" href="{% url 'tournaments:create_team' tournament.id %}">Crear equipo</a>
-</div>
+    <div class="actions">
+      {% if my_team_id %}
+        <a class="btn" href="{% url 'tournaments:manage_team' tournament.id my_team_id %}">
+          Gestionar mi equipo
+        </a>
+      {% endif %}
+
+      <a class="btn outline" href="{% url 'tournaments:create_team' tournament.id %}">
+        Crear equipo
+      </a>
+
+      <a class="btn" href="{% url 'tournaments:join_team' tournament.id %}">
+        Unirme a un equipo
+      </a>
+    </div>
   </section>
 </div>
 {% endblock %}
