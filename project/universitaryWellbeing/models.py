@@ -51,7 +51,7 @@ class AgendaPsicologos(models.Model):
 
 
 class Asistencias(models.Model):
-    id_asistencia = models.FloatField(primary_key=True)
+    id_asistencia = models.BigAutoField(primary_key=True)
     fecha = models.DateField()
     estados_asistencia_id_estado_asistencia = models.ForeignKey('EstadosAsistencia', models.DO_NOTHING, db_column='estados_asistencia_id_estado_asistencia')
     participaciones_id_participacion = models.ForeignKey('Participaciones', models.DO_NOTHING, db_column='participaciones_id_participacion')
@@ -399,7 +399,7 @@ class Notificaciones(models.Model):
 
 
 class Participaciones(models.Model):
-    id_participacion = models.FloatField(primary_key=True)
+    id_participacion = models.AutoField(primary_key=True)
     fecha_inscripcion = models.DateField()
     participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
     actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')

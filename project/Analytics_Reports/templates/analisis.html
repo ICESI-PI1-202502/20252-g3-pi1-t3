@@ -1,5 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
+<link rel="stylesheet" href="{% static 'css/analisis_comportamiento.css' %}">
+
 {% block content %}
 <div class="container mt-4">
     <h2>Análisis del Comportamiento Estudiantil</h2>
@@ -172,45 +174,5 @@
     {% endif %}
 </div>
 
-<style>
-.card {
-    border: none;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-    margin-bottom: 20px;
-}
-
-.table th {
-    border-top: none;
-    font-weight: 600;
-    font-size: 0.9em;
-}
-
-.badge {
-    font-size: 0.8em;
-}
-
-.btn-success {
-    background: linear-gradient(45deg, #28a745, #20c997);
-    border: none;
-}
-
-.btn-success:hover {
-    background: linear-gradient(45deg, #218838, #1ea885);
-    transform: translateY(-1px);
-}
-
-.card-body h4 {
-    font-weight: bold;
-    font-size: 1.8em;
-}
-
-.table-responsive {
-    border-radius: 8px;
-}
-
-.alert-info {
-    border-left: 4px solid #17a2b8;
-    background-color: #f8f9fa;
-}
-</style>
+ 
 {% endblock %}

@@ -472,6 +472,12 @@ from universitaryWellbeing.models import (
     EstadosAsistencia, HistorialParticipaciones
 )
 
+from datetime import datetime, date
+from django.core.paginator import Paginator
+from django.shortcuts import render
+from django.utils import timezone
+from universitaryWellbeing.models import Asistencias, Actividades, EstadosAsistencia
+
 def gestion_asistencia(request):
     """Vista principal para gestión de asistencias"""
     
@@ -536,6 +542,9 @@ def gestion_asistencia(request):
         ).count(),
     }
     
+    # ✅ Agregar variable para template
+    fecha_es_hoy = (fecha_obj == date.today())
+    
     context = {
         'asistencias': asistencias,
         'fecha_filtro': fecha_filtro,
@@ -546,10 +555,10 @@ def gestion_asistencia(request):
         'estados_asistencia': estados_asistencia,
         'stats': stats,
         'fecha_obj': fecha_obj,
+        'fecha_es_hoy': fecha_es_hoy,  # <-- variable booleana para JS/template
     }
     
     return render(request, 'gestion_asistencia.html', context)
-
 
 def obtener_participantes_actividad(request):
     """API endpoint para obtener participantes de una actividad"""
@@ -888,16 +897,19 @@ def registrar_asistencia_manual(request):
                     )
 
                     # 2️⃣ Participante
+                    # 2️⃣ Participante
                     participante, creado = Participantes.objects.get_or_create(
                         correo=auth_user.email,
                         defaults={
+                            'id_participante': auth_user.id,   # 👈 usar el id del usuario como clave
                             'nombre': f"Usuario {cedula}",
                             'apellido': '',
-                            'roles_id_rol_id': 1,      # rol por defecto
-                            'estado_activo': 'S',      # ✅ activo
+                            'roles_id_rol_id': 1,              # rol por defecto
+                            'estado_activo': 'S',              # activo
                             'user': auth_user
                         }
                     )
+
 
                     if not creado:
                         cambios = False

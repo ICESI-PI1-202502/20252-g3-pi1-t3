@@ -2,142 +2,7 @@
 {% load static %}
 
 {% block extra_css %}
-<style>
-    .stats-cards {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-        gap: 15px;
-        margin-bottom: 25px;
-    }
-    
-    .stat-card {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        border-left: 4px solid #007bff;
-    }
-    
-    .stat-card.presente { border-left-color: #28a745; }
-    .stat-card.ausente { border-left-color: #dc3545; }
-    .stat-card.tardio { border-left-color: #ffc107; }
-    
-    .stat-number {
-        font-size: 2em;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-    
-    .stat-label {
-        color: #666;
-        font-size: 0.9em;
-    }
-    
-    .filters-section {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 25px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .table-container {
-        background: white;
-        border-radius: 8px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    }
-    
-    .table th {
-        background-color: #f8f9fa;
-        border: none;
-        font-weight: 600;
-        color: #495057;
-        padding: 15px;
-    }
-    
-    .table td {
-        padding: 15px;
-        vertical-align: middle;
-        border-top: 1px solid #dee2e6;
-    }
-    
-    .badge-estado {
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-size: 0.8em;
-        font-weight: 500;
-        text-transform: uppercase;
-    }
-    
-    .badge-presente {
-        background-color: #d4edda;
-        color: #155724;
-    }
-    
-    .badge-ausente {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-    
-    .badge-tardio {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-    
-    .action-buttons {
-        margin-bottom: 20px;
-    }
-    
-    .btn {
-        margin-right: 10px;
-        margin-bottom: 10px;
-    }
-    
-    .form-control, .form-select {
-        border-radius: 6px;
-        border: 1px solid #ced4da;
-    }
-    
-    .no-data {
-        text-align: center;
-        padding: 40px;
-        color: #666;
-        font-style: italic;
-    }
-    
-    .participant-info {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .participant-avatar {
-        width: 40px;
-        height: 40px;
-        border-radius: 50%;
-        background: linear-gradient(45deg, #007bff, #0056b3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-    }
-    
-    .participant-details h6 {
-        margin: 0;
-        font-weight: 500;
-    }
-    
-    .participant-details small {
-        color: #666;
-    }
-    
-    .pagination {
-        justify-content: center;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/gestion_asistencia.css' %}">
 {% endblock %}
 
 {% block content %}
@@ -148,7 +13,9 @@
                 <i class="fas fa-clipboard-check"></i>
                 Gestión de Asistencia y Contingencia
             </h2>
-            <p class="text-muted">Registro manual de asistencias e historial por perfil - {{ fecha_obj|date:"l, d \d\e F \d\e Y" }}</p>
+            <p class="text-muted">
+                Registro manual de asistencias e historial por perfil - {{ fecha_obj|date:"l, d \d\e F \d\e Y" }}
+            </p>
             
             <!-- Estadísticas del día -->
             <div class="stats-cards">
@@ -164,8 +31,7 @@
                     <i class="fas fa-plus"></i>
                     Registrar Asistencia Individual
                 </a>
-               
-                <button onclick="exportarAsistencias()" class="btn btn-info">
+                <button class="btn btn-info btn-exportar">
                     <i class="fas fa-download"></i>
                     Exportar Datos
                 </button>
@@ -240,10 +106,12 @@
                                     <td>
                                         <div class="participant-info">
                                             <div class="participant-avatar">
-                                                {{ asistencia.participaciones_id_participacion.participantes_id_participante.nombre.0 }}{{ asistencia.participaciones_id_participacion.participantes_id_participante.apellido.0 }}
+                                                {{ asistencia.participaciones_id_participacion.participantes_id_participante.nombre.0 }}
+                                                {{ asistencia.participaciones_id_participacion.participantes_id_participante.apellido.0 }}
                                             </div>
                                             <div class="participant-details">
-                                                <h6>{{ asistencia.participaciones_id_participacion.participantes_id_participante.nombre }} {{ asistencia.participaciones_id_participacion.participantes_id_participante.apellido }}</h6>
+                                                <h6>{{ asistencia.participaciones_id_participacion.participantes_id_participante.nombre }} 
+                                                    {{ asistencia.participaciones_id_participacion.participantes_id_participante.apellido }}</h6>
                                                 <small>{{ asistencia.participaciones_id_participacion.participantes_id_participante.programa }} - Semestre {{ asistencia.participaciones_id_participacion.participantes_id_participante.semestre }}</small>
                                             </div>
                                         </div>
@@ -264,8 +132,8 @@
                                            class="btn btn-sm btn-outline-primary" title="Ver historial">
                                             <i class="fas fa-history"></i>
                                         </a>
-                                        <button onclick="editarAsistencia({{ asistencia.id_asistencia }})" 
-                                                class="btn btn-sm btn-outline-warning" title="Editar">
+                                        <button class="btn btn-sm btn-outline-warning btn-editar" 
+                                                data-id="{{ asistencia.id_asistencia }}" title="Editar">
                                             <i class="fas fa-edit"></i>
                                         </button>
                                     </td>
@@ -283,19 +151,15 @@
                                         <a class="page-link" href="?page={{ asistencias.previous_page_number }}&fecha={{ fecha_filtro }}&actividad={{ actividad_filtro }}&participante={{ participante_filtro }}&estado={{ estado_filtro }}">Anterior</a>
                                     </li>
                                 {% endif %}
-                                
                                 {% for num in asistencias.paginator.page_range %}
                                     {% if asistencias.number == num %}
-                                        <li class="page-item active">
-                                            <span class="page-link">{{ num }}</span>
-                                        </li>
+                                        <li class="page-item active"><span class="page-link">{{ num }}</span></li>
                                     {% else %}
                                         <li class="page-item">
                                             <a class="page-link" href="?page={{ num }}&fecha={{ fecha_filtro }}&actividad={{ actividad_filtro }}&participante={{ participante_filtro }}&estado={{ estado_filtro }}">{{ num }}</a>
                                         </li>
                                     {% endif %}
                                 {% endfor %}
-                                
                                 {% if asistencias.has_next %}
                                     <li class="page-item">
                                         <a class="page-link" href="?page={{ asistencias.next_page_number }}&fecha={{ fecha_filtro }}&actividad={{ actividad_filtro }}&participante={{ participante_filtro }}&estado={{ estado_filtro }}">Siguiente</a>
@@ -309,7 +173,6 @@
                         <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
                         <h5>No hay registros de asistencia</h5>
                         <p>No se encontraron registros para los filtros aplicados.</p>
-                        
                     </div>
                 {% endif %}
             </div>
@@ -317,23 +180,10 @@
     </div>
 </div>
 
-<script>
-function editarAsistencia(asistenciaId) {
-    // Implementar modal de edición o redirección
-    alert('Funcionalidad de edición - ID: ' + asistenciaId);
-}
+<div id="asistencia-data"
+     data-url="{% url 'analytics_reports:gestion_asistencia' %}"
+     data-fecha-es-hoy="{{ fecha_es_hoy|yesno:'true,false' }}">
+</div>
 
-function exportarAsistencias() {
-    const params = new URLSearchParams(window.location.search);
-    params.set('export', 'csv');
-    window.location.href = '{% url "analytics_reports:gestion_asistencia" %}?' + params.toString();
-}
-
-// Auto-refresh cada 30 segundos si está en fecha actual
-{% if fecha_obj|date:"Y-m-d" == "today"|date:"Y-m-d" %}
-setTimeout(function() {
-    location.reload();
-}, 30000);
-{% endif %}
-</script>
+<script src="{% static 'js/gestion_asistencia.js' %}"></script>
 {% endblock %}

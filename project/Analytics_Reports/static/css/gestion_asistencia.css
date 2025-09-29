@@ -1,0 +1,134 @@
+   .stats-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 15px;
+        margin-bottom: 25px;
+    }
+    
+    .stat-card {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-left: 4px solid #007bff;
+    }
+    
+    .stat-card.presente { border-left-color: #28a745; }
+    .stat-card.ausente { border-left-color: #dc3545; }
+    .stat-card.tardio { border-left-color: #ffc107; }
+    
+    .stat-number {
+        font-size: 2em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stat-label {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .filters-section {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .table-container {
+        background: white;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .table th {
+        background-color: #f8f9fa;
+        border: none;
+        font-weight: 600;
+        color: #495057;
+        padding: 15px;
+    }
+    
+    .table td {
+        padding: 15px;
+        vertical-align: middle;
+        border-top: 1px solid #dee2e6;
+    }
+    
+    .badge-estado {
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 0.8em;
+        font-weight: 500;
+        text-transform: uppercase;
+    }
+    
+    .badge-presente {
+        background-color: #d4edda;
+        color: #155724;
+    }
+    
+    .badge-ausente {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+    
+    .badge-tardio {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+    
+    .action-buttons {
+        margin-bottom: 20px;
+    }
+    
+    .btn {
+        margin-right: 10px;
+        margin-bottom: 10px;
+    }
+    
+    .form-control, .form-select {
+        border-radius: 6px;
+        border: 1px solid #ced4da;
+    }
+    
+    .no-data {
+        text-align: center;
+        padding: 40px;
+        color: #666;
+        font-style: italic;
+    }
+    
+    .participant-info {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .participant-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(45deg, #007bff, #0056b3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: bold;
+    }
+    
+    .participant-details h6 {
+        margin: 0;
+        font-weight: 500;
+    }
+    
+    .participant-details small {
+        color: #666;
+    }
+    
+    .pagination {
+        justify-content: center;
+    }
