@@ -10,6 +10,6 @@ urlpatterns = [
     path("<int:torneo_id>/teams/create/", views.crear_equipo_en_torneo, name="create_team"),
     path("<int:id>/teams/join/", views.unirse_equipo, name="join_team"),
     path("create/", views.crear_torneo, name="create"),
-    #path("team/<int:team_id>/manage/", views.gestionar_equipo, name="manage_team"),
+    path("<int:torneo_id>/teams/<int:team_id>/manage/", views.gestionar_equipo, name="manage_team"),
 ]
 
