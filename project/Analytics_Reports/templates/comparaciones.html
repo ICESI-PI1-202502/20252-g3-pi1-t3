@@ -5,12 +5,28 @@
   <h2>Comparaciones y estadísticas</h2>
 
   <form method="get" class="mb-4">
-    <!-- 1. Tipo temporal -->
-    <label for="tiempo"><strong>Comparar por:</strong></label>
+    <!-- 1. Tipo de filtro -->
+    <label for="tiempo"><strong>Filtrar por:</strong></label>
     <select name="tiempo" id="tiempo" onchange="this.form.submit()">
-      <option value="semestre" {% if tiempo == "semestre" %}selected{% endif %}>Semestre</option>
+      <option value="todos" {% if tiempo == "todos" %}selected{% endif %}>Todos los registros</option>
+      <option value="semestre" {% if tiempo == "semestre" %}selected{% endif %}>Semestre específico</option>
       <option value="periodo" {% if tiempo == "periodo" %}selected{% endif %}>Periodo personalizado</option>
     </select>
+
+    <!-- Si elige semestre, mostrar selector de números de semestre -->
+    {% if tiempo == "semestre" %}
+      <div style="margin-top: 10px;">
+        <label for="semestre_filtro">Estudiantes de semestre:</label>
+        <select name="semestre_filtro" id="semestre_filtro" onchange="this.form.submit()">
+          <option value="">-- Seleccionar semestre --</option>
+          {% for sem in semestres_disponibles %}
+            <option value="{{ sem }}" {% if semestre_filtro == sem|stringformat:"s" %}selected{% endif %}>
+              Semestre {{ sem }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
 
     <!-- Si elige periodo, mostrar fechas -->
     {% if tiempo == "periodo" %}
@@ -31,6 +47,7 @@
       <option value="facultad" {% if agrupacion == "facultad" %}selected{% endif %}>Facultad</option>
       <option value="genero" {% if agrupacion == "genero" %}selected{% endif %}>Género</option>
       <option value="rol" {% if agrupacion == "rol" %}selected{% endif %}>Rol</option>
+      <option value="semestre" {% if agrupacion == "semestre" %}selected{% endif %}>Semestre</option>
     </select>
     
     <!-- Botón manual por si JavaScript está deshabilitado -->
@@ -40,8 +57,14 @@
   <!-- 3. Resultados -->
   {% if resultados %}
     <h3>Resultados: 
-      {% if tiempo == "semestre" %}
-        Por Semestre
+      {% if tiempo == "todos" %}
+        Todos los registros
+      {% elif tiempo == "semestre" %}
+        {% if semestre_filtro %}
+          Estudiantes de {{ semestre_filtro }}° semestre
+        {% else %}
+          (Selecciona un semestre)
+        {% endif %}
       {% else %}
         Periodo {% if request.GET.inicio %}del {{ request.GET.inicio }}{% endif %}{% if request.GET.fin %} al {{ request.GET.fin }}{% endif %}
       {% endif %}
@@ -65,6 +88,12 @@
                 {{ row.participantes_id_participante__genero|default:"Sin especificar" }}
               {% elif agrupacion == "rol" %}
                 {{ row.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin especificar" }}
+              {% elif agrupacion == "semestre" %}
+                {% if row.participantes_id_participante__semestre %}
+                  {{ row.participantes_id_participante__semestre }}° semestre
+                {% else %}
+                  Sin especificar
+                {% endif %}
               {% endif %}
             </td>
             <td>{{ row.total }}</td>
@@ -78,7 +107,6 @@
     <!-- Mostrar total general -->
     {% if resultados %}
       <p><strong>Total general: </strong>
-        {% widthratio resultados|length 1 1 as total_rows %}
         {{ resultados|length }} grupos encontrados
       </p>
     {% endif %}
@@ -86,7 +114,9 @@
   {% else %}
     <div class="alert alert-info">
       <p>Selecciona los filtros y haz clic en "Actualizar" para ver los resultados.</p>
-      {% if tiempo == "periodo" and not request.GET.inicio %}
+      {% if tiempo == "semestre" and not semestre_filtro %}
+        <p><em>Para filtrar por semestre, debes seleccionar un número de semestre.</em></p>
+      {% elif tiempo == "periodo" and not request.GET.inicio %}
         <p><em>Para el periodo personalizado, debes seleccionar las fechas de inicio y fin.</em></p>
       {% endif %}
     </div>
@@ -95,7 +125,9 @@
   <!-- 4. Métricas clave -->
   <div class="metricas-section">
     <h3>Métricas clave
-      {% if tiempo == "periodo" and request.GET.inicio and request.GET.fin %}
+      {% if tiempo == "semestre" and semestre_filtro %}
+        <small>(estudiantes de {{ semestre_filtro }}° semestre)</small>
+      {% elif tiempo == "periodo" and request.GET.inicio and request.GET.fin %}
         <small>(del {{ request.GET.inicio }} al {{ request.GET.fin }})</small>
       {% else %}
         <small>(totales generales)</small>

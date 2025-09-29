@@ -20,12 +20,9 @@ class Actividades(models.Model):
     aforo = models.FloatField(blank=True, null=True)
     fecha_apertura_ins = models.DateField(blank=True, null=True)
     fecha_cierre_ins = models.DateField(blank=True, null=True)
-    tipos_actividad_id_tipo = models.ForeignKey(
-        'TiposActividad', models.DO_NOTHING,
-        db_column='tipos_actividad_id_tipo', blank=True, null=True
-    )
+    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
     id_tipo = models.FloatField(blank=True, null=True)
-
+ 
     class Meta:
         managed = False
         db_table = 'actividades'
@@ -427,6 +424,10 @@ class Participantes(models.Model):
     facultad = models.CharField(max_length=80, blank=True, null=True)
     programa = models.CharField(max_length=120, blank=True, null=True)
     genero = models.CharField(max_length=20, blank=True, null=True)
+
+
+       #  referencia correcta al usuario
+    user = models.ForeignKey('AuthUser', models.DO_NOTHING, db_column='user')  
 
     class Meta:
         managed = False

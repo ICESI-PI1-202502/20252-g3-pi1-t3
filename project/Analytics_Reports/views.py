@@ -61,9 +61,14 @@ def participantes_list(request):
     participantes = Participantes.objects.all().order_by("nombre")
     return render(request, "participantes.html", {"participantes": participantes})
 
+
+
+
+
 def comparaciones(request):
-    tiempo = request.GET.get("tiempo", "semestre")
+    tiempo = request.GET.get("tiempo", "todos")
     agrupacion = request.GET.get("agrupacion", "facultad")
+    semestre_filtro = request.GET.get("semestre_filtro", "")
     
     resultados = []
     
@@ -72,7 +77,20 @@ def comparaciones(request):
     asistencias_query = Asistencias.objects
     participantes_query = Participantes.objects
     
-    if tiempo == "periodo":
+    if tiempo == "semestre" and semestre_filtro:
+        # Filtrar por semestre del estudiante (1, 2, 3, 4, etc.)
+        participaciones_query = participaciones_query.filter(
+            participantes_id_participante__semestre=semestre_filtro
+        )
+        participantes_query = participantes_query.filter(
+            semestre=semestre_filtro
+        )
+        # Para asistencias, filtramos a través de la relación con participaciones
+        asistencias_query = asistencias_query.filter(
+            participaciones_id_participacion__participantes_id_participante__semestre=semestre_filtro
+        )
+    
+    elif tiempo == "periodo":
         inicio_str = request.GET.get("inicio")
         fin_str = request.GET.get("fin")
         
@@ -112,6 +130,13 @@ def comparaciones(request):
             .annotate(total=Count("id_participacion"))
             .order_by("participantes_id_participante__roles_id_rol__nombre_rol")
         )
+    elif agrupacion == "semestre":
+        resultados = (
+            participaciones_query
+            .values("participantes_id_participante__semestre")
+            .annotate(total=Count("id_participacion"))
+            .order_by("participantes_id_participante__semestre")
+        )
     
     # Métricas generales
     total_asistencias = asistencias_query.count()
@@ -124,6 +149,16 @@ def comparaciones(request):
         .count()
     )
     
+    # Obtener lista de semestres disponibles desde la base de datos
+    semestres_disponibles = (
+        Participantes.objects
+        .values_list('semestre', flat=True)
+        .distinct()
+        .order_by('semestre')
+    )
+    # Filtrar valores nulos y convertir a lista
+    semestres_disponibles = [s for s in semestres_disponibles if s is not None]
+    
     metricas = {
         "total_asistencias": total_asistencias,
         "nuevos": nuevos,
@@ -133,14 +168,13 @@ def comparaciones(request):
     context = {
         "tiempo": tiempo,
         "agrupacion": agrupacion,
+        "semestre_filtro": semestre_filtro,
+        "semestres_disponibles": semestres_disponibles,
         "resultados": resultados,
         "metricas": metricas,
     }
     
     return render(request, "comparaciones.html", context)
-
-
-
 
 
 
@@ -516,78 +550,6 @@ def gestion_asistencia(request):
     
     return render(request, 'gestion_asistencia.html', context)
 
-def registrar_asistencia_manual(request):
-    """Vista para registro manual de asistencia"""
-    
-    if request.method == 'POST':
-        participacion_id = request.POST.get('participacion_id')
-        estado_id = request.POST.get('estado_id')
-        fecha_str = request.POST.get('fecha')
-        observaciones = request.POST.get('observaciones', '')
-        
-        try:
-            # Validar participación
-            participacion = get_object_or_404(Participaciones, id_participacion=participacion_id)
-            estado = get_object_or_404(EstadosAsistencia, id_estado_asistencia=estado_id)
-            fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
-            
-            # Verificar si ya existe registro para esta fecha
-            asistencia_existente = Asistencias.objects.filter(
-                participaciones_id_participacion=participacion,
-                fecha=fecha_obj
-            ).first()
-            
-            if asistencia_existente:
-                # Actualizar registro existente
-                asistencia_existente.estados_asistencia_id_estado_asistencia = estado
-                asistencia_existente.save()
-                
-                # Registrar en historial
-                HistorialParticipaciones.objects.create(
-                    participaciones_id_participacion=participacion,
-                    fecha=timezone.now().date(),
-                    nota=f"Asistencia actualizada a '{estado.nombre}' para fecha {fecha_obj}. {observaciones}"
-                )
-                
-                messages.success(request, f'Asistencia actualizada para {participacion.participantes_id_participante.nombre}')
-            else:
-                # Crear nuevo registro
-                # Obtener siguiente ID (ya que usas FloatField)
-                ultimo_id = Asistencias.objects.aggregate(Max('id_asistencia'))['id_asistencia__max'] or 0
-                nuevo_id = ultimo_id + 1
-                
-                Asistencias.objects.create(
-                    id_asistencia=nuevo_id,
-                    fecha=fecha_obj,
-                    estados_asistencia_id_estado_asistencia=estado,
-                    participaciones_id_participacion=participacion
-                )
-                
-                # Registrar en historial
-                HistorialParticipaciones.objects.create(
-                    participaciones_id_participacion=participacion,
-                    fecha=timezone.now().date(),
-                    nota=f"Asistencia registrada: '{estado.nombre}' para fecha {fecha_obj}. {observaciones}"
-                )
-                
-                messages.success(request, f'Asistencia registrada para {participacion.participantes_id_participante.nombre}')
-            
-        except Exception as e:
-            messages.error(request, f'Error al registrar asistencia: {str(e)}')
-        
-        return redirect('analytics_reports:gestion_asistencia')
-    
-    # GET - Mostrar formulario
-    actividades = Actividades.objects.all().order_by('nombre')
-    estados_asistencia = EstadosAsistencia.objects.all().order_by('nombre')
-    
-    context = {
-        'actividades': actividades,
-        'estados_asistencia': estados_asistencia,
-        'fecha_actual': timezone.now().date().strftime('%Y-%m-%d')
-    }
-    
-    return render(request, 'registrar_asistencia.html', context)
 
 def obtener_participantes_actividad(request):
     """API endpoint para obtener participantes de una actividad"""
@@ -753,3 +715,311 @@ def asistencia(request):
         .annotate(total=Count("id_asistencia"))
     )
     return render(request, "asistencia.html", {"data": data})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Agregar estas funciones a tu views.py
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.db.models import Max
+
+def registrar_asistencia_cedula_view(request):
+    """Vista principal para registro rápido por cédula"""
+    
+    actividad_seleccionada = request.GET.get('actividad_id', '')
+    fecha_seleccionada = request.GET.get('fecha', timezone.now().date().strftime('%Y-%m-%d'))
+    
+    actividades = Actividades.objects.all().order_by('nombre')
+    estados_asistencia = EstadosAsistencia.objects.all().order_by('nombre')
+    
+    stats = {'total': 0, 'presentes': 0}
+    ultimos_registros = []
+    
+    if actividad_seleccionada:
+        try:
+            fecha_obj = datetime.strptime(fecha_seleccionada, '%Y-%m-%d').date()
+            
+            asistencias_dia = Asistencias.objects.filter(
+                fecha=fecha_obj,
+                participaciones_id_participacion__actividades_id_actividad_id=actividad_seleccionada
+            ).select_related(
+                'estados_asistencia_id_estado_asistencia',
+                'participaciones_id_participacion__participantes_id_participante'
+            )
+            
+            stats = {
+                'total': asistencias_dia.count(),
+                'presentes': asistencias_dia.filter(
+                    estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+                ).count(),
+            }
+            
+            ultimos_registros = asistencias_dia.order_by('-id_asistencia')[:10]
+            
+        except ValueError:
+            pass
+    
+    context = {
+        'actividades': actividades,
+        'estados_asistencia': estados_asistencia,
+        'actividad_seleccionada': actividad_seleccionada,
+        'fecha_seleccionada': fecha_seleccionada,
+        'stats': stats,
+        'ultimos_registros': ultimos_registros,
+    }
+    
+    return render(request, 'registrar_asistencia_cedula.html', context)
+
+
+@require_http_methods(["POST"])
+def registrar_asistencia_rapido(request):
+    """Registra asistencia directamente con cédula"""
+    
+    try:
+        cedula = request.POST.get('cedula', '').strip()
+        estado_id = request.POST.get('estado_id')
+        actividad_id = request.POST.get('actividad_id')
+        fecha_str = request.POST.get('fecha')
+        
+        if not all([cedula, estado_id, actividad_id, fecha_str]):
+            return JsonResponse({
+                'error': 'Faltan datos requeridos'
+            }, status=400)
+        
+        # Buscar o crear participante por cédula (username)
+        participante, created = Participantes.objects.get_or_create(
+            correo=cedula,  # Usando correo como identificador temporal
+            defaults={
+                'nombre': f'Usuario {cedula}',
+                'apellido': '',
+                'roles_id_rol_id': 1  # Ajusta según tu rol por defecto
+            }
+        )
+        
+        # Buscar o crear participación
+        participacion, created = Participaciones.objects.get_or_create(
+            participantes_id_participante=participante,
+            actividades_id_actividad_id=actividad_id,
+            defaults={
+                'fecha_inscripcion': timezone.now().date(),
+                'roles_participacion_id_rol_participacion_id': 1,  # Ajustar
+                'estados_participacion_id_estado_participacion_id': 1  # Ajustar
+            }
+        )
+        
+        # Obtener estado y fecha
+        estado = get_object_or_404(EstadosAsistencia, id_estado_asistencia=estado_id)
+        fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+        
+        # Verificar si ya existe asistencia
+        asistencia_existente = Asistencias.objects.filter(
+            participaciones_id_participacion=participacion,
+            fecha=fecha_obj
+        ).first()
+        
+        if asistencia_existente:
+            asistencia_existente.estados_asistencia_id_estado_asistencia = estado
+            asistencia_existente.save()
+            mensaje = f'✓ Asistencia actualizada - Cédula: {cedula}'
+        else:
+            ultimo_id = Asistencias.objects.aggregate(Max('id_asistencia'))['id_asistencia__max'] or 0
+            
+            Asistencias.objects.create(
+                id_asistencia=ultimo_id + 1,
+                fecha=fecha_obj,
+                estados_asistencia_id_estado_asistencia=estado,
+                participaciones_id_participacion=participacion
+            )
+            
+            mensaje = f'✓ Registrado exitosamente - Cédula: {cedula} - Estado: {estado.nombre}'
+        
+        return JsonResponse({
+            'success': True,
+            'message': mensaje
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'error': f'Error: {str(e)}'
+        }, status=500)
+    
+
+
+
+
+
+
+
+from django.db import connection
+from universitaryWellbeing.models import AuthUser
+from django.db import connection
+from universitaryWellbeing.models import AuthUser
+
+from django.db import connection
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from datetime import datetime
+from django.contrib import messages
+
+from universitaryWellbeing.models import (
+    AuthUser, Participantes, Participaciones,
+    Asistencias, EstadosAsistencia, Actividades
+)
+
+
+from django.shortcuts import render, get_object_or_404
+from django.utils import timezone
+from django.contrib import messages
+from universitaryWellbeing.models import (
+    Actividades, AuthUser, Participantes, Participaciones,
+    EstadosAsistencia, Asistencias
+)
+from datetime import datetime
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from datetime import datetime
+from universitaryWellbeing.models import (
+    Actividades, EstadosAsistencia, AuthUser, Participantes,
+    Participaciones, Asistencias
+)
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from datetime import datetime
+from universitaryWellbeing.models import (
+    Actividades, EstadosAsistencia, AuthUser, Participantes,
+    Participaciones, Asistencias
+)
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib import messages
+from django.utils import timezone
+from datetime import datetime
+from universitaryWellbeing.models import (
+    Actividades, EstadosAsistencia, AuthUser, Participantes,
+    Participaciones, Asistencias
+)
+
+def registrar_asistencia_manual(request):
+    """Registra asistencias por cédula, creando AuthUser y Participante si no existen"""
+
+    actividades = Actividades.objects.all().order_by('nombre')
+    fecha_hoy = timezone.now().date().strftime('%Y-%m-%d')
+    resultados = None
+
+    if request.method == 'POST':
+        actividad_id = request.POST.get('actividad_id')
+        fecha_str = request.POST.get('fecha')
+        cedulas_texto = request.POST.get('cedulas', '')
+
+        cedulas = [c.strip() for c in cedulas_texto.split('\n') if c.strip()]
+        exitosos = 0
+        errores = []
+
+        try:
+            actividad = get_object_or_404(Actividades, id_actividad=actividad_id)
+            fecha_obj = datetime.strptime(fecha_str, '%Y-%m-%d').date()
+
+            # Estado "Presente"
+            estado_presente = EstadosAsistencia.objects.filter(nombre__icontains='presente').first()
+            if not estado_presente:
+                estado_presente = EstadosAsistencia.objects.first()
+
+            for cedula in cedulas:
+                try:
+                    # 1️⃣ AuthUser
+                    auth_user, _ = AuthUser.objects.get_or_create(
+                        username=cedula,
+                        defaults={
+                            'email': f"{cedula}@temp.com",
+                            'password': 'pbkdf2_sha256$260000$temp$temp',
+                            'first_name': '',
+                            'last_name': '',
+                            'is_staff': False,
+                            'is_active': True,
+                            'is_superuser': False,
+                            'date_joined': timezone.now()
+                        }
+                    )
+
+                    # 2️⃣ Participante
+                    participante, creado = Participantes.objects.get_or_create(
+                        correo=auth_user.email,
+                        defaults={
+                            'nombre': f"Usuario {cedula}",
+                            'apellido': '',
+                            'roles_id_rol_id': 1,      # rol por defecto
+                            'estado_activo': 'S',      # ✅ activo
+                            'user': auth_user
+                        }
+                    )
+
+                    if not creado:
+                        cambios = False
+                        if participante.user_id is None:
+                            participante.user = auth_user
+                            cambios = True
+                        if participante.estado_activo != 'S':
+                            participante.estado_activo = 'S'
+                            cambios = True
+                        if cambios:
+                            participante.save()
+
+                    # 3️⃣ Participación
+                    participacion, _ = Participaciones.objects.get_or_create(
+                        participantes_id_participante=participante,
+                        actividades_id_actividad=actividad,
+                        defaults={
+                            'fecha_inscripcion': fecha_obj,
+                            'roles_participacion_id_rol_participacion_id': 1,
+                            'estados_participacion_id_estado_participacion_id': 1
+                        }
+                    )
+
+                    # 4️⃣ Verificar asistencia
+                    if Asistencias.objects.filter(participaciones_id_participacion=participacion, fecha=fecha_obj).exists():
+                        errores.append(f"Cédula {cedula}: Ya tiene asistencia registrada")
+                        continue
+
+                    # 5️⃣ Crear asistencia
+                    Asistencias.objects.create(
+                        fecha=fecha_obj,
+                        estados_asistencia_id_estado_asistencia=estado_presente,
+                        participaciones_id_participacion=participacion
+                    )
+
+                    exitosos += 1
+
+                except Exception as e:
+                    errores.append(f"Cédula {cedula}: {str(e)}")
+
+            resultados = {'exitosos': exitosos, 'errores': errores}
+
+            if exitosos > 0:
+                messages.success(request, f'{exitosos} asistencias registradas')
+            if errores:
+                messages.warning(request, f'{len(errores)} errores')
+
+        except Exception as e:
+            messages.error(request, f'Error: {str(e)}')
+
+    context = {'actividades': actividades, 'fecha_hoy': fecha_hoy, 'resultados': resultados}
+    return render(request, 'registrar_asistencia.html', context)

@@ -1,515 +1,56 @@
 {% extends "base.html" %}
-{% load static %}
-
-{% block extra_css %}
-<style>
-    .form-container {
-        background: white;
-        border-radius: 12px;
-        padding: 30px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-        margin-bottom: 30px;
-    }
-    
-    .form-header {
-        border-bottom: 2px solid #f1f3f4;
-        padding-bottom: 20px;
-        margin-bottom: 30px;
-    }
-    
-    .form-header h3 {
-        color: #2c3e50;
-        margin: 0;
-        font-weight: 600;
-    }
-    
-    .form-header p {
-        color: #7f8c8d;
-        margin: 5px 0 0 0;
-    }
-    
-    .form-group {
-        margin-bottom: 25px;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #34495e;
-        margin-bottom: 8px;
-        display: block;
-    }
-    
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 2px solid #e9ecef;
-        padding: 12px 15px;
-        font-size: 14px;
-        transition: all 0.3s ease;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #007bff;
-        box-shadow: 0 0 0 0.2rem rgba(0,123,255,0.25);
-    }
-    
-    .btn-primary {
-        background: linear-gradient(45deg, #007bff, #0056b3);
-        border: none;
-        border-radius: 8px;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-    
-    .btn-primary:hover {
-        background: linear-gradient(45deg, #0056b3, #004085);
-        transform: translateY(-1px);
-        box-shadow: 0 4px 12px rgba(0,123,255,0.3);
-    }
-    
-    .btn-secondary {
-        border-radius: 8px;
-        padding: 12px 30px;
-        font-weight: 600;
-    }
-    
-    .participantes-container {
-        max-height: 400px;
-        overflow-y: auto;
-        border: 2px solid #e9ecef;
-        border-radius: 8px;
-        padding: 15px;
-        background: #f8f9fa;
-    }
-    
-    .participante-item {
-        background: white;
-        border-radius: 6px;
-        padding: 15px;
-        margin-bottom: 10px;
-        border: 1px solid #dee2e6;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        transition: all 0.3s ease;
-    }
-    
-    .participante-item:hover {
-        border-color: #007bff;
-        box-shadow: 0 2px 8px rgba(0,123,255,0.15);
-    }
-    
-    .participante-info {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    
-    .participante-avatar {
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        background: linear-gradient(45deg, #007bff, #0056b3);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
-        font-weight: bold;
-        font-size: 16px;
-    }
-    
-    .participante-details h6 {
-        margin: 0 0 4px 0;
-        color: #2c3e50;
-        font-weight: 600;
-    }
-    
-    .participante-details small {
-        color: #7f8c8d;
-        display: block;
-    }
-    
-    .estado-selector {
-        min-width: 150px;
-    }
-    
-    .loading-spinner {
-        display: none;
-        text-align: center;
-        padding: 20px;
-    }
-    
-    .spinner-border {
-        width: 3rem;
-        height: 3rem;
-    }
-    
-    .alert {
-        border-radius: 8px;
-        margin-bottom: 20px;
-    }
-    
-    .no-participantes {
-        text-align: center;
-        padding: 40px;
-        color: #7f8c8d;
-    }
-    
-    .breadcrumb {
-        background: transparent;
-        padding: 0;
-        margin-bottom: 20px;
-    }
-    
-    .breadcrumb-item a {
-        color: #007bff;
-        text-decoration: none;
-    }
-    
-    .breadcrumb-item.active {
-        color: #6c757d;
-    }
-    
-    .form-floating {
-        position: relative;
-    }
-    
-    .form-floating > label {
-        position: absolute;
-        top: 0;
-        left: 0;
-        height: 100%;
-        padding: 1rem 0.75rem;
-        pointer-events: none;
-        border: 1px solid transparent;
-        transform-origin: 0 0;
-        transition: opacity 0.1s ease-in-out, transform 0.1s ease-in-out;
-        color: #6c757d;
-    }
-    
-    @media (max-width: 768px) {
-        .form-container {
-            padding: 20px;
-        }
-        
-        .participante-item {
-            flex-direction: column;
-            gap: 10px;
-            text-align: center;
-        }
-        
-        .estado-selector {
-            min-width: 100%;
-        }
-    }
-</style>
-{% endblock %}
 
 {% block content %}
-<div class="container-fluid">
-    <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb">
-        <ol class="breadcrumb">
-            <li class="breadcrumb-item">
-                <a href="{% url 'analytics_reports:analytics_index' %}">Inicio</a>
-            </li>
-            <li class="breadcrumb-item">
-                <a href="{% url 'analytics_reports:gestion_asistencia' %}">Gestión de Asistencia</a>
-            </li>
-            <li class="breadcrumb-item active" aria-current="page">
-                Registro Manual
-            </li>
-        </ol>
-    </nav>
+<div class="container mt-4">
+    <h2>Registrar Asistencia</h2>
 
-    <div class="row justify-content-center">
-        <div class="col-12 col-lg-10">
-            <!-- Formulario de registro -->
-            <div class="form-container">
-                <div class="form-header">
-                    <h3>
-                        <i class="fas fa-user-plus"></i>
-                        Registro Manual de Asistencia
-                    </h3>
-                    <p>Registra la asistencia de un participante específico para una actividad</p>
-                </div>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
 
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-
-                <!-- Formulario de selección -->
-                <form id="form-seleccion" method="get">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="actividad" class="form-label">
-                                    <i class="fas fa-calendar-alt"></i>
-                                    Actividad *
-                                </label>
-                                <select class="form-select" id="actividad" name="actividad" required>
-                                    <option value="">Selecciona una actividad</option>
-                                    {% for actividad in actividades %}
-                                        <option value="{{ actividad.id_actividad }}"
-                                                {% if request.GET.actividad == actividad.id_actividad|stringformat:"s" %}selected{% endif %}>
-                                            {{ actividad.nombre }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="fecha" class="form-label">
-                                    <i class="fas fa-calendar"></i>
-                                    Fecha de Asistencia *
-                                </label>
-                                <input type="date" class="form-control" id="fecha" name="fecha" 
-                                       value="{{ request.GET.fecha|default:fecha_actual }}" required>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="text-center">
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-search"></i>
-                            Cargar Participantes
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            <!-- Lista de participantes -->
-            {% if request.GET.actividad %}
-                <div class="form-container">
-                    <div class="form-header">
-                        <h4>
-                            <i class="fas fa-users"></i>
-                            Participantes de la Actividad
-                        </h4>
-                        <p>Selecciona el estado de asistencia para cada participante</p>
-                    </div>
-
-                    <!-- Loading spinner -->
-                    <div id="loading" class="loading-spinner">
-                        <div class="spinner-border text-primary" role="status">
-                            <span class="visually-hidden">Cargando participantes...</span>
-                        </div>
-                        <p class="mt-2">Cargando participantes...</p>
-                    </div>
-
-                    <!-- Contenedor de participantes -->
-                    <div id="participantes-container" class="participantes-container" style="display: none;">
-                        <!-- Los participantes se cargarán aquí via JavaScript -->
-                    </div>
-
-                    <!-- Formulario de registro -->
-                    <form id="form-registro" method="post" style="display: none;">
-                        {% csrf_token %}
-                        <input type="hidden" name="actividad_id" value="{{ request.GET.actividad }}">
-                        <input type="hidden" name="fecha" value="{{ request.GET.fecha|default:fecha_actual }}">
-                        <div id="registros-container">
-                            <!-- Los registros se generarán aquí -->
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="observaciones" class="form-label">
-                                <i class="fas fa-comment"></i>
-                                Observaciones (opcional)
-                            </label>
-                            <textarea class="form-control" id="observaciones" name="observaciones" 
-                                      rows="3" placeholder="Agrega cualquier observación relevante..."></textarea>
-                        </div>
-
-                        <div class="text-center">
-                            <button type="submit" class="btn btn-success btn-lg">
-                                <i class="fas fa-save"></i>
-                                Registrar Asistencias Seleccionadas
-                            </button>
-                            <a href="{% url 'analytics_reports:gestion_asistencia' %}" class="btn btn-secondary btn-lg">
-                                <i class="fas fa-arrow-left"></i>
-                                Volver
-                            </a>
-                        </div>
-                    </form>
-                </div>
-            {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label>Actividad:</label>
+            <select name="actividad_id" class="form-select" required>
+                <option value="">Selecciona una actividad</option>
+                {% for actividad in actividades %}
+                    <option value="{{ actividad.id_actividad }}">{{ actividad.nombre }}</option>
+                {% endfor %}
+            </select>
         </div>
+
+        <div class="mb-3">
+            <label>Fecha: {{ fecha_hoy }}</label>
+            <input type="hidden" name="fecha" value="{{ fecha_hoy }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Cédulas (una por línea):</label>
+            <textarea name="cedulas" class="form-control" rows="10" required 
+                      placeholder="1234567890&#10;0987654321"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrar Asistencias</button>
+    </form>
+
+    {% if resultados %}
+    <div class="mt-4">
+        <div class="alert alert-success">Registrados: {{ resultados.exitosos }}</div>
+        {% if resultados.errores %}
+        <div class="alert alert-warning">
+            <strong>Errores:</strong>
+            <ul>
+                {% for error in resultados.errores %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
     </div>
+    {% endif %}
 </div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const actividadSelect = document.getElementById('actividad');
-    const loadingDiv = document.getElementById('loading');
-    const participantesContainer = document.getElementById('participantes-container');
-    const formRegistro = document.getElementById('form-registro');
-    const registrosContainer = document.getElementById('registros-container');
-
-    // Cargar participantes cuando se selecciona una actividad
-    if (actividadSelect.value) {
-        cargarParticipantes();
-    }
-
-    function cargarParticipantes() {
-        const actividadId = actividadSelect.value;
-        if (!actividadId) return;
-
-        loadingDiv.style.display = 'block';
-        participantesContainer.style.display = 'none';
-        formRegistro.style.display = 'none';
-
-        fetch(`/analytics/api/participantes-actividad/?actividad_id=${actividadId}`)
-            .then(response => response.json())
-            .then(data => {
-                loadingDiv.style.display = 'none';
-                
-                if (data.error) {
-                    mostrarError(data.error);
-                    return;
-                }
-
-                if (data.participantes && data.participantes.length > 0) {
-                    mostrarParticipantes(data.participantes);
-                } else {
-                    mostrarSinParticipantes();
-                }
-            })
-            .catch(error => {
-                loadingDiv.style.display = 'none';
-                mostrarError('Error al cargar participantes: ' + error.message);
-            });
-    }
-
-    function mostrarParticipantes(participantes) {
-        let html = '';
-        participantes.forEach(participante => {
-            const iniciales = participante.nombre.split(' ').map(n => n[0]).join('').substring(0, 2);
-            html += `
-                <div class="participante-item">
-                    <div class="participante-info">
-                        <div class="participante-avatar">${iniciales}</div>
-                        <div class="participante-details">
-                            <h6>${participante.nombre}</h6>
-                            <small>${participante.programa} - Semestre ${participante.semestre}</small>
-                            <small class="text-muted">${participante.correo}</small>
-                        </div>
-                    </div>
-                    <div>
-                        <select class="form-select estado-selector" 
-                                data-participacion-id="${participante.participacion_id}"
-                                onchange="actualizarRegistro(this)">
-                            <option value="">Sin registrar</option>
-                            {% for estado in estados_asistencia %}
-                                <option value="{{ estado.id_estado_asistencia }}">{{ estado.nombre }}</option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
-            `;
-        });
-
-        participantesContainer.innerHTML = html;
-        participantesContainer.style.display = 'block';
-        formRegistro.style.display = 'block';
-    }
-
-    function mostrarSinParticipantes() {
-        participantesContainer.innerHTML = `
-            <div class="no-participantes">
-                <i class="fas fa-users-slash fa-3x text-muted mb-3"></i>
-                <h5>No hay participantes</h5>
-                <p>Esta actividad no tiene participantes registrados.</p>
-            </div>
-        `;
-        participantesContainer.style.display = 'block';
-    }
-
-    function mostrarError(mensaje) {
-        participantesContainer.innerHTML = `
-            <div class="alert alert-danger">
-                <i class="fas fa-exclamation-triangle"></i>
-                ${mensaje}
-            </div>
-        `;
-        participantesContainer.style.display = 'block';
-    }
-
-    // Función global para actualizar registros
-    window.actualizarRegistro = function(selectElement) {
-        const participacionId = selectElement.dataset.participacionId;
-        const estadoId = selectElement.value;
-        
-        // Remover registro existente si existe
-        const existingInput = document.querySelector(`input[value*="${participacionId}:"]`);
-        if (existingInput) {
-            existingInput.remove();
-        }
-        
-        // Agregar nuevo registro si hay estado seleccionado
-        if (estadoId) {
-            const input = document.createElement('input');
-            input.type = 'hidden';
-            input.name = 'registros[]';
-            input.value = `${participacionId}:${estadoId}`;
-            registrosContainer.appendChild(input);
-        }
-        
-        // Actualizar botón de envío
-        actualizarBotonEnvio();
-    };
-
-    function actualizarBotonEnvio() {
-        const registros = registrosContainer.querySelectorAll('input[name="registros[]"]');
-        const submitBtn = document.querySelector('button[type="submit"]');
-        
-        if (registros.length > 0) {
-            submitBtn.innerHTML = `
-                <i class="fas fa-save"></i>
-                Registrar ${registros.length} Asistencia${registros.length > 1 ? 's' : ''}
-            `;
-            submitBtn.disabled = false;
-        } else {
-            submitBtn.innerHTML = `
-                <i class="fas fa-save"></i>
-                Selecciona al menos un participante
-            `;
-            submitBtn.disabled = true;
-        }
-    }
-
-    // Validación del formulario
-    document.getElementById('form-registro').addEventListener('submit', function(e) {
-        const registros = registrosContainer.querySelectorAll('input[name="registros[]"]');
-        
-        if (registros.length === 0) {
-            e.preventDefault();
-            alert('Debe seleccionar al menos un participante para registrar su asistencia.');
-            return false;
-        }
-        
-        // Confirmación
-        if (!confirm(`¿Está seguro de registrar la asistencia de ${registros.length} participante${registros.length > 1 ? 's' : ''}?`)) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    // Inicializar botón de envío
-    actualizarBotonEnvio();
-});
-
-// Función para marcar todos como presente/ausente
-function marcarTodos(estado) {
-    const selects = document.querySelectorAll('.estado-selector');
-    selects.forEach(select => {
-        select.value = estado;
-        actualizarRegistro(select);
-    });
-}
-</script>
 {% endblock %}
