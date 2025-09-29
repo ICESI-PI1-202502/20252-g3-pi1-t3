@@ -56,13 +56,6 @@ body {
     border-radius: 5px;
 }
  
-
-
-
-
-
-
-
 /* campana en navbar */
 .navbar-option img {
   height: 28px;        /* ajusta tamaño */
@@ -200,7 +193,7 @@ ul li a:hover {
 .judo, .ajedrez, .natacin, .arquero-de-ftbol, .image-34-icon, .hola-pablo-bienvenido,
 .modulo-1-rf3-14-item, .bienestar-universitario, .menu-icon, .pp-wrapper, .pp,
 .modulo-1-rf3-14-inner, .calendar, .row, .header-cell, .cell, .inner, .cell28,
-.modulo-1-rf3-14-child, .image-32-icon, .home-bariphone-15pro, .home-bariphone-15pro-child {
+.modulo-1-rf3-14-child, .image-32-icon{
     display: none;
 }
 
