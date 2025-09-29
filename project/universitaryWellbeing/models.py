@@ -390,6 +390,7 @@ class Participantes(models.Model):
     programa = models.CharField(max_length=120, blank=True, null=True)
     genero = models.CharField(max_length=20, blank=True, null=True)
     user = models.ForeignKey(User, db_column='user', to_field='id', on_delete=models.CASCADE)
+    
     class Meta:
         managed = False
         db_table = 'participantes'
@@ -422,12 +423,14 @@ class Preferencias(models.Model):
 class PreferenciasActividades(models.Model):
 
     id_preferencia_actividad = models.BigAutoField(primary_key=True)
-    preferencias_id_preferencia = models.ForeignKey(Preferencias, models.DO_NOTHING, db_column='preferencias_id_preferencia')
-    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')
+    # Una preferencia (de un usuario) puede tener muchos tipos de actividad
+    preferencia = models.ForeignKey(Preferencias, models.DO_NOTHING, db_column='preferencias_id_preferencia')
+    # Un tipo de actividad puede estar en muchas preferencias
+    tipo_actividad = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_id_actividad')
     class Meta:
-        managed = False
+        managed = False  # Mantén esto si estás usando una base existente
         db_table = 'preferencias_actividades'
-        unique_together = (('preferencias_id_preferencia', 'actividades_id_actividad'),)
+        unique_together = (('preferencia', 'tipo_actividad'),)
 
 class ProyectosSociales(models.Model):
 
@@ -447,6 +450,14 @@ class Roles(models.Model):
     id_rol = models.BigAutoField(primary_key=True)
     nombre_rol = models.CharField(max_length=50)
     grupo_d = models.OneToOneField(Group, on_delete=models.DO_NOTHING, db_column='group_id', null=True, blank=True)
+
+    def save(self, *args, **kwargs):
+    # Si no tiene grupo asociado, crear uno nuevo con el mismo nombre que el rol
+        if not self.group:
+            group, created = Group.objects.get_or_create(name=self.nombre_rol)
+            self.group = group
+        super().save(*args, **kwargs)
+
     class Meta:
         managed = False
         db_table = 'roles'

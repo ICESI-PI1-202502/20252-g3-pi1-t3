@@ -1,15 +1,13 @@
 from datetime import date
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from django.contrib.auth.views import LoginView
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles
 from .forms import UserLoginForm, UserRegisterForm
 
@@ -18,8 +16,24 @@ def user_login(request):
         form = UserLoginForm(request.POST)
         if form.is_valid():
             login(request, form.user)
+            
+            # Obtener el participante relacionado con el usuario
+            try:
+                participante = Participantes.objects.get(user=form.user)
+            except Participantes.DoesNotExist:
+                participante = None
+            
+            # Si el participante no tiene preferencias, redirigir a la función 'preferencias'
+            if participante:
+                tiene_preferencias = Preferencias.objects.filter(participantes_id_participante=participante).exists()
+                if not tiene_preferencias:
+                    return redirect("preferences")  # Asume que tienes una URL con el nombre 'preferencias'
+            
+            # Si es admin, redirigir al admin
             if is_role_admin(form.user):
                 return redirect("admin:index")
+            
+            # Si tiene preferencias o no es admin, ir a home
             return redirect("home")
         else:
             for error in form.errors.values():
@@ -28,6 +42,10 @@ def user_login(request):
     else:
         form = UserLoginForm()
     return render(request, "login.html", {'form': form})
+
+def is_role_admin(user):
+    return user.groups.filter(name="admin").exists() or user.is_superuser
+
 
 def register(request):
     if request.method == "POST":
@@ -54,6 +72,7 @@ def register(request):
             rol = Roles.objects.get(nombre_rol='Estudiante')
             Participantes.objects.create(
                 user=user,
+                id_participante=cedula,
                 nombre=first_name,
                 apellido=last_name,
                 correo=email,
@@ -78,6 +97,8 @@ def register(request):
         form = UserRegisterForm()
 
     return render(request, "auth/register.html", {'form': form})
+
+
 #class AdminLoginView(LoginView):
     template_name = 'login.html'
 
@@ -99,39 +120,37 @@ def user_logout(request):
     messages.success(request, "Sesión cerrada correctamente")
     return redirect("login")
 
-def is_role_admin(user):
-    return user.groups.filter(name="admin").exists() or user.is_superuser
 
-#EXPERIMENTAL-
-#@login_required 
+@login_required 
 def preferences(request):
-    categorias = TiposActividad.objects.all()  # todas las categorías disponibles
+    participante = Participantes.objects.get(user=request.user)
+    # Verificar si ya existen preferencias
+    if hasattr(participante, 'preferencias'):
+        return redirect('home')  # Ya las completó
+
+    categorias = TiposActividad.objects.all()
 
     if request.method == 'POST':
-        seleccionadas = request.POST.getlist('categories')  # IDs de categorías elegidas
+        seleccionadas = request.POST.getlist('categories')
 
-        # Crear o recuperar la preferencia del usuario
-        pref, created = Preferencias.objects.get_or_create(
-            participantes_id_participante=request.user.participantes,  # ajusta según tu modelo
-            defaults={'fecha_registro': date.today()}
+        # Crear la preferencia solo si no existe
+        pref = Preferencias.objects.create(
+            participantes_id_participante=participante,
+            fecha_registro=date.today()
         )
 
-        # Borrar preferencias antiguas
-        PreferenciasActividades.objects.filter(preferencias_id_preferencia=pref).delete()
-
-        # Guardar nuevas
         for cat_id in seleccionadas:
             PreferenciasActividades.objects.create(
-                preferencias_id_preferencia=pref,
-                actividades_id_actividad=TiposActividad.objects.get(pk=cat_id)
-            )
+                preferencia=pref,
+                tipo_actividad=TiposActividad.objects.get(pk=cat_id)
+        )
 
-        # En lugar de mandar a "recommendations", vamos al home del usuario
-        return redirect('home_user')
+
+        return redirect('home')
 
     return render(request, 'list_preferences.html', {'categorias': categorias})
 
-
+@login_required
 def home_user(request):
     data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
     return render(request, 'home_user.html', {'actividades': data})
@@ -169,10 +188,7 @@ def home_user(request):
 def home_admin(request):
     return render(request, "home_admin.html")
 
-def home(request):
-  return render(request, 'home.html')
-
-
+@login_required
 def profile(request):
     participante = request.user.participante  # acceso directo al modelo relacionado
 

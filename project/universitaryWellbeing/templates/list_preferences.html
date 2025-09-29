@@ -20,17 +20,21 @@
 		Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
 	</p>
 
-	<!-- Formulario de selección de categorías -->
-	{% for category in categorias %}
-	<label class="category-item">
-		<input type="checkbox" name="categories" value="{{ category.id_tipo }}">
-		{{ category.nombre_tipo }}
-	</label>
-	{% endfor %}
+	<!-- FORMULARIO BIEN ABIERTO -->
+    <form method="post">
+        {% csrf_token %}
+        
+        <!-- Formulario de selección de categorías -->
+        {% for category in categorias %}
+        <label class="category-item">
+            <input type="checkbox" name="categories" value="{{ category.id_tipo }}">
+            {{ category.nombre_tipo }}
+        </label>
+        {% endfor %}
 
-	<!-- Botón para enviar el formulario -->
-	<button class="greenBotton_White">Continuar</button>
-	</form>
+        <!-- Botón para enviar el formulario -->
+        <button type="submit" class="greenBotton_White">Continuar</button>
+    </form>
 
 	<!-- Línea de separación -->
 	<div class="line-div"></div>
