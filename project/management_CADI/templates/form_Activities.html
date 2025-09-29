@@ -1,49 +1,120 @@
 {% extends "form_base.html" %}
 {% load static %}
 
-{% block title %}Crear Actividad{% endblock %}
-{% block form_title %}Añadir nueva actividad{% endblock %}
+{% block title %}{% if modo == 'edit' %}Editar actividad{% else %}Crear actividad{% endif %}{% endblock %}
+{% block form_title %}{% if modo == 'edit' %}Editar actividad{% else %}Añadir nueva actividad{% endif %}{% endblock %}
 
 {% block form_fields %}
+
+{% if error %}
+  <div class="alert alert-danger text-center">{{ error }}</div>
+{% endif %}
 
 <div class="row text-center mb-4">
   <div class="col-md-6">
     <h6>Nombre de actividad</h6>
-    <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
+    <input type="text" name="nombre" class="form-control text-center" maxlength="150" required
+           value="{{ draft.nombre|default:'' }}">
   </div>
 
   <div class="col-md-6">
     <h6>Espacio</h6>
-    <textarea name="espacio" class="form-control text-center" rows="1" maxlength="50" required></textarea>
+    <input name="espacio" class="form-control text-center" maxlength="150" required
+           value="{{ draft.espacio|default:'' }}">
   </div>
 </div>
 
 <div class="row text-center mb-4">
-
   <div class="col-md-6">
     <h6>Tipo de Actividad</h6>
     <select name="tipo" class="form-control text-center" required>
-      <option value="" disabled selected>Seleccione un tipo</option>
+      <option value="" disabled {% if not draft.tipo_id %}selected{% endif %}>Seleccione un tipo</option>
       {% for t in tipos %}
-      <option value="{{ t.id_tipo }}">{{ t.nombre_tipo }}</option>
+        <option value="{{ t.id_tipo }}" {% if draft.tipo_id == t.id_tipo|stringformat:"s" %}selected{% endif %}>
+          {{ t.nombre_tipo }}
+        </option>
       {% endfor %}
     </select>
   </div>
 
   <div class="col-md-6">
-    <h6>Horario</h6>
-    <textarea name="horario" class="form-control text-center" rows="3" maxlength="50" required></textarea>
-
+    <h6>Aforo (opcional)</h6>
+    <input type="number" min="1" name="aforo" class="form-control text-center"
+           value="{{ draft.aforo|default:'' }}">
   </div>
 </div>
 
-<br>
-<div class="row text-center">
+<div class="row text-center mb-4">
   <div class="col-md-12">
-    <a href="{% url 'management_cadi:form_Activities-2' %}" target="_blank" class="yellowBotton_Black">
-      Agregar horario
-    </a>
+    <h6>Descripción (opcional)</h6>
+    <textarea name="descripcion" class="form-control text-center" rows="3" maxlength="500">{{ draft.descripcion|default:'' }}</textarea>
   </div>
 </div>
 
+<div class="row text-center mb-4">
+  <div class="col-md-6">
+    <h6>¿Requiere inscripción?</h6>
+    <select name="requiere_inscripcion"
+            id="requiere_inscripcion"
+            class="form-control text-center"
+            required
+            onchange="document.getElementById('bloque_fechas').style.display = (this.value==='si' ? 'block' : 'none')">
+      <option value="" disabled {% if not draft.requiere %}selected{% endif %}>Seleccione</option>
+      <option value="si" {% if draft.requiere == 'si' %}selected{% endif %}>Sí</option>
+      <option value="no" {% if draft.requiere == 'no' %}selected{% endif %}>No</option>
+    </select>
+  </div>
+
+  <div class="col-md-6" id="bloque_fechas" style="display:none;">
+    <div class="row">
+      <div class="col-md-6">
+        <h6>Apertura inscripción</h6>
+        <input type="date" name="fecha_apertura_ins" class="form-control text-center"
+        value="{{ draft.fecha_apertura_ins|date:'Y-m-d'|default:'' }}">
+      </div>
+      <div class="col-md-6">
+        <h6>Cierre inscripción</h6>
+        <input type="date" name="fecha_cierre_ins" class="form-control text-center"
+        value="{{ draft.fecha_cierre_ins|date:'Y-m-d'|default:'' }}">
+      </div>
+    </div>
+  </div>
+</div>
+
+{% if sched %}
+  <div class="alert alert-info mt-3">
+    <strong>Horario guardado:</strong>
+    Profesor: {{ sched.profesor|default:"—" }},
+    {{ sched.hora_inicio|default:"—" }} - {{ sched.hora_fin|default:"—" }},
+    Días: {% if sched.dias %}{{ sched.dias|join:", " }}{% else %}—{% endif %}
+  </div>
+{% endif %}
+
+
+
+<script>
+  (function(){
+    var sel = document.getElementById('requiere_inscripcion');
+    var bloque = document.getElementById('bloque_fechas');
+    if (sel && bloque){
+      bloque.style.display = (sel.value === 'si') ? 'block' : 'none';
+    }
+  })();
+</script>
 {% endblock %}
+
+{% block form_button %}
+<div class="row text-center">
+  <div class="col-md-12 mb-3">
+    <button type="submit" name="action" value="schedule" class="yellowBotton_Black" formnovalidate>
+      {% if modo == 'edit' %}Editar horario{% else %}Agregar horario{% endif %}
+    </button>
+  </div>
+  <div class="col-md-12">
+    <button type="submit" name="action" value="confirm" class="greenBotton_White">
+      {% if modo == 'edit' %}Actualizar{% else %}Crear actividad{% endif %}
+    </button>
+  </div>
+</div>
+{% endblock %}
+
