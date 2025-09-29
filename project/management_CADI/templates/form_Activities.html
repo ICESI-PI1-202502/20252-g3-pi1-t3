@@ -1,8 +1,8 @@
 {% extends "form_base.html" %}
 {% load static %}
 
-{% block title %}Crear Actividad{% endblock %}
-{% block form_title %}Añadir nueva actividad{% endblock %}
+{% block title %}{% if modo == 'edit' %}Editar actividad{% else %}Crear actividad{% endif %}{% endblock %}
+{% block form_title %}{% if modo == 'edit' %}Editar actividad{% else %}Añadir nueva actividad{% endif %}{% endblock %}
 
 {% block form_fields %}
 
@@ -106,14 +106,13 @@
 {% block form_button %}
 <div class="row text-center">
   <div class="col-md-12 mb-3">
-    <!-- NO envía validación del form base -->
     <button type="submit" name="action" value="schedule" class="yellowBotton_Black" formnovalidate>
-      Agregar / Editar horario
+      {% if modo == 'edit' %}Editar horario{% else %}Agregar horario{% endif %}
     </button>
   </div>
   <div class="col-md-12">
     <button type="submit" name="action" value="confirm" class="greenBotton_White">
-      Confirmar
+      {% if modo == 'edit' %}Actualizar{% else %}Crear actividad{% endif %}
     </button>
   </div>
 </div>
