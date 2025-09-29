@@ -18,7 +18,7 @@ class Actividades(models.Model):
     fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
     tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
     id_tipo = models.BigIntegerField(blank=True, null=True)
-    actividades_grupos_id_actividad_grupo = models.ForeignKey('ActividadesGrupos', models.DO_NOTHING, db_column='actividades_grupos_id_actividad_grupo', blank=True, null=True)
+    actividades_grupos_id_actividad_grupo = models.ForeignKey('ActividadesGrupos', models.DO_NOTHING, db_column='act_grup_id', blank=True, null=True)
     class Meta:
         managed = False
         db_table = 'actividades'

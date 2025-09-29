@@ -8,7 +8,7 @@ from django.core.validators import validate_email
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.shortcuts import redirect, render
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
 from .forms import UserLoginForm, UserRegisterForm
 
 def user_login(request):
@@ -152,9 +152,48 @@ def preferences(request):
 
 @login_required
 def home_user(request):
-    data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
-    return render(request, 'home_user.html', {'actividades': data})
+    user = request.user
+    actividades = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
+    actividades_recomendadas = get_recommendations_for_user(user)
+    horario = get_user_schedule(user)
+    calendario = get_user_calendar(user)
 
+    context = {
+        "actividades_recomendadas": actividades_recomendadas,
+        "horario": horario,
+        "calendario": calendario,
+        "actividades": actividades,
+    }
+
+    return render(request, "home_user.html", context)
+
+def get_recommendations_for_user(user):
+    try:
+        participante = Participantes.objects.get(user=user)
+        preferencias = Preferencias.objects.get(participantes_id_participante=participante)
+        tipos_preferidos = PreferenciasActividades.objects.filter(
+            preferencia=preferencias
+        ).values_list('tipo_actividad', flat=True)
+
+        return Actividades.objects.filter(tipos_actividad_id_tipo__in=tipos_preferidos)
+    except (Participantes.DoesNotExist, Preferencias.DoesNotExist):
+        return []
+    
+def get_user_schedule(user):
+    try:
+        participante = Participantes.objects.get(user=user)
+        return HorariosParticipante.objects.filter(participantes_id_participante=participante)
+    except Participantes.DoesNotExist:
+        return []
+    
+def get_user_calendar(user):
+    try:
+        participante = Participantes.objects.get(user=user)
+        return Citas.objects.filter(participantes_id_participante=participante)
+    except Participantes.DoesNotExist:
+        return []
+
+          
 #def home_user(request):
     data = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
     user_email = request.user.email
@@ -190,11 +229,16 @@ def home_admin(request):
 
 @login_required
 def profile(request):
-    participante = request.user.participante  # acceso directo al modelo relacionado
+    participante = Participantes.objects.get(user=request.user)
+    try:
+        preferencia = Preferencias.objects.get(participantes_id_participante=participante)
+        actividades = preferencia.preferenciasactividades_set.all()
+    except Participantes.DoesNotExist:
+        actividades = None
 
     context = {
-        "user": request.user,
         "participante": participante,
+        "actividades": actividades,
     }
-    return render(request, "auth/profile.html", context)
+    return render(request, "profile.html", context)
 
