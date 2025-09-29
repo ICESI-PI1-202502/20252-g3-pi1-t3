@@ -10,26 +10,31 @@ from django.utils.text import slugify
 import os
 
 class Actividades(models.Model):
-    id_actividad = models.FloatField(primary_key=True)
+    id_actividad = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     lugar = models.CharField(max_length=150, blank=True, null=True)
-    fecha_inicio = models.DateField(blank=True, null=True)
-    fecha_fin = models.DateField(blank=True, null=True)
+
+    # ⬇⬇ cambiar a DateTimeField (coincide con "timestamp without time zone")
+    fecha_inicio = models.DateTimeField(blank=True, null=True)
+    fecha_fin = models.DateTimeField(blank=True, null=True)
+
     requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
     modalidad = models.CharField(max_length=1, blank=True, null=True)
     aforo = models.FloatField(blank=True, null=True)
-    fecha_apertura_ins = models.DateField(blank=True, null=True)
-    fecha_cierre_ins = models.DateField(blank=True, null=True)
+
+    # opcionalmente también (tu DB los tiene como timestamp)
+    fecha_apertura_ins = models.DateTimeField(blank=True, null=True)
+    fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
+
     tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
     id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
-        db_column='ACT_GRUP_ID',   # <- antes: actividades_grupos_id_actividad_grupo (oracle no acepta nombres con más de 30 caracteres)
+        db_column='act_grup_id',
         blank=True, null=True
     )
-
     profesor = models.CharField(max_length=150, blank=True, null=True)
     dias_semana = models.CharField(max_length=150, blank=True, null=True)
 
@@ -37,17 +42,18 @@ class Actividades(models.Model):
         managed = False
         db_table = 'actividades'
 
+
 class ActividadesGrupos(models.Model):
-    id_actividad_grupo = models.IntegerField(primary_key=True)
+    id_actividad_grupo = models.BigAutoField(primary_key=True)
     grupos_actividad = models.ForeignKey(
         'GruposActividad',
         models.DO_NOTHING,
-        db_column='GRP_ACT_ID'     # <- antes: grupos_actividad_id_grupo_actividad
+        db_column='grp_act_id'     # <- antes: grupos_actividad_id_grupo_actividad
     )
     actividad = models.ForeignKey(
         'Actividades',
         models.DO_NOTHING,
-        db_column='ACTIVIDADES_ID_ACTIVIDAD'
+        db_column='actividades_id_actividad'
     )
 
     class Meta:
@@ -323,8 +329,8 @@ class FkProysocCoordinador(models.Model):
 
 
 class Grupos(models.Model):
-    id_grupo = models.FloatField(primary_key=True)
-    nombre = models.CharField(max_length=100)
+    id_grupo = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=255, unique=True)
 
     class Meta:
         managed = False
@@ -345,14 +351,19 @@ def actividad_upload_to(instance, filename):
     return os.path.join(str(grupo_id), actividad_slug, filename)
 
 class GruposActividad(models.Model):
-    id_grupo_actividad = models.FloatField(primary_key=True)
-    grupos_id_grupo = models.ForeignKey(Grupos, models.DO_NOTHING, db_column='grupos_id_grupo')
+    # 👇 coincide con bigint identity en Postgres
+    id_grupo_actividad = models.BigAutoField(
+        db_column='id_grupo_actividad', primary_key=True
+    )
+    grupos_id_grupo = models.ForeignKey(
+        Grupos, models.DO_NOTHING, db_column='grupos_id_grupo'
+    )
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     imagen = models.ImageField(upload_to=actividad_upload_to, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = False            # (seguimos sin migrar esta tabla desde Django)
         db_table = 'grupos_actividad'
 
 

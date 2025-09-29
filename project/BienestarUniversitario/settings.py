@@ -77,13 +77,18 @@ WSGI_APPLICATION = 'BienestarUniversitario.wsgi.application'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.oracle",
-        "NAME": "200.3.193.24:1522/ESTUD",
-        "USER": "P09778_3_6",
-        "PASSWORD": "9c1CsJ43",
-    }
+   'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'postgres',
+        'USER': 'postgres',
+        'PASSWORD': 'h9TZan8icTf3hjsn',
+        'HOST': 'db.xlknciyujekwbhysmamn.supabase.co',
+        'PORT': '5432',
+        'CONN_MAX_AGE': 60,
+        'OPTIONS': {'sslmode': 'require'},
+   }
 }
+
 
 
 #AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"

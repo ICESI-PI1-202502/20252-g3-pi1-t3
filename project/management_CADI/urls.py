@@ -17,8 +17,17 @@ urlpatterns = [
     name="crear_actividad"),
 
     path(
-    "cadi-home/<slug:grupo_nombre>/<int:grupo_id>/grupo-actividad/<int:grupo_actividad_id>/añadir-horario/",
-    views.schedule_draft,
-    name="schedule_draft",
+        "cadi-home/<slug:grupo_nombre>/<int:grupo_id>/grupo-actividad/<int:grupo_actividad_id>/añadir-horario/",
+        views.schedule_draft,
+        name="schedule_draft",
+    ),
+
+    path("cadi-home/<slug:grupo_nombre>/<int:grupo_id>/grupo-actividad/<int:grupo_actividad_id>/actividad/<int:actividad_id>/editar/",
+         views.editar_actividad, name="editar_actividad"),
+
+    path(
+        "cadi-home/<slug:grupo_nombre>/<int:grupo_id>/grupo-actividad/<int:grupo_actividad_id>/actividad/<int:actividad_id>/añadir-horario/",
+        views.schedule_draft,
+        name="schedule_draft_edit",
     ),
 ]

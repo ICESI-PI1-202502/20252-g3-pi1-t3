@@ -70,25 +70,27 @@
       <div class="col-md-6">
         <h6>Apertura inscripción</h6>
         <input type="date" name="fecha_apertura_ins" class="form-control text-center"
-               value="{{ draft.fecha_apertura_ins|default:'' }}">
+        value="{{ draft.fecha_apertura_ins|date:'Y-m-d'|default:'' }}">
       </div>
       <div class="col-md-6">
         <h6>Cierre inscripción</h6>
         <input type="date" name="fecha_cierre_ins" class="form-control text-center"
-               value="{{ draft.fecha_cierre_ins|default:'' }}">
+        value="{{ draft.fecha_cierre_ins|date:'Y-m-d'|default:'' }}">
       </div>
     </div>
   </div>
 </div>
 
-{% if sched.profesor or sched.dias or sched.hora_inicio or sched.hora_fin %}
-  <div class="alert alert-info text-center">
+{% if sched %}
+  <div class="alert alert-info mt-3">
     <strong>Horario guardado:</strong>
     Profesor: {{ sched.profesor|default:"—" }},
     {{ sched.hora_inicio|default:"—" }} - {{ sched.hora_fin|default:"—" }},
-    Días: {{ sched.dias|join:", "|default:"—" }}
+    Días: {% if sched.dias %}{{ sched.dias|join:", " }}{% else %}—{% endif %}
   </div>
 {% endif %}
+
+
 
 <script>
   (function(){
@@ -103,15 +105,17 @@
 
 {% block form_button %}
 <div class="row text-center">
-  <div class="col-md-6 mb-2">
-    <button type="submit" name="action" value="schedule" class="yellowBotton_Black">
-      Agregar/Editar horario
+  <div class="col-md-12 mb-3">
+    <!-- NO envía validación del form base -->
+    <button type="submit" name="action" value="schedule" class="yellowBotton_Black" formnovalidate>
+      Agregar / Editar horario
     </button>
   </div>
-  <div class="col-md-6">
+  <div class="col-md-12">
     <button type="submit" name="action" value="confirm" class="greenBotton_White">
       Confirmar
     </button>
   </div>
 </div>
 {% endblock %}
+
