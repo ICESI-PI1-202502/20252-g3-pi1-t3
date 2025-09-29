@@ -5,96 +5,78 @@
 {% block form_title %}Añadir horario{% endblock %}
 
 {% block form_fields %}
+<div class="row text-center mb-4">
+  <div class="col-md-6">
+    <h6>Nombre del profesor a cargo de la actividad</h6>
+    <input type="text" name="profesor" class="form-control text-center" maxlength="50"
+           value="{{ draft.profesor|default:'' }}" required>
+  </div>
 
+  <div class="col-md-6">
     <div class="row text-center mb-4">
-        <div class="col-md-6">
-            <h6>Nombre del profesor a cargo de la actividad</h6>
-            <input type="text" name="nombre" class="form-control text-center" maxlength="50" required>
-        </div>
-
-        <div class="col-md-6">
-            <div class="row text-center mb-4">
-                <div class="col-md-6">
-
-                    <h6>Hora de inicio</h6>
-                    <select name="hora_inicio" class="form-control text-center" required>
-                        <option value="" disabled selected>Selecciona hora</option>
-                        {% for hora in horas %}
-                        <option value="{{ hora }}">{{ hora }}</option>
-                        {% endfor %}
-                    </select>
-
-                </div>
-
-                <div class="col-md-6">
-                    <h6>Hora de finalización</h6>
-                    <select name="hora_fin" class="form-control text-center" required>
-                        <option value="" disabled selected>Selecciona hora</option>
-                        {% for hora in horas %}
-                        <option value="{{ hora }}">{{ hora }}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-            </div>
-        </div>
+      <div class="col-md-6">
+        <h6>Hora de inicio</h6>
+        <select name="hora_inicio" class="form-control text-center" required>
+          <option value="" disabled {% if not draft.hora_inicio %}selected{% endif %}>Selecciona hora</option>
+          {% for hora in horas %}
+            <option value="{{ hora }}" {% if draft.hora_inicio == hora %}selected{% endif %}>{{ hora }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-6">
+        <h6>Hora de finalización</h6>
+        <select name="hora_fin" class="form-control text-center" required>
+          <option value="" disabled {% if not draft.hora_fin %}selected{% endif %}>Selecciona hora</option>
+          {% for hora in horas %}
+            <option value="{{ hora }}" {% if draft.hora_fin == hora %}selected{% endif %}>{{ hora }}</option>
+          {% endfor %}
+        </select>
+      </div>
     </div>
+  </div>
+</div>
 
-    <form method="POST">
-    {% csrf_token %}
-    
-    <!-- Tabla de días de la semana 2x3 -->
-     <center><h6>Días de semana</h6></center>
-     
-    <br>
-    <table style="margin:auto; border-collapse: collapse;">
-        <tr>
-            <td style="padding: 5px; text-align: center;">
-                <label class="category-item">
-                    <input type="checkbox" name="dias" value="{{ dias_semana.0 }}"> {{ dias_semana.0 }}
-                </label>
-            </td>
-            <td style="padding: 5px; text-align: center;">
-                <label class="category-item">
-                    <input type="checkbox" name="dias" value="{{ dias_semana.1 }}"> {{ dias_semana.1 }}
-                </label>
-            </td>
-
-            <td style="padding: 5px; text-align: center;">
-                <label class="category-item">
-                    <input type="checkbox" name="dias" value="{{ dias_semana.2 }}"> {{ dias_semana.2 }}
-                </label>
-            </td>
-        </tr>
-        <tr>
-            <td style="padding: 5px; text-align: center;">
-                <label class="category-item">
-                    <input type="checkbox" name="dias" value="{{ dias_semana.3 }}"> {{ dias_semana.3 }}
-                </label>
-            </td>
-
-            <td style="padding: 5px; text-align: center;">
-                <label class="category-item">
-                    <input type="checkbox" name="dias" value="{{ dias_semana.4 }}"> {{ dias_semana.4 }}
-                </label>
-            </td>
-            <td style="padding: 5px; text-align: center;">
-                <label class="category-item">
-                    <input type="checkbox" name="dias" value="{{ dias_semana.5 }}"> {{ dias_semana.5 }}
-                </label>
-            </td>
-        </tr>
-
-        
-        
-    </table>
-</form>
-
+<center><h6>Días de semana</h6></center>
+<br>
+<table style="margin:auto; border-collapse: collapse;">
+  <tr>
+    {% for dia in dias_semana|slice:":3" %}
+      <td style="padding: 5px; text-align: center;">
+        <label class="category-item">
+          <input type="checkbox" name="dias" value="{{ dia }}"
+                 {% if draft.dias and dia in draft.dias %}checked{% endif %}>
+          {{ dia }}
+        </label>
+      </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    {% for dia in dias_semana|slice:"3:6" %}
+      <td style="padding: 5px; text-align: center;">
+        <label class="category-item">
+          <input type="checkbox" name="dias" value="{{ dia }}"
+                 {% if draft.dias and dia in draft.dias %}checked{% endif %}>
+          {{ dia }}
+        </label>
+      </td>
+    {% endfor %}
+  </tr>
+  <tr>
+    <td style="padding: 5px; text-align: center;">
+      <label class="category-item">
+        <input type="checkbox" name="dias" value="{{ dias_semana.6 }}"
+               {% if draft.dias and dias_semana.6 in draft.dias %}checked{% endif %}>
+        {{ dias_semana.6 }}
+      </label>
+    </td>
+  </tr>
+</table>
 {% endblock %}
 
 {% block form_button %}
-    <div class="row text-center">
-        <div class="col-md-12">
-            <button class="yellowBotton_Black">Agregar horario</button>
-        </div>
-    </div>
+<div class="row text-center mt-4">
+  <div class="col-md-12">
+    <button type="submit" class="yellowBotton_Black">Guardar horario y volver</button>
+  </div>
+</div>
 {% endblock %}

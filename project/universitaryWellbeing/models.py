@@ -10,20 +10,32 @@ from django.utils.text import slugify
 import os
 
 class Actividades(models.Model):
-    id_actividad = models.FloatField(primary_key=True)
+    id_actividad = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     lugar = models.CharField(max_length=150, blank=True, null=True)
-    fecha_inicio = models.DateField(blank=True, null=True)
-    fecha_fin = models.DateField(blank=True, null=True)
+
+    
+    fecha_inicio = models.DateTimeField(blank=True, null=True)
+    fecha_fin = models.DateTimeField(blank=True, null=True)
+
     requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
     modalidad = models.CharField(max_length=1, blank=True, null=True)
     aforo = models.FloatField(blank=True, null=True)
-    fecha_apertura_ins = models.DateField(blank=True, null=True)
-    fecha_cierre_ins = models.DateField(blank=True, null=True)
+
+    fecha_apertura_ins = models.DateTimeField(blank=True, null=True)
+    fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
+
     tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
     id_tipo = models.FloatField(blank=True, null=True)
-    actividades_grupos_id_actividad_grupo = models.ForeignKey('ActividadesGrupos', models.DO_NOTHING, db_column='actividades_grupos_id_actividad_grupo', blank=True, null=True)
+    actividades_grupos_id_actividad_grupo = models.ForeignKey(
+        'ActividadesGrupos',
+        models.DO_NOTHING,
+        db_column='act_grup_id',
+        blank=True, null=True
+    )
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    dias_semana = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -31,13 +43,22 @@ class Actividades(models.Model):
 
 
 class ActividadesGrupos(models.Model):
-    id_actividad_grupo = models.FloatField(primary_key=True)
-    grupos_actividad_id_grupo_actividad = models.OneToOneField('GruposActividad', models.DO_NOTHING, db_column='grupos_actividad_id_grupo_actividad')
-    actividades_id_actividad = models.FloatField()
+    id_actividad_grupo = models.BigAutoField(primary_key=True)
+    grupos_actividad = models.ForeignKey(
+        'GruposActividad',
+        models.DO_NOTHING,
+        db_column='grp_act_id'     # <- antes: grupos_actividad_id_grupo_actividad
+    )
+    actividad = models.ForeignKey(
+        'Actividades',
+        models.DO_NOTHING,
+        db_column='actividades_id_actividad'
+    )
 
     class Meta:
         managed = False
         db_table = 'actividades_grupos'
+
 
 
 class AgendaPsicologos(models.Model):
@@ -249,13 +270,15 @@ class Equipos(models.Model):
 
 
 class EquiposParticipantes(models.Model):
-    equipos_id_equipo = models.OneToOneField(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo', primary_key=True)
+    id = models.BigAutoField(primary_key=True) 
+    equipos_id_equipo = models.ForeignKey('Equipos', models.DO_NOTHING, db_column='equipos_id_equipo')
     participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    id_participante1 = models.FloatField()
-
+    id_participante1 = models.BigIntegerField()  
     class Meta:
         managed = False
         db_table = 'equipos_participantes'
+        unique_together = (('equipos_id_equipo', 'participantes_id_participante'),)
+
 
 
 class EstadosAsistencia(models.Model):
@@ -289,8 +312,6 @@ class EstadosParticipacion(models.Model):
 class EstadosTorneo(models.Model):
     id_estado_torneo = models.FloatField(primary_key=True)
     nombre = models.CharField(unique=True, max_length=30)
-    torneos_id_torneo = models.OneToOneField('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
-
     class Meta:
         managed = False
         db_table = 'estados_torneo'
@@ -307,8 +328,8 @@ class FkProysocCoordinador(models.Model):
 
 
 class Grupos(models.Model):
-    id_grupo = models.FloatField(primary_key=True)
-    nombre = models.CharField(max_length=100)
+    id_grupo = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=255, unique=True)
 
     class Meta:
         managed = False
@@ -316,26 +337,32 @@ class Grupos(models.Model):
 
 
 def actividad_upload_to(instance, filename):
-    # id del grupo (ejemplo: 3)
+
     grupo_id = instance.grupos_id_grupo.id_grupo
-    # slug del nombre (ejemplo: futbol)
+
     actividad_slug = slugify(instance.nombre)
-    # extensión original
+
     ext = filename.split('.')[-1]
-    # nombre de archivo fijo
+
     filename = f"{actividad_slug}.{ext}"
+    
     # ruta final: media/<grupo_id>/<actividad_slug>/<actividad_slug>.ext
     return os.path.join(str(grupo_id), actividad_slug, filename)
 
 class GruposActividad(models.Model):
-    id_grupo_actividad = models.FloatField(primary_key=True)
-    grupos_id_grupo = models.ForeignKey(Grupos, models.DO_NOTHING, db_column='grupos_id_grupo')
+    # 👇 coincide con bigint identity en Postgres
+    id_grupo_actividad = models.BigAutoField(
+        db_column='id_grupo_actividad', primary_key=True
+    )
+    grupos_id_grupo = models.ForeignKey(
+        Grupos, models.DO_NOTHING, db_column='grupos_id_grupo'
+    )
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
     imagen = models.ImageField(upload_to=actividad_upload_to, blank=True, null=True)
 
     class Meta:
-        managed = False
+        managed = False            # (seguimos sin migrar esta tabla desde Django)
         db_table = 'grupos_actividad'
 
 
@@ -536,14 +563,15 @@ class TiposNotificacion(models.Model):
 
 
 class Torneos(models.Model):
-    id_torneo = models.FloatField(primary_key=True)
+    id_torneo = models.BigAutoField(db_column="id_torneo", primary_key=True) 
     nombre = models.CharField(max_length=150)
     disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina')
-    fecha_inicio = models.DateField()
-    fecha_fin = models.DateField()
-    estados_torneo_id_estado_torneo = models.OneToOneField(EstadosTorneo, models.DO_NOTHING, db_column='estados_torneo_id_estado_torneo')
+    fecha_inicio = models.DateTimeField()
+    fecha_fin    = models.DateTimeField()
+    estados_torneo_id_estado_torneo = models.ForeignKey(EstadosTorneo,models.DO_NOTHING,db_column='estados_torneo_id_estado_torneo'
+)
     reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
-    aforo_equipos = models.FloatField(blank=True, null=True)
+    aforo_equipos = models.BigIntegerField(null=True, blank=True)
 
     class Meta:
         managed = False
@@ -551,10 +579,11 @@ class Torneos(models.Model):
 
 
 class TorneosEquipos(models.Model):
-    pk = models.CompositePrimaryKey('torneos_id_torneo', 'equipos_id_equipo')
-    torneos_id_torneo = models.ForeignKey(Torneos, models.DO_NOTHING, db_column='torneos_id_torneo')
-    equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
+    id = models.BigAutoField(primary_key=True)  # NEW surrogate PK
+    torneos_id_torneo = models.ForeignKey('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
+    equipos_id_equipo = models.ForeignKey('Equipos', models.DO_NOTHING, db_column='equipos_id_equipo')
 
     class Meta:
         managed = False
         db_table = 'torneos_equipos'
+        unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)

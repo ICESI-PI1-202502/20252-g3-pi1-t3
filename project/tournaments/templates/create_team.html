@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Crear equipo para {{ tournament.nombre }}</h2>
+
+<form method="post">
+  {% csrf_token %}
+
+  <label>Nombre del equipo</label>
+  <input name="nombre_equipo" required>
+
+  <label>ID responsable (participante)</label>
+  <input name="responsable_id" required>
+
+  <label>Disciplina (opcional)</label>
+  <select name="disciplina_id">
+    <option value="">—</option>
+    {% for d in disciplinas %}
+      <option value="{{ d.id_disciplina }}" {% if d.id_disciplina == tournament.disciplinas_id_disciplina_id %}selected{% endif %}>
+        {{ d.nombre }}
+      </option>
+    {% endfor %}
+  </select>
+
+  <div style="display:flex; gap:12px">
+    <div>
+      <label>Capacidad mínima</label>
+      <input name="capacidad_min" type="number" min="0">
+    </div>
+    <div>
+      <label>Capacidad máxima</label>
+      <input name="capacidad_max" type="number" min="0">
+    </div>
+  </div>
+
+  <label>Fecha creación</label>
+  <input name="fecha_creacion" type="date" value="{{ today }}">
+
+  <button class="btn">Crear equipo</button>
+</form>
+{% endblock %}
