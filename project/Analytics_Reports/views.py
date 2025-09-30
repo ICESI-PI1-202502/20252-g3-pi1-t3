@@ -15,6 +15,10 @@ from universitaryWellbeing.models import (
     Participantes, TiposActividad, Roles, Citas, ProyectosSociales, Equipos
 )
 
+from django.contrib.auth.models import User
+
+
+
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
@@ -818,9 +822,7 @@ def registrar_asistencia_rapido(request):
 
 
 from django.db import connection
-from universitaryWellbeing.models import AuthUser
 from django.db import connection
-from universitaryWellbeing.models import AuthUser
 
 from django.db import connection
 from django.shortcuts import render, get_object_or_404
@@ -829,7 +831,7 @@ from datetime import datetime
 from django.contrib import messages
 
 from universitaryWellbeing.models import (
-    AuthUser, Participantes, Participaciones,
+     Participantes, Participaciones,
     Asistencias, EstadosAsistencia, Actividades
 )
 
@@ -838,7 +840,7 @@ from django.shortcuts import render, get_object_or_404
 from django.utils import timezone
 from django.contrib import messages
 from universitaryWellbeing.models import (
-    Actividades, AuthUser, Participantes, Participaciones,
+    Actividades,  Participantes, Participaciones,
     EstadosAsistencia, Asistencias
 )
 from datetime import datetime
@@ -848,7 +850,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
 from universitaryWellbeing.models import (
-    Actividades, EstadosAsistencia, AuthUser, Participantes,
+    Actividades, EstadosAsistencia, Participantes,
     Participaciones, Asistencias
 )
 
@@ -857,7 +859,7 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
 from universitaryWellbeing.models import (
-    Actividades, EstadosAsistencia, AuthUser, Participantes,
+    Actividades, EstadosAsistencia, Participantes,
     Participaciones, Asistencias
 )
 
@@ -866,12 +868,13 @@ from django.contrib import messages
 from django.utils import timezone
 from datetime import datetime
 from universitaryWellbeing.models import (
-    Actividades, EstadosAsistencia, AuthUser, Participantes,
+    Actividades, EstadosAsistencia, Participantes,
     Participaciones, Asistencias
 )
+
 
 def registrar_asistencia_manual(request):
-    """Registra asistencias por cédula, creando AuthUser y Participante si no existen"""
+    """Registra asistencias por cédula, creando User y Participante si no existen"""
 
     actividades = Actividades.objects.all().order_by('nombre')
     fecha_hoy = timezone.now().date().strftime('%Y-%m-%d')
@@ -897,8 +900,8 @@ def registrar_asistencia_manual(request):
 
             for cedula in cedulas:
                 try:
-                    # 1️⃣ AuthUser
-                    auth_user, _ = AuthUser.objects.get_or_create(
+                    # 1️⃣ User (antes AuthUser)
+                    user, _ = User.objects.get_or_create(
                         username=cedula,
                         defaults={
                             'email': f"{cedula}@temp.com",
@@ -913,24 +916,22 @@ def registrar_asistencia_manual(request):
                     )
 
                     # 2️⃣ Participante
-                    # 2️⃣ Participante
                     participante, creado = Participantes.objects.get_or_create(
-                        correo=auth_user.email,
+                        correo=user.email,
                         defaults={
-                            'id_participante': auth_user.id,   # 👈 usar el id del usuario como clave
+                            'id_participante': user.id,  # Vincular con el ID del usuario
                             'nombre': f"Usuario {cedula}",
                             'apellido': '',
-                            'roles_id_rol_id': 1,              # rol por defecto
-                            'estado_activo': 'S',              # activo
-                            'user': auth_user
+                            'roles_id_rol_id': 1,  # Rol por defecto
+                            'estado_activo': 'S',  # Activo
+                            'user': user  # Vincular al modelo User
                         }
                     )
-
 
                     if not creado:
                         cambios = False
                         if participante.user_id is None:
-                            participante.user = auth_user
+                            participante.user = user
                             cambios = True
                         if participante.estado_activo != 'S':
                             participante.estado_activo = 'S'
