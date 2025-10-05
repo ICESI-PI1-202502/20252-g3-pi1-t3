@@ -44,10 +44,17 @@
         <a href="#">¿Quiénes Somos?</a>
         <a href="#">Nuestra oferta</a>
         <a href="#">Eventos y Servicios</a>
-        <a href="#">Analítica y reportes</a>
-        <a href="{% url 'tournaments:list' %}">Torneos</a>
+        
+        {% if user.is_staff or user.is_superuser %}
+            <!-- Opciones solo para admins -->
+            <a href="#">Analítica y reportes</a>
+            <a href="{% url 'tournaments:list' %}">Torneos</a>
+        {% else %}
+            <!-- Opciones para cualquier usuario normal -->
+            <a href="#">Buscar</a>
+        {% endif %}
+        
         <a href="{% url 'logout' %}">Cerrar sesión</a>
-
 
     </div>
 
