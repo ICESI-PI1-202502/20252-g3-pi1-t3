@@ -11,24 +11,8 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-import sys, os
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+import sys
 
-# ---------------------
-# Use a different database for tests (faster).
-if 'test' in sys.argv:
-    DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': os.path.join(BASE_DIR, 'testdb.sqlite3'),  # or ':memory:'
-        }
-    }
-    # Disable migrations (Django will do a "syncdb" for managed models).
-    class _DisableMigrations(dict):
-        def __contains__(self, item): return True
-        def __getitem__(self, item): return None
-    MIGRATION_MODULES = _DisableMigrations()
-# ---------------------
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -77,7 +61,7 @@ ROOT_URLCONF = 'BienestarUniversitario.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -103,15 +87,8 @@ DATABASES = {
         'PASSWORD': 'h9TZan8icTf3hjsn',
         'HOST': 'db.xlknciyujekwbhysmamn.supabase.co',
         'PORT': '5432',
-        'CONN_MAX_AGE': 60,
-        'OPTIONS': {'sslmode': 'require'},
    }
 }
-
-
-
-#AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -169,5 +146,7 @@ LOGIN_URL = "/"              # login view
 LOGIN_REDIRECT_URL = "/home/"   # where to send after login
 LOGOUT_REDIRECT_URL = "/"       # where to send after logout
 
-MEDIA_URL = "/media/"
-MEDIA_ROOT = BASE_DIR / "media"
+if any(cmd in sys.argv for cmd in ["test", "pytest"]):
+    INSTALLED_APPS += ["tournaments.tests"]
+    # Desactiva migraciones del app real que está en conflicto
+    MIGRATION_MODULES = {"universitaryWellbeing": None}
