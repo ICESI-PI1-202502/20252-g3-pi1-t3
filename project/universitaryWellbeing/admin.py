@@ -1,7 +1,4 @@
 from django.contrib import admin
-from django.contrib.auth.models import User, Group
-from django.contrib.auth.admin import UserAdmin, GroupAdmin
-
 from .models import (
     Equipos, Torneos, Participantes, Disciplinas, Roles, Actividades,
     ActividadesGrupos, AgendaPsicologos, Asistencias, CalificacionesActividad,
@@ -62,10 +59,3 @@ readonly_models = [
 
 for model in readonly_models:
     admin.site.register(model, ReadOnlyAdmin)
-
-# -----------------------
-# USUARIOS Y GRUPOS
-# -----------------------
-
-admin.site.register(User, UserAdmin)
-admin.site.register(Group, GroupAdmin)
