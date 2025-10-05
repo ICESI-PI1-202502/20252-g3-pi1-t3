@@ -1,5 +1,4 @@
-from django.db.models import Count, Avg, Q, F, Case, When, IntegerField
-from django.shortcuts import render, redirect
+from django.db.models import Count, Avg, Q, F, Case, When, IntegerField,Max, ExpressionWrapper
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
@@ -9,15 +8,22 @@ from django.http import HttpResponse, JsonResponse
 from datetime import datetime, timedelta
 import csv
 import json
-
+from django.contrib.auth.models import User
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
+from django.core.paginator import Paginator
+from datetime import datetime, date
+from django.db import connection
+import os
 from universitaryWellbeing.models import (
-    Participaciones, Asistencias, Actividades, Notificaciones, 
-    Participantes, TiposActividad, Roles, Citas, ProyectosSociales, Equipos
+    Participaciones, Asistencias, Actividades, Notificaciones, HistorialParticipaciones,
+    Participantes, TiposActividad, Roles, Citas, ProyectosSociales, Equipos,EstadosAsistencia
 )
 
-from django.contrib.auth.models import User
-
-
+LOG_DIR = os.path.join("Analytics_Reports","logs", "emails")
+LOG_EMAILS_FILE = os.path.join(LOG_DIR, "log_emails.txt")
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -60,13 +66,9 @@ def analisis_comportamiento(request):
     )
 
  
-
 def participantes_list(request):
     participantes = Participantes.objects.all().order_by("nombre")
     return render(request, "participantes.html", {"participantes": participantes})
-
-
-
 
 
 def comparaciones(request):
@@ -187,46 +189,12 @@ def comparaciones(request):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
  # views.py - Sistema completo de recomendaciones  
  #######################################################
  #######################################################
  #######################################################
  #######################################################
  #######################################################
-from django.shortcuts import render, redirect
-from django.core.mail import send_mail
-from django.conf import settings
-from django.contrib import messages
-from django.db.models import Count, Q, F, Value, IntegerField, ExpressionWrapper
-from django.utils import timezone
-from datetime import timedelta
-from universitaryWellbeing.models import Asistencias, Participaciones, Actividades, Participantes
-import os
 
 
 def obtener_estudiantes_activos(dias_actividad=14):
@@ -248,11 +216,13 @@ def obtener_estudiantes_activos(dias_actividad=14):
         .order_by('-asistencias_recientes')
     )
 
-
-LOG_EMAILS_FILE = os.path.join(settings.BASE_DIR, "emails_enviados.txt")
-
 def log_email(destinatarios, asunto):
     """Guarda en un TXT los destinatarios y el asunto del correo enviado"""
+    
+    # Crea el directorio si no existe
+    os.makedirs(LOG_DIR, exist_ok=True)
+
+    # Abre el archivo en modo append y guarda la línea
     with open(LOG_EMAILS_FILE, "a", encoding="utf-8") as f:
         linea = f"{timezone.now().strftime('%Y-%m-%d %H:%M:%S')} | {asunto} | {', '.join(destinatarios)}\n"
         f.write(linea)
@@ -389,7 +359,6 @@ def enviar_notificacion_reconocimientos(estudiantes):
         asunto = f"¡Estás cerca de un reconocimiento, {est.participantes_id_participante.nombre}!"
         mensaje = f"""
 Hola {nombre_completo},
-
 ¡Felicidades! Tienes {est.total_asistencias} asistencias en {est.actividades_id_actividad.nombre}.
 Solo necesitas {10 - est.total_asistencias} más para obtener tu reconocimiento.
 
@@ -473,31 +442,6 @@ def configurar_notificaciones(request):
 
 
 
-
-
-
-
-
-# Agregar estas funciones a tu views.py existente
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.db.models import Count, Q, Max
-from django.utils import timezone
-from django.http import JsonResponse
-from django.core.paginator import Paginator
-from datetime import datetime, date
-from universitaryWellbeing.models import (
-    Asistencias, Participaciones, Participantes, Actividades, 
-    EstadosAsistencia, HistorialParticipaciones
-)
-
-from datetime import datetime, date
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from django.utils import timezone
-from universitaryWellbeing.models import Asistencias, Actividades, EstadosAsistencia
-
 def gestion_asistencia(request):
     """Vista principal para gestión de asistencias"""
     
@@ -562,7 +506,7 @@ def gestion_asistencia(request):
         ).count(),
     }
     
-    # ✅ Agregar variable para template
+    # Agregar variable para template
     fecha_es_hoy = (fecha_obj == date.today())
     
     context = {
@@ -673,26 +617,6 @@ def asistencia(request):
     return render(request, "asistencia.html", {"data": data})
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Agregar estas funciones a tu views.py
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_http_methods
-from django.db.models import Max
 
 def registrar_asistencia_cedula_view(request):
     """Vista principal para registro rápido por cédula"""
@@ -815,64 +739,6 @@ def registrar_asistencia_rapido(request):
         }, status=500)
     
 
-
-
-
-
-
-
-from django.db import connection
-from django.db import connection
-
-from django.db import connection
-from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
-from datetime import datetime
-from django.contrib import messages
-
-from universitaryWellbeing.models import (
-     Participantes, Participaciones,
-    Asistencias, EstadosAsistencia, Actividades
-)
-
-
-from django.shortcuts import render, get_object_or_404
-from django.utils import timezone
-from django.contrib import messages
-from universitaryWellbeing.models import (
-    Actividades,  Participantes, Participaciones,
-    EstadosAsistencia, Asistencias
-)
-from datetime import datetime
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib import messages
-from django.utils import timezone
-from datetime import datetime
-from universitaryWellbeing.models import (
-    Actividades, EstadosAsistencia, Participantes,
-    Participaciones, Asistencias
-)
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib import messages
-from django.utils import timezone
-from datetime import datetime
-from universitaryWellbeing.models import (
-    Actividades, EstadosAsistencia, Participantes,
-    Participaciones, Asistencias
-)
-
-from django.shortcuts import render, get_object_or_404
-from django.contrib import messages
-from django.utils import timezone
-from datetime import datetime
-from universitaryWellbeing.models import (
-    Actividades, EstadosAsistencia, Participantes,
-    Participaciones, Asistencias
-)
-
-
 def registrar_asistencia_manual(request):
     """Registra asistencias por cédula, creando User y Participante si no existen"""
 
@@ -900,7 +766,7 @@ def registrar_asistencia_manual(request):
 
             for cedula in cedulas:
                 try:
-                    # 1️⃣ User (antes AuthUser)
+                    # User
                     user, _ = User.objects.get_or_create(
                         username=cedula,
                         defaults={
@@ -915,11 +781,11 @@ def registrar_asistencia_manual(request):
                         }
                     )
 
-                    # 2️⃣ Participante
+                    # Participante
                     participante, creado = Participantes.objects.get_or_create(
                         correo=user.email,
                         defaults={
-                            'id_participante': user.id,  # Vincular con el ID del usuario
+                            'id_participante': user,  # Vincular con el ID del usuario
                             'nombre': f"Usuario {cedula}",
                             'apellido': '',
                             'roles_id_rol_id': 1,  # Rol por defecto
@@ -930,7 +796,7 @@ def registrar_asistencia_manual(request):
 
                     if not creado:
                         cambios = False
-                        if participante.user_id is None:
+                        if participante.user is None:
                             participante.user = user
                             cambios = True
                         if participante.estado_activo != 'S':
@@ -939,7 +805,7 @@ def registrar_asistencia_manual(request):
                         if cambios:
                             participante.save()
 
-                    # 3️⃣ Participación
+                    # Participación
                     participacion, _ = Participaciones.objects.get_or_create(
                         participantes_id_participante=participante,
                         actividades_id_actividad=actividad,
@@ -950,12 +816,12 @@ def registrar_asistencia_manual(request):
                         }
                     )
 
-                    # 4️⃣ Verificar asistencia
+                    # Verificar asistencia
                     if Asistencias.objects.filter(participaciones_id_participacion=participacion, fecha=fecha_obj).exists():
                         errores.append(f"Cédula {cedula}: Ya tiene asistencia registrada")
                         continue
 
-                    # 5️⃣ Crear asistencia
+                    # Crear asistencia
                     Asistencias.objects.create(
                         fecha=fecha_obj,
                         estados_asistencia_id_estado_asistencia=estado_presente,

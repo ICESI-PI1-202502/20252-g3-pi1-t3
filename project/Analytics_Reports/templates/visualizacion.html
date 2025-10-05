@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Visualización y exportación</h2>
+<table border="1">
+  <tr><th>Actividad</th><th>Total participaciones</th></tr>
+  {% for row in data %}
+    <tr>
+      <td>{{ row.id_actividad__nombre }}</td>
+      <td>{{ row.total }}</td>
+    </tr>
+  {% endfor %}
+</table>
+<a href="#">Exportar a Excel (pendiente)</a>
+{% endblock %}
