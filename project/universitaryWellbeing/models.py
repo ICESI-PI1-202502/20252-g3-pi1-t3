@@ -2,9 +2,6 @@ from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User,Group
 import os
-from django.utils.text import slugify
-from django.contrib.auth.models import User,Group
-import os
 
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
@@ -218,7 +215,7 @@ class DjangoSession(models.Model):
         db_table = 'django_session'
 
 class Equipos(models.Model):
-    id_equipo = models.FloatField(primary_key=True)
+    id_equipo = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=100)
     fecha_creacion = models.DateTimeField()
     cantidad_personas = models.BigIntegerField(blank=True, null=True)

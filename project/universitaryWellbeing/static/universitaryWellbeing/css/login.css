@@ -127,7 +127,7 @@ body {
 }
 
 .message {
-    color: #ff6b6b; /* rojo para errores */
+    color: #fff; /* rojo para errores */
     background-color: rgba(255, 255, 255, 0.1);
     padding: 8px 12px;
     border-radius: 8px;
@@ -183,3 +183,5 @@ p, a, button, input, textarea, select,
 .message, .botn-agregar, .registrarse, .administrador {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
+
+

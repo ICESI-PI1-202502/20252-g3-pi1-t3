@@ -15,10 +15,7 @@ from universitaryWellbeing.models import (
  Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos, EquiposParticipantes, Participantes
 )
 from django.http import Http404
-
-def _current_participante(user):
-    # Your schema has FK participantes.user → auth_user.id (not OneToOne), so pick the first.
-    return Participantes.objects.filter(user_id=user.id).order_by("id_participante").first()
+from django.utils import timezone
 
 def get_torneo_or_404(id_: int):
     t = get_object_or_404(
@@ -34,6 +31,7 @@ def get_torneo_or_404(id_: int):
         "disciplina": getattr(t.disciplinas_id_disciplina, "nombre", "") or "",
         "aforo_equipos": t.aforo_equipos,
         "tiene_equipos": bool(t.aforo_equipos),
+        "limite_inscripcion": getattr(t, "limite_inscripcion", None),
     }
 
     teams = []
@@ -66,6 +64,16 @@ def crear_torneo(request):
         fecha_inicio  = (request.POST.get("fecha_inicio") or "").strip() 
         fecha_fin     = (request.POST.get("fecha_fin") or "").strip()
         aforo         = (request.POST.get("aforo") or "").strip()
+        limite_raw    = (request.POST.get("limite_inscripcion") or "").strip()
+        # '2025-10-01T12:30' -> datetime(2025,10,1,12,30)
+        limite_inscripcion = None
+        if limite_raw:
+            try:
+                parsed = dt.datetime.fromisoformat(limite_raw)
+            except ValueError:
+                # No bloqueamos creación; simplemente lo ignoramos por ahora
+                pass
+
 
         # Validations
         if not nombre or not disciplina_id or not fecha_inicio or not fecha_fin:
@@ -81,6 +89,7 @@ def crear_torneo(request):
                 estados_torneo_id_estado_torneo_id=1,  
                 reglas_elegibilidad=None,
                 aforo_equipos=(aforo or None),
+                limite_inscripcion=limite_inscripcion,
             )
         except Exception as e:
             print("Error creating torneo:", e)
@@ -145,40 +154,6 @@ def detalle_torneo(request, id: int):
     return render(request, template, {"tournament": t, "teams": teams, "my_team_id": my_team_id})
 
 
-# NOT TAKING THIS ONE INTO ACCOUNT
-#@login_required
-def inscripcion_individual(request, id: int):
-    torneo, _ = get_torneo_or_404(id)
-    if torneo["tiene_equipos"]:
-        raise Http404("Este torneo no es individual.")
-
-    ctx = {"tournament": torneo, "ok": False, "errors": {}}
-
-    if request.method == "POST":
-        nombre = (request.POST.get("nombre") or "").strip()
-        apellido = (request.POST.get("apellido") or "").strip()
-        cedula = (request.POST.get("cedula") or "").strip()
-        correo = (request.POST.get("correo") or "").strip()
-        genero = (request.POST.get("genero") or "").strip()
-
-        # Validations
-        if not nombre: ctx["errors"]["nombre"] = "Requerido"
-        if not apellido: ctx["errors"]["apellido"] = "Requerido"
-        if not (cedula.isdigit() and len(cedula) == 10):
-            ctx["errors"]["cedula"] = "La cédula debe tener exactamente 10 dígitos"
-        try:
-            validate_email(correo)
-        except ValidationError:
-            ctx["errors"]["correo"] = "Formato de correo inválido"
-        if genero not in ("Femenino", "Masculino", "Otro"):
-            ctx["errors"]["genero"] = "Selecciona un género"
-
-        if not ctx["errors"]:
-            ctx.update(ok=True, nombre=nombre, apellido=apellido, correo=correo)
-
-    return render(request, "join_individual.html", ctx)
-
-
 # Historia : crear equipo 
 def crear_equipo_en_torneo(request, torneo_id: int):
     torneo = get_object_or_404(
@@ -219,7 +194,7 @@ def crear_equipo_en_torneo(request, torneo_id: int):
     fecha_creacion = _parse_date(f_crea) or dt.date.today()
     disc_fk = int(disc_id) if disc_id.isdigit() else None
 
-    # ---- FK prechecks (errores humanos más claros que un FK violation)
+   
     if resp_id.isdigit() and not Participantes.objects.filter(pk=int(resp_id)).exists():
         errors["responsable_fk"] = f"Participante {resp_id} no existe."
     if disc_fk and not Disciplinas.objects.filter(pk=disc_fk).exists():
@@ -234,7 +209,7 @@ def crear_equipo_en_torneo(request, torneo_id: int):
         with transaction.atomic():
             new_team_id = None
 
-            # 1) Crear equipo con un savepoint interno
+           
             try:
                 with transaction.atomic():  # savepoint
                     team = Equipos.objects.create(
@@ -249,10 +224,10 @@ def crear_equipo_en_torneo(request, torneo_id: int):
                     new_team_id = getattr(team, "id_equipo", None) or getattr(team, "id", None)
                     print("ORM team created:", new_team_id)
             except Exception as orm_err:
-                # El fallo del bloque interno NO envenena la transacción externa
+                
                 print("ORM insert failed:", repr(orm_err))
                 print(traceback.format_exc())
-                # 1b) Fallback: SQL crudo con RETURNING
+               
                 with connection.cursor() as cur:
                     cur.execute("""
                         INSERT INTO equipos
@@ -262,12 +237,16 @@ def crear_equipo_en_torneo(request, torneo_id: int):
                         VALUES (%s, %s, %s, %s, %s, %s, %s)
                         RETURNING id_equipo
                     """, [
-                        nombre, fecha_creacion, None,
+                        nombre, fecha_creacion.isoformat(), None,
                         int(resp_id), disc_fk,
                         (int(cap_min) if cap_min else None),
                         (int(cap_max) if cap_max else None),
                     ])
-                    new_team_id = cur.fetchone()[0]
+                    row = cur.fetchone()
+                    if row is None:
+                        raise ValueError("La consulta no devolvió ningún ID del equipo.")
+                    new_team_id = row[0]
+
                     print("SQL team created:", new_team_id)
 
             # 2) Vincular torneo ↔ equipo (savepoint opcional)
@@ -306,17 +285,15 @@ def _current_participante(user):
     return Participantes.objects.filter(user_id=user.id).order_by("id_participante").first()
 
 
-# Historia : unirse a equipo (demo)
-#@login_required
+# Historia : unirse a equipo
 @login_required
 def unirse_equipo(request, id: int):
-    # 1) Torneo must accept teams
     torneo = get_object_or_404(Torneos.objects.select_related("disciplinas_id_disciplina"), pk=id)
     if not torneo.aforo_equipos:
         messages.error(request, "Este torneo es individual; no permite equipos.")
         return redirect("tournaments:detail", id)
 
-    # 2) Teams that belong to this tournament (for dropdown)
+    #  teams that belong to this tournament
     teams = list(
         Equipos.objects
         .filter(torneosequipos__torneos_id_torneo=id)
@@ -324,7 +301,7 @@ def unirse_equipo(request, id: int):
         .order_by("nombre")
     )
 
-    # 3) Resolve current participante from logged-in user
+    #resolve current participante from logged-in user
     participante = _current_participante(request.user)
     if not participante:
         messages.error(request, "Tu usuario no está vinculado a un participante.")
@@ -369,11 +346,6 @@ def unirse_equipo(request, id: int):
             messages.error(request, "Este equipo ya alcanzó su capacidad máxima.")
             return redirect("tournaments:join_team", id)
 
-    if team.disciplinas_id_disciplina_id and torneo.disciplinas_id_disciplina_id:
-        if int(team.disciplinas_id_disciplina_id) != int(torneo.disciplinas_id_disciplina_id):
-            messages.error(request, "La disciplina del equipo no coincide con la del torneo.")
-            return redirect("tournaments:join_team", id)
-
     # 5) Join (idempotent thanks to UNIQUE (equipo, participante))
     try:
         with transaction.atomic():
@@ -415,7 +387,7 @@ def gestionar_equipo(request, torneo_id: int, team_id: int):
         messages.error(request, "Tu usuario no está vinculado a un participante.", extra_tags="tournaments")
         return redirect("tournaments:detail", torneo_id)
 
-    # ✅ enforce membership
+ 
     is_member = EquiposParticipantes.objects.filter(
         equipos_id_equipo_id=team_id,
         participantes_id_participante_id=participante.id_participante
@@ -501,4 +473,34 @@ def gestionar_equipo(request, torneo_id: int, team_id: int):
         "i_am_leader": i_am_leader,
     }
     return render(request, "manage_team.html", ctx)
-  
+
+def inscripcion_individual(request, id: int):
+    torneo, _ = get_torneo_or_404(id)
+    if torneo["tiene_equipos"]:
+        raise Http404("Este torneo no es individual.")
+
+    ctx = {"tournament": torneo, "ok": False, "errors": {}}
+
+    if request.method == "POST":
+        nombre = (request.POST.get("nombre") or "").strip()
+        apellido = (request.POST.get("apellido") or "").strip()
+        cedula = (request.POST.get("cedula") or "").strip()
+        correo = (request.POST.get("correo") or "").strip()
+        genero = (request.POST.get("genero") or "").strip()
+
+        # Validations
+        if not nombre: ctx["errors"]["nombre"] = "Requerido"
+        if not apellido: ctx["errors"]["apellido"] = "Requerido"
+        if not (cedula.isdigit() and len(cedula) == 10):
+            ctx["errors"]["cedula"] = "La cédula debe tener exactamente 10 dígitos"
+        try:
+            validate_email(correo)
+        except ValidationError:
+            ctx["errors"]["correo"] = "Formato de correo inválido"
+        if genero not in ("Femenino", "Masculino", "Otro"):
+            ctx["errors"]["genero"] = "Selecciona un género"
+
+        if not ctx["errors"]:
+            ctx.update(ok=True, nombre=nombre, apellido=apellido, correo=correo)
+
+    return render(request, "join_individual.html", ctx)

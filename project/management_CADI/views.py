@@ -56,7 +56,7 @@ def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
 
     k_base, k_sched = _draft_keys(grupo_actividad_id)
 
-    # (opcional) reset por querystring ?reset=1 para limpiar borradores
+    # reset por querystring ?reset=1 para limpiar borradores
     if request.method == "GET" and request.GET.get("reset") == "1":
         request.session.pop(k_base, None)
         request.session.pop(k_sched, None)

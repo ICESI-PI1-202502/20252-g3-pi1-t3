@@ -1,5 +1,5 @@
 .list-preferences {
-  max-width: 900px;
+  max-width: 700px;
   margin: 40px auto;
   background: #fff;
   border-radius: 16px;
@@ -20,10 +20,9 @@
   margin-bottom: 2rem;
 }
 
-/* Aquí fijo la grilla en 4 columnas */
-.categories-grid {
+.categorias-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr); /* siempre 4 columnas */
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 1rem;
   margin-bottom: 2rem;
   text-align: left;
@@ -35,8 +34,6 @@
   padding: 12px;
   transition: 0.3s;
   cursor: pointer;
-  display: flex;
-  align-items: center;
 }
 
 .category-item:hover {
