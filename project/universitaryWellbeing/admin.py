@@ -5,7 +5,7 @@ from django.contrib.auth.admin import UserAdmin, GroupAdmin
 from .models import (
     Equipos, Torneos, Participantes, Disciplinas, Roles, Actividades,
     ActividadesGrupos, AgendaPsicologos, Asistencias, CalificacionesActividad,
-    Citas, Clasificaciones, EquiposParticipantes, EstadosAsistencia,
+    Citas, EquiposParticipantes, EstadosAsistencia,
     EstadosCita, EstadosParticipacion, EstadosTorneo, Grupos, GruposActividad,
     HistorialCitas, HistorialParticipaciones, HorariosParticipante,
     InscripcionesPsu, MotivosCita, Notificaciones, Participaciones, Partidos,
@@ -51,7 +51,7 @@ class ReadOnlyAdmin(admin.ModelAdmin):
 
 readonly_models = [
     Disciplinas, Actividades, ActividadesGrupos, AgendaPsicologos,
-    Asistencias, CalificacionesActividad, Citas, Clasificaciones,
+    Asistencias, CalificacionesActividad, Citas,
     EquiposParticipantes, EstadosAsistencia, EstadosCita,
     EstadosParticipacion, EstadosTorneo, Grupos, GruposActividad,
     HistorialCitas, HistorialParticipaciones, HorariosParticipante,
