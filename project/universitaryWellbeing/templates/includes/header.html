@@ -8,34 +8,39 @@
         Bienestar Universitario
       </a>
 
-      
+
 
       <!-- ADDED: wrapper que contiene nav-collapse + campana -->
       <div class="d-flex align-items-center ms-auto">
         <div class="collapse navbar-collapse" id="navbarNav">
-          
+
         </div>
 
         <!-- ADDED: bell -->
         <div class="navbar-option ms-3">
-            <a href="#" title="Notificaciones">
-                <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
-            </a>
-            </div>
+          <a href="#" title="Notificaciones">
+            <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+          </a>
+        </div>
 
-              <!-- en lugar del bloque <div class="navbar-option ms-3"> con la imagen PP -->
-              <div class="navbar-option ms-3">
-                {% include 'includes/user_avatar.html' %}
-              </div>
-            
-            <div class="navbar-option ms-3">
-              <a href="#" id="menu-btn" title="Menú">
-                <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
-              </a>
-            </div>
+        <div class="navbar-option ms-3">
+          {% if user.is_authenticated %}
+          <a href="{% url 'profile' %}" title="Perfil">
+            {% include 'includes/user_avatar.html' %}
+          </a>
+          {% else %}
+          <a href="{% url 'login' %}" class="btn btn-link text-light">Iniciar</a>
+          {% endif %}
+        </div>
+
+        <div class="navbar-option ms-3">
+          <a href="#" id="menu-btn" title="Menú">
+            <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+          </a>
+        </div>
 
 
-            
+
 
       </div>
       <!-- /ADDED -->

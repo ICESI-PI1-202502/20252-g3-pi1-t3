@@ -449,14 +449,11 @@ class Preferencias(models.Model):
         db_table = 'preferencias'
 
 class PreferenciasActividades(models.Model):
-
     id_preferencia_actividad = models.BigAutoField(primary_key=True)
-    # Una preferencia (de un usuario) puede tener muchos tipos de actividad
-    preferencia = models.ForeignKey(Preferencias, models.DO_NOTHING, db_column='preferencias_id_preferencia')
-    # Un tipo de actividad puede estar en muchas preferencias
+    preferencia = models.ForeignKey(Preferencias, models.DO_NOTHING, db_column='preferencias_id_preferencia', related_name='actividades')
     tipo_actividad = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_id_actividad')
     class Meta:
-        managed = False  # Mantén esto si estás usando una base existente
+        managed = False
         db_table = 'preferencias_actividades'
         unique_together = (('preferencia', 'tipo_actividad'),)
 

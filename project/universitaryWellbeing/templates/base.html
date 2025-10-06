@@ -39,22 +39,15 @@
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
         <a href="{% url 'home' %}">Inicio</a>
-        <a href="#">FAQ</a>
+        <a href="#">FAQ</a> <!-- {url 'faq' } examples-->
         <a href="#">Calendario</a>
-        <a href="#">¿Quiénes Somos?</a>
+        <a href="#">¿Quiénes Somos?</a> <!-- { url 'manifest' } url examples -->
         <a href="#">Nuestra oferta</a>
         <a href="#">Eventos y Servicios</a>
-        
-        {% if user.is_staff or user.is_superuser %}
-            <!-- Opciones solo para admins -->
-            <a href="#">Analítica y reportes</a>
-            <a href="{% url 'tournaments:list' %}">Torneos</a>
-        {% else %}
-            <!-- Opciones para cualquier usuario normal -->
-            <a href="#">Buscar</a>
-        {% endif %}
-        
+        <a href="#">Analítica y reportes</a>
+        <a href="{% url 'tournaments:list' %}">Torneos</a>
         <a href="{% url 'logout' %}">Cerrar sesión</a>
+
 
     </div>
 

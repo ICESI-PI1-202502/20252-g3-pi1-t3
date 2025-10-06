@@ -70,6 +70,28 @@ body {
   transform: scale(1.08);
 }
 
+/*regla CSS en el icono del perfiñ*/
+.user-avatar { 
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: #0b2ea6;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.navbar-option a:hover .user-avatar {
+  transform: scale(1.05);
+}
+
 /* opcional: badge de notificaciones (pequeño círculo rojo) */
 .navbar-option .notif-badge {
   position: relative;
