@@ -5,6 +5,37 @@
     ¡Bienvenido Preferencias!
 {% endblock %}
 
+{% block header_logo %}
+<span class="navbar-brand disabled-icon">
+  <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+  Bienestar Universitario
+</span>
+{% endblock %}
+
+{% block header_notifications %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Notificaciones">
+    <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+  </span>
+</div>
+{% endblock %}
+
+{% block header_avatar %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Perfil">
+    {% include 'includes/user_avatar.html' %}
+  </span>
+</div>
+{% endblock %}
+
+{% block header_sidebar_btn %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Menú">
+    <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+  </span>
+</div>
+{% endblock %}
+
 {% block extra_css %}
     {{ block.super }}
     <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
