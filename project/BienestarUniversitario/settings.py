@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'Analytics_Reports',   
     'management_CADI',
     'tournaments',
+    'social_projects',
 
 ]
 

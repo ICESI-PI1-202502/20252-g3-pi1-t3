@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Proyectos sociales · Bienestar{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social_projects/css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+    <form method="get" action="{% url 'social_projects:lista_proyectos' %}" class="flex-grow-1 d-flex gap-2">
+      <input
+        type="text"
+        name="q"
+        value="{{ search }}"
+        class="form-control"
+        placeholder="Buscar proyectos por nombre o descripción"
+        aria-label="Buscar proyectos sociales">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+      {% if search %}
+        <a class="btn btn-outline-secondary" href="{% url 'social_projects:lista_proyectos' %}">Limpiar</a>
+      {% endif %}
+    </form>
+
+    {% if can_create %}
+      <a href="{% url 'social_projects:crear_proyecto' %}" class="btn btn-success">+ Crear proyecto</a>
+    {% endif %}
+  </div>
+
+  <div class="card-grid">
+    {% for p in projects %}
+      <article class="card-item">
+        <h3 class="title mb-1">{{ p.nombre }}</h3>
+
+        {% with fi=p.fecha_inicio ff=p.fecha_fin %}
+          <p class="meta mb-1">
+            <b>Fecha:</b>
+            {% if fi and ff %}{{ fi|date:"d M" }} – {{ ff|date:"d M" }}{% else %}—{% endif %}
+          </p>
+        {% endwith %}
+
+        <p class="meta mb-3"><b>Aforo:</b> {{ p.aforo|default:"—" }}</p>
+
+        <a class="btn btn-detail" href="{% url 'social_projects:detalle_proyecto' p.id_proyecto %}">Detalles</a>
+      </article>
+    {% empty %}
+      <div class="alert alert-light border">
+        No hay proyectos disponibles{% if search %} para “{{ search }}”{% endif %}.
+      </div>
+    {% endfor %}
+  </div>
+
+</div>
+{% endblock %}

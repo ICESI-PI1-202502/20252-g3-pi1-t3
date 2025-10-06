@@ -33,6 +33,7 @@ urlpatterns = [
     path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
     path("tournaments/", include("tournaments.urls")),
     ##path('logout/', views.user_logout, name='logout'),
+    path("psu/", include("social_projects.urls")),
      
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
