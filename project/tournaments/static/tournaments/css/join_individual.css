@@ -1,0 +1,90 @@
+/* ===== Layout general del flujo de formularios ===== */
+.shell{
+  max-width: 840px;
+  margin: 28px auto 48px;
+  padding: 0 18px;
+}
+
+.title{
+  font-size: clamp(24px, 3vw, 36px);
+  margin: 0 0 14px;
+}
+
+/* ===== Contenedor del formulario, sin recuadros feos ===== */
+.form-shell{
+  display: grid;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.form-shell label{
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.form-shell input,
+.form-shell select{
+  height: 44px;
+  border: 1px solid #d9d9e3;
+  border-radius: 12px;
+  padding: 0 12px;
+  outline: none;
+  font: inherit;
+  background: #fff;
+}
+
+.grid-2{
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+@media (max-width: 720px){
+  .grid-2{ grid-template-columns: 1fr; }
+}
+
+/* ===== Errores inline ===== */
+.err{
+  color: #c0272b;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* ===== Botones ===== */
+.btn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  border-radius: 14px;
+  padding: 0 18px;
+  text-decoration: none;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.btn.primary{
+  background: #5959e6;
+  color: #fff;
+  width: 100%;          /* botón grande full width como en el Figma */
+  box-shadow: 0 10px 20px rgba(89,89,230,.18);
+}
+.btn.primary:hover{ filter: brightness(.96); }
+
+.btn.ghost{
+  background: #f4f4ff;
+  color: #1e1e2a;
+}
+
+/* ===== Mensajes de éxito sin borde horroroso ===== */
+.success-box{
+  background: #f6f6ff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 12px 26px rgba(0,0,0,.06);
+  display: grid;
+  gap: 10px;
+}
+.success-box h3{ margin: 0; }

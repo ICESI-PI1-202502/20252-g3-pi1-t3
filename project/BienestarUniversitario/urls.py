@@ -17,9 +17,20 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from universitaryWellbeing import views
+from django.contrib.auth import views as auth_views
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # urls del app principal
     path("", include("universitaryWellbeing.urls")),
     path('logout/', views.user_logout, name='logout'),
     #path("accounts/", include("django.contrib.auth.urls")), 
-]
+    #path("analytics-reports/", include(("Analytics_Reports.urls", "analytics_reports"), namespace="analytics_reports")),
+    path("login/", auth_views.LoginView.as_view(template_name="login.html"), name="login"),
+    path("logout/", auth_views.LogoutView.as_view(next_page="login"), name="logout"),
+    path("tournaments/", include("tournaments.urls")),
+     
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

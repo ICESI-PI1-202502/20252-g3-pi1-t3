@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Gestionar equipo — {{ team.nombre }}</h2>
+    <a class="btn btn-outline-secondary" href="{% url 'tournaments:detail' torneo.id %}">
+      ← Volver al torneo
+    </a>
+  </div>
+
+  {% if messages %}
+    <div class="mb-3">
+      {% for message in messages %}
+        {% if 'tournaments' in message.tags %}
+          <div class="alert alert-{{ message.level_tag }} mb-2">{{ message }}</div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <div class="row g-4">
+    <!-- LEFT: Torneo -->
+    <div class="col-12 col-lg-5">
+      <div class="card shadow-sm h-100">
+        <div class="card-body">
+          <h5 class="mb-3">Información del torneo</h5>
+          <p class="mb-2"><span class="fw-semibold">Torneo:</span><br>{{ torneo.nombre }}</p>
+          <p class="mb-2"><span class="fw-semibold">Disciplina:</span><br>{{ torneo.disciplina }}</p>
+
+          {% if team.integrantes_max %}
+            <p class="mb-0">
+              <span class="fw-semibold">Progreso:</span><br>
+              {{ team.integrantes_count }}/{{ team.integrantes_max }}
+            </p>
+          {% else %}
+            <p class="mb-0"><span class="fw-semibold">Integrantes:</span><br>{{ team.integrantes_count }}</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Integrantes -->
+    <div class="col-12 col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="card-title mb-0">Integrantes</h5>
+            {% if i_am_leader %}
+              <span class="badge text-bg-primary">Eres líder</span>
+            {% endif %}
+          </div>
+
+          {% if miembros %}
+            <div class="vstack gap-3">
+              {% for m in miembros %}
+                <div class="d-flex align-items-center justify-content-between p-3 border rounded">
+                  <div class="me-3">
+                    <div class="fw-semibold">
+                      {{ m.participantes_id_participante__nombre }} {{ m.participantes_id_participante__apellido }}
+                      {% if m.is_leader %}<span class="badge text-bg-primary ms-2">Líder</span>{% endif %}
+                      {% if m.is_me and not i_am_leader %}<span class="badge text-bg-secondary ms-2">Tú</span>{% endif %}
+                    </div>
+                    <div class="text-muted small">ID: {{ m.participantes_id_participante }}</div>
+                  </div>
+                  <div class="ms-3">
+                    <form method="post" class="d-inline">
+                      {% csrf_token %}
+                      <input type="hidden" name="remove_id" value="{{ m.participantes_id_participante }}">
+                      {% if m.is_leader %}
+                        <button class="btn btn-sm btn-danger" disabled>Quitar</button>
+                      {% elif i_am_leader %}
+                        <button class="btn btn-sm btn-danger" type="submit">Quitar</button>
+                      {% elif m.is_me %}
+                        <button class="btn btn-sm btn-outline-danger" type="submit">Salir del equipo</button>
+                      {% endif %}
+                    </form>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          {% else %}
+            <p class="text-muted mb-0">Aún no hay integrantes.</p>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -10,38 +10,43 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
 from .forms import UserLoginForm, UserRegisterForm
+from typing import List
 
 def user_login(request):
     if request.method == "POST":
         form = UserLoginForm(request.POST)
         if form.is_valid():
             login(request, form.user)
-            
+
+            # Si es admin -> redirige al home_admin
+            if is_role_admin(form.user):
+                return redirect("cadi_admin") 
+
             # Obtener el participante relacionado con el usuario
             try:
                 participante = Participantes.objects.get(user=form.user)
             except Participantes.DoesNotExist:
                 participante = None
-            
-            # Si el participante no tiene preferencias, redirigir a la función 'preferencias'
+
+            # Si el participante no tiene preferencias, redirigir a la función 'preferences'
             if participante:
-                tiene_preferencias = Preferencias.objects.filter(participantes_id_participante=participante).exists()
+                tiene_preferencias = Preferencias.objects.filter(
+                    participantes_id_participante=participante
+                ).exists()
                 if not tiene_preferencias:
-                    return redirect("preferences")  # Asume que tienes una URL con el nombre 'preferencias'
-            
-            # Si es admin, redirigir al admin
-            if is_role_admin(form.user):
-                return redirect("admin:index")
-            
-            # Si tiene preferencias o no es admin, ir a home
+                    return redirect("preferences")
+
+            # Si tiene preferencias o no es admin -> home normal
             return redirect("home")
+
         else:
             for error in form.errors.values():
-                messages.error(request, error)
+                messages.error(request, str(error))
             return redirect("login")
     else:
         form = UserLoginForm()
-    return render(request, "login.html", {'form': form})
+    return render(request, "login.html", {"form": form})
+
 
 def is_role_admin(user):
     return user.groups.filter(name="admin").exists() or user.is_superuser
@@ -91,7 +96,7 @@ def register(request):
             return redirect("login")
         else:
             for error in form.errors.values():
-                messages.error(request, error)
+                messages.error(request, str(error))
             return redirect("register")
     else:
         form = UserRegisterForm()
@@ -202,13 +207,12 @@ def profile(request):
     participante = Participantes.objects.get(user=request.user)
     try:
         preferencia = Preferencias.objects.get(participantes_id_participante=participante)
-        actividades = preferencia.preferenciasactividades_set.all()
-    except Participantes.DoesNotExist:
-        actividades = None
+        actividades: List[PreferenciasActividades] = preferencia.actividades.all()  # type: ignore # Esto funciona en Django pero Pylance lo marca falso positivo
+    except Preferencias.DoesNotExist:
+        actividades = []
 
     context = {
         "participante": participante,
         "actividades": actividades,
     }
     return render(request, "profile.html", context)
-

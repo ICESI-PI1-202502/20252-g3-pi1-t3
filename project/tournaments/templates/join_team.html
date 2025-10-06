@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Unirme a un equipo – {{ tournament.nombre }}</h2>
+
+{% if messages %}
+  <ul class="alerts">
+    {% for message in messages %}
+      <li class="alert {{ message.tags }}">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  <label for="team_id">Equipo</label>
+  <select id="team_id" name="team_id" required>
+    <option value="">-- Selecciona --</option>
+    {% for t in teams %}
+      <option value="{{ t.id_equipo }}">
+        {{ t.nombre }}{% if t.capacidad_max %} (máx: {{ t.capacidad_max }}){% endif %}
+      </option>
+    {% endfor %}
+  </select>
+
+  <button class="btn" type="submit">Unirme</button>
+</form>
+{% endblock %}

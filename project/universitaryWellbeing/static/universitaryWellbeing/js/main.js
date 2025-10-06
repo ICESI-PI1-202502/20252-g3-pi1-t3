@@ -1,18 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const menuBtn = document.querySelector('.navbar-option img[src*="Menu.png"]');
-
+  const menuBtn = document.getElementById("menu-btn");
   const sidebar = document.getElementById("sidebar");
   const overlay = document.getElementById("overlay");
 
   if (menuBtn && sidebar && overlay) {
-    // Open the Menu
+    // Abrir menú
     menuBtn.addEventListener("click", (e) => {
       e.preventDefault();
-      sidebar.classList.add("open");
-      overlay.classList.add("show");
+      sidebar.classList.toggle("open");
+      overlay.classList.toggle("show");
     });
 
-    // close to clic in overlay
+    // Cerrar al hacer clic fuera
     overlay.addEventListener("click", () => {
       sidebar.classList.remove("open");
       overlay.classList.remove("show");

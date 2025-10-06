@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+
+<div class="tournament-detail centered-only">
+  <section class="tournament-info centered">
+    <h2 class="page-title">{{ tournament.nombre }}</h2>
+
+    {% with fi=tournament.fecha_inicio ff=tournament.fecha_fin %}
+      <p class="meta">
+        <b>Fechas:</b>
+        {% if fi and ff %}{{ fi|date:"d M Y" }} – {{ ff|date:"d M Y" }}{% else %}—{% endif %}
+      </p>
+    {% endwith %}
+
+    <p class="meta"><b>Disciplina:</b> {{ tournament.disciplina|default:"—" }}</p>
+
+    {% if tournament.aforo_equipos %}
+      <p class="meta"><b>Aforo de equipos:</b> {{ tournament.aforo_equipos }}</p>
+    {% endif %}
+
+    <h3 class="section-title">Equipos registrados</h3>
+    <ul class="list">
+      {% for team in teams %}
+        <li>{{ team.nombre }}</li>
+      {% empty %}
+        <li>Aún no hay equipos.</li>
+      {% endfor %}
+    </ul>
+
+    <div class="actions">
+      {% if my_team_id %}
+        <a class="btn" href="{% url 'tournaments:manage_team' tournament.id my_team_id %}">
+          Gestionar mi equipo
+        </a>
+      {% endif %}
+
+      <a class="btn outline" href="{% url 'tournaments:create_team' tournament.id %}">
+        Crear equipo
+      </a>
+
+      <a class="btn" href="{% url 'tournaments:join_team' tournament.id %}">
+        Unirme a un equipo
+      </a>
+    </div>
+  </section>
+</div>
+{% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+
+<div class="tournament-detail">
+  <section class="tournament-info">
+    <h2 class="page-title">{{ tournament.nombre }}</h2>
+
+    <p class="meta"><b>Fechas:</b> {{ tournament.fecha_inicio|date:"d M Y" }} – {{ tournament.fecha_fin|date:"d M Y" }}</p>
+    <p class="meta"><b>Disciplina:</b> {{ tournament.disciplina }}</p>
+
+    <div class="callout">
+      <p><b>Este torneo es individual.</b> No requiere crear ni unirse a equipos.</p>
+      <a class="btn primary" href="{% url 'tournaments:join_individual' tournament.id %}">Inscribirme</a>
+    </div>
+  </section>
+
+  <aside class="tournament-hero">
+    <img src="{% static 'tournaments/images/ajedrez.jpg' %}" alt="Imagen del torneo {{ tournament.nombre }}">
+  </aside>
+</div>
+{% endblock %}
