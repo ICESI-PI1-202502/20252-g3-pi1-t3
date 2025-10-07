@@ -13,7 +13,6 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 from pathlib import Path
 import sys
 
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -88,6 +87,8 @@ DATABASES = {
         'PASSWORD': 'h9TZan8icTf3hjsn',
         'HOST': 'db.xlknciyujekwbhysmamn.supabase.co',
         'PORT': '5432',
+        'CONN_MAX_AGE': 60,
+        'OPTIONS': {'sslmode': 'require'},
    }
 }
 
@@ -146,6 +147,9 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 LOGIN_URL = "/"              # login view
 LOGIN_REDIRECT_URL = "/home/"   # where to send after login
 LOGOUT_REDIRECT_URL = "/"       # where to send after logout
+
+MEDIA_URL = "/media/"
+MEDIA_ROOT = BASE_DIR / "media"
 
 if any(cmd in sys.argv for cmd in ["test", "pytest"]):
     INSTALLED_APPS += ["tournaments.tests"]

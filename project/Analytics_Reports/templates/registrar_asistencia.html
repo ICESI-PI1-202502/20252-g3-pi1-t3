@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Registrar Asistencia</h2>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="mb-3">
+            <label>Actividad:</label>
+            <select name="actividad_id" class="form-select" required>
+                <option value="">Selecciona una actividad</option>
+                {% for actividad in actividades %}
+                    <option value="{{ actividad.id_actividad }}">{{ actividad.nombre }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label>Fecha: {{ fecha_hoy }}</label>
+            <input type="hidden" name="fecha" value="{{ fecha_hoy }}">
+        </div>
+
+        <div class="mb-3">
+            <label>Cédulas (una por línea):</label>
+            <textarea name="cedulas" class="form-control" rows="10" required 
+                      placeholder="1234567890&#10;0987654321"></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-primary">Registrar Asistencias</button>
+    </form>
+
+    {% if resultados %}
+    <div class="mt-4">
+        <div class="alert alert-success">Registrados: {{ resultados.exitosos }}</div>
+        {% if resultados.errores %}
+        <div class="alert alert-warning">
+            <strong>Errores:</strong>
+            <ul>
+                {% for error in resultados.errores %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

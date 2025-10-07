@@ -5,11 +5,9 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.shortcuts import redirect, render
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
 from .forms import UserLoginForm, UserRegisterForm
+from typing import List
 
 def user_login(request):
     if request.method == "POST":
@@ -40,7 +38,7 @@ def user_login(request):
 
         else:
             for error in form.errors.values():
-                messages.error(request, error) # type: ignore
+                messages.error(request, str(error))
             return redirect("login")
     else:
         form = UserLoginForm()
@@ -95,7 +93,7 @@ def register(request):
             return redirect("login")
         else:
             for error in form.errors.values():
-                messages.error(request, error) # type: ignore
+                messages.error(request, str(error))
             return redirect("register")
     else:
         form = UserRegisterForm()
@@ -206,9 +204,9 @@ def profile(request):
     participante = Participantes.objects.get(user=request.user)
     try:
         preferencia = Preferencias.objects.get(participantes_id_participante=participante)
-        actividades = preferencia.preferenciasactividades_set.all() # type: ignore
-    except Participantes.DoesNotExist:
-        actividades = None
+        actividades: List[PreferenciasActividades] = preferencia.actividades.all()  # type: ignore # Esto funciona en Django pero Pylance lo marca falso positivo
+    except Preferencias.DoesNotExist:
+        actividades = []
 
     context = {
         "participante": participante,
