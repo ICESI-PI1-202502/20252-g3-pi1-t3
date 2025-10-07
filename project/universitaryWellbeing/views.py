@@ -5,9 +5,6 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.shortcuts import redirect, render
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
 from .forms import UserLoginForm, UserRegisterForm
 from typing import List
