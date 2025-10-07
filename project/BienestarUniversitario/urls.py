@@ -27,6 +27,9 @@ urlpatterns = [
     path("", include("universitaryWellbeing.urls")),
     path('logout/', views.user_logout, name='logout'),
     #path("accounts/", include("django.contrib.auth.urls")), 
-    #path("analytics-reports/", include(("Analytics_Reports.urls", "analytics_reports"), namespace="analytics_reports")),    
+    #path("analytics-reports/", include(("Analytics_Reports.urls", "analytics_reports"), namespace="analytics_reports")), 
+    path("login/", auth_views.LoginView.as_view(template_name="login.html"), name="login"),
+    path("tournaments/", include("tournaments.urls")),
+    path("psu/", include("social_projects.urls")),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

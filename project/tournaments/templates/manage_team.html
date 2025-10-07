@@ -1,5 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
 
 {% block content %}
 <div class="container py-4">

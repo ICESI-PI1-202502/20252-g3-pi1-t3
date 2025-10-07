@@ -524,6 +524,7 @@ class Torneos(models.Model):
 )
     reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
     aforo_equipos = models.BigIntegerField(null=True, blank=True)
+    limite_inscripcion = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False

@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'Analytics_Reports',   
     'management_CADI',
     'tournaments',
+    'social_projects',
 
 ]
 
@@ -60,7 +61,7 @@ ROOT_URLCONF = 'BienestarUniversitario.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -90,11 +91,6 @@ DATABASES = {
         'OPTIONS': {'sslmode': 'require'},
    }
 }
-
-
-
-#AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -154,3 +150,8 @@ LOGOUT_REDIRECT_URL = "/"       # where to send after logout
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+if any(cmd in sys.argv for cmd in ["test", "pytest"]):
+    INSTALLED_APPS += ["tournaments.tests"]
+    # Desactiva migraciones del app real que está en conflicto
+    MIGRATION_MODULES = {"universitaryWellbeing": None}
