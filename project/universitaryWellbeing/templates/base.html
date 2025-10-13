@@ -86,14 +86,14 @@
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
         <a href="{% url 'home' %}">Inicio</a>
-        <a href="#">FAQ</a> <!-- {url 'faq' } examples-->
+        <a href="{% url 'searchActivities:search' %}">Buscar</a>
         <a href="#">Calendario</a>
-        <a href="#">¿Quiénes Somos?</a> <!-- { url 'manifest' } url examples -->
+        <a href="#">¿Quiénes Somos?</a>
         <a href="#">Nuestra oferta</a>
         <a href="#">Eventos y Servicios</a>
-        <a href="#">Analítica y reportes</a>
         {% if request.user.is_superuser %}
         <a href="{% url 'admin:index' %}">Panel de Administrador</a>
+        <a href="#">Analítica y reportes</a>
         {% endif %}
         <a href="{% url 'tournaments:list' %}">Torneos</a>
         <a href="{% url 'social_projects:lista_proyectos' %}">PSU</a>
