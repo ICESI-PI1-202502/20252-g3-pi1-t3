@@ -16,12 +16,6 @@
     <input type="text" name="nombre" class="form-control text-center" maxlength="150" required
            value="{{ draft.nombre|default:'' }}">
   </div>
-
-  <div class="col-md-6">
-    <h6>Espacio</h6>
-    <input name="espacio" class="form-control text-center" maxlength="150" required
-           value="{{ draft.espacio|default:'' }}">
-  </div>
 </div>
 
 <div class="row text-center mb-4">
@@ -70,27 +64,16 @@
       <div class="col-md-6">
         <h6>Apertura inscripción</h6>
         <input type="date" name="fecha_apertura_ins" class="form-control text-center"
-        value="{{ draft.fecha_apertura_ins|date:'Y-m-d'|default:'' }}">
+        value="{{ draft.fecha_apertura_ins|default:'' }}">
       </div>
       <div class="col-md-6">
         <h6>Cierre inscripción</h6>
         <input type="date" name="fecha_cierre_ins" class="form-control text-center"
-        value="{{ draft.fecha_cierre_ins|date:'Y-m-d'|default:'' }}">
+        value="{{ draft.fecha_cierre_ins|default:'' }}">
       </div>
     </div>
   </div>
 </div>
-
-{% if sched %}
-  <div class="alert alert-info mt-3">
-    <strong>Horario guardado:</strong>
-    Profesor: {{ sched.profesor|default:"—" }},
-    {{ sched.hora_inicio|default:"—" }} - {{ sched.hora_fin|default:"—" }},
-    Días: {% if sched.dias %}{{ sched.dias|join:", " }}{% else %}—{% endif %}
-  </div>
-{% endif %}
-
-
 
 <script>
   (function(){

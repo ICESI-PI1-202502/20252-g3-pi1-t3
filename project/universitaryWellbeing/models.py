@@ -7,11 +7,6 @@ class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
-    lugar = models.CharField(max_length=150, blank=True, null=True)
-
-    
-    fecha_inicio = models.DateTimeField(blank=True, null=True)
-    fecha_fin = models.DateTimeField(blank=True, null=True)
 
     requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
     modalidad = models.CharField(max_length=1, blank=True, null=True)
@@ -28,12 +23,42 @@ class Actividades(models.Model):
         db_column='act_grup_id',
         blank=True, null=True
     )
-    profesor = models.CharField(max_length=150, blank=True, null=True)
-    dias_semana = models.CharField(max_length=150, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'actividades'
+
+# Estos son nuevos modelos para la solucón del problema
+class HorariosBloque(models.Model):
+    id_horario_bloque = models.BigAutoField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(
+        Actividades, models.DO_NOTHING, db_column='actividades_id_actividad'
+    )
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'horarios_bloque'
+
+class HorariosActividad(models.Model):
+    id_horario = models.BigAutoField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(
+        Actividades, models.DO_NOTHING, db_column='actividades_id_actividad'
+    )
+    horario_bloque = models.ForeignKey(
+        HorariosBloque, models.DO_NOTHING, db_column='horario_bloque_id', null=True, blank=True
+    )
+    dia_semana = models.SmallIntegerField()
+
+    hora_inicio = models.TimeField(blank=True, null=True)
+    hora_fin = models.TimeField(blank=True, null=True)
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'horarios_actividad'
 
 
 class ActividadesGrupos(models.Model):
@@ -295,11 +320,10 @@ def actividad_upload_to(instance, filename):
 
     filename = f"{actividad_slug}.{ext}"
     
-    # ruta final: media/<grupo_id>/<actividad_slug>/<actividad_slug>.ext
     return os.path.join(str(grupo_id), actividad_slug, filename)
 
 class GruposActividad(models.Model):
-    # 👇 coincide con bigint identity en Postgres
+    
     id_grupo_actividad = models.BigAutoField(
         db_column='id_grupo_actividad', primary_key=True
     )

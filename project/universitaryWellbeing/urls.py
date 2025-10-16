@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.user_login, name="login"),
     path('logout/', views.user_logout, name='logout'),
     path("cadi/", include("management_CADI.urls", namespace="management_cadi")),
+    path("search/", include("searchActivities.urls", namespace="search_cadi")),
     path("home/", views.home_user, name="home"),
     path("profile/", views.profile, name="profile"),
     path("cadi-home/", views.home_admin, name="cadi_admin"),
@@ -13,6 +14,7 @@ urlpatterns = [
     path("preferences/", views.preferences, name="preferences"),
     path("analytics-reports/", include("Analytics_Reports.urls", namespace="analytics_reports")),
     path("tournaments/", include("tournaments.urls")),
+    path("psu/", include("social_projects.urls")),
 
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
