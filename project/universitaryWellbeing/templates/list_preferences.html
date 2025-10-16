@@ -2,62 +2,93 @@
 {% load static %}
 
 {% block title %}
-¡Bienvenido Preferencias!
+    ¡Bienvenido Preferencias!
+{% endblock %}
+
+{% block header_logo %}
+<span class="navbar-brand disabled-icon">
+  <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+  Bienestar Universitario
+</span>
+{% endblock %}
+
+{% block header_notifications %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Notificaciones">
+    <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+  </span>
+</div>
+{% endblock %}
+
+{% block header_avatar %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Perfil">
+    {% include 'includes/user_avatar.html' %}
+  </span>
+</div>
+{% endblock %}
+
+{% block header_sidebar_btn %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Menú">
+    <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+  </span>
+</div>
 {% endblock %}
 
 {% block extra_css %}
-{{ block.super }}
-<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
 {% endblock %}
 
 {% block content %}
-<!-- Contenedor principal de la lista de preferencias -->
-<section class="list-preferences">
+    <!-- Contenedor principal de la lista de preferencias -->
+    <section class="list-preferences">
 
-	<!-- Título y descripción -->
-	<h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
-	<p class="esto-nos-ayudar">
-		Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
-	</p>
+        <!-- Título y descripción -->
+        <h1 class="selecciona-el-tipo">¡Selecciona el tipo de actividades que te gusten!</h1>
+        <p class="esto-nos-ayudar">
+            Esto nos ayudará a encontrar las actividades que te encantarán. Selecciona las de tu preferencia.
+        </p>
 
-	<!-- FORMULARIO BIEN ABIERTO -->
-    <form method="post">
-        {% csrf_token %}
-        
         <!-- Formulario de selección de categorías -->
-        {% for category in categorias %}
-        <label class="category-item">
-            <input type="checkbox" name="categories" value="{{ category.id_tipo }}">
-            {{ category.nombre_tipo }}
-        </label>
-        {% endfor %}
+        <form method="POST">
+            {% csrf_token %}
+            <div class="categories-grid">
+                {% for category in categorias %}
+                    <label class="category-item">
+                        <input type="checkbox" name="categories" value="{{ category.id_tipo }}">
+                        {{ category.nombre_tipo }}
+                    </label>
+                {% endfor %}
+            </div>
 
-        <!-- Botón para enviar el formulario -->
-        <button type="submit" class="greenBotton_White">Continuar</button>
-    </form>
+            <!-- Botón para enviar el formulario -->
+            <button type="submit" class="greenBotton_White">Continuar</button>
+        </form>
 
-	<!-- Línea de separación -->
-	<div class="line-div"></div>
+        <!-- Línea de separación -->
+        <div class="line-div"></div>
 
-</section>
+    </section>
 
-<!-- Script para interacción de botones -->
-<script>
-	document.addEventListener('DOMContentLoaded', function () {
-		const botnAgregarContainer = document.getElementById("botnAgregarContainer");
-		if (botnAgregarContainer) {
-			botnAgregarContainer.addEventListener("click", function () {
-				// Lógica para continuar
-			});
-		}
+    <!-- Script para interacción de botones -->
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const botnAgregarContainer = document.getElementById("botnAgregarContainer");
+            if (botnAgregarContainer) {
+                botnAgregarContainer.addEventListener("click", function () {
+                    // Lógica para continuar
+                });
+            }
 
-		const menuImage = document.getElementById("menuImage");
-		if (menuImage) {
-			menuImage.addEventListener("click", function () {
-				// Lógica para menú
-			});
-		}
-	});
-</script>
-
+            const menuImage = document.getElementById("menuImage");
+            if (menuImage) {
+                menuImage.addEventListener("click", function () {
+                    // Lógica para menú
+                });
+            }
+        });
+    </script>
+    
 {% endblock %}

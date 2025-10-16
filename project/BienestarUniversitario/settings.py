@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+import sys, os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -40,12 +41,15 @@ INSTALLED_APPS = [
     'universitaryWellbeing',
     'Analytics_Reports',   
     'management_CADI',
+    'searchActivities',
     'tournaments',
+    'social_projects',
 
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -59,7 +63,7 @@ ROOT_URLCONF = 'BienestarUniversitario.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / "templates"],
+        'DIRS': [],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -81,19 +85,14 @@ DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'postgres',
-        'USER': 'postgres',
+        'USER': 'postgres.xlknciyujekwbhysmamn',
         'PASSWORD': 'h9TZan8icTf3hjsn',
-        'HOST': 'db.xlknciyujekwbhysmamn.supabase.co',
+        'HOST': 'aws-1-us-east-2.pooler.supabase.com',
         'PORT': '5432',
         'CONN_MAX_AGE': 60,
         'OPTIONS': {'sslmode': 'require'},
    }
 }
-
-
-
-#AUTH_USER_MODEL = "universitaryWellbeing.CustomUser"
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -133,7 +132,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIR = [BASE_DIR / "static"]
 
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+STORAGES = {
+    "staticfiles": {
+        "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+    },
+}
 
 
 
@@ -153,3 +160,8 @@ LOGOUT_REDIRECT_URL = "/"       # where to send after logout
 
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
+
+if any(cmd in sys.argv for cmd in ["test", "pytest"]):
+    INSTALLED_APPS += ["tournaments.tests"]
+    # Desactiva migraciones del app real que está en conflicto
+    MIGRATION_MODULES = {"universitaryWellbeing": None}

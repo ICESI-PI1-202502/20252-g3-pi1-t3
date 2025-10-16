@@ -1,13 +1,206 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
 {% block content %}
-<h2>Gestión de asistencia y contingencia</h2>
-<table border="1">
-  <tr><th>Estado de asistencia</th><th>Total</th></tr>
-  {% for row in data %}
-    <tr>
-      <td>{{ row.id_estado_asistencia__nombre }}</td>
-      <td>{{ row.total }}</td>
-    </tr>
-  {% endfor %}
-</table>
+<div class="estadisticas-page">
+  <h2>Comparaciones y estadísticas</h2>
+
+  <form method="get" class="mb-4">
+    <!-- 1. Tipo de filtro -->
+    <label for="tiempo"><strong>Filtrar por:</strong></label>
+    <select name="tiempo" id="tiempo" onchange="this.form.submit()">
+      <option value="todos" {% if tiempo == "todos" %}selected{% endif %}>Todos los registros</option>
+      <option value="semestre" {% if tiempo == "semestre" %}selected{% endif %}>Semestre específico</option>
+      <option value="periodo" {% if tiempo == "periodo" %}selected{% endif %}>Periodo personalizado</option>
+    </select>
+
+    <!-- Si elige semestre, mostrar selector de números de semestre -->
+    {% if tiempo == "semestre" %}
+      <div style="margin-top: 10px;">
+        <label for="semestre_filtro">Estudiantes de semestre:</label>
+        <select name="semestre_filtro" id="semestre_filtro" onchange="this.form.submit()">
+          <option value="">-- Seleccionar semestre --</option>
+          {% for sem in semestres_disponibles %}
+            <option value="{{ sem }}" {% if semestre_filtro == sem|stringformat:"s" %}selected{% endif %}>
+              Semestre {{ sem }}
+            </option>
+          {% endfor %}
+        </select>
+      </div>
+    {% endif %}
+
+    <!-- Si elige periodo, mostrar fechas -->
+    {% if tiempo == "periodo" %}
+      <div style="margin-top: 10px;">
+        <label for="inicio">Desde:</label>
+        <input type="date" name="inicio" id="inicio" value="{{ request.GET.inicio }}">
+        <label for="fin">Hasta:</label>
+        <input type="date" name="fin" id="fin" value="{{ request.GET.fin }}">
+        <button type="submit">Aplicar fechas</button>
+      </div>
+    {% endif %}
+
+    <br><br>
+
+    <!-- 2. Agrupación -->
+    <label for="agrupacion"><strong>Agrupar por:</strong></label>
+    <select name="agrupacion" id="agrupacion" onchange="this.form.submit()">
+      <option value="facultad" {% if agrupacion == "facultad" %}selected{% endif %}>Facultad</option>
+      <option value="genero" {% if agrupacion == "genero" %}selected{% endif %}>Género</option>
+      <option value="rol" {% if agrupacion == "rol" %}selected{% endif %}>Rol</option>
+      <option value="semestre" {% if agrupacion == "semestre" %}selected{% endif %}>Semestre</option>
+    </select>
+    
+    <!-- Botón manual por si JavaScript está deshabilitado -->
+    <button type="submit" style="margin-left: 10px;">Actualizar</button>
+  </form>
+
+  <!-- 3. Resultados -->
+  {% if resultados %}
+    <h3>Resultados: 
+      {% if tiempo == "todos" %}
+        Todos los registros
+      {% elif tiempo == "semestre" %}
+        {% if semestre_filtro %}
+          Estudiantes de {{ semestre_filtro }}° semestre
+        {% else %}
+          (Selecciona un semestre)
+        {% endif %}
+      {% else %}
+        Periodo {% if request.GET.inicio %}del {{ request.GET.inicio }}{% endif %}{% if request.GET.fin %} al {{ request.GET.fin }}{% endif %}
+      {% endif %}
+      → Agrupado por {{ agrupacion|capfirst }}
+    </h3>
+    
+    <table class="tabla-estadisticas table table-striped">
+      <thead>
+        <tr>
+          <th>{{ agrupacion|capfirst }}</th>
+          <th>Total Participaciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in resultados %}
+          <tr>
+            <td>
+              {% if agrupacion == "facultad" %}
+                {{ row.participantes_id_participante__facultad|default:"Sin especificar" }}
+              {% elif agrupacion == "genero" %}
+                {{ row.participantes_id_participante__genero|default:"Sin especificar" }}
+              {% elif agrupacion == "rol" %}
+                {{ row.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin especificar" }}
+              {% elif agrupacion == "semestre" %}
+                {% if row.participantes_id_participante__semestre %}
+                  {{ row.participantes_id_participante__semestre }}° semestre
+                {% else %}
+                  Sin especificar
+                {% endif %}
+              {% endif %}
+            </td>
+            <td>{{ row.total }}</td>
+          </tr>
+        {% empty %}
+          <tr><td colspan="2">No hay datos para mostrar</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    
+    <!-- Mostrar total general -->
+    {% if resultados %}
+      <p><strong>Total general: </strong>
+        {{ resultados|length }} grupos encontrados
+      </p>
+    {% endif %}
+    
+  {% else %}
+    <div class="alert alert-info">
+      <p>Selecciona los filtros y haz clic en "Actualizar" para ver los resultados.</p>
+      {% if tiempo == "semestre" and not semestre_filtro %}
+        <p><em>Para filtrar por semestre, debes seleccionar un número de semestre.</em></p>
+      {% elif tiempo == "periodo" and not request.GET.inicio %}
+        <p><em>Para el periodo personalizado, debes seleccionar las fechas de inicio y fin.</em></p>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  <!-- 4. Métricas clave -->
+  <div class="metricas-section">
+    <h3>Métricas clave
+      {% if tiempo == "semestre" and semestre_filtro %}
+        <small>(estudiantes de {{ semestre_filtro }}° semestre)</small>
+      {% elif tiempo == "periodo" and request.GET.inicio and request.GET.fin %}
+        <small>(del {{ request.GET.inicio }} al {{ request.GET.fin }})</small>
+      {% else %}
+        <small>(totales generales)</small>
+      {% endif %}
+    </h3>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h4 class="card-title">{{ metricas.total_asistencias }}</h4>
+            <p class="card-text">Total asistencias</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h4 class="card-title">{{ metricas.nuevos }}</h4>
+            <p class="card-text">Nuevos participantes</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="card text-center">
+          <div class="card-body">
+            <h4 class="card-title">{{ metricas.reincidencia }}</h4>
+            <p class="card-text">Participantes reincidentes</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+.estadisticas-page {
+  padding: 20px;
+}
+
+.tabla-estadisticas {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.tabla-estadisticas th {
+  background-color: #f8f9fa;
+  font-weight: bold;
+}
+
+.metricas-section {
+  margin-top: 30px;
+}
+
+.card {
+  margin-bottom: 15px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card-title {
+  color: #007bff;
+  font-size: 2em;
+  margin-bottom: 10px;
+}
+
+.alert {
+  margin-top: 20px;
+}
+</style>
 {% endblock %}

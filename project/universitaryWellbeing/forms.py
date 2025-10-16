@@ -11,7 +11,7 @@ class UserLoginForm(forms.Form):
 
     def clean_cedula(self):
         cedula = self.cleaned_data.get('cedula')
-        if not cedula.isdigit(): # type: ignore
+        if not isinstance(cedula, str) or not cedula.isdigit():
             raise ValidationError("La cédula debe contener solo números.")
         if not User.objects.filter(username=cedula).exists():
             raise ValidationError("El usuario con esa cédula no existe.")
@@ -38,7 +38,7 @@ class UserRegisterForm(forms.Form):
 
     def clean_cedula(self):
         cedula = self.cleaned_data.get('cedula')
-        if not cedula.isdigit(): # type: ignore
+        if not isinstance(cedula, str) or not cedula.isdigit():
             raise ValidationError("La cédula debe contener solo números.")
         if User.objects.filter(username=cedula).exists():
             raise ValidationError("Este número de cédula ya está registrado.")
@@ -55,7 +55,7 @@ class UserRegisterForm(forms.Form):
         return email
 
     def clean_nombre_completo(self):
-        nombre = self.cleaned_data.get('nombre_completo')
-        if any(char.isdigit() for char in nombre): # type: ignore
+        nombre = self.cleaned_data.get('nombre_completo') or ""
+        if any(char.isdigit() for char in nombre):
             raise ValidationError("El nombre no puede contener números.")
         return nombre
