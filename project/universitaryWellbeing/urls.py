@@ -14,6 +14,7 @@ urlpatterns = [
     path("preferences/", views.preferences, name="preferences"),
     path("analytics-reports/", include("Analytics_Reports.urls", namespace="analytics_reports")),
     path("tournaments/", include("tournaments.urls")),
+    path("psu/", include("social_projects.urls")),
 
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
