@@ -6,6 +6,7 @@ urlpatterns = [
     path("", views.user_login, name="login"),
     path('logout/', views.user_logout, name='logout'),
     path("cadi/", include("management_CADI.urls", namespace="management_cadi")),
+    path("search/", include("searchActivities.urls", namespace="search_cadi")),
     path("home/", views.home_user, name="home"),
     path("profile/", views.profile, name="profile"),
     path("cadi-home/", views.home_admin, name="cadi_admin"),

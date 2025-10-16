@@ -15,38 +15,47 @@
   <p class="text-center">{{ grupo_actividad.descripcion }}</p>
 
   {% if actividades %}
-    <div class="row mt-4">
-      {% for a in actividades %}
-        <div class="col-md-4 text-center mb-4">
-          <div class="card shadow-sm p-3">
+  <div class="row mt-4">
+    {% for a in actividades %}
+    <div class="col-md-4 text-center mb-4">
+      <div class="card shadow-sm p-3">
 
-            <!-- Ícono editar (arriba derecha) -->
-            <a href="{{ a.editar_url }}" class="position-absolute" style="top:8px; right:8px;">
-              <img src="{% static 'management_CADI/images/create/edit.png' %}" alt="Editar" style="width:24px;height:24px;">
-            </a>
-            
-            <h5 class="mt-2">{{ a.nombre }}</h5>
-            <p><strong>Días:</strong> {{ a.dias_semana|default:"—" }}</p>
-            <p><strong>Hora:</strong>
-              {% if a.fecha_inicio and a.fecha_fin %}
-                {{ a.fecha_inicio|time:"H:i" }} - {{ a.fecha_fin|time:"H:i" }}
-              {% else %}—{% endif %}
-            </p>
-            <p><strong>Espacio:</strong> {{ a.lugar|default:"—" }}</p>
-            <p><strong>Profesor:</strong> {{ a.profesor|default:"—" }}</p>
+        <!-- Ícono editar (arriba derecha) -->
+        <a href="{{ a.editar_url }}" class="position-absolute" style="top:8px; right:8px;">
+          <img src="{% static 'management_CADI/images/create/edit.png' %}" alt="Editar" style="width:24px;height:24px;">
+        </a>
+
+        <h5 class="mt-2">{{ a.nombre }}</h5>
+
+        {% if a.items_dia %}
+        <div class="text-start" style="font-size: 0.95rem;">
+          {% for it in a.items_dia %}
+          <div class="mb-2">
+            <div><strong>Día:</strong> {{ it.dia }}</div>
+            <div><strong>Horario:</strong> {{ it.horario }}</div>
+            <div><strong>Espacio:</strong> {{ it.espacio|default:"—" }}</div>
+            <div><strong>Profesor:</strong> {{ it.profesor|default:"—" }}</div>
           </div>
+          {% if not forloop.last %}
+          <hr class="my-2">
+          {% endif %}
+          {% endfor %}
         </div>
-      {% endfor %}
+        {% else %}
+        <p>—</p>
+        {% endif %}
+
+      </div>
     </div>
+    {% endfor %}
+  </div>
   {% else %}
-    <p class="text-center mt-4">Aún no hay actividades.</p>
+  <p class="text-center mt-4">Aún no hay actividades.</p>
   {% endif %}
 
-  <!-- El botón puede quedarse visible siempre; cuando pases a crear, esta URL ya estará correcta -->
   <br><br>
   <center>
-  <a href="{{ crear_url }}?reset=1" class="yellowBotton_Black">Agregar actividad</a>
-
+    <a href="{{ crear_url }}?reset=1" class="yellowBotton_Black">Agregar actividad</a>
   </center>
 </div>
 {% endblock %}
