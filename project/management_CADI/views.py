@@ -4,9 +4,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.urls import reverse
 from collections import defaultdict
+from django.db.models import Avg
+from django.http import Http404
+from django.contrib.auth.decorators import login_required
 from universitaryWellbeing.models import (
     ActividadesGrupos, Actividades, TiposActividad, GruposActividad, Grupos,
-    HorariosBloque, HorariosActividad,
+    HorariosBloque, HorariosActividad, CalificacionesActividad
 )
 
 def _draft_keys(grupo_actividad_id, actividad_id=None):
@@ -26,7 +29,13 @@ DIAS_REV = {
 def is_admin(user):
     return user.is_authenticated and user.is_staff
 
-# @user_passes_test(is_admin)  # Uncomment if you want to restrict access
+def superuser_required(view_func):
+    def wrapper(request, *args, **kwargs):
+        if not request.user.is_superuser:
+            return render(request, "pageNotFound-404.html", status=404)
+        return view_func(request, *args, **kwargs)
+    return wrapper
+
 
 DRAFT_KEY_BASE = "cadi_draft_base_{ga}"
 DRAFT_KEY_SCHED = "cadi_draft_sched_{ga}"
@@ -69,7 +78,9 @@ def cadi_index(request):
         "grupos_actividad": grupos_actividad
     })
 
-def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
+@superuser_required
+@login_required
+def create_Activities(request, grupo_actividad_id):
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
     slug_real = slugify(grupo_actividad.grupos_id_grupo.nombre)
     tipos = TiposActividad.objects.all().order_by("id_tipo")
@@ -194,7 +205,8 @@ def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
         "modo": "create",
     })
 
-
+@superuser_required
+@login_required
 def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id, grupos_id_grupo=grupo)
@@ -355,26 +367,25 @@ def editar_actividad(request, grupo_nombre, grupo_id, grupo_actividad_id, activi
         "modo": "edit",
     })
 
-
-
+@login_required
 def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id, grupos_id_grupo=grupo)
 
+    # Verificar si el nombre del grupo coincide con el slug real
     slug_real = slugify(grupo.nombre)
     if grupo_nombre != slug_real:
         return redirect("management_cadi:listar_actividades", slug_real, grupo.id_grupo, grupo_actividad.id_grupo_actividad)
 
+    # URL para crear actividad
     crear_url = reverse("management_cadi:crear_actividad", kwargs={
         "grupo_nombre": slug_real,
         "grupo_id": grupo.id_grupo,
         "grupo_actividad_id": grupo_actividad.id_grupo_actividad,
     })
 
-    actividades_ids = ActividadesGrupos.objects.filter(
-        grupos_actividad_id=grupo_actividad_id
-    ).values_list("actividad_id", flat=True)
-
+    # Obtener las actividades asociadas al grupo
+    actividades_ids = ActividadesGrupos.objects.filter(grupos_actividad_id=grupo_actividad_id).values_list("actividad_id", flat=True)
     actividades = list(
         Actividades.objects
         .filter(id_actividad__in=actividades_ids)
@@ -382,7 +393,7 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
         .order_by("nombre")
     )
 
-    # Traer bloques y días
+    # Traer bloques y días de las actividades
     bloques = list(
         HorariosBloque.objects
         .filter(actividades_id_actividad__in=[a["id_actividad"] for a in actividades])
@@ -398,7 +409,7 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
     for d in dias:
         dias_por_bloque[d["horario_bloque_id"]].append(d["dia_semana"])
 
-    # Construir salida "día a día"
+    # Construir la salida "día a día"
     daywise_por_act = defaultdict(list)
     for b in bloques:
         bdias = sorted(dias_por_bloque.get(b["id_horario_bloque"], []))
@@ -410,13 +421,45 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
                 "profesor": b["profesor"],
             })
 
+    # Calcular y asignar el promedio de calificación y la imagen correspondiente a cada actividad
     for a in actividades:
+        # Calcular el promedio de las calificaciones
+        promedio_calificacion = CalificacionesActividad.objects.filter(actividades_id_actividad=a["id_actividad"]).aggregate(Avg('estrellas'))['estrellas__avg']
+        promedio_calificacion = promedio_calificacion if promedio_calificacion is not None else 0
+
+        # Asignar el promedio de calificación
+        a["promedio_calificacion"] = promedio_calificacion
+
+        # Asignar la imagen de la calificación según el promedio
+        if promedio_calificacion == 0:
+            a["rating_image"] = 'rating_0_0.png'
+        elif 0 < promedio_calificacion <= 0.5:
+            a["rating_image"] = 'rating_0_5.png'
+        elif 1 <= promedio_calificacion < 1.5:
+            a["rating_image"] = 'rating_1_5.png'
+        elif 1.5 <= promedio_calificacion < 2:
+            a["rating_image"] = 'rating_2_0.png'
+        elif 2 <= promedio_calificacion < 2.5:
+            a["rating_image"] = 'rating_2_5.png'
+        elif 3 <= promedio_calificacion < 3.5:
+            a["rating_image"] = 'rating_3_0.png'
+        elif 3.5 <= promedio_calificacion < 4:
+            a["rating_image"] = 'rating_3_5.png'
+        elif 4 <= promedio_calificacion < 4.5:
+            a["rating_image"] = 'rating_4_0.png'
+        elif 4.5 <= promedio_calificacion < 5:
+            a["rating_image"] = 'rating_4_5.png'
+        else:
+            a["rating_image"] = 'rating_5_0.png'
+
+        # Asignar URL de edición
         a["editar_url"] = reverse("management_cadi:editar_actividad", kwargs={
             "grupo_nombre": slug_real,
             "grupo_id": grupo.id_grupo,
             "grupo_actividad_id": grupo_actividad.id_grupo_actividad,
             "actividad_id": a["id_actividad"],
         })
+        # Asignar los bloques y días de la actividad
         a["items_dia"] = daywise_por_act.get(a["id_actividad"], [])
 
     return render(request, "listar_actividades.html", {
@@ -426,7 +469,7 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
         "crear_url": crear_url,
     })
 
-
+@login_required
 def listar_grupos_actividad(request, grupo_nombre, grupo_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupos_actividad = GruposActividad.objects.filter(grupos_id_grupo=grupo)
@@ -450,7 +493,8 @@ def listar_grupos_actividad(request, grupo_nombre, grupo_id):
         "descripcion": descripcion,
     })
 
-
+@login_required
+@superuser_required
 def crear_grupo_actividad(request, grupo_nombre, grupo_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
 
@@ -480,7 +524,8 @@ def crear_grupo_actividad(request, grupo_nombre, grupo_id):
 
     return render(request, "form_gruposActivi.html", {"grupo": grupo})
 
-
+@login_required
+@superuser_required
 def schedule_draft(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id=None):
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
     grupo = grupo_actividad.grupos_id_grupo
