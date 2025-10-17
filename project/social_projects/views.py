@@ -40,7 +40,7 @@ def lista_proyectos(request):
     ctx = {
         "projects": projects,
         "search": q,
-        "can_create": is_admin(request.user),   # << para el botón en el template
+        "can_create": is_admin(request.user),   
     }
     return render(request, "lista.html", ctx)
 
@@ -85,7 +85,7 @@ def crear_proyecto_social(request):
                 ProyectosSociales.objects.create(
                     nombre=nombre,
                     descripcion=descripcion or None,
-                    coordinador_id=participante.id_participante,  # entero (no FK)
+                    coordinador_id=participante.id_participante,  
                     fecha_inicio=fecha_inicio,
                     fecha_fin=fecha_fin,
                     aforo=aforo,
