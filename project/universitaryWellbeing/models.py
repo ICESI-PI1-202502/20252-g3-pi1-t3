@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User,Group
+from django.core.validators import MinValueValidator, MaxValueValidator
 import os
 
 class Actividades(models.Model):
@@ -23,6 +24,8 @@ class Actividades(models.Model):
         db_column='act_grup_id',
         blank=True, null=True
     )
+
+    promedio_calificacion = models.FloatField(default=0, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -149,18 +152,31 @@ class AuthUserUserPermissions(models.Model):
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
 
-class CalificacionesActividad(models.Model):
 
+CALIFICACION_CHOICES = [(i, str(i)) for i in range(6)]
+
+class CalificacionesActividad(models.Model):
     id_calificacion = models.BigAutoField(primary_key=True)
-    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')
-    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    estrellas = models.IntegerField()
+    actividades_id_actividad = models.ForeignKey('Actividades', on_delete=models.DO_NOTHING, db_column='actividades_id_actividad')
+    participantes_id_participante = models.ForeignKey('Participantes', on_delete=models.DO_NOTHING, db_column='participantes_id_participante')
+    
+    estrellas = models.SmallIntegerField(
+        null=True, blank=True, choices=CALIFICACION_CHOICES,
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        default=0
+    )
     comentario = models.CharField(max_length=500, blank=True, null=True)
-    fecha = models.DateTimeField()
+    fecha = models.DateTimeField(auto_now_add=True)  # Por defecto se asigna la fecha actual al crear la calificación
+
     class Meta:
-        managed = False
+        managed = False  
         db_table = 'calificaciones_actividad'
-        unique_together = (('actividades_id_actividad', 'participantes_id_participante'),)
+        unique_together = (('actividades_id_actividad', 'participantes_id_participante'),)  # Única combinación de actividad y participante
+
+    def save(self, *args, **kwargs):
+        if not self.fecha:
+            self.fecha = models.DateTimeField(auto_now_add=True)  # Si no se pasa la fecha, se pone la actual
+        super().save(*args, **kwargs)
 
 class Citas(models.Model):
 

@@ -14,10 +14,19 @@
           <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
             Centro Artístico y Deportivo Icesi - CADI
           </h3>
-          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 1 %}" 
+
+          {% if request.user.is_superuser %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 1 %}" 
              class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-            Gestionar actividades
-          </a>
+              Gestionar actividades
+            </a>
+          {% else %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 1 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+              Ver actividades
+            </a>
+          {% endif %}
+          
         </div>
       </div>
     </div>
@@ -30,10 +39,18 @@
           <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
             Desarrollo Humano y Promoción de la Salud
           </h3>
-          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 2 %}" 
+
+          {% if request.user.is_superuser %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 2 %}" 
              class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-            Gestionar actividades
-          </a>
+              Gestionar actividades
+            </a>
+          {% else %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 2 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+              Ver actividades
+            </a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -46,10 +63,18 @@
           <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
             Proyecto Social de Bienestar Universitario (PSU)
           </h3>
-          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 3 %}" 
+
+          {% if request.user.is_superuser %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 3 %}" 
              class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-            Gestionar actividades
-          </a>
+              Gestionar actividades
+            </a>
+          {% else %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 3 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+              Ver actividades
+            </a>
+          {% endif %}
         </div>
       </div>
     </div>
@@ -62,10 +87,19 @@
           <h3 class="center-text position-absolute top-50 start-50 translate-middle text-white text-center px-2">
             Programa Estás en Casa
           </h3>
-          <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 4 %}" 
+
+          {% if request.user.is_superuser %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 4 %}" 
              class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
-            Gestionar actividades
-          </a>
+              Gestionar actividades
+            </a>
+          {% else %}
+            <a href="{% url 'management_cadi:listar_grupos_actividad' '-' 4 %}" 
+             class="yellowBotton_Black position-absolute start-50 bottom-0 translate-middle-x mb-3">
+              Ver actividades
+            </a>
+          {% endif %}
+          
         </div>
       </div>
     </div>
