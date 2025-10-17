@@ -20,10 +20,13 @@
     <div class="col-md-4 text-center mb-4">
       <div class="card shadow-sm p-3">
 
-        <!-- Ícono editar (arriba derecha) -->
+        {% if request.user.is_superuser %}
+        <!-- Ícono editar -->
         <a href="{{ a.editar_url }}" class="position-absolute" style="top:8px; right:8px;">
           <img src="{% static 'management_CADI/images/create/edit.png' %}" alt="Editar" style="width:24px;height:24px;">
         </a>
+        {% else %}
+        {% endif %}
 
         <h5 class="mt-2">{{ a.nombre }}</h5>
 
@@ -45,17 +48,30 @@
         <p>—</p>
         {% endif %}
 
+        <!-- Mostrar la calificación -->
+        <div class="mt-3">
+          <strong>Calificación Promedio:</strong>
+          <img src="{% static 'images/rating/'|add:a.rating_image %}" alt="Calificación"
+            style="width: 100px; height: auto;">
+        </div>
+
       </div>
     </div>
     {% endfor %}
   </div>
+  
   {% else %}
-  <p class="text-center mt-4">Aún no hay actividades.</p>
+    <br><br>
+    <p class="text-center mt-4">No hay actividades aún.</p>
   {% endif %}
 
   <br><br>
+  {% if request.user.is_superuser %}
   <center>
     <a href="{{ crear_url }}?reset=1" class="yellowBotton_Black">Agregar actividad</a>
   </center>
+  {% else %}
+  {% endif %}
+
 </div>
 {% endblock %}

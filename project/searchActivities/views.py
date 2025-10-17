@@ -1,27 +1,25 @@
 from collections import defaultdict
 from functools import reduce
 import operator
-
-from django.db.models import Q, F, Value
+from django.db.models import Q, F, Value, Avg
 from django.db.models.functions import Lower
 from django.shortcuts import render
-
+from django.contrib.auth.decorators import login_required
 from universitaryWellbeing.models import (
-    Actividades, TiposActividad, HorariosBloque, HorariosActividad
+    Actividades, TiposActividad, HorariosBloque, HorariosActividad, CalificacionesActividad
 )
 
-# Postgres helpers (si tienes pg_trgm y unaccent)
 try:
     from django.contrib.postgres.search import TrigramSimilarity
-    from django.contrib.postgres.functions import Unaccent # type: ignore
+    from django.contrib.postgres.functions import Unaccent  # type: ignore
     PG_TRIGRAM_AVAILABLE = True
 except Exception:
-    # En caso extremo de entorno que no tenga psycopg/postgres contrib
     PG_TRIGRAM_AVAILABLE = False
     Unaccent = None  # type: ignore
 
-DIAS_REV = {0:"Lunes",1:"Martes",2:"Miércoles",3:"Jueves",4:"Viernes",5:"Sábado",6:"Domingo"}
+DIAS_REV = {0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves", 4: "Viernes", 5: "Sábado", 6: "Domingo"}
 
+@login_required
 def search(request):
     q = (request.GET.get("q") or "").strip()
     tipo_id = (request.GET.get("tipo") or "").strip()
@@ -29,36 +27,25 @@ def search(request):
 
     qs = Actividades.objects.all()
 
-    # ---------- Filtro por NOMBRE (acentos y typos) ----------
     if q:
-        # normalizamos el query
         q_lower = q.lower()
         terms = [t for t in q_lower.split() if t]
 
         if PG_TRIGRAM_AVAILABLE:
-            # Requiere extensiones en Postgres:
-            #   CREATE EXTENSION IF NOT EXISTS unaccent;
-            #   CREATE EXTENSION IF NOT EXISTS pg_trgm;
-            # 1) Normaliza campo nombre: unaccent + lower
             qs = qs.annotate(
-                norm_name=Unaccent(Lower(F('nombre'))) # type: ignore
+                norm_name=Unaccent(Lower(F('nombre')))  # type: ignore
             )
-            # 2) Trigram similarity contra el query normalizado
             qs = qs.annotate(
-                sim=TrigramSimilarity(F('norm_name'), Unaccent(Value(q_lower))) # type: ignore
+                sim=TrigramSimilarity(F('norm_name'), Unaccent(Value(q_lower)))  # type: ignore
             )
-            # 3) Filtro por tokens (AND de icontains sin acentos)
             tokens_and = reduce(
                 operator.and_,
                 (Q(norm_name__icontains=t) for t in terms),
                 Q()  # identidad neutra
             ) if terms else Q()
 
-            # 4) Aceptamos si (todos los tokens aparecen) OR (sim ≥ umbral)
-            #    Umbral típico 0.2 - 0.3; lo dejamos sensible para typos
             qs = qs.filter(tokens_and | Q(sim__gte=0.20))
         else:
-            # Fallback sin trigram: lower() + icontains combinando AND de tokens
             qs = qs.annotate(name_lc=Lower(F('nombre')))
             if terms:
                 for t in terms:
@@ -114,11 +101,41 @@ def search(request):
                 'profesor': b['profesor'],
             })
 
+    # ---------- Calcular promedio de calificación y asignar imagen de calificación ----------
     for a in acts:
-        a['items_dia'] = daywise_por_act.get(a['id_actividad'], [])
+        # Calcular el promedio de calificación
+        promedio_calificacion = CalificacionesActividad.objects.filter(actividades_id_actividad=a['id_actividad']).aggregate(Avg('estrellas'))['estrellas__avg']
+        promedio_calificacion = promedio_calificacion if promedio_calificacion is not None else 0
+
+        # Asignar el promedio de calificación
+        a["promedio_calificacion"] = promedio_calificacion
+
+        # Asignar la imagen de calificación según el promedio
+        if promedio_calificacion == 0:
+            a["rating_image"] = 'rating_0_0.png'
+        elif 0 < promedio_calificacion <= 0.5:
+            a["rating_image"] = 'rating_0_5.png'
+        elif 1 <= promedio_calificacion < 1.5:
+            a["rating_image"] = 'rating_1_5.png'
+        elif 1.5 <= promedio_calificacion < 2:
+            a["rating_image"] = 'rating_2_0.png'
+        elif 2 <= promedio_calificacion < 2.5:
+            a["rating_image"] = 'rating_2_5.png'
+        elif 3 <= promedio_calificacion < 3.5:
+            a["rating_image"] = 'rating_3_0.png'
+        elif 3.5 <= promedio_calificacion < 4:
+            a["rating_image"] = 'rating_3_5.png'
+        elif 4 <= promedio_calificacion < 4.5:
+            a["rating_image"] = 'rating_4_0.png'
+        elif 4.5 <= promedio_calificacion < 5:
+            a["rating_image"] = 'rating_4_5.png'
+        else:
+            a["rating_image"] = 'rating_5_0.png'
+
+        # Asignar los bloques y días de la actividad
+        a["items_dia"] = daywise_por_act.get(a['id_actividad'], [])
 
     # ---------- Tipos ----------
-    # Anotamos 'nombre' desde 'nombre_tipo' para usarlo fácil en el template
     tipos = list(
         TiposActividad.objects
         .annotate(nombre=F('nombre_tipo'))
