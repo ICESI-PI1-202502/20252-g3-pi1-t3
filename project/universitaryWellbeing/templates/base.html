@@ -85,18 +85,29 @@
 
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
-        <a href="{% url 'home' %}">Inicio</a>
-        <a href="{% url 'searchActivities:search' %}">Buscar</a>
-        <a href="#">Calendario</a>
-        <a href="#">¿Quiénes Somos?</a>
-        <a href="#">Nuestra oferta</a>
-        <a href="#">Eventos y Servicios</a>
+
+        <a href="{% url request.user.is_superuser|yesno:'cadi_admin,home' %}">
+            {% if request.user.is_superuser %}
+                Administrar oferta
+            {% else %}
+                Inicio
+            {% endif %}
+        </a>
+
         {% if request.user.is_superuser %}
-        <a href="{% url 'admin:index' %}">Panel de Administrador</a>
-        <a href="#">Analítica y reportes</a>
+            <a href="#">Gestionar eventos y servicios</a>
+            <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
+            <a href="{% url 'admin:index' %}">Panel de Administrador</a>
+            <a href="#">Analítica y reportes</a>
+        {% else %}
+            <a href="{% url 'searchActivities:search' %}">Buscar</a>
+            <a href="#">Calendario</a>
+            <a href="#">¿Quiénes Somos?</a>
+            <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
+            <a href="#">Eventos y Servicios</a>
+            <a href="{% url 'tournaments:list' %}">Torneos</a>
         {% endif %}
-        <a href="{% url 'tournaments:list' %}">Torneos</a>
-        <a href="{% url 'social_projects:lista_proyectos' %}">PSU</a>
+
         <a href="{% url 'logout' %}">Cerrar sesión</a>
 
 

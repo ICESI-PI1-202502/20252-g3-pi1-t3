@@ -154,8 +154,12 @@ def preferences(request):
 
 @login_required
 def home_user(request):
+     
+    if request.user.is_superuser:
+        return render(request, "pageNotFound-404.html", status=404)
+    
     user = request.user
-    actividades = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
+    actividades = Actividades.objects.values("nombre") 
     actividades_recomendadas = get_recommendations_for_user(user)
     horario = get_user_schedule(user)
     calendario = get_user_calendar(user)
@@ -168,6 +172,11 @@ def home_user(request):
     }
 
     return render(request, "home_user.html", context)
+
+@login_required
+def home_admin(request):
+    
+    return render(request, "home_admin.html")
 
 def get_recommendations_for_user(user):
     try:
@@ -195,9 +204,6 @@ def get_user_calendar(user):
     except Participantes.DoesNotExist:
         return []
 
-@login_required
-def home_admin(request):
-    return render(request, "home_admin.html")
 
 @login_required
 def profile(request):
