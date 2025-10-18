@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Calificar actividad{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center">Calificar: {{ actividad.nombre }}</h2>
+
+  <form method="post" class="mt-4">
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="estrellas" class="form-label"><strong>Estrellas</strong></label>
+      <select id="estrellas" name="estrellas" class="form-select text-center">
+        {% for i in stars_range %}
+          <option value="{{ i }}" {% if calificacion and calificacion.estrellas == i %}selected{% endif %}>
+            {{ i }}
+          </option>
+        {% endfor %}
+      </select>
+
+    </div>
+
+    <div class="mb-3">
+      <label for="comentario" class="form-label"><strong>Comentario (opcional)</strong></label>
+      <textarea id="comentario" name="comentario" class="form-control" rows="3">{{ calificacion.comentario|default_if_none:"" }}</textarea>
+    </div>
+
+    <div class="text-center">
+      <button type="submit" class="greenBotton_White">Confirmar</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
