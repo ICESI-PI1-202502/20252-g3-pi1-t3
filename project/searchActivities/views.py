@@ -4,9 +4,11 @@ import operator
 from django.db.models import Q, F, Value, Avg
 from django.db.models.functions import Lower
 from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from universitaryWellbeing.models import (
-    Actividades, TiposActividad, HorariosBloque, HorariosActividad, CalificacionesActividad
+    Actividades, TiposActividad, HorariosBloque, HorariosActividad, CalificacionesActividad, Participantes
 )
 
 try:
@@ -19,7 +21,6 @@ except Exception:
 
 DIAS_REV = {0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves", 4: "Viernes", 5: "Sábado", 6: "Domingo"}
 
-@login_required
 def search(request):
     q = (request.GET.get("q") or "").strip()
     tipo_id = (request.GET.get("tipo") or "").strip()
@@ -115,19 +116,21 @@ def search(request):
             a["rating_image"] = 'rating_0_0.png'
         elif 0 < promedio_calificacion <= 0.5:
             a["rating_image"] = 'rating_0_5.png'
-        elif 1 <= promedio_calificacion < 1.5:
+        elif 0.5 < promedio_calificacion <= 1:
+            a["rating_image"] = 'rating_1_0.png'
+        elif 1 < promedio_calificacion <= 1.5:
             a["rating_image"] = 'rating_1_5.png'
-        elif 1.5 <= promedio_calificacion < 2:
+        elif 1.5 < promedio_calificacion <= 2:
             a["rating_image"] = 'rating_2_0.png'
-        elif 2 <= promedio_calificacion < 2.5:
+        elif 2 < promedio_calificacion <= 2.5:
             a["rating_image"] = 'rating_2_5.png'
-        elif 3 <= promedio_calificacion < 3.5:
+        elif 2.5 < promedio_calificacion <= 3:
             a["rating_image"] = 'rating_3_0.png'
-        elif 3.5 <= promedio_calificacion < 4:
+        elif 3 < promedio_calificacion <= 3.5:
             a["rating_image"] = 'rating_3_5.png'
-        elif 4 <= promedio_calificacion < 4.5:
+        elif 3.5 < promedio_calificacion <= 4:
             a["rating_image"] = 'rating_4_0.png'
-        elif 4.5 <= promedio_calificacion < 5:
+        elif 4 < promedio_calificacion <= 4.5:
             a["rating_image"] = 'rating_4_5.png'
         else:
             a["rating_image"] = 'rating_5_0.png'
@@ -162,4 +165,62 @@ def search(request):
         'selected_tipo_name': selected_tipo_name,
         'using_trigram': PG_TRIGRAM_AVAILABLE,
     }
+
+    for a in acts:
+        
+        try:
+            participante = Participantes.objects.get(user=request.user)
+            ya_califico = CalificacionesActividad.objects.filter(
+                actividades_id_actividad=a['id_actividad'],
+                participantes_id_participante=participante
+            ).exists()
+        except Participantes.DoesNotExist:
+            ya_califico = False
+
+        a["user_has_calificado"] = ya_califico
+        
     return render(request, "search.html", ctx)
+
+
+@login_required
+def calificar_actividad(request, actividad_id):
+    actividad = get_object_or_404(Actividades, pk=actividad_id)
+
+    # Relacionar el user logueado con su registro de participante
+    try:
+        participante = Participantes.objects.get(user=request.user)
+    except Participantes.DoesNotExist:
+        messages.error(request, "No se encontró un perfil de participante asociado a tu usuario.")
+        return redirect("searchActivities:search")
+
+    # Buscar si ya existe una calificación
+    calificacion = CalificacionesActividad.objects.filter(
+        actividades_id_actividad=actividad,
+        participantes_id_participante=participante
+    ).first()
+
+    if request.method == "POST":
+        estrellas = int(request.POST.get("estrellas", 0))
+        comentario = request.POST.get("comentario", "").strip()
+
+        if not calificacion:
+            calificacion = CalificacionesActividad(
+                actividades_id_actividad=actividad,
+                participantes_id_participante=participante,
+            )
+
+        calificacion.estrellas = estrellas
+        calificacion.comentario = comentario
+        calificacion.save()
+
+        # Redirigir según el parámetro `next`
+        next_url = request.GET.get("next")
+        if next_url:
+            return redirect(next_url)
+        return redirect("searchActivities:search")
+
+    return render(request, "calificar.html", {
+        "actividad": actividad,
+        "calificacion": calificacion,
+        "stars_range": range(6),
+    })

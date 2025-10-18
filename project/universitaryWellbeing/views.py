@@ -175,7 +175,7 @@ def home_user(request):
 
 @login_required
 def home_admin(request):
-    
+        
     return render(request, "home_admin.html")
 
 def get_recommendations_for_user(user):
