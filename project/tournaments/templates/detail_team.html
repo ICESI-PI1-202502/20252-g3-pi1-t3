@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
 {% endblock %}
 
-{# Si quieres forzar el back en esta vista (no es necesario si ya es default en base.html) #}
 {% block subheaderBar %}
 <a href="javascript:history.back()" class="back-link">
   <i class="bi bi-arrow-left"></i> Regresar
@@ -52,16 +51,69 @@
                 <a class="btn btn-primary" href="{% url 'tournaments:manage_team' tournament.id my_team_id %}">
                   Gestionar mi equipo
                 </a>
-              {% endif %}
-
+             {% endif %}
               <a class="btn btn-outline-primary" href="{% url 'tournaments:create_team' tournament.id %}">
                 Crear equipo
               </a>
-
               <a class="btn btn-primary" href="{% url 'tournaments:join_team' tournament.id %}">
                 Unirme a un equipo
               </a>
-            </div>
+
+              {# SOLO ADMIN: Registrar partido #}
+              {% if can_manage and tournament.aforo_equipos %}
+                <a class="btn btn-success" href="{% url 'tournaments:matches_create' tournament.id %}">
+                  Registrar partido
+                </a>
+              {% endif %}
+          </div>
+
+{# Lista de partidos #}
+<h3 class="section-title mt-5 mb-2">Partidos</h3>
+<div class="table-responsive">
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Partido</th>
+        <th>Estado</th>
+        <th>Marcador</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in matches %}
+        <tr>
+          <td>
+            {% if m.fecha_inicio %}{{ m.fecha_inicio|date:"d M Y H:i" }}{% else %}—{% endif %}
+          </td>
+          <td>
+            {{ m.equipos_id_equipo.nombre }} vs {{ m.equipos_id_equipo2.nombre }}
+            {% if m.lugar %}<div class="text-muted small">Lugar: {{ m.lugar }}</div>{% endif %}
+          </td>
+          <td>{{ m.estado|default:"PROGRAMADO" }}</td>
+          <td>
+            {% if m.marcador_a != None and m.marcador_b != None %}
+              {{ m.marcador_a }} - {{ m.marcador_b }}
+            {% else %}—{% endif %}
+          </td>
+           {% if can_manage %}
+        <td>
+          {% if m.estado != "FINALIZADO" %}
+            <a class="btn btn-sm btn-outline-primary"
+               href="{% url 'tournaments:match_result' m.id_partido %}">
+              Cargar resultado
+            </a>
+          {% else %}
+            <span class="text-muted small">Listo</span>
+          {% endif %}
+        </td>
+      {% endif %}
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center">Aún no hay partidos.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 
           </div>
         </div>
