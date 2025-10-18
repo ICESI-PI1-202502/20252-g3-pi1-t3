@@ -5,7 +5,7 @@
 
 {% block subheaderBar %}
 <a href="javascript:history.back()" class="back-link">
-  <i class="bi bi-arrow-left"></i> Regresar
+    <i class="bi bi-arrow-left"></i> Regresar
 </a>
 {% endblock %}
 
@@ -19,32 +19,45 @@
         {% for g in grupos_actividad %}
         <div class="col-md-3 text-center mb-4">
             {% if g.imagen %}
-                <a href="{% url 'management_cadi:listar_actividades' grupo_nombre=grupo.nombre|slugify grupo_id=grupo.id_grupo grupo_actividad_id=g.id_grupo_actividad %}">
-                    <img src="{{ g.imagen.url }}" alt="{{ g.nombre }}" class="img-fluid rounded shadow" style="max-height:200px; object-fit:cover;">
-                </a>
+            <a
+                href="{% url 'management_cadi:listar_actividades' grupo_nombre=grupo.nombre|slugify grupo_id=grupo.id_grupo grupo_actividad_id=g.id_grupo_actividad %}">
+                <img src="{{ g.imagen.url }}" alt="{{ g.nombre }}" class="img-fluid rounded shadow"
+                    style="max-height:200px; object-fit:cover;">
+            </a>
 
 
             {% else %}
-                
-                <img src="{% static 'management_CADI/images/create/galery.png' %}" 
-                     alt="Sin imagen" 
-                     class="img-fluid rounded shadow" 
-                     style="max-height:200px; object-fit:cover;">
+
+            <img src="{% static 'management_CADI/images/create/galery.png' %}" alt="Sin imagen"
+                class="img-fluid rounded shadow" style="max-height:200px; object-fit:cover;">
             {% endif %}
             <h6 class="mt-2">{{ g.nombre }}</h6>
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p class="text-center mt-4">No hay grupos de actividades aún.</p>
+
+        <br><br>
+        {% if request.user.is_superuser %}
+            <p class="text-center mt-4">No hay grupos de actividades aún.</p>
+        {% else %}
+            
+            <p class="text-center mt-4">No hay actividades aún.</p>
+        {% endif %}
     {% endif %}
 
+
     <br><br>
+    {% if request.user.is_superuser %}
     <center>
-        <a href="{% url 'management_cadi:crear_grupo_actividad' '-' grupo.id_grupo %}" 
-           class="yellowBotton_Black">
+        <a href="{% url 'management_cadi:crear_grupo_actividad' '-' grupo.id_grupo %}" class="yellowBotton_Black">
             Agregar grupo
         </a>
     </center>
+    {% else %}
+        
+        
+    {% endif %}
+
 </div>
 {% endblock %}

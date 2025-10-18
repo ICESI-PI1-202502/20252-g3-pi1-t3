@@ -1,0 +1,14 @@
+{% extends "home_base.html" %}
+
+{% block title %}Página no encontrada{% endblock %}
+
+{% block content %}
+<div class="container text-center mt-5">
+    <h1 class="display-4">404</h1>
+    <h3>Página no encontrada</h3>
+    <p>Lo sentimos, la página que buscas no existe o no tienes permiso para verla.</p>
+    <a href="{% url request.user.is_superuser|yesno:'cadi_admin,home' %}" class="btn btn-primary mt-3">
+        Volver al inicio
+    </a>
+</div>
+{% endblock %}

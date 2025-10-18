@@ -57,8 +57,8 @@
     </div>
 
     <div class="mt-4 text-center">
-      <button class="btn btn-primary" name="action" value="add_block" type="submit">Agregar bloque</button>
-      <button class="btn btn-secondary" name="action" value="done" type="submit">Terminar</button>
+      <button class="greenBotton_White me-3" name="action" value="add_block" type="submit">Agregar bloque</button>
+      <button class="blueBotton" name="action" value="done" type="submit">Terminar</button>
     </div>
   </form>
 
@@ -77,7 +77,7 @@
           <form method="post" class="mt-2">
             {% csrf_token %}
             <input type="hidden" name="idx" value="{{ forloop.counter0 }}">
-            <button name="action" value="delete_block" class="btn btn-outline-danger btn-sm">Eliminar</button>
+            <button name="action" value="delete_block" class="deleteButton">Eliminar</button>
           </form>
         </div>
       </div>

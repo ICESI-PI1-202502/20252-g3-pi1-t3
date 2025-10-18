@@ -297,6 +297,28 @@ ul li a:hover {
   transition: transform 0.2s, background-color 0.3s;
 }
 
+.whiteBotton {
+  background-color: #ffffff;
+  color: #000;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
+.blueBotton {
+  background-color: #5454e9;
+  color: #ffffff;              
+  font-weight: bold;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
 .greenBotton_Black {
   background-color: #4DB979;
   color: #000;              
@@ -319,9 +341,31 @@ ul li a:hover {
   transition: transform 0.2s, background-color 0.3s;
 }
 
+
+.deleteButton {
+  background-color: #FF6B6B;
+  color: #fff;
+  font-weight: bold;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: transform 0.2s, background-color 0.3s;
+}
+
 /* Hover States */
 .yellowBotton_Black:hover {
   background-color: #d9df55; /* un poco más oscuro */
+  transform: scale(1.05);
+}
+
+.whiteBotton:hover {
+  background-color: #adadad;
+  transform: scale(1.05);
+}
+
+.blueBotton:hover {
+  background-color: #2424d3; 
   transform: scale(1.05);
 }
 
@@ -332,6 +376,11 @@ ul li a:hover {
 
 .greenBotton_White:hover {
   background-color: #3fa468; /* más oscuro */
+  transform: scale(1.05);
+}
+
+.deleteButton:hover {
+  background-color: #D94B4B; /* Rojo más oscuro en hover */
   transform: scale(1.05);
 }
 
