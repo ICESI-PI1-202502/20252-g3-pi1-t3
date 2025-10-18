@@ -80,7 +80,7 @@ def cadi_index(request):
 
 @superuser_required
 @login_required
-def create_Activities(request, grupo_actividad_id):
+def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
     slug_real = slugify(grupo_actividad.grupos_id_grupo.nombre)
     tipos = TiposActividad.objects.all().order_by("id_tipo")
@@ -435,19 +435,21 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
             a["rating_image"] = 'rating_0_0.png'
         elif 0 < promedio_calificacion <= 0.5:
             a["rating_image"] = 'rating_0_5.png'
-        elif 1 <= promedio_calificacion < 1.5:
+        elif 0.5 < promedio_calificacion <= 1:
+            a["rating_image"] = 'rating_1_0.png'
+        elif 1 < promedio_calificacion <= 1.5:
             a["rating_image"] = 'rating_1_5.png'
-        elif 1.5 <= promedio_calificacion < 2:
+        elif 1.5 < promedio_calificacion <= 2:
             a["rating_image"] = 'rating_2_0.png'
-        elif 2 <= promedio_calificacion < 2.5:
+        elif 2 < promedio_calificacion <= 2.5:
             a["rating_image"] = 'rating_2_5.png'
-        elif 3 <= promedio_calificacion < 3.5:
+        elif 2.5 < promedio_calificacion <= 3:
             a["rating_image"] = 'rating_3_0.png'
-        elif 3.5 <= promedio_calificacion < 4:
+        elif 3 < promedio_calificacion <= 3.5:
             a["rating_image"] = 'rating_3_5.png'
-        elif 4 <= promedio_calificacion < 4.5:
+        elif 3.5 < promedio_calificacion <= 4:
             a["rating_image"] = 'rating_4_0.png'
-        elif 4.5 <= promedio_calificacion < 5:
+        elif 4 < promedio_calificacion <= 4.5:
             a["rating_image"] = 'rating_4_5.png'
         else:
             a["rating_image"] = 'rating_5_0.png'
@@ -461,6 +463,14 @@ def listar_actividades(request, grupo_nombre, grupo_id, grupo_actividad_id):
         })
         # Asignar los bloques y días de la actividad
         a["items_dia"] = daywise_por_act.get(a["id_actividad"], [])
+
+    for a in actividades:
+        ya_califico = CalificacionesActividad.objects.filter(
+            actividades_id_actividad=a["id_actividad"],
+            participantes_id_participante__user=request.user
+        ).exists()
+        a["user_has_calificado"] = ya_califico
+
 
     return render(request, "listar_actividades.html", {
         "grupo": grupo,
