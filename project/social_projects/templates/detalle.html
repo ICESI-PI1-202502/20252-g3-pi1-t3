@@ -42,7 +42,10 @@
       {% else %}
         <form method="post" action="{% url 'social_projects:inscribirse_psu' p.id_proyecto %}">
           {% csrf_token %}
-          <button class="btn btn-success">Inscribirme</button>
+          <button type="submit" class="btn btn-primary"
+              {% if ya_inscrito or not cupo_disponible %}disabled{% endif %}>
+          Inscribirme
+          </button>
         </form>
       {% endif %}
     </div>
