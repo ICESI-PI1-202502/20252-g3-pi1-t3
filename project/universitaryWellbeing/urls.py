@@ -12,7 +12,7 @@ urlpatterns = [
     path("cadi-home/", views.home_admin, name="cadi_admin"),
     path("register/", views.register, name="register"),
     path("preferences/", views.preferences, name="preferences"),
-    path("analytics-reports/", include("Analytics_Reports.urls", namespace="analytics_reports")),
+    path("analytics-reports/", include("Analytics_Reports.urls", namespace="Analytics_Reports")),
     path("tournaments/", include("tournaments.urls")),
     path("psu/", include("social_projects.urls")),
 
