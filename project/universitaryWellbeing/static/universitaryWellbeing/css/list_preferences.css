@@ -2,7 +2,6 @@
   margin-top: 20px;
 }
 
-
 .list-preferences {
   max-width: 700px;
   margin: 40px auto;
@@ -35,11 +34,11 @@
 
 .category-item {
   background: #f8f9fa;
-  
   border-radius: 12px;
   padding: 12px;
   transition: 0.3s;
   cursor: pointer;
+  position: relative; /* necesario para el tooltip */
 }
 
 .category-item:hover {
@@ -48,7 +47,27 @@
   box-shadow: 0 6px 12px rgba(0,0,0,0.1);
 }
 
+/* -------- Tooltip de descripción -------- */
+.category-item:hover::after {
+  content: attr(data-description);
+  position: absolute;
+  bottom: 110%; /* aparece encima */
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  font-size: 0.85rem;
+  padding: 6px 10px;
+  border-radius: 6px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  opacity: 1;
+}
 
+/* checkbox */
 .category-item input[type="checkbox"] {
   appearance: none;
   width: 20px;
@@ -60,7 +79,6 @@
   cursor: pointer;
   transition: all 0.2s ease;
 }
-
 
 .category-item input[type="checkbox"]:checked {
   background: #4f9aff;
@@ -80,4 +98,3 @@
 .category-item input {
   margin-right: 8px;
 }
-

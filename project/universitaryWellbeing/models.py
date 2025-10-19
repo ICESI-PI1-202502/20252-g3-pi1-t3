@@ -395,9 +395,6 @@ class HorariosParticipante(models.Model):
         unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
 
 
-
-
-
 class InscripcionesPsu(models.Model):
 
     id_inscripcion_psu = models.BigAutoField(primary_key=True)
@@ -539,6 +536,7 @@ class RolesParticipacion(models.Model):
 class TiposActividad(models.Model):
     id_tipo = models.FloatField(primary_key=True)
     nombre_tipo = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
