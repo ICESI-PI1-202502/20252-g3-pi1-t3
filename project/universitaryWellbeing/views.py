@@ -8,6 +8,7 @@ from django.core.validators import validate_email
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
 from .forms import UserLoginForm, UserRegisterForm
 from typing import List
+from .models import Notificaciones
 
 def user_login(request):
     if request.method == "POST":
@@ -219,3 +220,14 @@ def profile(request):
         "actividades": actividades,
     }
     return render(request, "profile.html", context)
+
+
+@login_required
+def ver_notificaciones(request):
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante__user=request.user
+    ).order_by('-fecha')
+
+    return render(request, "notificaciones/notificaciones.html", {
+        "notificaciones": notificaciones
+    })

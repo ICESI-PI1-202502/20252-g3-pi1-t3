@@ -16,6 +16,8 @@ urlpatterns = [
     path("tournaments/", include("tournaments.urls")),
     path("psu/", include("social_projects.urls")),
 
+     path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
+
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),

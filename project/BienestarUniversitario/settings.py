@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'searchActivities',
     'tournaments',
     'social_projects',
+    'notificaciones',
 
 ]
 
@@ -173,3 +174,17 @@ if any(cmd in sys.argv for cmd in ["test", "pytest"]):
     INSTALLED_APPS += ["tournaments.tests"]
     # Desactiva migraciones del app real que está en conflicto
     MIGRATION_MODULES = {"universitaryWellbeing": None}
+
+
+
+
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'luis.gluis.g.io.com@gmail.com'
+EMAIL_HOST_PASSWORD = 'jbrg abzk beox eipo'
+DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
