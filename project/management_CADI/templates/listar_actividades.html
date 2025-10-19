@@ -55,17 +55,32 @@
             style="width: 100px; height: auto;">
         </div>
 
+        {% if not request.user.is_superuser %}
+          {% if request.user.is_authenticated %}
+            {% if a.user_has_calificado %}
+              <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
+                class="yellowBotton_Black mt-2 d-block">
+                Editar calificación
+              </a>
+            {% else %}
+              <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
+                class="yellowBotton_Black mt-2 d-block">
+                Calificar
+              </a>
+            {% endif %}
+          {% endif %}
+        {% endif %}
+
       </div>
     </div>
     {% endfor %}
   </div>
-  
+  <br><br>
   {% else %}
     <br><br>
     <p class="text-center mt-4">No hay actividades aún.</p>
   {% endif %}
 
-  <br><br>
   {% if request.user.is_superuser %}
   <center>
     <a href="{{ crear_url }}?reset=1" class="yellowBotton_Black">Agregar actividad</a>
