@@ -48,9 +48,11 @@ INSTALLED_APPS = [
     'tournaments',
     'social_projects',
     'notificaciones',
+ 
 
 ]
 
+ 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -188,3 +190,22 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'luis.gluis.g.io.com@gmail.com'
 EMAIL_HOST_PASSWORD = 'jbrg abzk beox eipo'
 DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
+
+
+
+
+# Broker y backend de Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Timezone
+CELERY_TIMEZONE = 'America/Bogota'
+CELERY_ENABLE_UTC = True
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'generar-notificaciones-diarias': {
+        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
+        'schedule': crontab(minute='*/5'),  # cada 5 minutos, ajusta según necesidad
+    },
+}
