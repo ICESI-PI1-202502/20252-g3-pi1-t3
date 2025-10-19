@@ -169,7 +169,23 @@ LOGOUT_REDIRECT_URL = "/"       # where to send after logout
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
-if any(cmd in sys.argv for cmd in ["test", "pytest"]):
-    INSTALLED_APPS += ["tournaments.tests"]
-    # Desactiva migraciones del app real que está en conflicto
+
+# settings.py
+import sys
+
+if any(cmd in sys.argv for cmd in ("test", "pytest")):
+    # (lo que ya tienes para elegir qué app de tests instalar)
     MIGRATION_MODULES = {"universitaryWellbeing": None}
+    args = " ".join(sys.argv)
+    if " social_projects" in args or args.endswith("social_projects"):
+        INSTALLED_APPS += ["social_projects.tests"]
+    elif " tournaments" in args or args.endswith("tournaments"):
+        INSTALLED_APPS += ["tournaments.tests"]
+
+    # 👉 Forzar storage simple en tests (Django 5.x)
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+    # Evita warnings
+    STATIC_ROOT = BASE_DIR / ".test-static"
