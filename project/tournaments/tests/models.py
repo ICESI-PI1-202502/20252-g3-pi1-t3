@@ -108,3 +108,27 @@ class EquiposParticipantes(models.Model):
     class Meta:
         managed = True
         db_table = "equipos_participantes"
+
+
+class Partidos(models.Model):
+    id_partido = models.BigAutoField(primary_key=True)
+    torneos_id_torneo = models.ForeignKey(
+        Torneos, models.DO_NOTHING, db_column="torneos_id_torneo"
+    )
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField(blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    equipos_id_equipo = models.ForeignKey(
+        Equipos, models.DO_NOTHING, db_column="equipos_id_equipo", related_name="+"
+    )
+    equipos_id_equipo2 = models.ForeignKey(
+        Equipos, models.DO_NOTHING, db_column="equipos_id_equipo2", related_name="+"
+    )
+    marcador_a = models.IntegerField(blank=True, null=True)
+    marcador_b = models.IntegerField(blank=True, null=True)
+    estado = models.CharField(max_length=20)
+
+    class Meta:
+        managed = True
+        db_table = "partidos"
+

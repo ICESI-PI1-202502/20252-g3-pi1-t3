@@ -2,7 +2,7 @@
 import traceback
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime as dt
+import datetime as dt
 from django.utils import timezone 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.timezone import make_aware, get_current_timezone
@@ -88,7 +88,7 @@ def _parse_dt_local(s: str):
 
     # 1) ISO (lo usual de <input type="datetime-local">)
     try:
-        dt_naive = dt.fromisoformat(s.replace("Z", ""))
+        dt_naive = dt.datetime.fromisoformat(s.replace("Z", ""))
         return make_aware(dt_naive, tz)
     except Exception:
         pass
@@ -104,7 +104,7 @@ def _parse_dt_local(s: str):
     # 3) Probar formatos day-first
     for fmt in ("%d/%m/%Y %H:%M", "%d/%m/%Y %I:%M %p"):
         try:
-            dt_naive = dt.strptime(s_norm, fmt)
+            dt_naive = dt.datetime.strptime(s_norm, fmt)
             return make_aware(dt_naive, tz)
         except ValueError:
             continue
