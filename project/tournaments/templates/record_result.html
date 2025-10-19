@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Cargar resultado — {{ match.equipo_a }} vs {{ match.equipo_b }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+{% endblock %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <section class="col-12 col-md-10 col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h2 class="page-title text-center mb-3">Cargar resultado</h2>
+            <p class="text-center text-muted mb-4">
+              {{ match.torneo }} · {{ match.equipo_a }} vs {{ match.equipo_b }}
+            </p>
+
+            <form method="post" class="mx-auto" style="max-width: 520px;">
+              {% csrf_token %}
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label">{{ match.equipo_a }}</label>
+                  <input type="number" min="0" name="marcador_a" class="form-control"
+                         value="{{ prefill.marcador_a|default_if_none:'' }}">
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label">{{ match.equipo_b }}</label>
+                  <input type="number" min="0" name="marcador_b" class="form-control"
+                         value="{{ prefill.marcador_b|default_if_none:'' }}">
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Estado</label>
+                  <select name="estado" class="form-select" required>
+                    <option value="FINALIZADO" {% if prefill.estado == "FINALIZADO" %}selected{% endif %}>Finalizado</option>
+                    <option value="CANCELADO"  {% if prefill.estado == "CANCELADO"  %}selected{% endif %}>Cancelado</option>
+                  </select>
+                  <div class="form-text">
+                    Si cancelas el partido, los marcadores se ignorarán.
+                  </div>
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-success" type="submit">Guardar</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}

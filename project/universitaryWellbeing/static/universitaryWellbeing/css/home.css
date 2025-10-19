@@ -399,8 +399,8 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   justify-content:center;
   width:36px;
   height:36px;
-  border-radius:8px;   /* cuadrado con bordes redondeados */
-  background-color:#0b2ea6; /* ajusta color */
+  border-radius:8px; 
+  background-color:#0b2ea6;
   color:#fff;
   font-weight:700;
   font-size:14px;

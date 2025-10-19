@@ -16,25 +16,26 @@
 {% endblock %}
 
 {% block content %}
-<div class="container mt-4">
+<div class="d-flex justify-content-between align-items-center mb-3 gap-2">
+  <form method="get" action="{% url 'tournaments:list' %}" class="flex-grow-1 d-flex gap-2">
+    <input
+      type="text"
+      name="q"
+      value="{{ search }}"
+      class="form-control"
+      placeholder="Buscar torneos o disciplinas"
+      aria-label="Buscar torneos o disciplinas">
+    <button class="btn btn-primary" type="submit">Buscar</button>
+    {% if search %}
+      <a class="btn btn-outline-secondary" href="{% url 'tournaments:list' %}">Limpiar</a>
+    {% endif %}
+  </form>
 
-  <div class="d-flex justify-content-between align-items-center mb-3 gap-2">
-    <form method="get" action="{% url 'tournaments:list' %}" class="flex-grow-1 d-flex gap-2">
-      <input
-        type="text"
-        name="q"
-        value="{{ search }}"
-        class="form-control"
-        placeholder="Buscar torneos o disciplinas"
-        aria-label="Buscar torneos o disciplinas">
-      <button class="btn btn-primary" type="submit">Buscar</button>
-      {% if search %}
-        <a class="btn btn-outline-secondary" href="{% url 'tournaments:list' %}">Limpiar</a>
-      {% endif %}
-    </form>
-
-    <a href="{% url 'tournaments:create' %}" class="btn btn-success">+ Crear torneo</a>
-  </div>
+  {# Solo admin/superuser ve el botón #}
+  {% if can_create %}
+    <a href="{% url 'tournaments:create' %}" class="btn btn-success">+ Crear torneo</a> 
+  {% endif %}
+</div>
 
   <div class="tournament-grid">
     {% for t in tournaments %}
