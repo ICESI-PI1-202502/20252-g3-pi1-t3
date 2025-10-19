@@ -11,7 +11,7 @@
 #    return render(request, "notificaciones.html", {
 #        "notificaciones": notificaciones
 ##    })
-
+from universitaryWellbeing.models import HorariosParticipante
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -73,26 +73,57 @@ def es_notificacion_critica(tipo_notificacion_nombre):
     nombre_lower = tipo_notificacion_nombre.lower()
     return any(palabra in nombre_lower for palabra in palabras_criticas)
 
-
 def validar_envio_notificacion(fecha_programada, tipo_notificacion):
     """
     Valida si se puede enviar una notificación en la fecha programada
     
+    Args:
+        fecha_programada: datetime.date o datetime.datetime
+        tipo_notificacion: TiposNotificacion object, str (nombre), int (ID), o Mock
+    
     Returns:
         tuple: (puede_enviar: bool, motivo: str)
     """
-    # Obtener nombre del tipo
-    if isinstance(tipo_notificacion, TiposNotificacion):
-        nombre_tipo = tipo_notificacion.nombre
-    elif isinstance(tipo_notificacion, str):
-        nombre_tipo = tipo_notificacion
-    else:
-        try:
-            tipo_obj = TiposNotificacion.objects.get(id_tipo_notificacion=tipo_notificacion)
-            nombre_tipo = tipo_obj.nombre
-        except TiposNotificacion.DoesNotExist:
-            return False, "Tipo de notificación no encontrado"
+    # Validación de entrada - verificar lista PRIMERO
+    if isinstance(tipo_notificacion, (list, tuple)):
+        return False, "Tipo de notificación debe ser un objeto, ID o nombre, no una lista"
     
+    # Luego verificar si es None o vacío
+    if not tipo_notificacion:
+        return False, "Tipo de notificación vacío o inválido"
+    
+    # Obtener nombre del tipo según el tipo de entrada
+    nombre_tipo = None
+    
+    try:
+        # Primero intentar obtener atributo 'nombre' (funciona con objetos reales y Mocks)
+        if hasattr(tipo_notificacion, 'nombre'):
+            nombre_tipo = tipo_notificacion.nombre
+            
+        elif isinstance(tipo_notificacion, str):
+            # Es un string (nombre del tipo)
+            nombre_tipo = tipo_notificacion
+            
+        elif isinstance(tipo_notificacion, int):
+            # Es un ID, buscar en BD (solo en producción)
+            try:
+                tipo_obj = TiposNotificacion.objects.get(id_tipo_notificacion=tipo_notificacion)
+                nombre_tipo = tipo_obj.nombre
+            except TiposNotificacion.DoesNotExist:
+                return False, f"Tipo de notificación con ID {tipo_notificacion} no encontrado"
+            except Exception:
+                # En tests sin BD, puede fallar
+                return False, "No se puede acceder a la base de datos"
+        else:
+            return False, f"Tipo de notificación inválido: {type(tipo_notificacion).__name__}"
+            
+    except Exception as e:
+        return False, f"Error al procesar tipo de notificación: {str(e)}"
+    
+    if not nombre_tipo:
+        return False, "No se pudo determinar el nombre del tipo de notificación"
+    
+    # Convertir fecha a date si es datetime
     fecha_solo = fecha_programada.date() if isinstance(fecha_programada, datetime) else fecha_programada
     
     # Verificar si es día lectivo
@@ -114,8 +145,7 @@ def validar_envio_notificacion(fecha_programada, tipo_notificacion):
         info = get_info_dia_no_lectivo(fecha_solo)
         desc = info.get('descripcion', 'día no lectivo') if info else 'día no lectivo'
         return False, f"Día no lectivo ({desc}) que no permite notificaciones críticas"
-
-
+    
 def buscar_proximo_dia_lectivo(fecha_inicio, max_dias=30):
     """Busca el próximo día lectivo a partir de una fecha"""
     fecha_actual = fecha_inicio
@@ -128,7 +158,6 @@ def buscar_proximo_dia_lectivo(fecha_inicio, max_dias=30):
     
     return None
 
-
 def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notificacion, auto_reprogramar=True):
     """
     Crea una notificación aplicando las reglas de calendario académico
@@ -137,6 +166,16 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
         dict: resultado con información del proceso
     """
     puede_enviar, motivo = validar_envio_notificacion(fecha_deseada, tipo_notificacion)
+    
+    # FIX 1: Retornar early si tipo_notificacion es inválido
+    if not puede_enviar and not tipo_notificacion:
+        return {
+            'success': False,
+            'motivo': motivo,  # <-- AGREGAR 'motivo' en lugar de 'mensaje'
+            'mensaje': motivo,
+            'notificacion': None
+        }
+    
     fecha_final = fecha_deseada
     reprogramada = False
     
@@ -151,10 +190,16 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
                 fecha_final = proximo
                 puede_enviar = True
                 reprogramada = True
-                motivo = f"Reprogramada de {fecha_deseada.date()} a {fecha_final.date()}"
+                
+                # FIX 2: Manejar tanto date como datetime para fecha_deseada
+                fecha_original_str = fecha_deseada.strftime('%Y-%m-%d') if isinstance(fecha_deseada, (date, datetime)) else str(fecha_deseada)
+                fecha_final_str = fecha_final.strftime('%Y-%m-%d') if isinstance(fecha_final, (date, datetime)) else str(fecha_final)
+                
+                motivo = f"Reprogramada de {fecha_original_str} a {fecha_final_str}"
             else:
                 return {
                     'success': False,
+                    'motivo': 'No se encontró día lectivo disponible en los próximos 30 días',
                     'mensaje': 'No se encontró día lectivo disponible en los próximos 30 días',
                     'notificacion': None
                 }
@@ -169,10 +214,9 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
                 tipos_notificacion_id_tipo_notificacion=tipo_notificacion
             )
             
-            #logger.info(f"Notificación {notificacion.id_notificacion} creada - {motivo}")
-            
             return {
                 'success': True,
+                'motivo': motivo,  # <-- Incluir 'motivo'
                 'mensaje': motivo,
                 'notificacion': notificacion,
                 'reprogramada': reprogramada,
@@ -183,12 +227,15 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
             logger.error(f"Error al crear notificación: {e}")
             return {
                 'success': False,
+                'motivo': f"Error al crear notificación: {str(e)}",
                 'mensaje': f"Error al crear notificación: {str(e)}",
                 'notificacion': None
             }
     
+    # FIX 3: Siempre incluir 'motivo' en el diccionario de retorno
     return {
         'success': False,
+        'motivo': motivo,  # <-- AGREGAR esto
         'mensaje': motivo,
         'notificacion': None
     }
