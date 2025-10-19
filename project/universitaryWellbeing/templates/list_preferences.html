@@ -56,7 +56,7 @@
             {% csrf_token %}
             <div class="categories-grid">
                 {% for category in categorias %}
-                    <label class="category-item">
+                    <label class="category-item" data-description="{{ category.descripcion }}">
                         <input type="checkbox" name="categories" value="{{ category.id_tipo }}">
                         {{ category.nombre_tipo }}
                     </label>

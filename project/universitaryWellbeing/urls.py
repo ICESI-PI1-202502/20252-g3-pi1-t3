@@ -15,6 +15,7 @@ urlpatterns = [
     path("analytics-reports/", include("Analytics_Reports.urls", namespace="Analytics_Reports")),
     path("tournaments/", include("tournaments.urls")),
     path("psu/", include("social_projects.urls")),
+    path("horario/", views.horario, name="horario"),
 
      path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
 
