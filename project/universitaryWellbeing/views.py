@@ -1,13 +1,15 @@
 from datetime import date
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
 from .forms import UserLoginForm, UserRegisterForm
 from typing import List
+from datetime import datetime, timedelta
+from django.utils import timezone
 
 def user_login(request):
     if request.method == "POST":
@@ -151,6 +153,44 @@ def preferences(request):
         return redirect('home')
 
     return render(request, 'list_preferences.html', {'categorias': categorias})
+
+
+import json
+@login_required
+def horario(request):
+    # Obtener el participante asociado al usuario autenticado
+    participante = get_object_or_404(Participantes, user=request.user.id)
+
+    # Consultar todos los horarios del participante
+    eventos = HorariosParticipante.objects.filter(participantes_id_participante=participante.id_participante)
+
+    # Construir los eventos en formato compatible con FullCalendar
+    eventos_data = []
+    for e in eventos:
+        color = "#007bff"  # Azul por defecto
+        if e.actividades_id_actividad:
+            color = "#28a745"  # Verde
+        elif e.citas_id_cita:
+            color = "#ffc107"  # Amarillo
+        elif e.partidos_id_partido:
+            color = "#dc3545"  # Rojo
+
+        eventos_data.append({
+            "title": e.titulo,
+            "start": e.fecha_inicio.isoformat(),
+            "end": e.fecha_fin.isoformat(),
+            "color": color,
+            "extendedProps": {
+                "notas": e.notas or "",
+                "fuente": "Automática" if e.fuente_manual == 'N' else "Manual"
+            }
+        })
+
+    context = {
+        "participante": participante,
+        "eventos_json": json.dumps(eventos_data)
+    }
+    return render(request, "Horario.html", context)
 
 @login_required
 def home_user(request):

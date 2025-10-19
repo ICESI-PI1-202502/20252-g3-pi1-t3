@@ -1,13 +1,20 @@
-{% extends "home_base.html" %}
+{% extends "base.html" %}
 
 {% block title %}Página no encontrada{% endblock %}
+
+{% block extra_css %}
+	{{ block.super }}
+{% endblock %}
+
 
 {% block content %}
 <div class="container text-center mt-5">
     <h1 class="display-4">404</h1>
     <h3>Página no encontrada</h3>
+    <br>
     <p>Lo sentimos, la página que buscas no existe o no tienes permiso para verla.</p>
-    <a href="{% url request.user.is_superuser|yesno:'cadi_admin,home' %}" class="btn btn-primary mt-3">
+    <br>
+    <a href="{% url request.user.is_superuser|yesno:'cadi_admin,home' %}" class="blueBotton">
         Volver al inicio
     </a>
 </div>
