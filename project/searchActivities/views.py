@@ -184,7 +184,7 @@ def search(request):
 
 
 @login_required
-def calificar_actividad(request, actividad_id):
+def rateActivity(request, actividad_id):
     actividad = get_object_or_404(Actividades, pk=actividad_id)
 
     # Relacionar el user logueado con su registro de participante

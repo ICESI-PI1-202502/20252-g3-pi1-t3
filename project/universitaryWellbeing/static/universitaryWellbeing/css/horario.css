@@ -1,0 +1,58 @@
+.calendar-shell { max-width: 1200px; margin: 0 auto; }
+  .calendar-card {
+    background: #fff; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,.06);
+    padding: 16px 18px;
+  }
+
+  .calendar-controls {
+    display:flex; align-items:center; justify-content:space-between;
+    gap:8px; flex-wrap:wrap; margin-bottom:10px;
+  }
+  .controls-left, .controls-right { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .btn { border-radius:10px; font-weight:700; padding:8px 14px; border:none; cursor:pointer; }
+  .btn-nav { background:#E4EB60; color:#000; }
+  .btn-nav:hover { background:#d9df55; transform:scale(1.05); }
+  .btn-today { background:#5454e9; color:#fff; }
+  .btn-today:hover { background:#2424d3; transform:scale(1.05); }
+  .btn-next { background:#E9683B; color:#fff; }
+  .btn-next:hover { background:#e05d2d; transform:scale(1.05); }
+  .btn-view { background:#f7f7fb; color:#000; border:1px solid #ececf1; }
+  .btn-view.active { background:#E4EB60; color:#000; border-color:#E4EB60; }
+  .btn-view:hover { background:#eee; transform:scale(1.02); }
+  .btn-weekends { background:#ffffff; color:#000; border:1px solid #ececf1; }
+  .btn-weekends.active { background:#4DB979; color:#fff; border-color:#4DB979; }
+  .btn-weekends:hover { background:#f1f1f6; transform:scale(1.02); }
+  .date-picker { border:1px solid #ececf1; border-radius:10px; padding:8px 12px; outline:none; }
+
+  /* FullCalendar look */
+  #calendar { border:1px solid #f0f0f0; border-radius:12px; overflow:hidden; }
+  .fc .fc-toolbar { display:none; }
+  .fc-theme-standard td, .fc-theme-standard th { border-color:#f0f0f0; }
+  .fc .fc-daygrid-day-number, .fc .fc-col-header-cell-cushion { font-weight:700; }
+
+  /* Más aire entre eventos en vista mes */
+  .fc-daygrid-event { margin: 2px 0; padding: 2px 4px; border-radius: 6px; }
+
+  /* Vista semana/día */
+  .fc-timegrid-event { border-radius: 8px; }
+  .fc .fc-timegrid-slot-label-cushion, .fc .fc-timegrid-axis-cushion { font-size:.85rem; }
+
+  /* Tooltip */
+  .fc-tooltip {
+    position: fixed; background: rgba(0,0,0,.85); color: #fff; padding: 6px 10px;
+    border-radius: 8px; font-size: .85rem; z-index: 9999; pointer-events: none; display: none;
+    box-shadow: 0 2px 8px rgba(0,0,0,.25);
+  }
+
+  /* Leyenda */
+  .legend { display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-top:10px; }
+  .legend-item { display:inline-flex; align-items:center; gap:8px; background:#f5f5f7; padding:6px 10px; border-radius:999px; font-size:.85rem; }
+  .dot { width:12px; height:12px; border-radius:999px; }
+  .dot-actividad { background:#28a745; }
+  .dot-cita      { background:#ffc107; }
+  .dot-partido   { background:#E9683B; }
+
+  @media (max-width: 768px) {
+    .controls-left, .controls-right { width:100%; }
+    .calendar-card { padding: 12px; }
+  }

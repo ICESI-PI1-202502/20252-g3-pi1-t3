@@ -44,7 +44,7 @@
 
                     {% block header_notifications %}
                     <div class="navbar-option ms-3">
-                        <a href="#" title="Notificaciones">
+                        <a href="{% url 'notificaciones:ver_notificaciones' %}"title="Notificaciones">
                             <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
                         </a>
                     </div>
@@ -98,7 +98,9 @@
             <a href="#">Gestionar eventos y servicios</a>
             <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
             <a href="{% url 'admin:index' %}">Panel de Administrador</a>
-            <a href="#">Analítica y reportes</a>
+            <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
+            <a href="{% url 'Analytics_Reports:analytics_index' %}">Analítica y reportes</a>
+
         {% else %}
             <a href="{% url 'searchActivities:search' %}">Buscar</a>
             <a href="#">Calendario</a>
@@ -106,17 +108,21 @@
             <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
             <a href="#">Eventos y Servicios</a>
             <a href="{% url 'tournaments:list' %}">Torneos</a>
+            <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
+            
+            {# Opción adicional para Profesor #}
+            {% if user_rol == "Profesor" %}
+                <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">Registrar asistencia</a>
+            {% endif %}
         {% endif %}
 
         <a href="{% url 'logout' %}">Cerrar sesión</a>
-
 
     </div>
 
     <!-- Fondo oscuro para cerrar -->
     <div id="overlay" class="overlay"></div>
 
-a
     <main>
         {% block content %}
         <!-- specify content -->

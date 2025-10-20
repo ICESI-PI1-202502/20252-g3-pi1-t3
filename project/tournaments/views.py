@@ -1,5 +1,6 @@
 # Gestionar equipo (demo)
 import traceback
+from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
 import datetime as dt
 from django.utils import timezone 
@@ -11,11 +12,36 @@ from django.db import transaction, IntegrityError, DataError, DatabaseError, Pro
 from django.core.exceptions import ValidationError
 from django.contrib import messages
 from django.db.models import Max
+from django.db.models import Prefetch
 from universitaryWellbeing.models import (
- Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos, EquiposParticipantes, Participantes
+ Torneos, Disciplinas, EstadosTorneo, Equipos, TorneosEquipos, EquiposParticipantes, Participantes, Partidos
 )
 from django.http import Http404
-from django.utils import timezone
+
+
+def is_admin(user):
+    return user.is_authenticated and (user.is_staff or user.is_superuser)
+
+def _teams_belong_to_tournament(torneo_id, a_id, b_id) -> bool:
+    return (
+        TorneosEquipos.objects
+        .filter(torneos_id_torneo_id=torneo_id, equipos_id_equipo_id__in=[a_id, b_id])
+        .count() == 2
+    )
+
+from django.utils.timezone import make_aware, get_current_timezone, is_naive
+
+def _ensure_aware(d):
+    if d is None:
+        return None
+    return make_aware(d, get_current_timezone()) if is_naive(d) else d
+
+def _overlap_q(inicio, fin):
+    """
+    Devuelve un Q para chequear solapes: [inicio, fin) con registros que tengan
+    fecha_inicio < fin y fecha_fin > inicio
+    """
+    return Q(fecha_inicio__lt=fin) & Q(fecha_fin__gt=inicio)
 
 def get_torneo_or_404(id_: int):
     t = get_object_or_404(
@@ -53,31 +79,71 @@ def _parse_date(s: str):
     except Exception:
         return None
 
+def _parse_dt_local(s: str):
+
+    if not s:
+        return None
+    s = s.strip()
+    tz = get_current_timezone()
+
+    # 1) ISO (lo usual de <input type="datetime-local">)
+    try:
+        dt_naive = dt.datetime.fromisoformat(s.replace("Z", ""))
+        return make_aware(dt_naive, tz)
+    except Exception:
+        pass
+
+    # 2) Normalizar AM/PM español a inglés
+    s_norm = (
+        s.lower()
+         .replace("a. m.", "AM").replace("p. m.", "PM")
+         .replace("a. m", "AM").replace("p. m", "PM")
+         .replace(" a. m.", " AM").replace(" p. m.", " PM")
+    )
+
+    # 3) Probar formatos day-first
+    for fmt in ("%d/%m/%Y %H:%M", "%d/%m/%Y %I:%M %p"):
+        try:
+            dt_naive = dt.datetime.strptime(s_norm, fmt)
+            return make_aware(dt_naive, tz)
+        except ValueError:
+            continue
+
+    return None
+    
 # Historia : Crear Torneo
+@login_required
 def crear_torneo(request):
+    if not is_admin(request.user):
+        messages.error(request, "No tienes permisos para crear torneos.")
+        return redirect("tournaments:list")
+
     disciplinas = Disciplinas.objects.all().order_by("id_disciplina")
-    print("Disciplinas count:", disciplinas.count())
 
     if request.method == "POST":
         nombre        = (request.POST.get("nombre") or "").strip()
         disciplina_id = (request.POST.get("disciplina") or "").strip()
-        fecha_inicio  = (request.POST.get("fecha_inicio") or "").strip() 
+        fecha_inicio  = (request.POST.get("fecha_inicio") or "").strip()
         fecha_fin     = (request.POST.get("fecha_fin") or "").strip()
         aforo         = (request.POST.get("aforo") or "").strip()
         limite_raw    = (request.POST.get("limite_inscripcion") or "").strip()
-        # '2025-10-01T12:30' -> datetime(2025,10,1,12,30)
+
+       
         limite_inscripcion = None
         if limite_raw:
             try:
                 parsed = dt.datetime.fromisoformat(limite_raw)
+                limite_inscripcion = make_aware(parsed, get_current_timezone())
             except ValueError:
-                # No bloqueamos creación; simplemente lo ignoramos por ahora
-                pass
+                messages.warning(request, "Formato de límite de inscripción inválido; se omitirá.")
 
-
-        # Validations
+       
         if not nombre or not disciplina_id or not fecha_inicio or not fecha_fin:
             messages.error(request, "Completa nombre, disciplina y fechas.")
+            return redirect("tournaments:create")
+
+        if fecha_inicio > fecha_fin:
+            messages.error(request, "La fecha de inicio no puede ser posterior a la fecha fin.")
             return redirect("tournaments:create")
 
         try:
@@ -92,26 +158,22 @@ def crear_torneo(request):
                 limite_inscripcion=limite_inscripcion,
             )
         except Exception as e:
-            print("Error creating torneo:", e)
             messages.error(request, f"No se pudo crear el torneo: {e}")
             return redirect("tournaments:create")
-        
+
         messages.success(request, "Torneo creado correctamente.")
         return redirect("tournaments:list")
-    # GET
-    return render(request, "create_tournament.html", {"disciplinas": disciplinas})     
 
-# Historia : lista
+    return render(request, "create_tournament.html", {"disciplinas": disciplinas})    
+
+#Listar torneos existentes
 def lista_torneos(request):
-    q = (request.GET.get("q") or "").strip().lower()  
+    q = (request.GET.get("q") or "").strip().lower()
 
-    # Fetch tournaments from DB
     rows = (
         Torneos.objects
-        .values(
-            "id_torneo", "nombre", "fecha_inicio", "fecha_fin",
-            "aforo_equipos", "disciplinas_id_disciplina__nombre"
-        )
+        .values("id_torneo", "nombre", "fecha_inicio", "fecha_fin",
+                "aforo_equipos", "disciplinas_id_disciplina__nombre")
         .order_by("-fecha_inicio")
     )
 
@@ -127,15 +189,20 @@ def lista_torneos(request):
         }
         if not q or q in item["nombre"].lower() or q in item["disciplina"].lower():
             items.append(item)
-    return render(request,"list_tournament.html",{"tournaments": items, "search": request.GET.get("q", "")},
+
+    return render(
+        request,
+        "list_tournament.html",
+        {
+            "tournaments": items,
+            "search": request.GET.get("q", ""),
+            "can_create": is_admin(request.user),  
+        },
     )
 
-# Historia : detalle
+#mostrar detalle de un torneo 
 def detalle_torneo(request, id: int):
-    # still reuse your helper
     t, teams = get_torneo_or_404(id)
-
-    # find the team of the logged-in participant in this tournament (if any)
     my_team_id = None
     if t["tiene_equipos"]:
         p = _current_participante(request.user)
@@ -150,9 +217,25 @@ def detalle_torneo(request, id: int):
                 .first()
             )
 
-    template = "detail_team.html" if t["tiene_equipos"] else "detail_individual.html"
-    return render(request, template, {"tournament": t, "teams": teams, "my_team_id": my_team_id})
 
+    matches = (
+        Partidos.objects
+        .filter(torneos_id_torneo_id=id)
+        .select_related("equipos_id_equipo", "equipos_id_equipo2")
+        .order_by("-fecha_inicio")
+    )
+
+    return render(
+        request,
+        "detail_team.html" if t["tiene_equipos"] else "detail_individual.html",
+        {
+            "tournament": t,
+            "teams": teams,
+            "my_team_id": my_team_id,
+            "can_manage": (request.user.is_staff or request.user.is_superuser),  
+            "matches": matches,
+        }
+    )
 
 # Historia : crear equipo 
 def crear_equipo_en_torneo(request, torneo_id: int):
@@ -279,11 +362,9 @@ def crear_equipo_en_torneo(request, torneo_id: int):
             messages.error(request, last)
         return redirect("tournaments:create_team", torneo_id)
 
-
 def _current_participante(user):
     # With FK we may have multiple; take the first. If you enforced UNIQUE(user), this is exactly one.
     return Participantes.objects.filter(user_id=user.id).order_by("id_participante").first()
-
 
 # Historia : unirse a equipo
 @login_required
@@ -363,9 +444,7 @@ def unirse_equipo(request, id: int):
         messages.error(request, "No se pudo crear el equipo.", extra_tags="tournaments")
         return redirect("tournaments:join_team", id)
 
-
 # Historia : gestionar equipo 
-
 @login_required
 def gestionar_equipo(request, torneo_id: int, team_id: int):
     torneo = get_object_or_404(
@@ -503,9 +582,6 @@ def inscripcion_individual(request, id: int):
         if not ctx["errors"]:
             ctx.update(ok=True, nombre=nombre, apellido=apellido, correo=correo)
 
-<<<<<<< Updated upstream
-    return render(request, "join_individual.html", ctx)
-=======
     return render(request, "join_individual.html", ctx)
 
 # Historia : crear partido
@@ -711,4 +787,4 @@ def partido_resultado(request, match_id: int):
     except Exception as e:
         messages.error(request, f"No se pudo guardar el resultado: {e}")
         return render(request, "record_result.html", ctx)
->>>>>>> Stashed changes
+

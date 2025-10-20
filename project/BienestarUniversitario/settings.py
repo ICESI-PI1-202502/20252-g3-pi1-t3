@@ -47,9 +47,12 @@ INSTALLED_APPS = [
     'searchActivities',
     'tournaments',
     'social_projects',
+    'notificaciones',
+ 
 
 ]
 
+ 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -73,6 +76,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'universitaryWellbeing.context_processors.user_role',  
             ],
         },
     },
@@ -173,3 +177,60 @@ if any(cmd in sys.argv for cmd in ["test", "pytest"]):
     INSTALLED_APPS += ["tournaments.tests"]
     # Desactiva migraciones del app real que está en conflicto
     MIGRATION_MODULES = {"universitaryWellbeing": None}
+
+
+
+
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'luis.gluis.g.io.com@gmail.com'
+EMAIL_HOST_PASSWORD = 'jbrg abzk beox eipo'
+DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
+
+
+
+
+# Broker y backend de Celery
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Timezone
+CELERY_TIMEZONE = 'America/Bogota'
+CELERY_ENABLE_UTC = True
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'generar-notificaciones-diarias': {
+        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
+        'schedule': crontab(minute='*/5'),  # cada 5 minutos, ajusta según necesidad
+    },
+}
+
+
+
+
+if any(cmd in sys.argv for cmd in ("test", "pytest")):
+    MIGRATION_MODULES = {"universitaryWellbeing": None}
+
+    args = " ".join(sys.argv)
+    if " social_projects" in args or args.endswith("social_projects"):
+        INSTALLED_APPS += ["social_projects.tests"]
+    elif " tournaments" in args or args.endswith("tournaments"):
+        INSTALLED_APPS += ["tournaments.tests"]
+    elif " management_CADI" in args or args.endswith("management_CADI"):
+        INSTALLED_APPS += ["management_CADI.tests"]
+    elif " searchActivities" in args or args.endswith("searchActivities"):   
+        INSTALLED_APPS += ["searchActivities.tests"]
+
+    STORAGES = {
+        "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
+        "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+    }
+    STATIC_ROOT = BASE_DIR / ".test-static"
+
+

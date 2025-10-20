@@ -18,7 +18,7 @@
     <p>Registra y segmenta la participación de los usuarios (estudiantes, profesores, egresados) en función de frecuencia y tipo de actividad.</p>
 
     <!-- Buscador / Filtros -->
-    <form method="GET" action="{% url 'analytics_reports:analisis_comportamiento' %}" class="mb-3">
+    <form method="GET" action="{% url 'Analytics_Reports:analisis_comportamiento' %}" class="mb-3">
         <div class="row g-2">
             <div class="col-md-3">
                 <input type="number" name="min_frecuencia" class="form-control" placeholder="Frecuencia mínima" value="{{ request.GET.min_frecuencia|default:'' }}">

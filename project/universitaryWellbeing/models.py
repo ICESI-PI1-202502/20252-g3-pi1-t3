@@ -17,11 +17,14 @@ class Actividades(models.Model):
     fecha_apertura_ins = models.DateTimeField(blank=True, null=True)
     fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
 
-    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
-<<<<<<< Updated upstream
+    tipos_actividad_id_tipo = models.ForeignKey(
+        'TiposActividad',
+        models.DO_NOTHING,
+        db_column='tipos_actividad_id_tipo',
+        blank=True, null=True
+    )
+
     id_tipo = models.FloatField(blank=True, null=True)
-=======
->>>>>>> Stashed changes
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
@@ -34,6 +37,7 @@ class Actividades(models.Model):
     class Meta:
         managed = False
         db_table = 'actividades'
+
 
 # Estos son nuevos modelos para la solucón del problema
 class HorariosBloque(models.Model):
