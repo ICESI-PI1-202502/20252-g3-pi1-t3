@@ -1,6 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
+
+##PORFAVOR CORRER LOS TEST CON python manage.py test tournaments --keepdb
 class Disciplinas(models.Model):
     id_disciplina = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=80, unique=True)

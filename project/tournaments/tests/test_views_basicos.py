@@ -8,7 +8,8 @@ from django.contrib.auth.models import User
 from tournaments.tests.models import Partidos as TPartidos
 TZ = get_current_timezone()
 
-# Importa SOLO los modelos de prueba
+##PORFAVOR CORRER LOS TEST CON python manage.py test tournaments --keepdb
+##PORFAVOR CORRER LOS TEST CON python manage.py test tournaments --keepdb
 from tournaments.tests.models import (
     Disciplinas as TDisciplinas,
     EstadosTorneo as TEstadosTorneo,
