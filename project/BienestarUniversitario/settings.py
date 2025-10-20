@@ -170,6 +170,9 @@ MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 
+
+
+
 if any(cmd in sys.argv for cmd in ("test", "pytest")):
     MIGRATION_MODULES = {"universitaryWellbeing": None}
 
@@ -179,10 +182,14 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
     elif " tournaments" in args or args.endswith("tournaments"):
         INSTALLED_APPS += ["tournaments.tests"]
     elif " management_CADI" in args or args.endswith("management_CADI"):
-        INSTALLED_APPS += ["management_CADI.tests"]   # 👈 NUEVO
+        INSTALLED_APPS += ["management_CADI.tests"]
+    elif " searchActivities" in args or args.endswith("searchActivities"):   
+        INSTALLED_APPS += ["searchActivities.tests"]
 
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
     }
     STATIC_ROOT = BASE_DIR / ".test-static"
+
+
