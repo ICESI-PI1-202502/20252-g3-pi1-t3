@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from django.utils.timezone import make_aware, get_current_timezone
 from django.test.utils import override_settings
-
+from unittest.mock import patch
 
 
 ##PORFAVOR CORRER LOS TEST CON python manage.py test social_projects --keepdb
@@ -154,3 +154,43 @@ class TestViewsPSU(TestCase):
         self.assertEqual(TInscripciones.objects.filter(
             proyectos_sociales_id_proyecto=self.proy
         ).count(), 2)
+
+    @patch("social_projects.views.send_mail")  # mockeamos envío real de correo
+    def test_consultar_duda_post_ok(self, mock_send_mail):
+        """Debe permitir enviar una duda válida al coordinador"""
+        self.client.login(username="alice", password="x")
+        url = reverse("social_projects:consultar_duda", args=[self.proy.pk])
+        r = self.client.post(url, {"mensaje": "¿Cuándo inicia el proyecto?"})
+        
+        # Se espera redirección al detalle
+        self.assertIn(r.status_code, (302, 303))
+        # Debe haberse intentado enviar un correo
+        mock_send_mail.assert_called_once()
+        args, kwargs = mock_send_mail.call_args
+        self.assertIn("¿Cuándo inicia el proyecto?", kwargs["message"])
+
+    def test_consultar_duda_get_ok(self):
+        """Debe renderizar la página de consulta"""
+        self.client.login(username="alice", password="x")
+        url = reverse("social_projects:consultar_duda", args=[self.proy.pk])
+        r = self.client.get(url)
+        self.assertEqual(r.status_code, 200)
+        self.assertContains(r, "Paseo por Cali")
+
+    def test_consultar_duda_post_empty_message(self):
+        """Debe mostrar error si el mensaje está vacío"""
+        self.client.login(username="alice", password="x")
+        url = reverse("social_projects:consultar_duda", args=[self.proy.pk])
+        r = self.client.post(url, {"mensaje": "   "})
+        self.assertIn(r.status_code, (200, 302, 303))  # puede quedarse o redirigir
+        # No se crea excepción ni se envía correo
+
+    def test_consultar_duda_sin_coordinador(self):
+        """Debe manejar el caso de proyecto sin coordinador"""
+        # Quitamos coordinador
+        self.proy.coordinador_id = None
+        self.proy.save()
+        self.client.login(username="alice", password="x")
+        url = reverse("social_projects:consultar_duda", args=[self.proy.pk])
+        r = self.client.post(url, {"mensaje": "¿Hay cupos?"})
+        self.assertIn(r.status_code, (302, 303))

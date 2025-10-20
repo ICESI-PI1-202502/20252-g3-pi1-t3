@@ -39,7 +39,8 @@ def analisis_comportamiento(request):
     data = Participaciones.objects.values(
         "participantes_id_participante__nombre",
         "participantes_id_participante__semestre",
-        "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo"
+        "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+         "participantes_id_participante__roles_id_rol__nombre_rol", 
     ).annotate(total=Count("id_participacion")).order_by("participantes_id_participante__semestre")
 
     # Filtro por tipo de actividad (si se pasa)
@@ -742,7 +743,8 @@ def registrar_asistencia_rapido(request):
 def registrar_asistencia_manual(request):
     """Registra asistencias por cédula, creando User y Participante si no existen"""
 
-    actividades = Actividades.objects.all().order_by('nombre')
+    #actividades = Actividades.objects.all().order_by('nombre')
+    actividades = Actividades.objects.values("id_actividad", "nombre")
     fecha_hoy = timezone.now().date().strftime('%Y-%m-%d')
     resultados = None
 
