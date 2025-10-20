@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'tournaments',
     'social_projects',
     'notificaciones',
+
+    
  
 
 ]
@@ -214,23 +216,30 @@ CELERY_BEAT_SCHEDULE = {
 
 
 
+import sys
+
 if any(cmd in sys.argv for cmd in ("test", "pytest")):
     MIGRATION_MODULES = {"universitaryWellbeing": None}
 
     args = " ".join(sys.argv)
+
+    # Limpia cualquier *.tests previo por si algo quedó colado
+    INSTALLED_APPS = [app for app in INSTALLED_APPS if ".tests" not in app]
+
     if " social_projects" in args or args.endswith("social_projects"):
-        INSTALLED_APPS += ["social_projects.tests"]
+        INSTALLED_APPS += ["social_projects.tests.apps.SocialProjectsTestsConfig"]
     elif " tournaments" in args or args.endswith("tournaments"):
-        INSTALLED_APPS += ["tournaments.tests"]
+        INSTALLED_APPS += ["tournaments.tests.apps.TournamentsTestsConfig"]
     elif " management_CADI" in args or args.endswith("management_CADI"):
-        INSTALLED_APPS += ["management_CADI.tests"]
-    elif " searchActivities" in args or args.endswith("searchActivities"):   
-        INSTALLED_APPS += ["searchActivities.tests"]
+        INSTALLED_APPS += ["management_CADI.tests.apps.ManagementCADITestsConfig"]
+    elif " searchActivities" in args or args.endswith("searchActivities"):
+        INSTALLED_APPS += ["searchActivities.tests.apps.SearchActivitiesTestsConfig"]
 
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
     }
     STATIC_ROOT = BASE_DIR / ".test-static"
+
 
 
