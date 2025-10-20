@@ -157,7 +157,7 @@ def preferences(request):
 
 import json
 @login_required
-def horario(request):
+def schedule(request):
     # Obtener el participante asociado al usuario autenticado
     participante = get_object_or_404(Participantes, user=request.user.id)
 
