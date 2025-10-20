@@ -24,7 +24,7 @@ class Actividades(models.Model):
         blank=True, null=True
     )
 
-    id_tipo = models.FloatField(blank=True, null=True)
+    #id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
@@ -599,5 +599,3 @@ class TorneosEquipos(models.Model):
         managed = False
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
-
-
