@@ -783,7 +783,8 @@ def partido_resultado(request, match_id: int):
             m.save()
 
         messages.success(request, "Resultado guardado.")
-        return redirect("tournaments:detail", m.torneos_id_torneo_id)
+        return redirect("tournaments:detail", m.torneos_id_torneo)
     except Exception as e:
         messages.error(request, f"No se pudo guardar el resultado: {e}")
         return render(request, "record_result.html", ctx)
+
