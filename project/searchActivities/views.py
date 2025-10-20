@@ -135,6 +135,7 @@ def search(request):
         else:
             a["rating_image"] = 'rating_5_0.png'
 
+
         # Asignar los bloques y días de la actividad
         a["items_dia"] = daywise_por_act.get(a['id_actividad'], [])
 

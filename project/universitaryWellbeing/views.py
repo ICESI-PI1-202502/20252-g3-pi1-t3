@@ -100,23 +100,6 @@ def register(request):
 
     return render(request, "auth/register.html", {'form': form})
 
-
-#class AdminLoginView(LoginView):
-    template_name = 'login.html'
-
-    def form_valid(self, form):
-        user = form.get_user()
-        
-        if is_role_admin(user):
-            return redirect('home_admin')
-        else:
-            messages.error(self.request, 'No tienes permisos de administrador')
-            return redirect('login')
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Credenciales incorrectas')
-        return super().form_invalid(form)
-
 def user_logout(request):
     logout(request)
     messages.success(request, "Sesión cerrada correctamente")

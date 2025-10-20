@@ -503,4 +503,212 @@ def inscripcion_individual(request, id: int):
         if not ctx["errors"]:
             ctx.update(ok=True, nombre=nombre, apellido=apellido, correo=correo)
 
+<<<<<<< Updated upstream
     return render(request, "join_individual.html", ctx)
+=======
+    return render(request, "join_individual.html", ctx)
+
+# Historia : crear partido
+@login_required
+def partidos_crear(request, id: int):
+    if not is_admin(request.user):
+        messages.error(request, "No tienes permisos para registrar partidos.")
+        return redirect("tournaments:detail", id)
+
+    torneo = get_object_or_404(Torneos.objects.select_related("disciplinas_id_disciplina"), pk=id)
+
+    if not torneo.aforo_equipos:
+        messages.error(request, "Este torneo es individual; no admite partidos entre equipos.")
+        return redirect("tournaments:detail", id)
+
+    # Equipos del torneo para el form
+    teams = list(
+        Equipos.objects
+        .filter(torneosequipos__torneos_id_torneo=id)
+        .values("id_equipo", "nombre")
+        .order_by("nombre")
+    )
+
+    if request.method == "GET":
+        return render(request, "create_match.html", {
+            "tournament": {
+                "id": torneo.id_torneo,
+                "nombre": torneo.nombre,
+                "disciplina": getattr(torneo.disciplinas_id_disciplina, "nombre", "") or "",
+            },
+            "teams": teams,
+        })
+
+    # --- POST: validar y crear ---
+    equipo_a_raw = (request.POST.get("equipo_a") or "").strip()
+    equipo_b_raw = (request.POST.get("equipo_b") or "").strip()
+    inicio_raw    = (request.POST.get("inicio")   or "").strip()
+    fin_raw       = (request.POST.get("fin")      or "").strip()
+    lugar         = (request.POST.get("lugar")    or "").strip()
+
+    errors = []
+
+    if not equipo_a_raw.isdigit() or not equipo_b_raw.isdigit():
+        errors.append("Debes seleccionar ambos equipos.")
+    else:
+        equipo_a_id = int(equipo_a_raw)
+        equipo_b_id = int(equipo_b_raw)
+        if equipo_a_id == equipo_b_id:
+            errors.append("Los equipos deben ser distintos.")
+        elif not _teams_belong_to_tournament(torneo.id_torneo, equipo_a_id, equipo_b_id):
+            errors.append("Ambos equipos deben pertenecer al torneo.")
+
+    inicio = _parse_dt_local(inicio_raw)
+    fin    = _parse_dt_local(fin_raw)
+    if not inicio or not fin:
+        errors.append("Debes indicar fecha y hora de inicio y fin válidas.")
+    elif not (inicio < fin):
+        errors.append("La hora de inicio debe ser anterior a la de fin.")
+    else:
+       
+        t_ini = _ensure_aware(torneo.fecha_inicio)
+        t_fin = _ensure_aware(torneo.fecha_fin)
+        
+        if t_ini and inicio < t_ini:
+            errors.append("El partido inicia antes de la fecha de inicio del torneo.")
+        if t_fin and fin > t_fin:
+            errors.append("El partido termina después de la fecha fin del torneo.")
+
+    if not errors:
+        # ¿el equipo A tiene otro partido en ese rango?
+        conflicto_a = Partidos.objects.filter(
+            torneos_id_torneo_id=torneo.id_torneo
+        ).filter(
+            Q(equipos_id_equipo_id=equipo_a_id) | Q(equipos_id_equipo2_id=equipo_a_id)
+        ).filter(_overlap_q(inicio, fin)).exists()
+
+        # ¿el equipo B tiene otro partido en ese rango?
+        conflicto_b = Partidos.objects.filter(
+            torneos_id_torneo_id=torneo.id_torneo
+        ).filter(
+            Q(equipos_id_equipo_id=equipo_b_id) | Q(equipos_id_equipo2_id=equipo_b_id)
+        ).filter(_overlap_q(inicio, fin)).exists()
+
+        if conflicto_a:
+            errors.append("El equipo A ya tiene un partido que se solapa con ese horario.")
+        if conflicto_b:
+            errors.append("El equipo B ya tiene un partido que se solapa con ese horario.")
+
+    if errors:
+        for e in errors:
+            messages.error(request, e)
+        # re-render con lo ingresado
+        prefill = {
+            "equipo_a": equipo_a_raw,
+            "equipo_b": equipo_b_raw,
+            "inicio": inicio_raw,
+            "fin": fin_raw,
+            "lugar": lugar,
+        }
+        return render(request, "create_match.html", {
+            "tournament": {
+                "id": torneo.id_torneo,
+                "nombre": torneo.nombre,
+                "disciplina": getattr(torneo.disciplinas_id_disciplina, "nombre", "") or "",
+            },
+            "teams": teams,
+            "prefill": prefill,   
+        })
+
+   
+    try:
+        with transaction.atomic():
+            Partidos.objects.create(
+                torneos_id_torneo_id=torneo.id_torneo,
+                equipos_id_equipo_id=equipo_a_id,
+                equipos_id_equipo2_id=equipo_b_id,
+                fecha_inicio=inicio,
+                fecha_fin=fin,
+                lugar=(lugar or None),
+                estado="PROGRAMADO",   # estado inicial recomendado
+                marcador_a=None,
+                marcador_b=None,
+            )
+        messages.success(request, "Partido creado correctamente.")
+        return redirect("tournaments:detail", torneo.id_torneo)
+    except IntegrityError as e:
+        messages.error(request, f"No se pudo crear el partido (integridad): {e}")
+    except Exception as e:
+        messages.error(request, f"Ocurrió un error al crear el partido: {e}")
+
+    return redirect("tournaments:detail", torneo.id_torneo)
+
+@login_required
+def partido_resultado(request, match_id: int):
+    if not is_admin(request.user):
+        messages.error(request, "No tienes permisos para cargar resultados.")
+        
+        tor_id = Partidos.objects.filter(pk=match_id).values_list("torneos_id_torneo_id", flat=True).first()
+        return redirect("tournaments:detail", tor_id) if tor_id else redirect("tournaments:list")
+
+    m = get_object_or_404(
+        Partidos.objects.select_related("equipos_id_equipo", "equipos_id_equipo2", "torneos_id_torneo"),
+        pk=match_id
+    )
+
+    ctx = {
+        "match": {
+            "id": m.id_partido,
+            "torneo": getattr(m.torneos_id_torneo, "nombre", ""),
+            "equipo_a": getattr(m.equipos_id_equipo, "nombre", ""),
+            "equipo_b": getattr(m.equipos_id_equipo2, "nombre", ""),
+        },
+        "prefill": {
+            "marcador_a": m.marcador_a,
+            "marcador_b": m.marcador_b,
+            "estado": m.estado or "FINALIZADO",
+        },
+    }
+
+    if request.method == "GET":
+        return render(request, "record_result.html", ctx)
+
+    # POST
+    estado = (request.POST.get("estado") or "").strip().upper()
+    ma_raw = (request.POST.get("marcador_a") or "").strip()
+    mb_raw = (request.POST.get("marcador_b") or "").strip()
+
+    errors = []
+    if estado not in ("FINALIZADO", "CANCELADO"):
+        errors.append("Estado inválido.")
+
+    if estado == "FINALIZADO":
+        if not ma_raw.isdigit() or not mb_raw.isdigit():
+            errors.append("Los marcadores deben ser enteros ≥ 0.")
+        else:
+            ma = int(ma_raw)
+            mb = int(mb_raw)
+            if ma < 0 or mb < 0:
+                errors.append("Los marcadores no pueden ser negativos.")
+    else:
+        # cancelado → ignoramos marcadores
+        ma = None
+        mb = None
+
+    if errors:
+        for e in errors:
+            messages.error(request, e)
+        ctx["prefill"].update({"marcador_a": ma_raw, "marcador_b": mb_raw, "estado": estado})
+        return render(request, "record_result.html", ctx)
+
+    try:
+        with transaction.atomic():
+            m.estado = estado
+            m.marcador_a = ma
+            m.marcador_b = mb
+            # aseguramos fecha_fin si estaba vacía
+            if m.fecha_fin is None and estado in ("FINALIZADO", "CANCELADO"):
+                m.fecha_fin = timezone.now()
+            m.save()
+
+        messages.success(request, "Resultado guardado.")
+        return redirect("tournaments:detail", m.torneos_id_torneo)
+    except Exception as e:
+        messages.error(request, f"No se pudo guardar el resultado: {e}")
+        return render(request, "record_result.html", ctx)
+>>>>>>> Stashed changes
