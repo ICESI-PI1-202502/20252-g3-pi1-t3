@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User, Group
 
-# --- mínimos para FK de Participantes ---
+##PORFAVOR CORRER LOS TEST CON python manage.py test social_projects --keepdb
 class Roles(models.Model):
     id_rol = models.BigAutoField(primary_key=True)
     nombre_rol = models.CharField(max_length=50)

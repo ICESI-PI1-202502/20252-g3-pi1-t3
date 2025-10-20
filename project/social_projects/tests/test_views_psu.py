@@ -7,7 +7,7 @@ from django.test.utils import override_settings
 from unittest.mock import patch
 
 
-# Importa SOLO los modelos de prueba (evita tocar los reales)
+##PORFAVOR CORRER LOS TEST CON python manage.py test social_projects --keepdb
 from social_projects.tests.models import (
     Roles as TRoles,
     Participantes as TParticipantes,

@@ -2,7 +2,7 @@
 import traceback
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt
-from datetime import datetime as dt
+import datetime as dt
 from django.utils import timezone 
 from django.shortcuts import get_object_or_404, render, redirect
 from django.utils.timezone import make_aware, get_current_timezone
@@ -88,7 +88,7 @@ def _parse_dt_local(s: str):
 
     # 1) ISO (lo usual de <input type="datetime-local">)
     try:
-        dt_naive = dt.fromisoformat(s.replace("Z", ""))
+        dt_naive = dt.datetime.fromisoformat(s.replace("Z", ""))
         return make_aware(dt_naive, tz)
     except Exception:
         pass
@@ -104,7 +104,7 @@ def _parse_dt_local(s: str):
     # 3) Probar formatos day-first
     for fmt in ("%d/%m/%Y %H:%M", "%d/%m/%Y %I:%M %p"):
         try:
-            dt_naive = dt.strptime(s_norm, fmt)
+            dt_naive = dt.datetime.strptime(s_norm, fmt)
             return make_aware(dt_naive, tz)
         except ValueError:
             continue
@@ -593,7 +593,6 @@ def partidos_crear(request, id: int):
 
     torneo = get_object_or_404(Torneos.objects.select_related("disciplinas_id_disciplina"), pk=id)
 
-    # Solo permitimos partidos en torneos por equipos
     if not torneo.aforo_equipos:
         messages.error(request, "Este torneo es individual; no admite partidos entre equipos.")
         return redirect("tournaments:detail", id)
@@ -642,7 +641,7 @@ def partidos_crear(request, id: int):
     elif not (inicio < fin):
         errors.append("La hora de inicio debe ser anterior a la de fin.")
     else:
-        # (Opcional) validar contra fechas del torneo si las usas como límite
+       
         t_ini = _ensure_aware(torneo.fecha_inicio)
         t_fin = _ensure_aware(torneo.fecha_fin)
         
@@ -651,7 +650,6 @@ def partidos_crear(request, id: int):
         if t_fin and fin > t_fin:
             errors.append("El partido termina después de la fecha fin del torneo.")
 
-    # Conflictos de agenda (solo si tenemos ids y fechas válidas)
     if not errors:
         # ¿el equipo A tiene otro partido en ese rango?
         conflicto_a = Partidos.objects.filter(
@@ -690,10 +688,10 @@ def partidos_crear(request, id: int):
                 "disciplina": getattr(torneo.disciplinas_id_disciplina, "nombre", "") or "",
             },
             "teams": teams,
-            "prefill": prefill,   # si quieres preseleccionar en el template
+            "prefill": prefill,   
         })
 
-    # Crear el partido
+   
     try:
         with transaction.atomic():
             Partidos.objects.create(
@@ -720,7 +718,7 @@ def partidos_crear(request, id: int):
 def partido_resultado(request, match_id: int):
     if not is_admin(request.user):
         messages.error(request, "No tienes permisos para cargar resultados.")
-        # Intentamos regresar al torneo si podemos:
+        
         tor_id = Partidos.objects.filter(pk=match_id).values_list("torneos_id_torneo_id", flat=True).first()
         return redirect("tournaments:detail", tor_id) if tor_id else redirect("tournaments:list")
 
