@@ -197,9 +197,26 @@ DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
 
 
 
-# Broker y backend de Celery
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
+# Celery y Redis (Docker aware)
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+
+CELERY_TIMEZONE = 'America/Bogota'
+CELERY_ENABLE_UTC = True
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'generar-notificaciones-diarias': {
+        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
+        'schedule': crontab(minute='*/5'),
+    },
+}
+
+
+
+
 
 # Timezone
 CELERY_TIMEZONE = 'America/Bogota'
