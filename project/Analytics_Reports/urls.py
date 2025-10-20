@@ -23,4 +23,11 @@ urlpatterns = [
     path('historial/<int:participante_id>/', views.historial_participante, name='historial_participante'),
    path('api/participantes-actividad/', views.obtener_participantes_actividad, name='obtener_participantes_actividad'),
 
+
+
+     # URL para historial de participante (NUEVA)
+    path('historial-participante/<int:id_participante>/', views.historial_participante, name='historial_participante'),
+    
+    
+
 ]
