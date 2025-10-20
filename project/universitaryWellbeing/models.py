@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User,Group
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import os
 
@@ -23,6 +24,7 @@ class Actividades(models.Model):
         blank=True, null=True
     )
 
+    id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
@@ -400,6 +402,17 @@ class HorariosParticipante(models.Model):
         db_table = 'horarios_participante'
         unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
 
+    def clean(self):
+        # Buscar solapamientos con otros eventos del mismo participante
+        conflictos = HorariosParticipante.objects.filter(
+            participantes_id_participante=self.participantes_id_participante,
+            fecha_inicio__lt=self.fecha_fin,
+            fecha_fin__gt=self.fecha_inicio
+        ).exclude(id_horario=self.id_horario)
+
+        if conflictos.exists():
+            raise ValidationError("Conflicto de hora: ya tienes una actividad, cita o materia en este horario.")
+
 
 
 
@@ -586,3 +599,5 @@ class TorneosEquipos(models.Model):
         managed = False
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
+
+
