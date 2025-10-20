@@ -1,0 +1,1 @@
+##PORFAVOR CORRER LOS TEST CON python manage.py test management_CADI --keepdb
