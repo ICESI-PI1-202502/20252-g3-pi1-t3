@@ -23,5 +23,40 @@ services:
       - postgres_data:/var/lib/postgresql/data/
     ports:
     - "5432:5432"
+
+
+  #  Redis (broker de mensajes para Celery)
+  redis:
+    image: redis:alpine
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+
+  #  Celery Worker (procesa tareas)
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-worker
+    command: celery -A BienestarUniversitario worker -l info
+    depends_on:
+      - redis
+      - app
+    volumes:
+      - .:/app
+
+  #  Celery Beat (programa tareas)
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-beat
+    command: celery -A BienestarUniversitario beat -l info
+    depends_on:
+      - redis
+      - app
+    volumes:
+      - .:/app
+
 volumes:
  postgres_data:
