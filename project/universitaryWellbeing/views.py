@@ -8,9 +8,9 @@ from django.core.validators import validate_email
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
 from .forms import UserLoginForm, UserRegisterForm
 from typing import List
-from .models import Notificaciones
 from datetime import datetime, timedelta
 from django.utils import timezone
+from .models import Notificaciones
 
 def user_login(request):
     if request.method == "POST":
@@ -201,15 +201,22 @@ def home_user(request):
     
     user = request.user
     actividades = Actividades.objects.values("nombre") 
-    actividades_recomendadas = get_recommendations_for_user(user)
+   # actividades_recomendadas = get_recommendations_for_user(user)
     horario = get_user_schedule(user)
     calendario = get_user_calendar(user)
 
+ # Intentamos obtener el rol del participante
+    #participante = Participantes.objects.filter(usuario=user).select_related('roles_id_rol').first()
+    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
+    user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
+
+
     context = {
-        "actividades_recomendadas": actividades_recomendadas,
+       # "actividades_recomendadas": actividades_recomendadas,
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
+        "user_rol": user_rol,  #  agregado aquí
     }
 
     return render(request, "home_user.html", context)
@@ -271,3 +278,5 @@ def ver_notificaciones(request):
     return render(request, "notificaciones/notificaciones.html", {
         "notificaciones": notificaciones
     })
+
+

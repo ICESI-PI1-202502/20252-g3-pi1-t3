@@ -743,7 +743,8 @@ def registrar_asistencia_rapido(request):
 def registrar_asistencia_manual(request):
     """Registra asistencias por cédula, creando User y Participante si no existen"""
 
-    actividades = Actividades.objects.all().order_by('nombre')
+    #actividades = Actividades.objects.all().order_by('nombre')
+    actividades = Actividades.objects.values("id_actividad", "nombre")
     fecha_hoy = timezone.now().date().strftime('%Y-%m-%d')
     resultados = None
 
