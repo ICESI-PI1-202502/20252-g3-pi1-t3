@@ -47,7 +47,6 @@ INSTALLED_APPS = [
     'searchActivities',
     'tournaments',
     'social_projects',
-
 ]
 
 MIDDLEWARE = [
