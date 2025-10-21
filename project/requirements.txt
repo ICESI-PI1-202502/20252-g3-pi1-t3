@@ -1,0 +1,50 @@
+# --- Core Framework ---
+Django==5.2.7
+
+# --- Database Drivers ---
+psycopg2==2.9.10          # Usar compilado (más estable en producción)
+# psycopg2-binary==2.9.10 # Alternativa rápida para desarrollo
+
+# --- Task Queue / Background Jobs ---
+celery==5.5.3
+redis==6.4.0
+amqp==5.3.1
+billiard==4.2.2
+kombu==5.5.4
+vine==5.1.0
+django-crontab==0.7.1
+
+# --- Deployment / Server ---
+gunicorn==23.0.0
+whitenoise==6.11.0
+
+# --- Security & Encryption ---
+cryptography==46.0.1
+cffi==2.0.0
+pycparser==2.23
+
+# --- Utilities / CLI ---
+click==8.3.0
+click-didyoumean==0.3.1
+click-plugins==1.1.1.2
+click-repl==0.3.0
+prompt_toolkit==3.0.52
+colorama==0.4.6
+
+# --- Environment & Configuration ---
+python-dotenv==1.1.1
+packaging==25.0
+
+# --- Image Processing ---
+pillow==11.3.0
+
+# --- Date & Time ---
+python-dateutil==2.9.0.post0
+tzdata==2025.2
+
+# --- Typing & Compatibility ---
+typing_extensions==4.15.0
+six==1.17.0
+asgiref==3.10.0
+sqlparse==0.5.3
+wcwidth==0.2.14
