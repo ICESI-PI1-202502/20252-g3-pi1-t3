@@ -56,6 +56,7 @@ class TestViewsPSU(TestCase):
         )
 
     # --- lista_proyectos ---
+    # Debe listar proyectos visibles para un estudiante autenticado.
     def test_lista_proyectos_ok(self):
         self.client.login(username="alice", password="x")
         url = reverse("social_projects:lista_proyectos")
@@ -63,6 +64,7 @@ class TestViewsPSU(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Paseo por Cali")
 
+    # Debe filtrar por texto (q) en el listado de proyectos.
     def test_lista_proyectos_search(self):
         self.client.login(username="alice", password="x")
         url = reverse("social_projects:lista_proyectos")
@@ -71,6 +73,7 @@ class TestViewsPSU(TestCase):
         self.assertContains(r, "Paseo por Cali")
 
     # --- crear_proyecto_social (solo admin) ---
+    # Un usuario no admin no puede crear proyectos; debe redirigir y no persistir.
     def test_crear_proyecto_requires_admin(self):
         self.client.login(username="alice", password="x")
         url = reverse("social_projects:crear_proyecto")
@@ -84,7 +87,7 @@ class TestViewsPSU(TestCase):
         # debería redirigir con error por permisos
         self.assertIn(r.status_code, (302, 303))
         self.assertFalse(TProyectos.objects.filter(nombre="Nuevo").exists())
-
+    # Un admin sí puede crear proyectos; debe redirigir tras crear.
     def test_crear_proyecto_admin_ok(self):
         self.client.login(username="admin", password="x")
         url = reverse("social_projects:crear_proyecto")
@@ -98,7 +101,8 @@ class TestViewsPSU(TestCase):
         self.assertIn(r.status_code, (302, 303))
         self.assertTrue(TProyectos.objects.filter(nombre="Nuevo Proy").exists())
 
-    # --- detalle_proyecto ---
+     # --- detalle_proyecto ---
+    # Debe renderizar el detalle del proyecto para un estudiante autenticado.
     def test_detalle_proyecto_ok(self):
         self.client.login(username="alice", password="x")
         url = reverse("social_projects:detalle_proyecto", args=[self.proy.pk])
@@ -107,6 +111,7 @@ class TestViewsPSU(TestCase):
         self.assertContains(r, "Paseo por Cali")
 
     # --- inscribirse_psu ---
+    # Debe permitir que un estudiante se inscriba si hay cupo disponible.
     def test_inscribirse_psu_ok(self):
         self.client.login(username="alice", password="x")
         url = reverse("social_projects:inscribirse_psu", args=[self.proy.pk])
@@ -117,6 +122,7 @@ class TestViewsPSU(TestCase):
             proyectos_sociales_id_proyecto=self.proy
         ).exists())
 
+     # No debe permitir inscripciones duplicadas del mismo participante en el mismo proyecto.
     def test_inscribirse_psu_no_duplicate(self):
         # primera
         self.client.login(username="alice", password="x")
@@ -130,6 +136,7 @@ class TestViewsPSU(TestCase):
             proyectos_sociales_id_proyecto=self.proy
         ).count(), 1)
 
+    # Cuando el aforo está lleno (2), una tercera inscripción no debe crear registro.
     def test_inscribirse_psu_aforo_lleno(self):
         # Llenar aforo con 2 inscripciones previas
         u2 = User.objects.create_user("bob", password="x")
@@ -155,6 +162,8 @@ class TestViewsPSU(TestCase):
             proyectos_sociales_id_proyecto=self.proy
         ).count(), 2)
 
+
+    # Enviar duda por POST debe disparar un intento de envío de correo y redirigir al detalle.
     @patch("social_projects.views.send_mail")  # mockeamos envío real de correo
     def test_consultar_duda_post_ok(self, mock_send_mail):
         """Debe permitir enviar una duda válida al coordinador"""
@@ -169,6 +178,7 @@ class TestViewsPSU(TestCase):
         args, kwargs = mock_send_mail.call_args
         self.assertIn("¿Cuándo inicia el proyecto?", kwargs["message"])
 
+    # GET de la vista de consulta renderiza la página.
     def test_consultar_duda_get_ok(self):
         """Debe renderizar la página de consulta"""
         self.client.login(username="alice", password="x")
@@ -177,6 +187,7 @@ class TestViewsPSU(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertContains(r, "Paseo por Cali")
 
+    #POST con mensaje vacío debe manejar el error sin romper (quedarse o redirigir).
     def test_consultar_duda_post_empty_message(self):
         """Debe mostrar error si el mensaje está vacío"""
         self.client.login(username="alice", password="x")
@@ -185,6 +196,7 @@ class TestViewsPSU(TestCase):
         self.assertIn(r.status_code, (200, 302, 303))  # puede quedarse o redirigir
         # No se crea excepción ni se envía correo
 
+    # Si el proyecto no tiene coordinador, el flujo debe manejarse (redirigir/avisar).
     def test_consultar_duda_sin_coordinador(self):
         """Debe manejar el caso de proyecto sin coordinador"""
         # Quitamos coordinador

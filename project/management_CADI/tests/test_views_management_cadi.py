@@ -38,12 +38,15 @@ class TestListarActividades(TestCase):
     def _url(self, slug="cadi"):
         return reverse("management_cadi:listar_actividades",
                        args=[slug, self.grupo.id_grupo, self.ga.id_grupo_actividad])
+    
 
+      # Verifica que si el slug es incorrecto, la vista redirige al slug canónico "cadi".
     def test_slug_redirect_to_canonical(self):
         resp = self.client.get(self._url(slug="slug-erroneo"), follow=True)
         self.assertEqual(resp.status_code, 200)
         self.assertTrue(any("cadi" in url for url, _ in resp.redirect_chain))
 
+     # Construye la lista agrupada por día y, sin calificaciones, muestra promedio=0 y la imagen rating_0_0.
     def test_list_builds_daywise_and_zero_rating(self):
         resp = self.client.get(self._url())
         self.assertEqual(resp.status_code, 200)
@@ -63,6 +66,7 @@ class TestListarActividades(TestCase):
         self.assertEqual(a["rating_image"], "rating_0_0.png")
         self.assertFalse(a["user_has_calificado"])
 
+     # Calcula correctamente el promedio (4.5), el bucket de imagen (rating_4_5) y detecta si el usuario ya calificó.
     def test_rating_bucket_and_user_has_calificado(self):
         u2 = User.objects.create_user("bob", password="x")
         p2 = Participantes.objects.create(user=u2, roles_id_rol=self.part.roles_id_rol, correo="bob@ex.com")

@@ -76,6 +76,8 @@ class TestSearchActivitiesViews(TestCase):
             return f"{url}?{urlencode(params)}"
         return url
 
+    # Busca por texto (q='yog'): debe listar Yoga Avanzado y Yogur casero.
+    # Además, para Yoga Avanzado arma items_dia y, como el usuario no lo ha calificado, rating=0.
     def test_search_text_builds_daywise_and_zero_rating(self):
         """Busca 'yoga' y arma items_dia; act1 tiene horario y rating 0 si el usuario no ha calificado ahí."""
         resp = self.client.get(self._url(q="yog"))
@@ -96,6 +98,9 @@ class TestSearchActivitiesViews(TestCase):
         self.assertIn("user_has_calificado", a1)
         self.assertFalse(a1["user_has_calificado"])
 
+
+    # Filtra por tipo=Arte y only=1 (solo disponibles con horario): debe aparecer solo "Pintura libre".
+    # Además, como el usuario ya calificó esa actividad, user_has_calificado=True y rating_image es el bucket de 4.0.
     def test_filter_by_tipo_and_only_available_and_user_has_calificado(self):
         """Filtra por tipo=Arte y only=1. act2 cumple, act3 (sin horario) queda fuera.
            Además, para act2 el usuario ya calificó (flag True) y el bucket de imagen es correcto."""
@@ -113,6 +118,8 @@ class TestSearchActivitiesViews(TestCase):
         # Selected tipo name presente
         self.assertEqual(resp.context["selected_tipo_name"], "Arte")
 
+     
+    # Crea y luego actualiza la calificación mediante POST; ambas deben redirigir a la vista de búsqueda.
     def test_calificar_actividad_create_and_update(self):
         """Crea/actualiza calificación via POST y redirige a search."""
         url = reverse("searchActivities:calificar_actividad", args=[self.act1.id_actividad])  # ← nombre corregido

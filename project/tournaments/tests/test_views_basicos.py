@@ -29,7 +29,7 @@ class TestViewsBasicos(TestCase):
         self.disc = TDisciplinas.objects.create(nombre="Fútbol")
         self.rol = TRoles.objects.create(nombre_rol="Jugador")
 
-    # --- 1) CREAR TORNEO ---
+    # 1) Crear torneo: requiere admin; al crear debe persistir y redirigir.
     def test_crear_torneo(self):
     # login como admin antes del POST
         admin = User.objects.create_user("admin", password="x", is_staff=True, is_superuser=True)
@@ -47,7 +47,7 @@ class TestViewsBasicos(TestCase):
         self.assertIn(resp.status_code, (302, 303))
         self.assertTrue(TTorneos.objects.filter(nombre="Interfacultades").exists())
 
-    # --- 2) CREAR EQUIPO EN TORNEO ---
+    # 2) Crear equipo dentro de un torneo: crea equipo, lo asocia al torneo y agrega responsable al equipo.
     def test_crear_equipo_en_torneo(self):
         torneo = TTorneos.objects.create(
             nombre="Copa Uni",
@@ -84,7 +84,7 @@ class TestViewsBasicos(TestCase):
             equipos_id_equipo=equipo, participantes_id_participante=responsable
         ).exists())
 
-    # --- 3) UNIRSE A UN EQUIPO ---
+    # 3) Unirse a un equipo: el participante autenticado queda vinculado al equipo del torneo.
     def test_unirse_a_equipo(self):
         # Usuario que se unirá
         u_join = User.objects.create_user("luis", password="x")
@@ -178,7 +178,7 @@ class TestMatches(TestCase):
         """ Formato de <input type='datetime-local'>: YYYY-MM-DDTHH:MM """
         return f"{y:04d}-{m:02d}-{d:02d}T{hh:02d}:{mm:02d}"
 
-    # --- crear partido ---
+    # Crear partido: usuario sin admin debe ser redirigido y NO crear registros.
     def test_create_match_requires_admin(self):
         self.client.login(username="alice", password="x")
         url = reverse("tournaments:matches_create", args=[self.torneo.pk])
@@ -192,6 +192,7 @@ class TestMatches(TestCase):
         self.assertIn(r.status_code, (302, 303))
         self.assertFalse(TPartidos.objects.exists())
 
+    # Crear partido (happy path): admin crea partido válido dentro del rango del torneo.
     def test_create_match_happy_path(self):
         self.client.login(username="admin", password="x")
         url = reverse("tournaments:matches_create", args=[self.torneo.pk])
@@ -210,6 +211,7 @@ class TestMatches(TestCase):
             estado="PROGRAMADO",
         ).exists())
 
+    # Validación: no se puede programar un partido con el mismo equipo dos veces.
     def test_create_match_same_team_invalid(self):
         self.client.login(username="admin", password="x")
         url = reverse("tournaments:matches_create", args=[self.torneo.pk])
@@ -222,6 +224,7 @@ class TestMatches(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertFalse(TPartidos.objects.exists())
 
+    # Validación: ambos equipos deben pertenecer al torneo.
     def test_create_match_team_not_in_tournament(self):
         self.client.login(username="admin", password="x")
         outsider = TEquipos.objects.create(
@@ -240,6 +243,7 @@ class TestMatches(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertFalse(TPartidos.objects.exists())
 
+    # Validación: fecha/hora del partido debe estar dentro del rango del torneo.
     def test_create_match_out_of_tournament_dates(self):
         self.client.login(username="admin", password="x")
         url = reverse("tournaments:matches_create", args=[self.torneo.pk])
@@ -262,6 +266,7 @@ class TestMatches(TestCase):
         self.assertEqual(r2.status_code, 200)
         self.assertFalse(TPartidos.objects.exists())
 
+     # Validación: no permitir solapes de horarios entre partidos del mismo torneo/cancha (según tu lógica).
     def test_create_match_overlap_blocked(self):
         self.client.login(username="admin", password="x")
         url = reverse("tournaments:matches_create", args=[self.torneo.pk])
@@ -285,7 +290,7 @@ class TestMatches(TestCase):
         self.assertEqual(r.status_code, 200)
         self.assertEqual(TPartidos.objects.count(), 1)
 
-    # --- registrar resultados ---
+    # Helper para crear un partido programado base.
     def _crear_partido(self):
         return TPartidos.objects.create(
             torneos_id_torneo=self.torneo,
@@ -299,6 +304,7 @@ class TestMatches(TestCase):
             marcador_b=None,
         )
 
+    # Registrar resultado: requiere admin; un usuario normal no debe cambiar estado ni marcadores.
     def test_record_result_requires_admin(self):
         partido = self._crear_partido()
         self.client.login(username="alice", password="x")
@@ -308,6 +314,7 @@ class TestMatches(TestCase):
         partido.refresh_from_db()
         self.assertEqual(partido.estado, "PROGRAMADO")
 
+     # Registrar resultado (finalizar): admin actualiza estado, marcadores y fecha_fin.
     def test_record_result_finalize_ok(self):
         partido = self._crear_partido()
         self.client.login(username="admin", password="x")
@@ -320,6 +327,7 @@ class TestMatches(TestCase):
         self.assertEqual(partido.marcador_b, 2)
         self.assertIsNotNone(partido.fecha_fin)
 
+    # Registrar resultado (cancelar): limpia marcadores y cambia estado a CANCELADO.
     def test_record_result_cancel_ok(self):
         partido = self._crear_partido()
         self.client.login(username="admin", password="x")
@@ -331,6 +339,7 @@ class TestMatches(TestCase):
         self.assertIsNone(partido.marcador_a)
         self.assertIsNone(partido.marcador_b)
 
+    # Validación de entrada: scores inválidos mantienen el partido en PROGRAMADO y devuelven 200 (errores en form).
     def test_record_result_invalid_scores(self):
         partido = self._crear_partido()
         self.client.login(username="admin", password="x")
