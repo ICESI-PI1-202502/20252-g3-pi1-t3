@@ -34,7 +34,7 @@
             
             <!-- Botones de acción -->
             <div class="action-buttons">
-                <a href="{% url 'analytics_reports:registrar_asistencia_manual' %}" class="btn btn-primary">
+                <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}" class="btn btn-primary">
                     <i class="fas fa-plus"></i>
                     Registrar Asistencia Individual
                 </a>
@@ -86,7 +86,7 @@
                             <i class="fas fa-search"></i>
                             Filtrar
                         </button>
-                        <a href="{% url 'analytics_reports:gestion_asistencia' %}" class="btn btn-secondary">
+                        <a href="{% url 'Analytics_Reports:gestion_asistencia' %}" class="btn btn-secondary">
                             <i class="fas fa-times"></i>
                             Limpiar
                         </a>
@@ -135,7 +135,7 @@
                                     </td>
                                     <td>{{ asistencia.fecha|date:"d/m/Y" }}</td>
                                     <td>
-                                        <a href="{% url 'analytics_reports:historial_participante' asistencia.participaciones_id_participacion.participantes_id_participante.id_participante %}" 
+                                        <a href="{% url 'Analytics_Reports:historial_participante' asistencia.participaciones_id_participacion.participantes_id_participante.id_participante %}" 
                                            class="btn btn-sm btn-outline-primary" title="Ver historial">
                                             <i class="fas fa-history"></i>
                                         </a>
@@ -188,7 +188,7 @@
 </div>
 
 <div id="asistencia-data"
-     data-url="{% url 'analytics_reports:gestion_asistencia' %}"
+     data-url="{% url 'Analytics_Reports:gestion_asistencia' %}"
      data-fecha-es-hoy="{{ fecha_es_hoy|yesno:'true,false' }}">
 </div>
 

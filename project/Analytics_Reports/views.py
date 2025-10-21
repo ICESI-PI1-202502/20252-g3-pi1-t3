@@ -39,7 +39,8 @@ def analisis_comportamiento(request):
     data = Participaciones.objects.values(
         "participantes_id_participante__nombre",
         "participantes_id_participante__semestre",
-        "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo"
+        "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+         "participantes_id_participante__roles_id_rol__nombre_rol", 
     ).annotate(total=Count("id_participacion")).order_by("participantes_id_participante__semestre")
 
     # Filtro por tipo de actividad (si se pasa)
@@ -557,55 +558,141 @@ def obtener_participantes_actividad(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-def historial_participante(request, participante_id):
-    """Vista para mostrar historial completo de un participante"""
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+from datetime import datetime, timedelta
+ 
+@login_required
+def historial_participante(request, id_participante):
+    """
+    Vista para mostrar el historial completo de asistencia de un participante
+    """
+    # Obtener el participante
+    participante = get_object_or_404(Participantes, pk=id_participante)
     
-    participante = get_object_or_404(Participantes, id_participante=participante_id)
-    
-    # Obtener todas las participaciones del estudiante
+    # Obtener todas las participaciones del participante
     participaciones = Participaciones.objects.filter(
         participantes_id_participante=participante
-    ).select_related('actividades_id_actividad').order_by('-fecha_inscripcion')
+    ).select_related('actividades_id_actividad')
     
-    # Obtener historial de asistencias por participación
-    historial_data = []
+    # Obtener todas las asistencias del participante
+    asistencias = Asistencias.objects.filter(
+        participaciones_id_participacion__participantes_id_participante=participante
+    ).select_related(
+        'participaciones_id_participacion__actividades_id_actividad',
+        'estados_asistencia_id_estado_asistencia'
+    ).order_by('-fecha')
     
-    for participacion in participaciones:
-        asistencias = Asistencias.objects.filter(
-            participaciones_id_participacion=participacion
-        ).select_related('estados_asistencia_id_estado_asistencia').order_by('-fecha')
-        
-        # Estadísticas de la participación
-        total_asistencias = asistencias.count()
-        presentes = asistencias.filter(
-            estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
-        ).count()
-        
-        porcentaje_asistencia = (presentes * 100 / total_asistencias) if total_asistencias > 0 else 0
-        
-        historial_data.append({
-            'participacion': participacion,
-            'asistencias': asistencias[:10],  # Últimas 10 asistencias
-            'total_asistencias': total_asistencias,
-            'presentes': presentes,
-            'porcentaje': round(porcentaje_asistencia, 1)
-        })
+    # Filtros opcionales
+    actividad_filtro = request.GET.get('actividad', '')
+    fecha_inicio = request.GET.get('fecha_inicio', '')
+    fecha_fin = request.GET.get('fecha_fin', '')
+    estado_filtro = request.GET.get('estado', '')
     
-    # Obtener notas del historial
-    notas_historial = HistorialParticipaciones.objects.filter(
-        participaciones_id_participacion__in=participaciones
-    ).order_by('-fecha')[:20]  # Últimas 20 notas
+    if actividad_filtro:
+        asistencias = asistencias.filter(
+            participaciones_id_participacion__actividades_id_actividad__id_actividad=actividad_filtro
+        )
+    
+    if fecha_inicio:
+        asistencias = asistencias.filter(fecha__gte=fecha_inicio)
+    
+    if fecha_fin:
+        asistencias = asistencias.filter(fecha__lte=fecha_fin)
+    
+    if estado_filtro:
+        asistencias = asistencias.filter(
+            estados_asistencia_id_estado_asistencia__id_estado_asistencia=estado_filtro
+        )
+    
+    # Calcular estadísticas
+    total_asistencias = asistencias.count()
+    
+    # Estadísticas por estado
+    stats_estados = asistencias.values(
+        'estados_asistencia_id_estado_asistencia__nombre'
+    ).annotate(
+        cantidad=Count('id_asistencia')
+    )
+    
+    # Convertir a diccionario para fácil acceso
+    stats_dict = {
+        'presente': 0,
+        'ausente': 0,
+        'justificado': 0,
+        'tardanza': 0
+    }
+    
+    for stat in stats_estados:
+        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre'].lower()
+        stats_dict[estado_nombre] = stat['cantidad']
+    
+    # Calcular porcentaje de asistencia
+    if total_asistencias > 0:
+        porcentaje_asistencia = round(
+            (stats_dict['presente'] / total_asistencias) * 100, 2
+        )
+    else:
+        porcentaje_asistencia = 0
+    
+    # Estadísticas por actividad
+    stats_actividades = asistencias.values(
+        'participaciones_id_participacion__actividades_id_actividad__nombre',
+        'estados_asistencia_id_estado_asistencia__nombre'
+    ).annotate(
+        cantidad=Count('id_asistencia')
+    )
+    
+    # Organizar estadísticas por actividad
+    actividades_stats = {}
+    for stat in stats_actividades:
+        actividad_nombre = stat['participaciones_id_participacion__actividades_id_actividad__nombre']
+        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre']
+        
+        if actividad_nombre not in actividades_stats:
+            actividades_stats[actividad_nombre] = {
+                'nombre': actividad_nombre,
+                'presente': 0,
+                'ausente': 0,
+                'justificado': 0,
+                'tardanza': 0,
+                'total': 0
+            }
+        
+        actividades_stats[actividad_nombre][estado_nombre.lower()] = stat['cantidad']
+        actividades_stats[actividad_nombre]['total'] += stat['cantidad']
+    
+    # Calcular porcentaje de asistencia por actividad
+    for actividad in actividades_stats.values():
+        if actividad['total'] > 0:
+            actividad['porcentaje'] = round(
+                (actividad['presente'] / actividad['total']) * 100, 2
+            )
+        else:
+            actividad['porcentaje'] = 0
+    
+    # Obtener listas para filtros
+    from universitaryWellbeing.models import EstadosAsistencia
+    estados_asistencia = EstadosAsistencia.objects.all()
     
     context = {
         'participante': participante,
-        'historial_data': historial_data,
-        'notas_historial': notas_historial,
-        'total_participaciones': participaciones.count()
+        'asistencias': asistencias,
+        'participaciones': participaciones,
+        'total_asistencias': total_asistencias,
+        'stats': stats_dict,
+        'porcentaje_asistencia': porcentaje_asistencia,
+        'actividades_stats': actividades_stats.values(),
+        'estados_asistencia': estados_asistencia,
+        'actividad_filtro': actividad_filtro,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'estado_filtro': estado_filtro,
     }
     
     return render(request, 'historial_participante.html', context)
-
-
 
 
 def asistencia(request):
@@ -742,7 +829,8 @@ def registrar_asistencia_rapido(request):
 def registrar_asistencia_manual(request):
     """Registra asistencias por cédula, creando User y Participante si no existen"""
 
-    actividades = Actividades.objects.all().order_by('nombre')
+    #actividades = Actividades.objects.all().order_by('nombre')
+    actividades = Actividades.objects.values("id_actividad", "nombre")
     fecha_hoy = timezone.now().date().strftime('%Y-%m-%d')
     resultados = None
 

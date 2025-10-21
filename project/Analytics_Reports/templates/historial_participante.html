@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/historial_participante.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12">
+            <!-- Información del participante -->
+            <div class="participant-header">
+                <div class="participant-avatar-large">
+                    {{ participante.nombre.0 }}{{ participante.apellido.0 }}
+                </div>
+                <div class="participant-info-large">
+                    <h2>{{ participante.nombre }} {{ participante.apellido }}</h2>
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-id-card"></i> {{ participante.numero_identificacion }}
+                    </p>
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-graduation-cap"></i> {{ participante.programa }} - Semestre {{ participante.semestre }}
+                    </p>
+                    {% if participante.correo %}
+                    <p class="text-muted mb-1">
+                        <i class="fas fa-envelope"></i> {{ participante.correo }}
+                    </p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Estadísticas generales -->
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <div class="stat-icon text-success">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.presente }}</div>
+                        <div class="stat-label">Presente</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon text-danger">
+                        <i class="fas fa-times-circle"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.ausente }}</div>
+                        <div class="stat-label">Ausente</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon text-warning">
+                        <i class="fas fa-clock"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.tardanza }}</div>
+                        <div class="stat-label">Tardanza</div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon text-info">
+                        <i class="fas fa-file-alt"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ stats.justificado }}</div>
+                        <div class="stat-label">Justificado</div>
+                    </div>
+                </div>
+                <div class="stat-card stat-card-highlight">
+                    <div class="stat-icon text-primary">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-content">
+                        <div class="stat-number">{{ porcentaje_asistencia }}%</div>
+                        <div class="stat-label">Asistencia</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Estadísticas por actividad -->
+            {% if actividades_stats %}
+            <div class="section-card mt-4">
+                <h5 class="section-title">
+                    <i class="fas fa-chart-bar"></i>
+                    Estadísticas por Actividad
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Actividad</th>
+                                <th class="text-center">Presente</th>
+                                <th class="text-center">Ausente</th>
+                                <th class="text-center">Tardanza</th>
+                                <th class="text-center">Justificado</th>
+                                <th class="text-center">Total</th>
+                                <th class="text-center">% Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for actividad in actividades_stats %}
+                            <tr>
+                                <td><strong>{{ actividad.nombre }}</strong></td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ actividad.presente }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-danger">{{ actividad.ausente }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-warning">{{ actividad.tardanza }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-info">{{ actividad.justificado }}</span>
+                                </td>
+                                <td class="text-center">
+                                    <strong>{{ actividad.total }}</strong>
+                                </td>
+                                <td class="text-center">
+                                    <div class="progress" style="height: 20px;">
+                                        <div class="progress-bar bg-success" role="progressbar" 
+                                             style="width: '{{ actividad.porcentaje }}%'"
+                                             aria-valuenow="{{ actividad.porcentaje }}" 
+                                             aria-valuemin="0" aria-valuemax="100">
+                                            {{ actividad.porcentaje }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Filtros de historial -->
+            <div class="section-card mt-4">
+                <h5 class="section-title">
+                    <i class="fas fa-filter"></i>
+                    Filtrar Historial
+                </h5>
+                <form method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="actividad" class="form-label">Actividad</label>
+                        <select class="form-select" id="actividad" name="actividad">
+                            <option value="">Todas</option>
+                            {% for participacion in participaciones %}
+                                <option value="{{ participacion.actividades_id_actividad.id_actividad }}"
+                                        {% if actividad_filtro == participacion.actividades_id_actividad.id_actividad|stringformat:"s" %}selected{% endif %}>
+                                    {{ participacion.actividades_id_actividad.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="fecha_inicio" class="form-label">Fecha Inicio</label>
+                        <input type="date" class="form-control" id="fecha_inicio" 
+                               name="fecha_inicio" value="{{ fecha_inicio }}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="fecha_fin" class="form-label">Fecha Fin</label>
+                        <input type="date" class="form-control" id="fecha_fin" 
+                               name="fecha_fin" value="{{ fecha_fin }}">
+                    </div>
+                    <div class="col-md-3">
+                        <label for="estado" class="form-label">Estado</label>
+                        <select class="form-select" id="estado" name="estado">
+                            <option value="">Todos</option>
+                            {% for estado in estados_asistencia %}
+                                <option value="{{ estado.id_estado_asistencia }}"
+                                        {% if estado_filtro == estado.id_estado_asistencia|stringformat:"s" %}selected{% endif %}>
+                                    {{ estado.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Filtrar
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Historial de asistencias -->
+            <div class="section-card mt-4">
+                <h5 class="section-title">
+                    <i class="fas fa-history"></i>
+                    Historial de Asistencias ({{ total_asistencias }})
+                </h5>
+                
+                {% if asistencias %}
+                <div class="timeline">
+                    {% for asistencia in asistencias %}
+                    <div class="timeline-item">
+                        <div class="timeline-marker timeline-marker-{{ asistencia.estados_asistencia_id_estado_asistencia.nombre|lower }}">
+                            {% if asistencia.estados_asistencia_id_estado_asistencia.nombre == 'Presente' %}
+                                <i class="fas fa-check"></i>
+                            {% elif asistencia.estados_asistencia_id_estado_asistencia.nombre == 'Ausente' %}
+                                <i class="fas fa-times"></i>
+                            {% elif asistencia.estados_asistencia_id_estado_asistencia.nombre == 'Tardanza' %}
+                                <i class="fas fa-clock"></i>
+                            {% else %}
+                                <i class="fas fa-file-alt"></i>
+                            {% endif %}
+                        </div>
+                        <div class="timeline-content">
+                            <div class="timeline-header">
+                                <h6>{{ asistencia.participaciones_id_participacion.actividades_id_actividad.nombre }}</h6>
+                                <span class="timeline-date">
+                                    <i class="far fa-calendar"></i>
+                                    {{ asistencia.fecha|date:"d/m/Y" }}
+                                </span>
+                            </div>
+                            <div class="timeline-body">
+                                <span class="badge-estado badge-{{ asistencia.estados_asistencia_id_estado_asistencia.nombre|lower }}">
+                                    {{ asistencia.estados_asistencia_id_estado_asistencia.nombre }}
+                                </span>
+                                {% if asistencia.observaciones %}
+                                <p class="mt-2 mb-0">
+                                    <strong>Observaciones:</strong> {{ asistencia.observaciones }}
+                                </p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="no-data">
+                    <i class="fas fa-calendar-times fa-3x text-muted mb-3"></i>
+                    <h5>No hay registros de asistencia</h5>
+                    <p>No se encontraron registros para los filtros aplicados.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="{% static 'js/historial_participante.js' %}"></script>
+{% endblock %}

@@ -47,9 +47,14 @@ INSTALLED_APPS = [
     'searchActivities',
     'tournaments',
     'social_projects',
+    'notificaciones',
+
+    
+ 
 
 ]
 
+ 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -73,6 +78,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'universitaryWellbeing.context_processors.user_role',  
             ],
         },
     },
@@ -169,27 +175,88 @@ LOGOUT_REDIRECT_URL = "/"       # where to send after logout
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
+if any(cmd in sys.argv for cmd in ["test", "pytest"]):
+    INSTALLED_APPS += ["tournaments.tests"]
+    # Desactiva migraciones del app real que está en conflicto
+    MIGRATION_MODULES = {"universitaryWellbeing": None}
 
 
 
+
+
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'luis.gluis.g.io.com@gmail.com'
+EMAIL_HOST_PASSWORD = 'jbrg abzk beox eipo'
+DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
+
+
+
+
+
+# Celery y Redis (Docker aware)
+CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
+
+CELERY_TIMEZONE = 'America/Bogota'
+CELERY_ENABLE_UTC = True
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'generar-notificaciones-diarias': {
+        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
+        'schedule': crontab(minute='*/5'),
+    },
+}
+
+
+
+
+
+# Timezone
+CELERY_TIMEZONE = 'America/Bogota'
+CELERY_ENABLE_UTC = True
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'generar-notificaciones-diarias': {
+        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
+        'schedule': crontab(minute='*/5'),  # cada 5 minutos, ajusta según necesidad
+    },
+}
+
+
+
+
+import sys
 
 if any(cmd in sys.argv for cmd in ("test", "pytest")):
     MIGRATION_MODULES = {"universitaryWellbeing": None}
 
     args = " ".join(sys.argv)
+
+    # Limpia cualquier *.tests previo por si algo quedó colado
+    INSTALLED_APPS = [app for app in INSTALLED_APPS if ".tests" not in app]
+
     if " social_projects" in args or args.endswith("social_projects"):
-        INSTALLED_APPS += ["social_projects.tests"]
+        INSTALLED_APPS += ["social_projects.tests.apps.SocialProjectsTestsConfig"]
     elif " tournaments" in args or args.endswith("tournaments"):
-        INSTALLED_APPS += ["tournaments.tests"]
+        INSTALLED_APPS += ["tournaments.tests.apps.TournamentsTestsConfig"]
     elif " management_CADI" in args or args.endswith("management_CADI"):
-        INSTALLED_APPS += ["management_CADI.tests"]
-    elif " searchActivities" in args or args.endswith("searchActivities"):   
-        INSTALLED_APPS += ["searchActivities.tests"]
+        INSTALLED_APPS += ["management_CADI.tests.apps.ManagementCADITestsConfig"]
+    elif " searchActivities" in args or args.endswith("searchActivities"):
+        INSTALLED_APPS += ["searchActivities.tests.apps.SearchActivitiesTestsConfig"]
 
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
     }
     STATIC_ROOT = BASE_DIR / ".test-static"
+
 
 
