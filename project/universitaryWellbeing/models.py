@@ -402,20 +402,15 @@ class HorariosParticipante(models.Model):
         db_table = 'horarios_participante'
         unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
 
-    def clean(self):
-        # Buscar solapamientos con otros eventos del mismo participante
-        conflictos = HorariosParticipante.objects.filter(
-            participantes_id_participante=self.participantes_id_participante,
-            fecha_inicio__lt=self.fecha_fin,
-            fecha_fin__gt=self.fecha_inicio
-        ).exclude(id_horario=self.id_horario)
-
-        if conflictos.exists():
-            raise ValidationError("Conflicto de hora: ya tienes una actividad, cita o materia en este horario.")
-
-
-
-
+def clean(self):
+    # Buscar solapamientos con otros eventos del mismo participante
+    conflictos = HorariosParticipante.objects.filter(
+        participantes_id_participante=self.participantes_id_participante,
+        fecha_inicio__lt=self.fecha_fin,
+        fecha_fin__gt=self.fecha_inicio
+    ).exclude(id_horario=self.id_horario)
+    if conflictos.exists():
+        raise ValidationError("Conflicto de hora: ya tienes una actividad, cita o materia en este horario.")
 
 class InscripcionesPsu(models.Model):
 
@@ -558,6 +553,7 @@ class RolesParticipacion(models.Model):
 class TiposActividad(models.Model):
     id_tipo = models.FloatField(primary_key=True)
     nombre_tipo = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
