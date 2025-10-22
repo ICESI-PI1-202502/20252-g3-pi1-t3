@@ -30,22 +30,30 @@ def is_admin(user):
 
 def analytics_index(request):
     return render(request, "index.html")
-
 def analisis_comportamiento(request): 
     tipo_actividad = request.GET.get("tipo_actividad")
     min_frecuencia = request.GET.get("min_frecuencia")
+    export = request.GET.get("export")  # 👈 nuevo parámetro para detectar exportación
 
     # Base queryset: contamos participaciones por participante y tipo de actividad
-    data = Participaciones.objects.values(
-        "participantes_id_participante__nombre",
-        "participantes_id_participante__semestre",
-        "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
-         "participantes_id_participante__roles_id_rol__nombre_rol", 
-    ).annotate(total=Count("id_participacion")).order_by("participantes_id_participante__semestre")
+    data = (
+        Participaciones.objects.values(
+            "participantes_id_participante__nombre",
+            "participantes_id_participante__correo",
+            "participantes_id_participante__semestre",
+            "participantes_id_participante__facultad",
+            "participantes_id_participante__roles_id_rol__nombre_rol",
+            "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+        )
+        .annotate(total=Count("id_participacion"))
+        .order_by("participantes_id_participante__semestre")
+    )
 
-    # Filtro por tipo de actividad (si se pasa)
+    # Filtro por tipo de actividad
     if tipo_actividad:
-        data = data.filter(actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad)
+        data = data.filter(
+            actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
+        )
 
     # Filtro por frecuencia mínima
     if min_frecuencia:
@@ -55,6 +63,40 @@ def analisis_comportamiento(request):
         except ValueError:
             pass
 
+    # 🔽 --- EXPORTACIÓN CSV ---
+    if export == "csv":
+        response = HttpResponse(content_type="text/csv")
+        response["Content-Disposition"] = 'attachment; filename="analisis_comportamiento.csv"'
+
+        writer = csv.writer(response)
+        writer.writerow([
+            "Usuario", "Correo", "Semestre", "Facultad",
+            "Rol", "Tipo de Actividad", "Total Participaciones", "Frecuencia"
+        ])
+
+        for item in data:
+            total = item["total"]
+            if total >= 5:
+                frecuencia = "Alta"
+            elif total >= 2:
+                frecuencia = "Media"
+            else:
+                frecuencia = "Baja"
+
+            writer.writerow([
+                item.get("participantes_id_participante__nombre", "N/A"),
+                item.get("participantes_id_participante__correo", "N/A"),
+                item.get("participantes_id_participante__semestre", "N/A"),
+                item.get("participantes_id_participante__facultad", "Sin especificar"),
+                item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol"),
+                item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Sin especificar"),
+                total,
+                frecuencia
+            ])
+
+        return response  # 👈 descarga directa
+
+    # --- Render normal ---
     tipos_actividad = TiposActividad.objects.all().order_by("nombre_tipo")
 
     return render(
@@ -65,7 +107,6 @@ def analisis_comportamiento(request):
             "tipos_actividad": tipos_actividad,
         }
     )
-
  
 def participantes_list(request):
     participantes = Participantes.objects.all().order_by("nombre")

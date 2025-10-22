@@ -16,3 +16,25 @@ def user_role(request):
         context['user_rol'] = None
     
     return context
+
+
+from universitaryWellbeing.models import Notificaciones
+
+def notificaciones_context(request):
+    """
+    Devuelve notificaciones y cantidad de no leídas para el usuario autenticado
+    (se inyecta automáticamente en todas las plantillas)
+    """
+    if not request.user.is_authenticated:
+        return {}
+
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante__user_id=request.user.id
+    ).order_by('-fecha')
+
+    no_leidas = notificaciones.filter(leida=False).count()
+
+    return {
+        "notificaciones": notificaciones[:10],  # solo las primeras 10 para el menú
+        "notificaciones_no_leidas": no_leidas,
+    }

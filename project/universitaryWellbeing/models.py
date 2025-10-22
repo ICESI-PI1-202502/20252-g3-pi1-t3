@@ -434,16 +434,28 @@ class MotivosCita(models.Model):
         db_table = 'motivos_cita'
 
 class Notificaciones(models.Model):
-
     id_notificacion = models.BigAutoField(primary_key=True)
     mensaje = models.CharField(max_length=500)
     fecha = models.DateTimeField()
-    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    tipos_notificacion_id_tipo_notificacion = models.ForeignKey('TiposNotificacion', models.DO_NOTHING, db_column='tipos_notificacion_id_tipo_notificacion')
+    participantes_id_participante = models.ForeignKey(
+        'Participantes',
+        models.DO_NOTHING,
+        db_column='participantes_id_participante'
+    )
+    tipos_notificacion_id_tipo_notificacion = models.ForeignKey(
+        'TiposNotificacion',
+        models.DO_NOTHING,
+        db_column='tipos_notificacion_id_tipo_notificacion'
+    )
+
+    leida = models.BooleanField(default=False)
 
     class Meta:
-        managed = False
+        managed = True  # 👈 temporalmente
         db_table = 'notificaciones'
+
+
+
 
 class Participaciones(models.Model):
 

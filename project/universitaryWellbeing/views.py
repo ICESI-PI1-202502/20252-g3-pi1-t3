@@ -256,16 +256,32 @@ def get_user_calendar(user):
 @login_required
 def profile(request):
     participante = Participantes.objects.get(user=request.user)
+
+    #  Obtener notificaciones de este participante
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante=participante
+    ).order_by('-fecha')
+
+    notificaciones_no_leidas = notificaciones.filter(leida=False).count()
+
+    # 👤 Rol del usuario (por si lo necesita el menú lateral)
+    user_rol = participante.roles_id_rol.nombre_rol if participante.roles_id_rol else None
+
+    # Actividades del participante
     try:
         preferencia = Preferencias.objects.get(participantes_id_participante=participante)
-        actividades: List[PreferenciasActividades] = preferencia.actividades.all()  # type: ignore # Esto funciona en Django pero Pylance lo marca falso positivo
+        actividades = preferencia.actividades.all()  # type: ignore
     except Preferencias.DoesNotExist:
         actividades = []
 
     context = {
         "participante": participante,
         "actividades": actividades,
+        "notificaciones": notificaciones,
+        "notificaciones_no_leidas": notificaciones_no_leidas,
+        "user_rol": user_rol,
     }
+
     return render(request, "profile.html", context)
 
 @login_required

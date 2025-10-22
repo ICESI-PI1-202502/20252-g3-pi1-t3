@@ -408,3 +408,212 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   text-transform:uppercase;
   cursor: pointer;
 }
+
+
+
+
+
+
+
+
+/* 
+Esto son los estilos de las notificaciones
+*/
+
+
+
+
+
+ /* Estilos para el dropdown de notificaciones */
+        .notifications-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .notifications-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: #dc3545;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 10px;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .notifications-menu {
+            position: absolute;
+            top: 45px;
+            right: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            width: 380px;
+            max-height: 500px;
+            overflow: hidden;
+            display: none;
+            z-index: 1050;
+        }
+
+        .notifications-menu.show {
+            display: block;
+            animation: slideDown 0.2s ease-out;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .notifications-header {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .notifications-header h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .notifications-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .notification-item {
+            padding: 12px 20px;
+            border-bottom: 1px solid #f1f3f5;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #e3f2fd;
+        }
+
+        .notification-item.unread:hover {
+            background: #d1e7f7;
+        }
+
+        .notification-content {
+            display: flex;
+            gap: 12px;
+        }
+
+        .notification-icon {
+            flex-shrink: 0;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #007bff;
+            color: white;
+        }
+
+        .notification-text {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            color: #333;
+            margin-bottom: 4px;
+            line-height: 1.4;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #6c757d;
+        }
+
+        .notification-unread-dot {
+            width: 8px;
+            height: 8px;
+            background: #007bff;
+            border-radius: 50%;
+            margin-top: 6px;
+            flex-shrink: 0;
+        }
+
+        .notifications-footer {
+            padding: 12px 20px;
+            text-align: center;
+            border-top: 1px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .notifications-footer a {
+            color: #007bff;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .notifications-footer a:hover {
+            text-decoration: underline;
+        }
+
+        .empty-notifications {
+            padding: 40px 20px;
+            text-align: center;
+            color: #6c757d;
+        }
+
+        .empty-notifications i {
+            font-size: 48px;
+            color: #dee2e6;
+            margin-bottom: 10px;
+        }
+
+        /* Scrollbar personalizada */
+        .notifications-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .notifications-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+
+        .notifications-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+
+        .notifications-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
+            .notifications-menu {
+                width: 320px;
+                right: -10px;
+            }
+        }
