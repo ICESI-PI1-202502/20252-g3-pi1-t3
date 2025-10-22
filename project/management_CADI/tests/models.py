@@ -10,6 +10,7 @@ class Grupos(models.Model):
     class Meta:
         managed = True
         db_table = "grupos"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class GruposActividad(models.Model):
@@ -25,6 +26,7 @@ class GruposActividad(models.Model):
     class Meta:
         managed = True
         db_table = "grupos_actividad"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class TiposActividad(models.Model):
@@ -36,7 +38,7 @@ class TiposActividad(models.Model):
     class Meta:
         managed = True
         db_table = "tipos_actividad"
-
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
@@ -58,6 +60,7 @@ class Actividades(models.Model):
     class Meta:
         managed = True
         db_table = "actividades"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class ActividadesGrupos(models.Model):
@@ -69,6 +72,7 @@ class ActividadesGrupos(models.Model):
     class Meta:
         managed = True
         db_table = "actividades_grupos"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class HorariosBloque(models.Model):
@@ -84,6 +88,7 @@ class HorariosBloque(models.Model):
     class Meta:
         managed = True
         db_table = "horarios_bloque"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class HorariosActividad(models.Model):
@@ -106,6 +111,7 @@ class HorariosActividad(models.Model):
     class Meta:
         managed = True
         db_table = "horarios_actividad"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 # --------------------------
@@ -119,6 +125,7 @@ class Roles(models.Model):
     class Meta:
         managed = True
         db_table = "roles"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class Participantes(models.Model):
@@ -141,6 +148,7 @@ class Participantes(models.Model):
     class Meta:
         managed = True
         db_table = "participantes"
+        app_label = 'tests_management_CADI'  # <-- agrega esto
 
 
 class CalificacionesActividad(models.Model):
@@ -158,3 +166,4 @@ class CalificacionesActividad(models.Model):
         managed = True
         db_table = "calificaciones_actividad"
         unique_together = (("actividades_id_actividad", "participantes_id_participante"),)
+        app_label = 'tests_management_CADI'  # <-- agrega esto

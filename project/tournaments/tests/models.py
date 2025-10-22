@@ -9,6 +9,8 @@ class Disciplinas(models.Model):
     class Meta:
         managed = True
         db_table = "disciplinas"
+        app_label = 'tests_tournaments'
+
 
 class EstadosTorneo(models.Model):
     id_estado_torneo = models.BigAutoField(primary_key=True)
@@ -16,6 +18,7 @@ class EstadosTorneo(models.Model):
     class Meta:
         managed = True
         db_table = "estados_torneo"
+        app_label = 'tests_tournaments'
 
 class Roles(models.Model):
     id_rol = models.BigAutoField(primary_key=True)
@@ -32,6 +35,8 @@ class Roles(models.Model):
     class Meta:
         managed = True
         db_table = "roles"
+        app_label = 'tests_tournaments'
+
 
 class Participantes(models.Model):
     id_participante = models.BigAutoField(primary_key=True)
@@ -55,6 +60,8 @@ class Participantes(models.Model):
     class Meta:
         managed = True
         db_table = "participantes"
+        app_label = 'tests_tournaments'
+
 
 class Equipos(models.Model):
     id_equipo = models.BigAutoField(primary_key=True)
@@ -73,6 +80,8 @@ class Equipos(models.Model):
     class Meta:
         managed = True
         db_table = "equipos"
+        app_label = 'tests_tournaments'
+
 
 class Torneos(models.Model):
     id_torneo = models.BigAutoField(primary_key=True, db_column="id_torneo")
@@ -91,6 +100,8 @@ class Torneos(models.Model):
     class Meta:
         managed = True
         db_table = "torneos"
+        app_label = 'tests_tournaments'
+
 
 class TorneosEquipos(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -99,6 +110,8 @@ class TorneosEquipos(models.Model):
     class Meta:
         managed = True
         db_table = "torneos_equipos"
+        app_label = 'tests_tournaments'
+
 
 class EquiposParticipantes(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -110,6 +123,8 @@ class EquiposParticipantes(models.Model):
     class Meta:
         managed = True
         db_table = "equipos_participantes"
+        app_label = 'tests_tournaments'
+
 
 
 class Partidos(models.Model):
@@ -133,4 +148,6 @@ class Partidos(models.Model):
     class Meta:
         managed = True
         db_table = "partidos"
+        app_label = 'tests_tournaments'
+
 

@@ -13,6 +13,7 @@ class Roles(models.Model):
     class Meta:
         managed = True
         db_table = "roles"
+        app_label = 'tests_social_projects'
 
 class Participantes(models.Model):
     id_participante = models.BigAutoField(primary_key=True)
@@ -32,6 +33,7 @@ class Participantes(models.Model):
     class Meta:
         managed = True
         db_table = "participantes"
+        app_label = 'tests_social_projects'
 
 # --- PSU ---
 class ProyectosSociales(models.Model):
@@ -45,6 +47,7 @@ class ProyectosSociales(models.Model):
     class Meta:
         managed = True
         db_table = "proyectos_sociales"
+        app_label = 'tests_social_projects'
 
 class EstadosParticipacion(models.Model):
     id_estado_participacion = models.BigAutoField(primary_key=True)
@@ -52,6 +55,7 @@ class EstadosParticipacion(models.Model):
     class Meta:
         managed = True
         db_table = "estados_participacion"
+        app_label = 'tests_social_projects'
 
 class InscripcionesPsu(models.Model):
     id_inscripcion_psu = models.BigAutoField(primary_key=True)
@@ -70,3 +74,4 @@ class InscripcionesPsu(models.Model):
         managed = True
         db_table = "inscripciones_psu"
         unique_together = (("participantes_id_participante", "proyectos_sociales_id_proyecto"),)
+        app_label = 'tests_social_projects'

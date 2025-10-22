@@ -14,6 +14,7 @@ class TiposActividad(models.Model):
     class Meta:
         managed = True
         db_table = "tipos_actividad"
+        app_label = 'tests_searchActivities'
 
 
 # --------------- Grupos / GruposActividad (mínimos) ---------------
@@ -24,6 +25,7 @@ class Grupos(models.Model):
     class Meta:
         managed = True
         db_table = "grupos"
+        app_label = 'tests_searchActivities'
 
 
 class GruposActividad(models.Model):
@@ -37,6 +39,7 @@ class GruposActividad(models.Model):
     class Meta:
         managed = True
         db_table = "grupos_actividad"
+        app_label = 'tests_searchActivities'
 
 
 # ---------------- ActividadesGrupos (para tener la columna act_grup_id) ----------------
@@ -49,6 +52,7 @@ class ActividadesGrupos(models.Model):
     class Meta:
         managed = True
         db_table = "actividades_grupos"
+        app_label = 'tests_searchActivities'
 
 
 # ---------------- Actividades (alineado al modelo real) ----------------
@@ -80,6 +84,7 @@ class Actividades(models.Model):
     class Meta:
         managed = True
         db_table = "actividades"
+        app_label = 'tests_searchActivities'
 
 
 # ---------------- Horarios (bloques + días) ----------------
@@ -96,6 +101,7 @@ class HorariosBloque(models.Model):
     class Meta:
         managed = True
         db_table = "horarios_bloque"
+        app_label = 'tests_searchActivities'
 
 
 class HorariosActividad(models.Model):
@@ -117,6 +123,7 @@ class HorariosActividad(models.Model):
     class Meta:
         managed = True
         db_table = "horarios_actividad"
+        app_label = 'tests_searchActivities'
 
 
 # ---------------- Roles / Participantes ----------------
@@ -131,6 +138,7 @@ class Roles(models.Model):
     class Meta:
         managed = True
         db_table = "roles"
+        app_label = 'tests_searchActivities'
 
 
 class Participantes(models.Model):
@@ -154,6 +162,7 @@ class Participantes(models.Model):
     class Meta:
         managed = True
         db_table = "participantes"
+        app_label = 'tests_searchActivities'
 
 
 # ---------------- CalificacionesActividad ----------------
@@ -173,3 +182,4 @@ class CalificacionesActividad(models.Model):
         managed = True
         db_table = "calificaciones_actividad"
         unique_together = (("actividades_id_actividad", "participantes_id_participante"),)
+        app_label = 'tests_searchActivities'
