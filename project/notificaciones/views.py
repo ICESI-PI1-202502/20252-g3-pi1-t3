@@ -385,3 +385,62 @@ def generar_notificaciones_horarios():
     
     print(f"\n=== Total creadas: {contador} ===\n")
     return contador
+
+
+
+
+
+
+
+
+
+
+
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from universitaryWellbeing.models import Notificaciones
+
+# ===== VISTA 1: Ver todas las notificaciones (página completa) =====
+@login_required
+def ver_notificaciones(request):
+    """
+    Muestra TODAS las notificaciones del usuario en una página completa
+    """
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante__user_id=request.user.id
+    ).order_by('-fecha')
+
+    return render(request, "notificaciones.html", {
+        "notificaciones": notificaciones
+    })
+
+
+# ===== VISTA 2: Marcar como leída (AJAX) =====
+@login_required
+@require_POST
+def marcar_notificacion_leida(request, notificacion_id):
+    """
+    Marca una notificación como leída (llamada desde el dropdown)
+    """
+    try:
+        notificacion = Notificaciones.objects.get(
+            id_notificacion=notificacion_id,
+            participantes_id_participante__user_id=request.user.id
+        )
+        notificacion.leida = True
+        notificacion.save()
+        
+        return JsonResponse({'success': True})
+    except Notificaciones.DoesNotExist:
+        return JsonResponse({
+            'success': False, 
+            'error': 'Notificación no encontrada'
+        }, status=404)
+    except Exception as e:
+        return JsonResponse({
+            'success': False, 
+            'error': str(e)
+        }, status=500)

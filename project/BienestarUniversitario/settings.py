@@ -79,6 +79,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'universitaryWellbeing.context_processors.user_role',  
+                'universitaryWellbeing.context_processors.notificaciones_context',
             ],
         },
     },
