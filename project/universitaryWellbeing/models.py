@@ -433,6 +433,7 @@ class MotivosCita(models.Model):
         managed = False
         db_table = 'motivos_cita'
 
+
 class Notificaciones(models.Model):
     id_notificacion = models.BigAutoField(primary_key=True)
     mensaje = models.CharField(max_length=500)
@@ -447,15 +448,17 @@ class Notificaciones(models.Model):
         models.DO_NOTHING,
         db_column='tipos_notificacion_id_tipo_notificacion'
     )
-
     leida = models.BooleanField(default=False)
+    
+    #  NUEVO: Fecha de creación real de la notificación
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
-        managed = True  # 👈 temporalmente
+        managed = False  #  CAMBIO: Dejar en False para no tocar otras tablas
         db_table = 'notificaciones'
-
-
-
+    
+    def __str__(self):
+        return f"{self.mensaje[:50]}..."
 
 class Participaciones(models.Model):
 
