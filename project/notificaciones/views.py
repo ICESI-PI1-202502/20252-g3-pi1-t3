@@ -1,25 +1,17 @@
-#from django.shortcuts import render
-#from django.contrib.auth.decorators import login_required
-#from universitaryWellbeing.models import Notificaciones
-
-#@login_required
-#def ver_notificaciones(request):
-#    notificaciones = Notificaciones.objects.filter(
-#        participantes_id_participante__user_id=request.user.id
-#    ).order_by('-fecha')
-#
-#    return render(request, "notificaciones.html", {
-#        "notificaciones": notificaciones
-##    })
-from universitaryWellbeing.models import HorariosParticipante
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.utils import timezone
 from django.http import JsonResponse
 from django.conf import settings
+from django.views.decorators.http import require_POST
 from datetime import datetime, timedelta, date
-from universitaryWellbeing.models import Notificaciones, TiposNotificacion, Participantes
+from universitaryWellbeing.models import (
+    Notificaciones, 
+    TiposNotificacion, 
+    Participantes,
+    HorariosParticipante
+)
 import logging
 
 logger = logging.getLogger(__name__)
@@ -72,6 +64,7 @@ def es_notificacion_critica(tipo_notificacion_nombre):
     
     nombre_lower = tipo_notificacion_nombre.lower()
     return any(palabra in nombre_lower for palabra in palabras_criticas)
+
 
 def validar_envio_notificacion(fecha_programada, tipo_notificacion):
     """
@@ -145,7 +138,8 @@ def validar_envio_notificacion(fecha_programada, tipo_notificacion):
         info = get_info_dia_no_lectivo(fecha_solo)
         desc = info.get('descripcion', 'día no lectivo') if info else 'día no lectivo'
         return False, f"Día no lectivo ({desc}) que no permite notificaciones críticas"
-    
+
+
 def buscar_proximo_dia_lectivo(fecha_inicio, max_dias=30):
     """Busca el próximo día lectivo a partir de una fecha"""
     fecha_actual = fecha_inicio
@@ -158,6 +152,7 @@ def buscar_proximo_dia_lectivo(fecha_inicio, max_dias=30):
     
     return None
 
+
 def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notificacion, auto_reprogramar=True):
     """
     Crea una notificación aplicando las reglas de calendario académico
@@ -167,11 +162,11 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
     """
     puede_enviar, motivo = validar_envio_notificacion(fecha_deseada, tipo_notificacion)
     
-    # FIX 1: Retornar early si tipo_notificacion es inválido
+    # Retornar early si tipo_notificacion es inválido
     if not puede_enviar and not tipo_notificacion:
         return {
             'success': False,
-            'motivo': motivo,  # <-- AGREGAR 'motivo' en lugar de 'mensaje'
+            'motivo': motivo,
             'mensaje': motivo,
             'notificacion': None
         }
@@ -191,7 +186,6 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
                 puede_enviar = True
                 reprogramada = True
                 
-                # FIX 2: Manejar tanto date como datetime para fecha_deseada
                 fecha_original_str = fecha_deseada.strftime('%Y-%m-%d') if isinstance(fecha_deseada, (date, datetime)) else str(fecha_deseada)
                 fecha_final_str = fecha_final.strftime('%Y-%m-%d') if isinstance(fecha_final, (date, datetime)) else str(fecha_final)
                 
@@ -216,7 +210,7 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
             
             return {
                 'success': True,
-                'motivo': motivo,  # <-- Incluir 'motivo'
+                'motivo': motivo,
                 'mensaje': motivo,
                 'notificacion': notificacion,
                 'reprogramada': reprogramada,
@@ -232,10 +226,9 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
                 'notificacion': None
             }
     
-    # FIX 3: Siempre incluir 'motivo' en el diccionario de retorno
     return {
         'success': False,
-        'motivo': motivo,  # <-- AGREGAR esto
+        'motivo': motivo,
         'mensaje': motivo,
         'notificacion': None
     }
@@ -247,7 +240,9 @@ def crear_notificacion_validada(mensaje, fecha_deseada, participante, tipo_notif
 
 @login_required
 def ver_notificaciones(request):
-    """Vista original - Lista notificaciones del usuario"""
+    """
+    Muestra TODAS las notificaciones del usuario en una página completa
+    """
     notificaciones = Notificaciones.objects.filter(
         participantes_id_participante__user_id=request.user.id
     ).order_by('-fecha')
@@ -273,8 +268,11 @@ def crear_notificacion(request):
         auto_reprogramar = request.POST.get('auto_reprogramar') == 'on'
         
         try:
-            # Convertir fecha
-            fecha = datetime.strptime(fecha_str, '%Y-%m-%dT%H:%M')
+            # Usar timezone.now() y localtime para Colombia
+            fecha = timezone.make_aware(
+                datetime.strptime(fecha_str, '%Y-%m-%dT%H:%M'),
+                timezone.get_current_timezone()
+            )
             
             # Obtener objetos
             participante = Participantes.objects.get(id_participante=participante_id)
@@ -308,117 +306,7 @@ def crear_notificacion(request):
     
     return render(request, 'crear_notificacion.html', context)
 
- 
 
-
-
-def generar_notificaciones_horarios():
-    """
-    Crea notificaciones automáticas para eventos próximos según el horario del participante.
-    """
-    from universitaryWellbeing.models import HorariosParticipante, Notificaciones, TiposNotificacion
-    
-    ahora = timezone.now()
-    en_48_horas = ahora + timedelta(hours=48)  # AMPLIADO A 48 HORAS
-
-    # Obtener o crear tipo de notificación
-    tipo_recordatorio, _ = TiposNotificacion.objects.get_or_create(
-        nombre="Recordatorio de actividad"
-    )
-
-    # Buscar horarios próximos
-    proximos = HorariosParticipante.objects.filter(
-        fecha_inicio__gte=ahora,
-        fecha_inicio__lte=en_48_horas
-    )
-
-    print(f"\n=== Generando notificaciones ===")
-    print(f"Fecha actual: {ahora}")
-    print(f"Buscando hasta: {en_48_horas}")
-    print(f"Horarios encontrados: {proximos.count()}")
-    
-    contador = 0
-    for bloque in proximos:
-        participante = bloque.participantes_id_participante
-        fecha_evento = bloque.fecha_inicio
-        lugar = bloque.notas or "lugar asignado"
-        
-        mensaje = f"Recordatorio: Tienes '{bloque.titulo}' programado el {fecha_evento.strftime('%d/%m/%Y a las %H:%M')} en {lugar}."
-
-        print(f"\n  Procesando: {bloque.titulo}")
-        print(f"    Fecha evento: {fecha_evento}")
-        
-        # Validar si el día es lectivo
-        if not es_dia_lectivo(fecha_evento.date()):
-            print(f"    ⊗ Día no lectivo")
-            continue
-        
-        print(f"    ✓ Día lectivo")
-        
-        # Verificar si ya existe
-        existe = Notificaciones.objects.filter(
-            participantes_id_participante=participante,
-            mensaje__contains=bloque.titulo,
-            fecha__gte=ahora - timedelta(hours=2)
-        ).exists()
-        
-        if existe:
-            print(f"    ⊗ Notificación duplicada")
-            continue
-
-        print(f"    ✓ Creando notificación...")
-        
-        # Crear notificación
-        resultado = crear_notificacion_validada(
-            mensaje=mensaje,
-            fecha_deseada=ahora,
-            participante=participante,
-            tipo_notificacion=tipo_recordatorio,
-            auto_reprogramar=False
-        )
-        
-        if resultado['success']:
-            contador += 1
-            print(f"    ✓✓ ID: {resultado['notificacion'].id_notificacion}")
-        else:
-            print(f"    ✗✗ Error: {resultado['mensaje']}")
-    
-    print(f"\n=== Total creadas: {contador} ===\n")
-    return contador
-
-
-
-
-
-
-
-
-
-
-
-
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
-from universitaryWellbeing.models import Notificaciones
-
-# ===== VISTA 1: Ver todas las notificaciones (página completa) =====
-@login_required
-def ver_notificaciones(request):
-    """
-    Muestra TODAS las notificaciones del usuario en una página completa
-    """
-    notificaciones = Notificaciones.objects.filter(
-        participantes_id_participante__user_id=request.user.id
-    ).order_by('-fecha')
-
-    return render(request, "notificaciones.html", {
-        "notificaciones": notificaciones
-    })
-
-
-# ===== VISTA 2: Marcar como leída (AJAX) =====
 @login_required
 @require_POST
 def marcar_notificacion_leida(request, notificacion_id):

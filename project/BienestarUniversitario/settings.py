@@ -99,7 +99,7 @@ DATABASES = {
         'PASSWORD': 'h9TZan8icTf3hjsn',
         'HOST': 'aws-1-us-east-2.pooler.supabase.com',
         'PORT': '5432',
-        'CONN_MAX_AGE': 60,
+        'CONN_MAX_AGE': 0,
         'OPTIONS': {'sslmode': 'require'},
    }
 }
@@ -128,10 +128,16 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+ #  Zona horaria de Colombia
+TIME_ZONE = 'America/Bogota'
 
+# Habilitar internacionalización
 USE_I18N = True
 
+# Habilitar localización de fechas
+USE_L10N = True
+
+# IMPORTANTE: Usar zonas horarias (todas las fechas serán timezone-aware)
 USE_TZ = True
 
 
@@ -198,36 +204,21 @@ DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
 
 
 
-
-# Celery y Redis (Docker aware)
+# Celery y Redis
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
 CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0")
-
-CELERY_TIMEZONE = 'America/Bogota'
-CELERY_ENABLE_UTC = True
-
-from celery.schedules import crontab
-
-CELERY_BEAT_SCHEDULE = {
-    'generar-notificaciones-diarias': {
-        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
-        'schedule': crontab(minute='*/5'),
-    },
-}
-
-
-
-
 
 # Timezone
 CELERY_TIMEZONE = 'America/Bogota'
 CELERY_ENABLE_UTC = True
+
 from celery.schedules import crontab
 
+# Tareas periódicas
 CELERY_BEAT_SCHEDULE = {
     'generar-notificaciones-diarias': {
         'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
-        'schedule': crontab(minute='*/5'),  # cada 5 minutos, ajusta según necesidad
+        'schedule': crontab(minute='*/1'),  # cada 1 minutos
     },
 }
 

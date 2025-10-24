@@ -119,7 +119,7 @@ body {
 }
 
 .sub-bar a {
-    color: white; /* ✅ white text on blue background */
+    color: white; /*  white text on blue background */
     text-decoration: none;
     font-size: 1rem;
     font-weight: bold;
