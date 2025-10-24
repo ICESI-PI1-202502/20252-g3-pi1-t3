@@ -68,7 +68,11 @@
                                                         {{ notif.mensaje|truncatewords:20 }}
                                                     </div>
                                                     <div class="notification-time">
-                                                        {{ notif.fecha|timesince }} atrás
+                                                    {% if notif.created_at %}
+                                                    hace {{ notif.created_at|timesince }}
+                                                    {% else %}
+                                                        {{ notif.fecha|date:"d/m/Y H:i" }}
+                                                    {% endif %}
                                                     </div>
                                                 </div>
                                                 {% if not notif.leida %}

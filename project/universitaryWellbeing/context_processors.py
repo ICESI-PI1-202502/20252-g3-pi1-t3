@@ -1,10 +1,11 @@
+from universitaryWellbeing.models import Notificaciones, Participantes
+
 def user_role(request):
     """Agrega información del rol del usuario al contexto global"""
     context = {}
     
     if request.user.is_authenticated:
         try:
-            from universitaryWellbeing.models import Participantes
             participante = Participantes.objects.select_related('roles_id_rol').get(user=request.user)
             context['user_participante'] = participante
             context['user_rol'] = participante.roles_id_rol.nombre_rol
@@ -18,8 +19,6 @@ def user_role(request):
     return context
 
 
-from universitaryWellbeing.models import Notificaciones
-
 def notificaciones_context(request):
     """
     Devuelve notificaciones y cantidad de no leídas para el usuario autenticado
@@ -28,9 +27,11 @@ def notificaciones_context(request):
     if not request.user.is_authenticated:
         return {}
 
+    # CAMBIO IMPORTANTE: Ordenar por ID descendente (más reciente primero)
+    # El ID es auto-incremental, por lo que IDs más altos = más recientes
     notificaciones = Notificaciones.objects.filter(
         participantes_id_participante__user_id=request.user.id
-    ).order_by('-fecha')
+    ).order_by('-id_notificacion')  # <- CAMBIO AQUÍ
 
     no_leidas = notificaciones.filter(leida=False).count()
 
