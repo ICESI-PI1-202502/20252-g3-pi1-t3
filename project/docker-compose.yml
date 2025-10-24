@@ -20,19 +20,20 @@ services:
       POSTGRES_PASSWORD: h9TZan8icTf3hjsn
       POSTGRES_DB: postgres
     volumes:
-      - postgres_data:/var/lib/postgresql/data/
+      - postgres_data:/var/lib/postgresql/app 
     ports:
     - "5432:5432"
 
-
-  #  Redis (broker de mensajes para Celery)
+  # Redis (broker de mensajes para Celery)
   redis:
     image: redis:alpine
     container_name: redis-container
     ports:
       - "6379:6379"
+    environment:
+      - TZ=America/Bogota
 
-  #  Celery Worker (procesa tareas)
+  # Celery Worker (procesa tareas)
   celery:
     build:
       context: .
@@ -44,8 +45,12 @@ services:
       - app
     volumes:
       - .:/app
+    environment:
+      - TZ=America/Bogota
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
-  #  Celery Beat (programa tareas)
+  # Celery Beat (programa tareas)
   celery-beat:
     build:
       context: .
@@ -57,6 +62,10 @@ services:
       - app
     volumes:
       - .:/app
+    environment:
+      - TZ=America/Bogota
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
 
 volumes:
  postgres_data:

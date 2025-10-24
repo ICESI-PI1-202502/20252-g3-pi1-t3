@@ -53,3 +53,5 @@ wcwidth==0.2.14
 
 ###Coverage 
 coverage==7.6.0
+
+pytz
