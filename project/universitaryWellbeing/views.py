@@ -10,6 +10,7 @@ from .forms import UserLoginForm, UserRegisterForm
 from typing import List
 from datetime import datetime, timedelta
 from django.utils import timezone
+from .models import Notificaciones
 
 def user_login(request):
     if request.method == "POST":
@@ -200,15 +201,22 @@ def home_user(request):
     
     user = request.user
     actividades = Actividades.objects.values("nombre") 
-    actividades_recomendadas = get_recommendations_for_user(user)
+   # actividades_recomendadas = get_recommendations_for_user(user)
     horario = get_user_schedule(user)
     calendario = get_user_calendar(user)
 
+ # Intentamos obtener el rol del participante
+    #participante = Participantes.objects.filter(usuario=user).select_related('roles_id_rol').first()
+    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
+    user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
+
+
     context = {
-        "actividades_recomendadas": actividades_recomendadas,
+       # "actividades_recomendadas": actividades_recomendadas,
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
+        "user_rol": user_rol,  #  agregado aquí
     }
 
     return render(request, "home_user.html", context)
@@ -248,14 +256,39 @@ def get_user_calendar(user):
 @login_required
 def profile(request):
     participante = Participantes.objects.get(user=request.user)
+
+    #  Obtener notificaciones de este participante
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante=participante
+    ).order_by('-fecha')
+
+    notificaciones_no_leidas = notificaciones.filter(leida=False).count()
+
+    # 👤 Rol del usuario (por si lo necesita el menú lateral)
+    user_rol = participante.roles_id_rol.nombre_rol if participante.roles_id_rol else None
+
+    # Actividades del participante
     try:
         preferencia = Preferencias.objects.get(participantes_id_participante=participante)
-        actividades: List[PreferenciasActividades] = preferencia.actividades.all()  # type: ignore # Esto funciona en Django pero Pylance lo marca falso positivo
+        actividades = preferencia.actividades.all()  # type: ignore
     except Preferencias.DoesNotExist:
         actividades = []
 
     context = {
         "participante": participante,
         "actividades": actividades,
+        "notificaciones": notificaciones,
+        "notificaciones_no_leidas": notificaciones_no_leidas,
+        "user_rol": user_rol,
     }
+
     return render(request, "profile.html", context)
+
+@login_required
+def ver_notificaciones(request):
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante__user=request.user
+    ).order_by('-fecha')
+    return render(request, "notificaciones/notificaciones.html", {
+        "notificaciones": notificaciones
+    })

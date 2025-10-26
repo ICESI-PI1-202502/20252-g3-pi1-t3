@@ -7,6 +7,8 @@ from django.db.models import Q
 from django.utils.timezone import make_aware, get_current_timezone
 from datetime import datetime
 import logging
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 from universitaryWellbeing.models import ProyectosSociales, Participantes, InscripcionesPsu , EstadosParticipacion
@@ -192,3 +194,64 @@ def inscribirse_psu(request, pk):
     messages.success(request, "Inscripción realizada con éxito.")
     logger.info("inscribirse_psu: OK user=%s proj=%s", request.user.id, pk)
     return redirect("social_projects:detalle_proyecto", pk=pk)
+
+
+
+
+@login_required
+def consultar_duda(request, pk):
+    """Permite a un estudiante enviar una duda al coordinador de un proyecto social."""
+    proyecto = get_object_or_404(ProyectosSociales, id_proyecto=pk)
+    participante = get_object_or_404(Participantes, user_id=request.user.id)
+    
+    try:
+        coordinador = Participantes.objects.get(id_participante=proyecto.coordinador_id)
+    except Participantes.DoesNotExist:
+        coordinador = None
+
+    if request.method == "POST":
+        mensaje = request.POST.get("mensaje")
+
+        if not mensaje.strip():
+            messages.error(request, "Por favor, escribe tu duda antes de enviarla.")
+        else:
+            if coordinador and coordinador.correo:
+                try:
+                    send_mail(
+                        subject=f"Duda sobre el proyecto: {proyecto.nombre}",
+                        message=f"Estudiante: {participante.nombre} {participante.apellido}\n"
+                                f"Correo: {participante.correo}\n\n"
+                                f"Duda:\n{mensaje}",
+                        from_email=settings.DEFAULT_FROM_EMAIL,
+                        recipient_list=[coordinador.correo],
+                        fail_silently=False,
+                    )
+                    messages.success(request, "Tu duda fue enviada exitosamente al coordinador del proyecto.")
+                except Exception as e:
+                    messages.error(request, f"Hubo un error al enviar el mensaje. Por favor intenta más tarde.")
+            else:
+                messages.error(request, "No se pudo enviar el mensaje. El proyecto no tiene coordinador asignado.")
+            
+            return redirect("social_projects:detalle_proyecto", pk=pk)
+
+    return render(request, "consultar_duda.html", {
+        "proyecto": proyecto,
+        "coordinador": coordinador
+    })
+
+
+def enviar_email(asunto, mensaje, destinatarios):
+    """Envía un email y lo registra en el log"""
+    if not destinatarios:
+        return
+    send_mail(
+        asunto,
+        mensaje,
+        settings.DEFAULT_FROM_EMAIL,
+        destinatarios,
+        fail_silently=True
+    )
+ 
+
+
+ 

@@ -1,7 +1,7 @@
 from django.urls import path
 from . import views
 
-app_name = "analytics_reports"   
+app_name = "Analytics_Reports"   
 
 urlpatterns = [
     path("", views.analytics_index, name="analytics_index"),
@@ -22,5 +22,12 @@ urlpatterns = [
    path('registrar-asistencia/', views.registrar_asistencia_manual, name='registrar_asistencia_manual'),
     path('historial/<int:participante_id>/', views.historial_participante, name='historial_participante'),
    path('api/participantes-actividad/', views.obtener_participantes_actividad, name='obtener_participantes_actividad'),
+
+
+
+     # URL para historial de participante (NUEVA)
+    path('historial-participante/<int:id_participante>/', views.historial_participante, name='historial_participante'),
+    
+    
 
 ]

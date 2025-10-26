@@ -1,6 +1,7 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User,Group
+from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import os
 
@@ -23,6 +24,7 @@ class Actividades(models.Model):
         blank=True, null=True
     )
 
+    #id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
@@ -400,6 +402,15 @@ class HorariosParticipante(models.Model):
         db_table = 'horarios_participante'
         unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
 
+def clean(self):
+    # Buscar solapamientos con otros eventos del mismo participante
+    conflictos = HorariosParticipante.objects.filter(
+        participantes_id_participante=self.participantes_id_participante,
+        fecha_inicio__lt=self.fecha_fin,
+        fecha_fin__gt=self.fecha_inicio
+    ).exclude(id_horario=self.id_horario)
+    if conflictos.exists():
+        raise ValidationError("Conflicto de hora: ya tienes una actividad, cita o materia en este horario.")
 
 class InscripcionesPsu(models.Model):
 
@@ -422,17 +433,32 @@ class MotivosCita(models.Model):
         managed = False
         db_table = 'motivos_cita'
 
-class Notificaciones(models.Model):
 
+class Notificaciones(models.Model):
     id_notificacion = models.BigAutoField(primary_key=True)
     mensaje = models.CharField(max_length=500)
     fecha = models.DateTimeField()
-    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    tipos_notificacion_id_tipo_notificacion = models.ForeignKey('TiposNotificacion', models.DO_NOTHING, db_column='tipos_notificacion_id_tipo_notificacion')
+    participantes_id_participante = models.ForeignKey(
+        'Participantes',
+        models.DO_NOTHING,
+        db_column='participantes_id_participante'
+    )
+    tipos_notificacion_id_tipo_notificacion = models.ForeignKey(
+        'TiposNotificacion',
+        models.DO_NOTHING,
+        db_column='tipos_notificacion_id_tipo_notificacion'
+    )
+    leida = models.BooleanField(default=False)
+    
+    #  NUEVO: Fecha de creación real de la notificación
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
-        managed = False
+        managed = False  #  CAMBIO: Dejar en False para no tocar otras tablas
         db_table = 'notificaciones'
+    
+    def __str__(self):
+        return f"{self.mensaje[:50]}..."
 
 class Participaciones(models.Model):
 
