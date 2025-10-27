@@ -48,9 +48,7 @@ INSTALLED_APPS = [
     'tournaments',
     'social_projects',
     'notificaciones',
-
-    
- 
+    'appointments', 
 
 ]
 
