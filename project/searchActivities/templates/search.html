@@ -14,6 +14,19 @@
 <link rel="stylesheet" href="{% static 'css/main.css' %}">
 {% endblock %}
 
+{% block flash_messages %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 {{ block.super }}
 
@@ -135,19 +148,34 @@
             </div>
 
             {% if request.user.is_authenticated %}
-              {% if a.user_has_calificado %}
-                <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
-                  class="yellowBotton_Black mt-2 d-block">
-                  Editar calificación
-                </a>
-              {% else %}
-                <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
-                  class="yellowBotton_Black mt-2 d-block">
-                  Calificar
-                </a>
-              {% endif %}
-            {% endif %}
-
+  {% if a.user_has_calificado %}
+    {% if a.user_has_participacion %}
+      <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.get_full_path|urlencode }}"
+         class="yellowBotton_Black mt-2 d-block">
+        Editar calificación
+      </a>
+    {% else %}
+      <span class="yellowBotton_Black mt-2 d-block is-disabled"
+            aria-disabled="true" tabindex="-1"
+            title="Disponible solo para participantes">
+        Editar calificación
+      </span>
+    {% endif %}
+  {% else %}
+    {% if a.user_has_participacion %}
+      <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.get_full_path|urlencode }}"
+         class="yellowBotton_Black mt-2 d-block">
+        Calificar
+      </a>
+    {% else %}
+      <span class="yellowBotton_Black mt-2 d-block is-disabled"
+            aria-disabled="true" tabindex="-1"
+            title="Debes haber participado para calificar">
+        Calificar
+      </span>
+    {% endif %}
+  {% endif %}
+{% endif %}
 
           </div>
         </div>

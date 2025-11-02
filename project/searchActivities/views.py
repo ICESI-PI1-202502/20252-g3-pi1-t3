@@ -8,7 +8,8 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from universitaryWellbeing.models import (
-    Actividades, TiposActividad, HorariosBloque, HorariosActividad, CalificacionesActividad, Participantes
+    Actividades, TiposActividad, HorariosBloque, HorariosActividad, CalificacionesActividad, Participantes,
+    Participaciones
 )
 
 try:
@@ -22,6 +23,17 @@ except Exception:
 DIAS_REV = {0: "Lunes", 1: "Martes", 2: "Miércoles", 3: "Jueves", 4: "Viernes", 5: "Sábado", 6: "Domingo"}
 
 def search(request):
+
+
+    ##Esto lo usaremos más adelante para validar que se pueda calificar una actividad
+    if request.user.is_authenticated:
+        try:
+            participante = Participantes.objects.get(user=request.user)
+        except Participantes.DoesNotExist:
+            participante = None
+    else:
+        participante = None
+
     q = (request.GET.get("q") or "").strip()
     tipo_id = (request.GET.get("tipo") or "").strip()
     only_available = request.GET.get("only") == "1"
@@ -167,19 +179,37 @@ def search(request):
         'using_trigram': PG_TRIGRAM_AVAILABLE,
     }
 
-    for a in acts:
-        
-        try:
-            participante = Participantes.objects.get(user=request.user)
-            ya_califico = CalificacionesActividad.objects.filter(
-                actividades_id_actividad=a['id_actividad'],
-                participantes_id_participante=participante
-            ).exists()
-        except Participantes.DoesNotExist:
-            ya_califico = False
 
-        a["user_has_calificado"] = ya_califico
-        
+    # 2) Si hay participante, traemos de una sola vez las actividades
+    #    donde YA calificó y donde TIENE participación (evitamos consultas por cada actividad)
+    if participante:
+        ids_actividades = [a['id_actividad'] for a in acts]
+
+        calificados_ids = set(
+            CalificacionesActividad.objects.filter(
+                participantes_id_participante=participante,
+                actividades_id_actividad__in=ids_actividades
+            ).values_list('actividades_id_actividad', flat=True)
+        )
+
+        participados_ids = set(
+            Participaciones.objects.filter(
+                participantes_id_participante=participante,
+                actividades_id_actividad__in=ids_actividades
+            ).values_list('actividades_id_actividad', flat=True)
+        )
+    else:
+        calificados_ids = set()
+        participados_ids = set()
+
+    # 3) Marcar cada actividad
+    for a in acts:
+        act_id = a['id_actividad']
+        a['user_has_calificado'] = act_id in calificados_ids
+        a['user_has_participacion'] = act_id in participados_ids
+
+    # 4) Render
+    ctx['actividades'] = acts  # <- este es el que usa tu template
     return render(request, "search.html", ctx)
 
 
@@ -187,41 +217,56 @@ def search(request):
 def rateActivity(request, actividad_id):
     actividad = get_object_or_404(Actividades, pk=actividad_id)
 
-    # Relacionar el user logueado con su registro de participante
+    # 1) Resolver participante del usuario
     try:
         participante = Participantes.objects.get(user=request.user)
     except Participantes.DoesNotExist:
         messages.error(request, "No se encontró un perfil de participante asociado a tu usuario.")
-        return redirect("searchActivities:search")
+        return redirect(request.GET.get("next") or "searchActivities:search")
 
-    # Buscar si ya existe una calificación
-    calificacion = CalificacionesActividad.objects.filter(
+    # 2) Verificar que tenga participación en esta actividad (CRÍTICO)
+    #    Si necesitas limitar por estado (p. ej. 'asistió'), agrega el filtro por estado aquí.
+    tiene_participacion = Participaciones.objects.filter(
+        participantes_id_participante=participante,
+        actividades_id_actividad=actividad.id_actividad,
+        # estados_participacion_id_estado_participacion=ESTADO_ASISTIO,  # opcional
+    ).exists()
+
+    if not tiene_participacion:
+        messages.error(request, "Solo quienes participaron pueden calificar esta actividad.")
+        return redirect(request.GET.get("next") or "searchActivities:search")
+
+    # 3) Obtener o crear calificación del participante para esta actividad
+    calificacion, _created = CalificacionesActividad.objects.get_or_create(
         actividades_id_actividad=actividad,
-        participantes_id_participante=participante
-    ).first()
+        participantes_id_participante=participante,
+        defaults={"estrellas": 0, "comentario": ""},
+    )
 
+    # 4) Procesar POST
     if request.method == "POST":
-        estrellas = int(request.POST.get("estrellas", 0))
-        comentario = request.POST.get("comentario", "").strip()
+        # Sanitizar estrellas (0 a 5)
+        try:
+            estrellas = int(request.POST.get("estrellas", 0))
+        except (TypeError, ValueError):
+            estrellas = 0
+        estrellas = max(0, min(5, estrellas))
 
-        if not calificacion:
-            calificacion = CalificacionesActividad(
-                actividades_id_actividad=actividad,
-                participantes_id_participante=participante,
-            )
+        comentario = (request.POST.get("comentario") or "").strip()
 
         calificacion.estrellas = estrellas
         calificacion.comentario = comentario
-        calificacion.save()
+        calificacion.save(update_fields=["estrellas", "comentario"])
 
-        # Redirigir según el parámetro `next`
+        messages.success(request, "Tu calificación fue guardada correctamente.")
+
         next_url = request.GET.get("next")
-        if next_url:
-            return redirect(next_url)
-        return redirect("searchActivities:search")
+        return redirect(next_url or "searchActivities:search")
 
+    # 5) GET → mostrar formulario
     return render(request, "calificar.html", {
         "actividad": actividad,
         "calificacion": calificacion,
         "stars_range": range(6),
     })
+
