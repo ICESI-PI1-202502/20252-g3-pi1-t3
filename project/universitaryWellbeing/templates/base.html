@@ -151,7 +151,7 @@
             <a href="{% url 'admin:index' %}">Panel de Administrador</a>
             <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
             <a href="{% url 'Analytics_Reports:analytics_index' %}">Analítica y reportes</a>
-            <a href="{% url 'appointments:create' %}">Citas psicológica</a>
+            <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
 
         {% else %}
             <a href="{% url 'searchActivities:search' %}">Buscar</a>
@@ -161,7 +161,7 @@
             <a href="#">Eventos y Servicios</a>
             <a href="{% url 'tournaments:list' %}">Torneos</a>
             <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales</a>
-            <a href="{% url 'appointments:create' %}">Citas psicológica</a>
+            <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
 
 
             {# Opción adicional para Profesor #}
