@@ -1,21 +1,25 @@
 import datetime as dt
+from dataclasses import dataclass
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
-from django.utils.timezone import make_aware, get_current_timezone, is_naive
+from django.core.exceptions import ValidationError
+from django.db import transaction, IntegrityError
+from django.db.models import Q
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils.timezone import (
+    make_aware, get_current_timezone, is_naive, now
+)
 
-# IMPORTA TUS MODELOS desde el app donde viven (ajusta el import si tu módulo es otro)
-from universitaryWellbeing.models import Participantes  # y luego Citas/Agenda cuando implementemos servicio
-
+# AJUSTA este import al módulo real donde están tus modelos
+from universitaryWellbeing.models import (
+    Participantes, AgendaPsicologos, HorariosParticipante,
+    Citas, HistorialCitas, EstadosCita, MotivosCita # EstadosCita/MotivosCita están bloqueados por el OneToOne
+)
 
 # ----------------------------
 # Utilidades
 # ----------------------------
 def _parse_dt_local(s: str):
-    """
-    Convierte entradas tipo <input type='datetime-local'> o formatos comunes (DD/MM/YYYY hh:mm, con AM/PM),
-    y las vuelve timezone-aware con la zona actual del proyecto.
-    """
     if not s:
         return None
     s = s.strip()
@@ -48,26 +52,72 @@ def _parse_dt_local(s: str):
 
 
 def _get_professionals():
-    """
-    Profesionales autorizados para atender citas.
-    Por ahora: usuarios staff/superuser (admins) + (opcional) rol 'Psicólogo' si existe.
-    """
     qs = (
         Participantes.objects
         .select_related("user", "roles_id_rol")
         .filter(user__is_active=True)
-        .filter(user__is_staff=True)   # criterio base: admin autorizado
+        .filter(
+            Q(roles_id_rol__id_rol=5) |                  # rol Psicólogo
+            Q(roles_id_rol__nombre_rol__iexact="Psicólogo") |
+            Q(user__is_staff=True) | Q(user__is_superuser=True)
+        )
         .order_by("nombre", "apellido")
+        .distinct()
     )
-    # Si tuvieras un rol explícito:
-    # qs = qs.filter(roles_id_rol__nombre_rol__in=["Psicólogo", "Psicologa", "Ps."])
     return [
-        {
-            "id": p.id_participante,
-            "nombre": f"{p.nombre} {p.apellido}".strip() or p.correo
-        }
+        {"id": p.id_participante, "nombre": f"{p.nombre} {p.apellido}".strip() or p.correo}
         for p in qs
     ]
+
+
+def _overlap_q(inicio, fin):
+    """
+    Solape estricto en [inicio, fin):
+    existe si fecha_inicio < fin  y  fecha_fin > inicio
+    """
+    return Q(fecha_inicio__lt=fin) & Q(fecha_fin__gt=inicio)
+
+
+def _get_participante_from_user(user) -> Participantes:
+    return get_object_or_404(Participantes, user_id=user.id)
+
+
+@dataclass
+class SlotDecision:
+    inicio: dt.datetime
+    fin: dt.datetime
+    slot: AgendaPsicologos | None
+    lugar: str | None
+
+
+def _decide_slot_or_duration(*, profesional: Participantes, inicio: dt.datetime) -> SlotDecision:
+    """
+    - Si existe un slot DISPONIBLE del profesional que cubra el inicio, úsalo.
+    - En otro caso, duración por defecto: 45 minutos.
+    """
+    slot = (
+        AgendaPsicologos.objects
+        .filter(participantes_id_participante=profesional)
+        .filter(fecha_inicio__lte=inicio, fecha_fin__gt=inicio)
+        .filter(estado_slot__iexact="DISPONIBLE")
+        .order_by("fecha_inicio")
+        .first()
+    )
+
+    if slot:
+        return SlotDecision(inicio=slot.fecha_inicio, fin=slot.fecha_fin, slot=slot, lugar=getattr(slot, "lugar", None))
+
+    # Sin slot: 45 minutos por defecto
+    fin = inicio + dt.timedelta(minutes=45)
+    return SlotDecision(inicio=inicio, fin=fin, slot=None, lugar="Bienestar (2.º piso)")
+
+
+def _assert_no_overlap(*, participante: Participantes, inicio: dt.datetime, fin: dt.datetime):
+    conflict = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+    ).filter(_overlap_q(inicio, fin)).exists()
+    if conflict:
+        raise ValidationError(f"Conflicto de horario para {participante.nombre} {participante.apellido}.")
 
 
 # ----------------------------
@@ -75,7 +125,18 @@ def _get_professionals():
 # ----------------------------
 @login_required
 def create_appointment(request):
-
+    """
+    Agendar cita:
+      - Resuelve estudiante/profesional
+      - Determina slot o duración por defecto (45m)
+      - Verifica solapes (estudiante y profesional)
+      - Crea Cita (+ dos HorariosParticipante)
+      - Reserva slot (si pudo)
+      - Historial
+    NOTA: EstadosCita/MotivosCita tienen OneToOne circular con Citas; este código
+    crea la cita sin estado si la BD permite NULL en esa columna. Si tu BD no lo
+    permite, verás un IntegrityError con una guía para ajustar el modelo/tabla.
+    """
     professionals = _get_professionals()
 
     if request.method == "POST":
@@ -84,43 +145,105 @@ def create_appointment(request):
         motivo         = (request.POST.get("motivo") or "").strip()
         observaciones  = (request.POST.get("observaciones") or "").strip()
 
-        # Validaciones mínimas de UI
+        # Validaciones mínimas
         if not profesional_id:
             messages.error(request, "Selecciona un profesional.")
-            return render(request, "appointments/create_appointment.html", {
-                "professionals": professionals
-            })
+            return render(request, "appointments/create_appointment.html", {"professionals": professionals})
 
-        fecha = _parse_dt_local(fecha_raw)
-        if not fecha:
+        fecha_inicio = _parse_dt_local(fecha_raw)
+        if not fecha_inicio:
             messages.error(request, "Fecha/hora inválida. Usa el selector o formato correcto.")
-            return render(request, "appointments/create_appointment.html", {
-                "professionals": professionals
-            })
+            return render(request, "appointments/create_appointment.html", {"professionals": professionals})
 
-        # AQUI IREMOS CON LA LÓGICA REAL (servicio de dominio)
-        # from .services.appointments import create_appointment as svc_create_appointment
-        # try:
-        #     cita = svc_create_appointment(
-        #         student_user=request.user,
-        #         profesional_id=int(profesional_id),
-        #         fecha=fecha,
-        #         motivo=motivo,
-        #         observaciones=observaciones,
-        #     )
-        #     messages.success(request, f"Cita programada (código: {cita.id_cita}). Revisa tu correo para la confirmación.")
-        #     return redirect("appointments:create")  # o a un 'detail'
-        # except Exception as e:
-        #     messages.error(request, f"No se pudo agendar la cita: {e}")
+        if fecha_inicio < now():
+            messages.error(request, "La fecha debe ser futura.")
+            return render(request, "appointments/create_appointment.html", {"professionals": professionals})
 
-        # Por ahora (UI only):
-        messages.success(
-            request,
-            "Formulario recibido. La lógica de agendamiento (slots/solapes/notificaciones) se implementará a continuación."
-        )
+        # Resolver actores
+        estudiante = _get_participante_from_user(request.user)
+        profesional = get_object_or_404(Participantes, pk=int(profesional_id))
+
+        # Decidir slot o duración por defecto
+        decision = _decide_slot_or_duration(profesional=profesional, inicio=fecha_inicio)
+        inicio, fin = decision.inicio, decision.fin
+
+        # Validar solapes
+        try:
+            _assert_no_overlap(participante=estudiante, inicio=inicio, fin=fin)
+            _assert_no_overlap(participante=profesional, inicio=inicio, fin=fin)
+        except ValidationError as ve:
+            messages.error(request, f"No se pudo agendar: {ve}")
+            return render(request, "appointments/create_appointment.html", {"professionals": professionals})
+
+        # Persistencia
+        try:
+            with transaction.atomic():
+                # 1) Crear la CITA
+                #    OJO: por el OneToOne circular con EstadosCita/MotivosCita dejamos esos campos fuera.
+                cita = Citas.objects.create(
+                    fecha=inicio,
+                    motivo=(motivo or None),
+                    observaciones=(observaciones or None),
+                    participantes_id_participante=estudiante,
+                    participantes_id_participante2=profesional,
+                    agenda_psicologos_id_agenda_slot=decision.slot  # puede ser None
+                )
+
+                 # Estado por-cita (tu esquema lo modela así: 1 a 1)
+                estado = EstadosCita.objects.create(    nombre="Programada",citas_id_cita=cita)
+                cita.estados_cita_id_estado_cita = estado
+                cita.save(update_fields=["estados_cita_id_estado_cita"])
+
+                # 2) Marcar slot como RESERVADO (si aplica)
+                if decision.slot:
+                    decision.slot.estado_slot = "RESERVADO"
+                    decision.slot.save(update_fields=["estado_slot"])
+
+                # 3) Crear eventos de calendario (HorariosParticipante)
+                HorariosParticipante.objects.create(
+                    participantes_id_participante=estudiante,
+                    titulo="Cita psicológica",
+                    fecha_inicio=inicio,
+                    fecha_fin=fin,
+                    fuente_manual="N",
+                    citas_id_cita=cita,
+                    notas=None,
+                )
+                HorariosParticipante.objects.create(
+                    participantes_id_participante=profesional,
+                    titulo="Cita psicológica (atención)",
+                    fecha_inicio=inicio,
+                    fecha_fin=fin,
+                    fuente_manual="N",
+                    citas_id_cita=cita,
+                    notas=None,
+                )
+
+                # 4) Historial
+                HistorialCitas.objects.create(
+                    citas_id_cita=cita,
+                    participantes_id_participante=estudiante,
+                    fecha=now(),
+                    nota="Cita programada."
+                )
+
+                # 5) (Opcional) Notificaciones — cuando tengas el servicio de notificaciones
+                # Notificaciones.objects.create(...)
+
+        except IntegrityError as ie:
+            # Suele aparecer si la tabla de Citas NO permite NULL en estados_cita_id_estado_cita
+            messages.error(
+                request,
+                "No se pudo crear la cita por una restricción de base de datos (EstadosCita/MotivosCita "
+                "OneToOne). Sugerencia: cambiar esos campos a ForeignKey (catálogo) o permitir NULL en la tabla."
+            )
+            return render(request, "appointments/create_appointment.html", {"professionals": professionals})
+        except Exception as e:
+            messages.error(request, f"No se pudo agendar la cita: {e}")
+            return render(request, "appointments/create_appointment.html", {"professionals": professionals})
+
+        messages.success(request, f"Cita programada correctamente (código: {cita.id_cita}).")
         return redirect("appointments:create")
 
     # GET
-    return render(request, "appointments/create_appointment.html", {
-        "professionals": professionals
-    })
+    return render(request, "appointments/create_appointment.html", {"professionals": professionals})
