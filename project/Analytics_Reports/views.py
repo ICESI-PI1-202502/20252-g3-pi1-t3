@@ -19,252 +19,16 @@ from django.db import connection
 import os
 from universitaryWellbeing.models import (
     Participaciones, Asistencias, Actividades, Notificaciones, HistorialParticipaciones,
-    Participantes, TiposActividad, Roles, Citas, ProyectosSociales, Equipos,EstadosAsistencia
+    Participantes, TiposActividad, Roles, Citas, ProyectosSociales, Equipos,EstadosAsistencia, ConfiguracionNotificaciones,
+    RolesParticipacion,EstadosParticipacion 
 )
 
-LOG_DIR = os.path.join("Analytics_Reports","logs", "emails")
+LOG_DIR = os.path.join("Analytics_Reports", "logs", "emails")
 LOG_EMAILS_FILE = os.path.join(LOG_DIR, "log_emails.txt")
-
-def is_admin(user):
-    return user.is_authenticated and user.is_staff
-
-def analytics_index(request):
-    return render(request, "index.html")
-def analisis_comportamiento(request): 
-    tipo_actividad = request.GET.get("tipo_actividad")
-    min_frecuencia = request.GET.get("min_frecuencia")
-    export = request.GET.get("export")  # 👈 nuevo parámetro para detectar exportación
-
-    # Base queryset: contamos participaciones por participante y tipo de actividad
-    data = (
-        Participaciones.objects.values(
-            "participantes_id_participante__nombre",
-            "participantes_id_participante__correo",
-            "participantes_id_participante__semestre",
-            "participantes_id_participante__facultad",
-            "participantes_id_participante__roles_id_rol__nombre_rol",
-            "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
-        )
-        .annotate(total=Count("id_participacion"))
-        .order_by("participantes_id_participante__semestre")
-    )
-
-    # Filtro por tipo de actividad
-    if tipo_actividad:
-        data = data.filter(
-            actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
-        )
-
-    # Filtro por frecuencia mínima
-    if min_frecuencia:
-        try:
-            min_freq = int(min_frecuencia)
-            data = data.filter(total__gte=min_freq)
-        except ValueError:
-            pass
-
-    # 🔽 --- EXPORTACIÓN CSV ---
-    if export == "csv":
-        response = HttpResponse(content_type="text/csv")
-        response["Content-Disposition"] = 'attachment; filename="analisis_comportamiento.csv"'
-
-        writer = csv.writer(response)
-        writer.writerow([
-            "Usuario", "Correo", "Semestre", "Facultad",
-            "Rol", "Tipo de Actividad", "Total Participaciones", "Frecuencia"
-        ])
-
-        for item in data:
-            total = item["total"]
-            if total >= 5:
-                frecuencia = "Alta"
-            elif total >= 2:
-                frecuencia = "Media"
-            else:
-                frecuencia = "Baja"
-
-            writer.writerow([
-                item.get("participantes_id_participante__nombre", "N/A"),
-                item.get("participantes_id_participante__correo", "N/A"),
-                item.get("participantes_id_participante__semestre", "N/A"),
-                item.get("participantes_id_participante__facultad", "Sin especificar"),
-                item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol"),
-                item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Sin especificar"),
-                total,
-                frecuencia
-            ])
-
-        return response  # 👈 descarga directa
-
-    # --- Render normal ---
-    tipos_actividad = TiposActividad.objects.all().order_by("nombre_tipo")
-
-    return render(
-        request,
-        "analisis.html",
-        {
-            "data": data,
-            "tipos_actividad": tipos_actividad,
-        }
-    )
- 
-def participantes_list(request):
-    participantes = Participantes.objects.all().order_by("nombre")
-    return render(request, "participantes.html", {"participantes": participantes})
-
-
-def comparaciones(request):
-    tiempo = request.GET.get("tiempo", "todos")
-    agrupacion = request.GET.get("agrupacion", "facultad")
-    semestre_filtro = request.GET.get("semestre_filtro", "")
-    
-    resultados = []
-    
-    # Lógica de filtrado temporal
-    participaciones_query = Participaciones.objects
-    asistencias_query = Asistencias.objects
-    participantes_query = Participantes.objects
-    
-    if tiempo == "semestre" and semestre_filtro:
-        # Filtrar por semestre del estudiante (1, 2, 3, 4, etc.)
-        participaciones_query = participaciones_query.filter(
-            participantes_id_participante__semestre=semestre_filtro
-        )
-        participantes_query = participantes_query.filter(
-            semestre=semestre_filtro
-        )
-        # Para asistencias, filtramos a través de la relación con participaciones
-        asistencias_query = asistencias_query.filter(
-            participaciones_id_participacion__participantes_id_participante__semestre=semestre_filtro
-        )
-    
-    elif tiempo == "periodo":
-        inicio_str = request.GET.get("inicio")
-        fin_str = request.GET.get("fin")
-        
-        if inicio_str and fin_str:
-            try:
-                inicio = parse_date(inicio_str.strip())
-                fin = parse_date(fin_str.strip())
-                if inicio and fin:
-                    participaciones_query = participaciones_query.filter(
-                        fecha_inscripcion__range=[inicio, fin]
-                    )
-                    asistencias_query = asistencias_query.filter(
-                        fecha__range=[inicio, fin]
-                    )
-            except (ValueError, TypeError):
-                pass
-    
-    # Lógica de agrupación
-    if agrupacion == "facultad":
-        resultados = (
-            participaciones_query
-            .values("participantes_id_participante__facultad")
-            .annotate(total=Count("id_participacion"))
-            .order_by("participantes_id_participante__facultad")
-        )
-    elif agrupacion == "genero":
-        resultados = (
-            participaciones_query
-            .values("participantes_id_participante__genero")
-            .annotate(total=Count("id_participacion"))
-            .order_by("participantes_id_participante__genero")
-        )
-    elif agrupacion == "rol":
-        resultados = (
-            participaciones_query
-            .values("participantes_id_participante__roles_id_rol__nombre_rol")
-            .annotate(total=Count("id_participacion"))
-            .order_by("participantes_id_participante__roles_id_rol__nombre_rol")
-        )
-    elif agrupacion == "semestre":
-        resultados = (
-            participaciones_query
-            .values("participantes_id_participante__semestre")
-            .annotate(total=Count("id_participacion"))
-            .order_by("participantes_id_participante__semestre")
-        )
-    
-    # Métricas generales
-    total_asistencias = asistencias_query.count()
-    nuevos = participantes_query.count()
-    reincidencia = (
-        participaciones_query
-        .values("participantes_id_participante")
-        .annotate(total=Count("id_participacion"))
-        .filter(total__gt=1)
-        .count()
-    )
-    
-    # Obtener lista de semestres disponibles desde la base de datos
-    semestres_disponibles = (
-        Participantes.objects
-        .values_list('semestre', flat=True)
-        .distinct()
-        .order_by('semestre')
-    )
-    # Filtrar valores nulos y convertir a lista
-    semestres_disponibles = [s for s in semestres_disponibles if s is not None]
-    
-    metricas = {
-        "total_asistencias": total_asistencias,
-        "nuevos": nuevos,
-        "reincidencia": reincidencia,
-    }
-    
-    context = {
-        "tiempo": tiempo,
-        "agrupacion": agrupacion,
-        "semestre_filtro": semestre_filtro,
-        "semestres_disponibles": semestres_disponibles,
-        "resultados": resultados,
-        "metricas": metricas,
-    }
-    
-    return render(request, "comparaciones.html", context)
-
-
-
-
-
-
-
-
- # views.py - Sistema completo de recomendaciones  
- #######################################################
- #######################################################
- #######################################################
- #######################################################
- #######################################################
-
-
-def obtener_estudiantes_activos(dias_actividad=14):
-    """
-    Devuelve estudiantes que han tenido al menos una asistencia en los últimos `dias_actividad` días.
-    """
-    fecha_limite = timezone.now().date() - timedelta(days=dias_actividad)
-    return (
-        Participaciones.objects
-        .annotate(
-            asistencias_recientes=Count(
-                'asistencias',
-                filter=Q(asistencias__fecha__gte=fecha_limite),
-                distinct=True
-            )
-        )
-        .filter(asistencias_recientes__gte=1)
-        .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('-asistencias_recientes')
-    )
 
 def log_email(destinatarios, asunto):
     """Guarda en un TXT los destinatarios y el asunto del correo enviado"""
-    
-    # Crea el directorio si no existe
     os.makedirs(LOG_DIR, exist_ok=True)
-
-    # Abre el archivo en modo append y guarda la línea
     with open(LOG_EMAILS_FILE, "a", encoding="utf-8") as f:
         linea = f"{timezone.now().strftime('%Y-%m-%d %H:%M:%S')} | {asunto} | {', '.join(destinatarios)}\n"
         f.write(linea)
@@ -282,62 +46,132 @@ def enviar_email(asunto, mensaje, destinatarios):
     )
     log_email(destinatarios, asunto)
 
-def recomendaciones(request):
-    """Vista principal para mostrar recomendaciones automáticas"""
-    poca_asistencia = obtener_estudiantes_poca_asistencia()
-    proximos_reconocimientos = obtener_proximos_reconocimientos()
-    estudiantes_inactivos = obtener_estudiantes_inactivos()
-    estudiantes_destacados = obtener_estudiantes_destacados()
-    alertas_riesgo = obtener_alertas_riesgo()
-    estudiantes_activos = obtener_estudiantes_activos()  
-    context = {
-        'poca_asistencia': poca_asistencia,
-        'proximos_reconocimientos': proximos_reconocimientos,
-        'estudiantes_inactivos': estudiantes_inactivos,
-        'estudiantes_destacados': estudiantes_destacados,
-        'alertas_riesgo': alertas_riesgo,
-        'estudiantes_activos': estudiantes_activos, 
-        'fecha_actualizacion': timezone.now()
-    }
-    
-    if request.GET.get('enviar_notificaciones'):
-        enviar_notificaciones_automaticas(context)
-        messages.success(request, 'Notificaciones enviadas correctamente.')
-    
-    return render(request, "recomendaciones.html", context)
 
-def obtener_estudiantes_poca_asistencia(umbral_asistencias=3):
+# ========== FUNCIONES CORREGIDAS CON LÓGICA CLARA ==========
+
+def obtener_alertas_riesgo():
+    """
+    RIESGO CRÍTICO: Estudiantes con muy pocas asistencias Y mucha inactividad
+    - Menos de 2 asistencias totales
+    - Sin asistir en los últimos 21 días
+    """
+    config = ConfiguracionNotificaciones.obtener_config()
+    fecha_limite = timezone.now().date() - timedelta(days=config.dias_riesgo_critico)
+    
     return (
         Participaciones.objects
-        .annotate(total_asistencias=Count('asistencias'))
-        .filter(total_asistencias__lt=umbral_asistencias)
+        .annotate(
+            total_asistencias=Count('asistencias', distinct=True),
+            ultima_asistencia=Max('asistencias__fecha')
+        )
+        .filter(
+            total_asistencias__lte=config.umbral_riesgo_critico
+        )
+        .filter(
+            Q(ultima_asistencia__lt=fecha_limite) | Q(ultima_asistencia__isnull=True)
+        )
+        .select_related('participantes_id_participante', 'actividades_id_actividad')
+        .order_by('total_asistencias', 'ultima_asistencia')
+    )
+
+
+def obtener_estudiantes_poca_asistencia():
+    """
+    BAJA ASISTENCIA: Estudiantes con pocas asistencias pero NO en riesgo crítico
+    - Entre 3 y 5 asistencias
+    - Han asistido en las últimas 3 semanas
+    """
+    config = ConfiguracionNotificaciones.obtener_config()
+    fecha_limite_actividad = timezone.now().date() - timedelta(days=21)
+    
+    return (
+        Participaciones.objects
+        .annotate(
+            total_asistencias=Count('asistencias', distinct=True),
+            ultima_asistencia=Max('asistencias__fecha')
+        )
+        .filter(
+            total_asistencias__gt=config.umbral_riesgo_critico,
+            total_asistencias__lt=config.umbral_baja_asistencia
+        )
+        .filter(ultima_asistencia__gte=fecha_limite_actividad)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
         .order_by('total_asistencias')
     )
 
+
+def obtener_estudiantes_inactivos():
+    """
+    INACTIVOS: Estudiantes con participación previa pero sin asistir recientemente
+    - Tienen más de 5 asistencias históricas
+    - No han asistido en los últimos 14 días
+    """
+    config = ConfiguracionNotificaciones.obtener_config()
+    fecha_limite = timezone.now().date() - timedelta(days=config.dias_inactividad)
+    
+    return (
+        Participaciones.objects
+        .annotate(
+            total_asistencias=Count('asistencias', distinct=True),
+            ultima_asistencia=Max('asistencias__fecha')
+        )
+        .filter(
+            total_asistencias__gte=config.umbral_baja_asistencia
+        )
+        .filter(
+            Q(ultima_asistencia__lt=fecha_limite) | Q(ultima_asistencia__isnull=True)
+        )
+        .select_related('participantes_id_participante', 'actividades_id_actividad')
+        .order_by('-total_asistencias')
+    )
+
+
 def obtener_proximos_reconocimientos():
+    """
+    PRÓXIMOS A RECONOCIMIENTO: Estudiantes cerca de alcanzar el objetivo
+    """
+    config = ConfiguracionNotificaciones.obtener_config()
+    meta = config.asistencias_reconocimiento
+    margen = config.margen_proximo_reconocimiento
+    
     return (
         Participaciones.objects
         .annotate(
             total_asistencias=Count('asistencias', distinct=True),
             asistencias_faltantes=ExpressionWrapper(
-                10 - Count('asistencias', distinct=True),
+                meta - Count('asistencias', distinct=True),
                 output_field=IntegerField()
             )
         )
-        .filter(total_asistencias__gte=8, total_asistencias__lt=10)
+        .filter(
+            total_asistencias__gte=meta - margen,
+            total_asistencias__lt=meta
+        )
         .select_related('participantes_id_participante', 'actividades_id_actividad')
         .order_by('-total_asistencias')
     )
 
 
+def obtener_estudiantes_destacados():
+    """
+    DESTACADOS: Estudiantes con excelente participación
+    """
+    config = ConfiguracionNotificaciones.obtener_config()
+    
+    return (
+        Participaciones.objects
+        .annotate(total_asistencias=Count('asistencias', distinct=True))
+        .filter(total_asistencias__gte=config.asistencias_destacado)
+        .select_related('participantes_id_participante', 'actividades_id_actividad')
+        .order_by('-total_asistencias')
+    )
 
 
-
-
-
-def obtener_estudiantes_inactivos(dias_inactividad=14):
-    fecha_limite = timezone.now().date() - timedelta(days=dias_inactividad)
+def obtener_estudiantes_activos(dias_actividad=14):
+    """
+    ACTIVOS: Estudiantes con actividad reciente
+    """
+    fecha_limite = timezone.now().date() - timedelta(days=dias_actividad)
     return (
         Participaciones.objects
         .annotate(
@@ -347,77 +181,347 @@ def obtener_estudiantes_inactivos(dias_inactividad=14):
                 distinct=True
             )
         )
-        .filter(asistencias_recientes=0)
+        .filter(asistencias_recientes__gte=1)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
+        .order_by('-asistencias_recientes')
     )
 
-def obtener_estudiantes_destacados():
-    return (
-        Participaciones.objects
-        .annotate(total_asistencias=Count('asistencias'))
-        .filter(total_asistencias__gte=15)
-        .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('-total_asistencias')
-    )
 
-def obtener_alertas_riesgo():
-    fecha_limite = timezone.now().date() - timedelta(days=7)
-    return (
-        Participaciones.objects
-        .annotate(
-            asistencias_recientes=Count(
-                'asistencias',
-                filter=Q(asistencias__fecha__gte=fecha_limite),
-                distinct=True
-            ),
-            total_asistencias=Count('asistencias')
-        )
-        .filter(Q(asistencias_recientes=0) & Q(total_asistencias__lt=5))
-        .select_related('participantes_id_participante', 'actividades_id_actividad')
-    )
+# ========== VISTA PRINCIPAL ==========
 
-def enviar_notificaciones_automaticas(context):
-    """Envía notificaciones automáticas por email"""
-    if context['poca_asistencia']:
-        enviar_alerta_poca_asistencia(context['poca_asistencia'])
-    if context['proximos_reconocimientos']:
-        enviar_notificacion_reconocimientos(context['proximos_reconocimientos'])
-    if context['estudiantes_inactivos']:
-        enviar_alerta_inactividad(context['estudiantes_inactivos'])
+def recomendaciones(request):
+    """Vista principal para mostrar recomendaciones automáticas"""
+    
+    # Obtener todas las categorías
+    alertas_riesgo = obtener_alertas_riesgo()
+    poca_asistencia = obtener_estudiantes_poca_asistencia()
+    estudiantes_inactivos = obtener_estudiantes_inactivos()
+    proximos_reconocimientos = obtener_proximos_reconocimientos()
+    estudiantes_destacados = obtener_estudiantes_destacados()
+    estudiantes_activos = obtener_estudiantes_activos()
+    
+    context = {
+        'alertas_riesgo': alertas_riesgo,
+        'poca_asistencia': poca_asistencia,
+        'estudiantes_inactivos': estudiantes_inactivos,
+        'proximos_reconocimientos': proximos_reconocimientos,
+        'estudiantes_destacados': estudiantes_destacados,
+        'estudiantes_activos': estudiantes_activos,
+        'fecha_actualizacion': timezone.now(),
+        'config': ConfiguracionNotificaciones.obtener_config()
+    }
+    
+ 
+    return render(request, "recomendaciones.html", context)
 
-def enviar_alerta_poca_asistencia(estudiantes):
-    """Envía alertas por poca asistencia al staff"""
-    asunto = f"Alerta: {len(estudiantes)} estudiantes con baja asistencia"
-    mensaje = "Estudiantes que requieren intervención por baja asistencia:\n\n"
-    for est in estudiantes:
-        mensaje += f"• {est.participantes_id_participante.nombre} {est.participantes_id_participante.apellido} - {est.total_asistencias} asistencias\n"
-        mensaje += f"  Actividad: {est.actividades_id_actividad.nombre}\n\n"
-    enviar_email_staff(asunto, mensaje)
+
+# ========== NOTIFICACIONES ==========
+ 
+
+
+ 
 
 def enviar_notificacion_reconocimientos(estudiantes):
-    """Envía notificaciones sobre reconocimientos próximos a los participantes (por correo)."""
+    """Notificaciones de motivación a estudiantes próximos a reconocimiento"""
+    config = ConfiguracionNotificaciones.obtener_config()
+    
     for est in estudiantes:
-        nombre_completo = f"{est.participantes_id_participante.nombre} {est.participantes_id_participante.apellido}"
-        asunto = f"¡Estás cerca de un reconocimiento, {est.participantes_id_participante.nombre}!"
+        nombre = est.participantes_id_participante.nombre
+        asunto = f"🏆 ¡Estás cerca de un reconocimiento, {nombre}!"
         mensaje = f"""
-Hola {nombre_completo},
-¡Felicidades! Tienes {est.total_asistencias} asistencias en {est.actividades_id_actividad.nombre}.
-Solo necesitas {10 - est.total_asistencias} más para obtener tu reconocimiento.
+Hola {nombre},
 
-¡Sigue así!
+¡Excelente trabajo! Tienes {est.total_asistencias} asistencias en {est.actividades_id_actividad.nombre}.
+
+Solo necesitas {est.asistencias_faltantes} más para obtener tu reconocimiento.
+
+¡Sigue así! 💪
+
+---
+Equipo de Bienestar Universitario
 """
         correo = est.participantes_id_participante.correo
         if correo:
             enviar_email(asunto, mensaje, [correo])
 
-def enviar_alerta_inactividad(estudiantes):
-    """Envía alertas sobre estudiantes inactivos al staff"""
-    asunto = f"Alerta: {len(estudiantes)} estudiantes inactivos"
-    mensaje = "Estudiantes que no han asistido recientemente:\n\n"
-    for est in estudiantes:
-        mensaje += f"• {est.participantes_id_participante.nombre} {est.participantes_id_participante.apellido} - Actividad: {est.actividades_id_actividad.nombre}\n"
-    enviar_email_staff(asunto, mensaje)
 
+# ========== CONFIGURACIÓN ==========
+
+def configurar_notificaciones(request):
+    """Permite configurar parámetros de las notificaciones automáticas"""
+    config = ConfiguracionNotificaciones.obtener_config()
+    
+    if request.method == 'POST':
+        config.umbral_riesgo_critico = int(request.POST.get('umbral_riesgo_critico', 2))
+        config.umbral_baja_asistencia = int(request.POST.get('umbral_baja_asistencia', 5))
+        config.dias_inactividad = int(request.POST.get('dias_inactividad', 14))
+        config.dias_riesgo_critico = int(request.POST.get('dias_riesgo_critico', 21))
+        config.asistencias_reconocimiento = int(request.POST.get('asistencias_reconocimiento', 10))
+        config.margen_proximo_reconocimiento = int(request.POST.get('margen_proximo_reconocimiento', 2))
+        config.asistencias_destacado = int(request.POST.get('asistencias_destacado', 15))
+        config.envio_automatico = request.POST.get('envio_automatico') == 'on'
+        config.frecuencia_envio = request.POST.get('frecuencia_envio', 'semanal')
+        config.emails_staff = request.POST.get('emails_staff', 'admin@academia.com')
+        
+        config.save()
+        messages.success(request, 'Configuración guardada correctamente.')
+        return redirect('Analytics_Reports:recomendaciones')
+    
+    return render(request, 'configurar_notificaciones.html', {'config': config})
+
+def is_admin(user):
+    return user.is_authenticated and user.is_staff
+
+def analytics_index(request):
+    return render(request, "index.html")
+
+
+def analisis_comportamiento(request): 
+    tipo_actividad = request.GET.get("tipo_actividad")
+    min_frecuencia = request.GET.get("min_frecuencia")
+    export = request.GET.get("export")
+    mostrar_todos = request.GET.get("mostrar_todos")  # Nuevo parámetro
+    
+    # Verificar si hay al menos un filtro aplicado o se solicitó mostrar todos
+    has_filters = bool(tipo_actividad or min_frecuencia or mostrar_todos)
+    
+    # Solo consultar si hay filtros o si se está exportando
+    if has_filters or export:
+        # Base queryset: contamos participaciones por participante y tipo de actividad
+        data = (
+            Participaciones.objects.values(
+                "participantes_id_participante__nombre",
+                "participantes_id_participante__correo",
+                "participantes_id_participante__semestre",
+                "participantes_id_participante__facultad",
+                "participantes_id_participante__roles_id_rol__nombre_rol",
+                "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+            )
+            .annotate(total=Count("id_participacion"))
+            .order_by("participantes_id_participante__semestre")
+        )
+
+        # Filtro por tipo de actividad
+        if tipo_actividad:
+            data = data.filter(
+                actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
+            )
+
+        # Filtro por frecuencia mínima
+        if min_frecuencia:
+            try:
+                min_freq = int(min_frecuencia)
+                data = data.filter(total__gte=min_freq)
+            except ValueError:
+                pass
+
+        # --- EXPORTACIÓN CSV ---
+        if export == "csv":
+            response = HttpResponse(content_type="text/csv")
+            response["Content-Disposition"] = 'attachment; filename="analisis_comportamiento.csv"'
+
+            writer = csv.writer(response)
+            writer.writerow([
+                "Usuario", "Correo", "Semestre", "Facultad",
+                "Rol", "Tipo de Actividad", "Total Participaciones", "Frecuencia"
+            ])
+
+            for item in data:
+                total = item["total"]
+                if total >= 5:
+                    frecuencia = "Alta"
+                elif total >= 2:
+                    frecuencia = "Media"
+                else:
+                    frecuencia = "Baja"
+
+                writer.writerow([
+                    item.get("participantes_id_participante__nombre", "N/A"),
+                    item.get("participantes_id_participante__correo", "N/A"),
+                    item.get("participantes_id_participante__semestre", "N/A"),
+                    item.get("participantes_id_participante__facultad", "Sin especificar"),
+                    item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol"),
+                    item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Sin especificar"),
+                    total,
+                    frecuencia
+                ])
+
+            return response
+    else:
+        # No hay filtros aplicados, no mostrar datos
+        data = None
+
+    # --- Render normal ---
+    tipos_actividad = TiposActividad.objects.all().order_by("nombre_tipo")
+
+    return render(
+        request,
+        "analisis.html",
+        {
+            "data": data,
+            "tipos_actividad": tipos_actividad,
+            "has_filters": has_filters,
+            "mostrar_todos": mostrar_todos,
+        }
+    )
+
+ 
+def participantes_list(request):
+    participantes = Participantes.objects.all().order_by("nombre")
+    return render(request, "participantes.html", {"participantes": participantes})
+
+
+def comparaciones(request):
+    tiempo = request.GET.get("tiempo", "todos")
+    agrupacion = request.GET.get("agrupacion", "facultad")
+    semestre_filtro = request.GET.get("semestre_filtro", "")
+    
+    # Variable para controlar si se debe ejecutar la consulta
+    ejecutar_consulta = True
+    mensaje_filtro = None
+    
+    # Verificar si los filtros están completos según el tipo de tiempo seleccionado
+    if tiempo == "semestre" and not semestre_filtro:
+        ejecutar_consulta = False
+        mensaje_filtro = "Selecciona un número de semestre para ver los resultados."
+    elif tiempo == "periodo":
+        inicio_str = request.GET.get("inicio")
+        fin_str = request.GET.get("fin")
+        if not inicio_str or not fin_str:
+            ejecutar_consulta = False
+            mensaje_filtro = "Selecciona las fechas de inicio y fin para ver los resultados."
+    
+    resultados = []
+    
+    if ejecutar_consulta:
+        # Lógica de filtrado temporal
+        participaciones_query = Participaciones.objects
+        asistencias_query = Asistencias.objects
+        participantes_query = Participantes.objects
+        
+        if tiempo == "semestre" and semestre_filtro:
+            # Filtrar por semestre del estudiante (1, 2, 3, 4, etc.)
+            participaciones_query = participaciones_query.filter(
+                participantes_id_participante__semestre=semestre_filtro
+            )
+            participantes_query = participantes_query.filter(
+                semestre=semestre_filtro
+            )
+            # Para asistencias, filtramos a través de la relación con participaciones
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__semestre=semestre_filtro
+            )
+        
+        elif tiempo == "periodo":
+            inicio_str = request.GET.get("inicio")
+            fin_str = request.GET.get("fin")
+            
+            if inicio_str and fin_str:
+                try:
+                    inicio = parse_date(inicio_str.strip())
+                    fin = parse_date(fin_str.strip())
+                    if inicio and fin:
+                        participaciones_query = participaciones_query.filter(
+                            fecha_inscripcion__range=[inicio, fin]
+                        )
+                        asistencias_query = asistencias_query.filter(
+                            fecha__range=[inicio, fin]
+                        )
+                except (ValueError, TypeError):
+                    pass
+        
+        # Lógica de agrupación
+        if agrupacion == "facultad":
+            resultados = (
+                participaciones_query
+                .values("participantes_id_participante__facultad")
+                .annotate(total=Count("id_participacion"))
+                .order_by("participantes_id_participante__facultad")
+            )
+        elif agrupacion == "genero":
+            resultados = (
+                participaciones_query
+                .values("participantes_id_participante__genero")
+                .annotate(total=Count("id_participacion"))
+                .order_by("participantes_id_participante__genero")
+            )
+        elif agrupacion == "rol":
+            resultados = (
+                participaciones_query
+                .values("participantes_id_participante__roles_id_rol__nombre_rol")
+                .annotate(total=Count("id_participacion"))
+                .order_by("participantes_id_participante__roles_id_rol__nombre_rol")
+            )
+        elif agrupacion == "semestre":
+            resultados = (
+                participaciones_query
+                .values("participantes_id_participante__semestre")
+                .annotate(total=Count("id_participacion"))
+                .order_by("participantes_id_participante__semestre")
+            )
+        
+        # Métricas generales
+        total_asistencias = asistencias_query.count()
+        nuevos = participantes_query.count()
+        reincidencia = (
+            participaciones_query
+            .values("participantes_id_participante")
+            .annotate(total=Count("id_participacion"))
+            .filter(total__gt=1)
+            .count()
+        )
+        
+        metricas = {
+            "total_asistencias": total_asistencias,
+            "nuevos": nuevos,
+            "reincidencia": reincidencia,
+        }
+    else:
+        # No se ejecuta consulta, métricas en 0
+        metricas = {
+            "total_asistencias": 0,
+            "nuevos": 0,
+            "reincidencia": 0,
+        }
+    
+    # Obtener lista de semestres disponibles desde la base de datos
+    semestres_disponibles = (
+        Participantes.objects
+        .values_list('semestre', flat=True)
+        .distinct()
+        .order_by('semestre')
+    )
+    # Filtrar valores nulos y convertir a lista
+    semestres_disponibles = [s for s in semestres_disponibles if s is not None]
+    
+    context = {
+        "tiempo": tiempo,
+        "agrupacion": agrupacion,
+        "semestre_filtro": semestre_filtro,
+        "semestres_disponibles": semestres_disponibles,
+        "resultados": resultados,
+        "metricas": metricas,
+        "ejecutar_consulta": ejecutar_consulta,
+        "mensaje_filtro": mensaje_filtro,
+    }
+    
+    return render(request, "comparaciones.html", context)
+
+
+
+
+
+
+
+ # views.py - Sistema completo de recomendaciones  
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+ #######################################################
+
+ 
+  
 def enviar_email_staff(asunto, mensaje):
     """Envía email al personal administrativo"""
     staff_emails = ['admin@academia.com', 'coordinador@academia.com']
@@ -456,19 +560,7 @@ para completar esta breve encuesta:
     if correo:
         enviar_email(asunto, mensaje, [correo])
 
-def configurar_notificaciones(request):
-    """Permite configurar parámetros de las notificaciones automáticas"""
-    if request.method == 'POST':
-        configuracion = {
-            'umbral_asistencia': int(request.POST.get('umbral_asistencia', 50)),
-            'dias_inactividad': int(request.POST.get('dias_inactividad', 14)),
-            'envio_automatico': request.POST.get('envio_automatico') == 'on',
-            'frecuencia_envio': request.POST.get('frecuencia_envio', 'semanal')
-        }
-        messages.success(request, 'Configuración guardada correctamente.')
-    return render(request, 'configurar_notificaciones.html')
-
- #######################################################
+ 
  #######################################################
  #######################################################
  #######################################################
@@ -482,89 +574,7 @@ def configurar_notificaciones(request):
 
 
 
-
-
-def gestion_asistencia(request):
-    """Vista principal para gestión de asistencias"""
-    
-    # Obtener parámetros de filtro
-    fecha_filtro = request.GET.get('fecha', timezone.now().date().strftime('%Y-%m-%d'))
-    actividad_filtro = request.GET.get('actividad', '')
-    participante_filtro = request.GET.get('participante', '')
-    estado_filtro = request.GET.get('estado', '')
-    
-    # Convertir fecha string a objeto date
-    try:
-        fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d').date()
-    except ValueError:
-        fecha_obj = timezone.now().date()
-    
-    # Query base de asistencias
-    asistencias_query = Asistencias.objects.select_related(
-        'participaciones_id_participacion__participantes_id_participante',
-        'participaciones_id_participacion__actividades_id_actividad',
-        'estados_asistencia_id_estado_asistencia'
-    ).filter(fecha=fecha_obj)
-    
-    # Aplicar filtros
-    if actividad_filtro:
-        asistencias_query = asistencias_query.filter(
-            participaciones_id_participacion__actividades_id_actividad_id=actividad_filtro
-        )
-    
-    if participante_filtro:
-        asistencias_query = asistencias_query.filter(
-            participaciones_id_participacion__participantes_id_participante__nombre__icontains=participante_filtro
-        )
-    
-    if estado_filtro:
-        asistencias_query = asistencias_query.filter(
-            estados_asistencia_id_estado_asistencia_id=estado_filtro
-        )
-    
-    # Paginación
-    paginator = Paginator(asistencias_query.order_by('-id_asistencia'), 20)
-    page_number = request.GET.get('page')
-    asistencias = paginator.get_page(page_number)
-    
-    # Obtener datos para filtros
-    actividades = Actividades.objects.filter(
-        participaciones__asistencias__fecha=fecha_obj
-    ).distinct().order_by('nombre')
-    
-    estados_asistencia = EstadosAsistencia.objects.all().order_by('nombre')
-    
-    # Estadísticas del día
-    stats = {
-        'total_registros': asistencias_query.count(),
-        'presentes': asistencias_query.filter(
-            estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
-        ).count(),
-        'ausentes': asistencias_query.filter(
-            estados_asistencia_id_estado_asistencia__nombre__icontains='ausente'
-        ).count(),
-        'tardios': asistencias_query.filter(
-            estados_asistencia_id_estado_asistencia__nombre__icontains='tardio'
-        ).count(),
-    }
-    
-    # Agregar variable para template
-    fecha_es_hoy = (fecha_obj == date.today())
-    
-    context = {
-        'asistencias': asistencias,
-        'fecha_filtro': fecha_filtro,
-        'actividad_filtro': actividad_filtro,
-        'participante_filtro': participante_filtro,
-        'estado_filtro': estado_filtro,
-        'actividades': actividades,
-        'estados_asistencia': estados_asistencia,
-        'stats': stats,
-        'fecha_obj': fecha_obj,
-        'fecha_es_hoy': fecha_es_hoy,  # <-- variable booleana para JS/template
-    }
-    
-    return render(request, 'gestion_asistencia.html', context)
+ 
 
 def obtener_participantes_actividad(request):
     """API endpoint para obtener participantes de una actividad"""
@@ -866,11 +876,9 @@ def registrar_asistencia_rapido(request):
             'error': f'Error: {str(e)}'
         }, status=500)
     
-
 def registrar_asistencia_manual(request):
     """Registra asistencias por cédula, creando User y Participante si no existen"""
 
-    #actividades = Actividades.objects.all().order_by('nombre')
     actividades = Actividades.objects.values("id_actividad", "nombre")
     fecha_hoy = timezone.now().date().strftime('%Y-%m-%d')
     resultados = None
@@ -892,6 +900,44 @@ def registrar_asistencia_manual(request):
             estado_presente = EstadosAsistencia.objects.filter(nombre__icontains='presente').first()
             if not estado_presente:
                 estado_presente = EstadosAsistencia.objects.first()
+            
+            if not estado_presente:
+                messages.error(request, 'No hay estados de asistencia configurados')
+                return render(request, 'registrar_asistencia.html', {
+                    'actividades': actividades, 
+                    'fecha_hoy': fecha_hoy, 
+                    'resultados': resultados
+                })
+
+            # CRÍTICO: Obtener rol de participación válido
+            rol_participacion = RolesParticipacion.objects.first()
+            if not rol_participacion:
+                messages.error(request, 'No hay roles de participación configurados en el sistema')
+                return render(request, 'registrar_asistencia.html', {
+                    'actividades': actividades, 
+                    'fecha_hoy': fecha_hoy, 
+                    'resultados': resultados
+                })
+
+            # Obtener estado de participación válido
+            estado_participacion = EstadosParticipacion.objects.first()
+            if not estado_participacion:
+                messages.error(request, 'No hay estados de participación configurados')
+                return render(request, 'registrar_asistencia.html', {
+                    'actividades': actividades, 
+                    'fecha_hoy': fecha_hoy, 
+                    'resultados': resultados
+                })
+
+            # Obtener rol de participante válido
+            rol_participante = Roles.objects.first()
+            if not rol_participante:
+                messages.error(request, 'No hay roles de participantes configurados')
+                return render(request, 'registrar_asistencia.html', {
+                    'actividades': actividades, 
+                    'fecha_hoy': fecha_hoy, 
+                    'resultados': resultados
+                })
 
             for cedula in cedulas:
                 try:
@@ -914,12 +960,11 @@ def registrar_asistencia_manual(request):
                     participante, creado = Participantes.objects.get_or_create(
                         correo=user.email,
                         defaults={
-                            'id_participante': user,  # Vincular con el ID del usuario
                             'nombre': f"Usuario {cedula}",
                             'apellido': '',
-                            'roles_id_rol_id': 1,  # Rol por defecto
-                            'estado_activo': 'S',  # Activo
-                            'user': user  # Vincular al modelo User
+                            'roles_id_rol': rol_participante,
+                            'estado_activo': 'S',
+                            'user': user
                         }
                     )
 
@@ -940,8 +985,8 @@ def registrar_asistencia_manual(request):
                         actividades_id_actividad=actividad,
                         defaults={
                             'fecha_inscripcion': fecha_obj,
-                            'roles_participacion_id_rol_participacion_id': 1,
-                            'estados_participacion_id_estado_participacion_id': 1
+                            'roles_participacion_id_rol_participacion': rol_participacion,
+                            'estados_participacion_id_estado_participacion': estado_participacion
                         }
                     )
 
@@ -970,7 +1015,83 @@ def registrar_asistencia_manual(request):
                 messages.warning(request, f'{len(errores)} errores')
 
         except Exception as e:
-            messages.error(request, f'Error: {str(e)}')
+            messages.error(request, f'Error general: {str(e)}')
 
     context = {'actividades': actividades, 'fecha_hoy': fecha_hoy, 'resultados': resultados}
     return render(request, 'registrar_asistencia.html', context)
+
+
+
+
+#########codigo no funcionando:
+def gestion_asistencia(request):
+    """Vista principal para gestión de asistencias"""
+    # Obtener parámetros de filtro
+    fecha_filtro = request.GET.get('fecha', timezone.now().date().strftime('%Y-%m-%d'))
+    actividad_filtro = request.GET.get('actividad', '')
+    estado_filtro = request.GET.get('estado', '')
+   
+    # Convertir la fecha a datetime con zona horaria activa
+    fecha_obj = datetime.strptime(fecha_filtro, '%Y-%m-%d')
+    fecha_aware = timezone.make_aware(fecha_obj)
+
+
+    asistencias_query = Asistencias.objects.select_related(
+    'participaciones_id_participacion__participantes_id_participante',
+    'participaciones_id_participacion__actividades_id_actividad',
+    'estados_asistencia_id_estado_asistencia'
+    ).filter(fecha__date=fecha_aware.date())
+ 
+    # Aplicar filtros
+    if actividad_filtro:
+        asistencias_query = asistencias_query.filter(
+            participaciones_id_participacion__actividades_id_actividad_id=actividad_filtro
+        )
+   
+    if estado_filtro:
+        asistencias_query = asistencias_query.filter(
+            estados_asistencia_id_estado_asistencia_id=estado_filtro
+        )
+   
+    # Paginación
+    paginator = Paginator(asistencias_query.order_by('-id_asistencia'), 20)
+    page_number = request.GET.get('page')
+    asistencias = paginator.get_page(page_number)
+   
+    # CAMBIO AQUÍ: Obtener TODAS las actividades, no solo las que tienen asistencias en esta fecha
+    actividades = Actividades.objects.all().order_by('nombre')
+   
+    # Obtener todos los estados de asistencia
+    estados_asistencia = EstadosAsistencia.objects.all().order_by('nombre')
+   
+    # Estadísticas del día
+    stats = {
+        'total_registros': asistencias_query.count(),
+        'presentes': asistencias_query.filter(
+            estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+        ).count(),
+        'ausentes': asistencias_query.filter(
+            estados_asistencia_id_estado_asistencia__nombre__icontains='ausente'
+        ).count(),
+        'tardios': asistencias_query.filter(
+            estados_asistencia_id_estado_asistencia__nombre__icontains='tardio'
+        ).count(),
+    }
+   
+    # Agregar variable para template
+    fecha_es_hoy = (fecha_obj == date.today())
+   
+    context = {
+        'asistencias': asistencias,
+        'fecha_filtro': fecha_filtro,
+        'actividad_filtro': actividad_filtro,
+        'estado_filtro': estado_filtro,
+        'actividades': actividades,
+        'estados_asistencia': estados_asistencia,
+        'stats': stats,
+        'fecha_obj': fecha_obj,
+        'fecha_es_hoy': fecha_es_hoy,
+    }
+   
+    return render(request, 'gestion_asistencia.html', context)
+

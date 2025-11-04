@@ -3,3 +3,22 @@
 2025-10-20 14:30:18 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
 2025-10-20 14:30:20 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
 2025-10-20 14:30:22 | Alerta: 165 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 01:20:17 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 01:20:18 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 01:20:22 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 01:20:24 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:02:07 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 16:02:10 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:02:12 | Alerta: 1 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 16:07:18 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 16:07:20 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:07:23 | Alerta: 1 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 16:12:30 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 16:12:32 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:12:34 | Alerta: 1 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 16:56:23 | ⚠️ URGENTE: 1 estudiantes en riesgo crítico | luis.gluis.g.io.com@gmail.com
+2025-11-03 16:56:25 | 📊 1 estudiantes con baja asistencia | luis.gluis.g.io.com@gmail.com
+2025-11-03 16:56:26 | 🏆 ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 17:01:41 | ⚠️ URGENTE: 1 estudiantes en riesgo crítico | luis.gluis.g.io.com@gmail.com
+2025-11-03 17:01:43 | 📊 1 estudiantes con baja asistencia | luis.gluis.g.io.com@gmail.com
+2025-11-03 17:01:45 | 🏆 ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com

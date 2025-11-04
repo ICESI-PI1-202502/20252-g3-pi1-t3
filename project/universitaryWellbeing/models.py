@@ -610,3 +610,79 @@ class TorneosEquipos(models.Model):
         managed = False
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
+
+
+
+class ConfiguracionNotificaciones(models.Model):
+    """Configuración para el sistema de recomendaciones automáticas"""
+    
+    # Umbrales para clasificaciones
+    umbral_riesgo_critico = models.IntegerField(
+        default=2,
+        help_text="Asistencias mínimas + días sin asistir para riesgo crítico"
+    )
+    umbral_baja_asistencia = models.IntegerField(
+        default=5,
+        help_text="Asistencias mínimas para considerar baja asistencia"
+    )
+    dias_inactividad = models.IntegerField(
+        default=14,
+        help_text="Días sin asistir para considerar inactivo"
+    )
+    dias_riesgo_critico = models.IntegerField(
+        default=21,
+        help_text="Días de inactividad para riesgo crítico"
+    )
+    
+    # Reconocimientos
+    asistencias_reconocimiento = models.IntegerField(
+        default=10,
+        help_text="Asistencias necesarias para reconocimiento"
+    )
+    margen_proximo_reconocimiento = models.IntegerField(
+        default=2,
+        help_text="Asistencias faltantes para notificar proximidad"
+    )
+    asistencias_destacado = models.IntegerField(
+        default=15,
+        help_text="Asistencias para clasificar como destacado"
+    )
+    
+    # Configuración de envíos
+    envio_automatico = models.BooleanField(
+        default=True,
+        help_text="Enviar notificaciones automáticamente"
+    )
+    frecuencia_envio = models.CharField(
+        max_length=20,
+        choices=[
+            ('diario', 'Diario'),
+            ('semanal', 'Semanal'),
+            ('quincenal', 'Quincenal'),
+        ],
+        default='semanal'
+    )
+    
+    # Emails del staff
+    emails_staff = models.TextField(
+        default='luis.gluis.g.io.com@gmail.com',
+        help_text="Emails separados por comas"
+    )
+    
+    ultima_modificacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        managed = False 
+        db_table = 'configuracion_notificaciones'
+        verbose_name = 'Configuración de Notificaciones'
+        verbose_name_plural = 'Configuraciones de Notificaciones'
+    
+    @classmethod
+    def obtener_config(cls):
+        """Obtiene la configuración activa (o crea una por defecto)"""
+        config, _ = cls.objects.get_or_create(pk=1)
+        return config
+    
+    def obtener_emails_staff(self):
+        """Retorna lista de emails del staff"""
+        return [email.strip() for email in self.emails_staff.split(',') if email.strip()]

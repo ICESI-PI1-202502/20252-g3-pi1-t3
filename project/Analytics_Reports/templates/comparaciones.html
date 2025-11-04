@@ -61,112 +61,119 @@
     <button type="submit" style="margin-left: 10px;">Actualizar</button>
   </form>
 
+  <!-- Mensaje cuando faltan filtros requeridos -->
+  {% if not ejecutar_consulta %}
+    <div class="alert alert-warning" role="alert">
+      <i class="fas fa-exclamation-triangle"></i>
+      <strong>{{ mensaje_filtro }}</strong>
+    </div>
+  {% endif %}
+
   <!-- 3. Resultados -->
-  {% if resultados %}
+  {% if ejecutar_consulta %}
     <h3>Resultados: 
       {% if tiempo == "todos" %}
         Todos los registros
       {% elif tiempo == "semestre" %}
-        {% if semestre_filtro %}
-          Estudiantes de {{ semestre_filtro }}° semestre
-        {% else %}
-          (Selecciona un semestre)
-        {% endif %}
+        Estudiantes de {{ semestre_filtro }}° semestre
       {% else %}
         Periodo {% if request.GET.inicio %}del {{ request.GET.inicio }}{% endif %}{% if request.GET.fin %} al {{ request.GET.fin }}{% endif %}
       {% endif %}
       → Agrupado por {{ agrupacion|capfirst }}
     </h3>
     
-    <table class="tabla-estadisticas table table-striped">
-      <thead>
-        <tr>
-          <th>{{ agrupacion|capfirst }}</th>
-          <th>Total Participaciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        {% for row in resultados %}
-          <tr>
-            <td>
-              {% if agrupacion == "facultad" %}
-                {{ row.participantes_id_participante__facultad|default:"Sin especificar" }}
-              {% elif agrupacion == "genero" %}
-                {{ row.participantes_id_participante__genero|default:"Sin especificar" }}
-              {% elif agrupacion == "rol" %}
-                {{ row.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin especificar" }}
-              {% elif agrupacion == "semestre" %}
-                {% if row.participantes_id_participante__semestre %}
-                  {{ row.participantes_id_participante__semestre }}° semestre
-                {% else %}
-                  Sin especificar
-                {% endif %}
-              {% endif %}
-            </td>
-            <td>{{ row.total }}</td>
-          </tr>
-        {% empty %}
-          <tr><td colspan="2">No hay datos para mostrar</td></tr>
-        {% endfor %}
-      </tbody>
-    </table>
-    
-    <!-- Mostrar total general -->
     {% if resultados %}
-      <p><strong>Total general: </strong>
-        {{ resultados|length }} grupos encontrados
-      </p>
+      <table class="tabla-estadisticas table table-striped">
+        <thead>
+          <tr>
+            <th>{{ agrupacion|capfirst }}</th>
+            <th>Total Participaciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in resultados %}
+            <tr>
+              <td>
+                {% if agrupacion == "facultad" %}
+                  {{ row.participantes_id_participante__facultad|default:"Sin especificar" }}
+                {% elif agrupacion == "genero" %}
+                  {{ row.participantes_id_participante__genero|default:"Sin especificar" }}
+                {% elif agrupacion == "rol" %}
+                  {{ row.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin especificar" }}
+                {% elif agrupacion == "semestre" %}
+                  {% if row.participantes_id_participante__semestre %}
+                    {{ row.participantes_id_participante__semestre }}° semestre
+                  {% else %}
+                    Sin especificar
+                  {% endif %}
+                {% endif %}
+              </td>
+              <td><strong>{{ row.total }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      
+      <!-- Mostrar total general -->
+      <p><strong>Total de grupos encontrados: </strong>{{ resultados|length }}</p>
+    {% else %}
+      <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i>
+        <strong>No hay datos disponibles para los filtros seleccionados.</strong>
+        <br>
+        <small>
+          {% if tiempo == "semestre" %}
+            No se encontraron participaciones de estudiantes del semestre {{ semestre_filtro }}.
+          {% elif tiempo == "periodo" %}
+            No se encontraron participaciones en el periodo seleccionado.
+          {% else %}
+            No hay registros en la base de datos.
+          {% endif %}
+        </small>
+      </div>
     {% endif %}
-    
-  {% else %}
-    <div class="alert alert-info">
-      <p>Selecciona los filtros y haz clic en "Actualizar" para ver los resultados.</p>
-      {% if tiempo == "semestre" and not semestre_filtro %}
-        <p><em>Para filtrar por semestre, debes seleccionar un número de semestre.</em></p>
-      {% elif tiempo == "periodo" and not request.GET.inicio %}
-        <p><em>Para el periodo personalizado, debes seleccionar las fechas de inicio y fin.</em></p>
-      {% endif %}
-    </div>
   {% endif %}
 
   <!-- 4. Métricas clave -->
-  <div class="metricas-section">
-    <h3>Métricas clave
-      {% if tiempo == "semestre" and semestre_filtro %}
-        <small>(estudiantes de {{ semestre_filtro }}° semestre)</small>
-      {% elif tiempo == "periodo" and request.GET.inicio and request.GET.fin %}
-        <small>(del {{ request.GET.inicio }} al {{ request.GET.fin }})</small>
-      {% else %}
-        <small>(totales generales)</small>
-      {% endif %}
-    </h3>
-    <div class="row">
-      <div class="col-md-4">
-        <div class="card text-center">
-          <div class="card-body">
-            <h4 class="card-title">{{ metricas.total_asistencias }}</h4>
-            <p class="card-text">Total asistencias</p>
+  {% if ejecutar_consulta %}
+    <div class="metricas-section">
+      <h3>Métricas clave
+        {% if tiempo == "semestre" and semestre_filtro %}
+          <small>(estudiantes de {{ semestre_filtro }}° semestre)</small>
+        {% elif tiempo == "periodo" and request.GET.inicio and request.GET.fin %}
+          <small>(del {{ request.GET.inicio }} al {{ request.GET.fin }})</small>
+        {% else %}
+          <small>(totales generales)</small>
+        {% endif %}
+      </h3>
+      <div class="row">
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h4 class="card-title">{{ metricas.total_asistencias }}</h4>
+              <p class="card-text">Total asistencias</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-center">
-          <div class="card-body">
-            <h4 class="card-title">{{ metricas.nuevos }}</h4>
-            <p class="card-text">Nuevos participantes</p>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h4 class="card-title">{{ metricas.nuevos }}</h4>
+              <p class="card-text">Nuevos participantes</p>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-center">
-          <div class="card-body">
-            <h4 class="card-title">{{ metricas.reincidencia }}</h4>
-            <p class="card-text">Participantes reincidentes</p>
+        <div class="col-md-4">
+          <div class="card text-center">
+            <div class="card-body">
+              <h4 class="card-title">{{ metricas.reincidencia }}</h4>
+              <p class="card-text">Participantes reincidentes</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
+  {% endif %}
 </div>
 
 <style>
@@ -184,6 +191,10 @@
   font-weight: bold;
 }
 
+.tabla-estadisticas tbody tr:hover {
+  background-color: #f1f3f5;
+}
+
 .metricas-section {
   margin-top: 30px;
 }
@@ -191,6 +202,12 @@
 .card {
   margin-bottom: 15px;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
 .card-title {
@@ -201,6 +218,24 @@
 
 .alert {
   margin-top: 20px;
+}
+
+select, input[type="date"], button {
+  padding: 8px 12px;
+  margin: 0 5px;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
 }
 </style>
 {% endblock %}
