@@ -7,10 +7,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
 from .forms import UserLoginForm, UserRegisterForm
-from typing import List
-from datetime import datetime, timedelta
-from django.utils import timezone
-from .models import Notificaciones
+from .models import Notificaciones, HorariosBloque
 
 def user_login(request):
     if request.method == "POST":
@@ -170,11 +167,11 @@ def schedule(request):
     for e in eventos:
         color = "#007bff"  # Azul por defecto
         if e.actividades_id_actividad:
-            color = "#28a745"  # Verde
+            color = "#5454E9"  # Azul
         elif e.citas_id_cita:
-            color = "#ffc107"  # Amarillo
+            color = "#E4EB60"  # Amarillo
         elif e.partidos_id_partido:
-            color = "#dc3545"  # Rojo
+            color = "#E9683B"  # Naranja
 
         eventos_data.append({
             "title": e.titulo,
@@ -192,6 +189,127 @@ def schedule(request):
         "eventos_json": json.dumps(eventos_data)
     }
     return render(request, "Horario.html", context)
+
+
+# FullCalendar: 0=Dom,1=Lun,...6=Sab
+def _django_weekday_to_fc_dow(django_wd: int) -> int:
+    # Django: 1=Dom ... 7=Sab  -> FC: 0=Dom ... 6=Sab
+    return django_wd % 7
+
+@login_required
+def calendario_unificado(request):
+    from collections import defaultdict
+    import json
+
+    tipo_id = request.GET.get("tipo")  # string or None
+
+    # Catálogo de tipos para el filtro (una sola consulta)
+    tipos = list(
+        TiposActividad.objects
+        .values("id_tipo", "nombre_tipo")
+        .order_by("nombre_tipo")
+    )
+
+    # ACTIVIDADES base (con filtro opcional por tipo)
+    qs_acts = Actividades.objects.all()
+    if tipo_id:
+        qs_acts = qs_acts.filter(tipos_actividad_id_tipo=tipo_id)
+
+    acts_rows = list(
+        qs_acts.select_related("tipos_actividad_id_tipo")
+        .values(
+            "id_actividad",
+            "nombre",
+            "descripcion",
+            "tipos_actividad_id_tipo",                      # id del tipo
+            "tipos_actividad_id_tipo__nombre_tipo",        # nombre del tipo
+        )
+    )
+
+    # Mapa en memoria: id_actividad -> info (incluye tipo)
+    acts_by_id = {
+        r["id_actividad"]: {
+            "nombre": r["nombre"],
+            "descripcion": r["descripcion"] or "",
+            "tipo_id": r["tipos_actividad_id_tipo"],
+            "tipo_nombre": r["tipos_actividad_id_tipo__nombre_tipo"],
+        }
+        for r in acts_rows
+    }
+
+    act_ids = list(acts_by_id.keys())
+
+    if not act_ids:
+        ctx = {
+            "tipos": tipos,
+            "tipo_id": str(tipo_id) if tipo_id else "",
+            "eventos_json": "[]",
+        }
+        return render(request, "calendario_unificado.html", ctx)
+
+    # Bloques (una consulta)
+    bloques = list(
+        HorariosBloque.objects
+        .filter(actividades_id_actividad__in=act_ids)
+        .values(
+            "id_horario_bloque",
+            "actividades_id_actividad",
+            "profesor",
+            "lugar",
+            "hora_inicio",
+            "hora_fin",
+        )
+    )
+
+    # Días por bloque (una consulta)
+    bloque_ids = [b["id_horario_bloque"] for b in bloques] or []
+    dias = list(
+        HorariosActividad.objects
+        .filter(horario_bloque_id__in=bloque_ids)
+        .values("horario_bloque_id", "dia_semana")
+    )
+
+    dias_por_bloque = defaultdict(list)
+    for d in dias:
+        dias_por_bloque[d["horario_bloque_id"]].append(d["dia_semana"])
+
+    # Construcción de eventos (todo en memoria, sin más consultas)
+    eventos = []
+    for b in bloques:
+        act_id = b["actividades_id_actividad"]
+        act = acts_by_id.get(act_id)
+        if not act:
+            continue
+
+        start_time = b["hora_inicio"].strftime("%H:%M:%S")
+        end_time   = b["hora_fin"].strftime("%H:%M:%S")
+
+        for django_wd in sorted(dias_por_bloque.get(b["id_horario_bloque"], [])):
+            fc_dow = _django_weekday_to_fc_dow(django_wd)
+            eventos.append({
+                "title": act["nombre"],
+                "daysOfWeek": [fc_dow],          # 0..6
+                "startTime": start_time,
+                "endTime": end_time,
+                "display": "block",
+                "color": "#5454E9",
+                "extendedProps": {
+                    "tipo": act["tipo_nombre"],
+                    "actividad_id": act_id,
+                    "bloque_id": b["id_horario_bloque"],
+                    "profesor": b["profesor"] or "",
+                    "espacio": b["lugar"] or "",
+                    "descripcion": act["descripcion"],
+                }
+            })
+
+    ctx = {
+        "tipos": tipos,
+        "tipo_id": str(tipo_id) if tipo_id else "",
+        "eventos_json": json.dumps(eventos, ensure_ascii=False, separators=(",", ":")),
+    }
+    return render(request, "calendario_unificado.html", ctx)
+
 
 @login_required
 def home_user(request):

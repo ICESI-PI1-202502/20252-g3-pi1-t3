@@ -14,6 +14,19 @@
 <link rel="stylesheet" href="{% static 'css/main.css' %}">
 {% endblock %}
 
+{% block flash_messages %}
+  {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags|default:'info' }}{% endif %} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endblock %}
+
 {% block content %}
 {{ block.super }}
 
@@ -116,14 +129,42 @@
           <div class="result-body">
             {% if a.items_dia %}
               {% for it in a.items_dia %}
-                <div class="item-row">
+              <div class="item-row d-flex justify-content-between align-items-center">
+                <div>
                   <div><strong>Día:</strong> {{ it.dia }}</div>
                   <div><strong>Horario:</strong> {{ it.horario }}</div>
                   <div><strong>Espacio:</strong> {{ it.espacio|default:"—" }}</div>
                   <div><strong>Profesor:</strong> {{ it.profesor|default:"—" }}</div>
                 </div>
-                {% if not forloop.last %}<hr class="result-sep">{% endif %}
-              {% endfor %}
+
+                {% if request.user.is_authenticated and not request.user.is_superuser %}
+                  <form method="post" action="{% url 'searchActivities:add_slot_from_search' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="actividad_id" value="{{ a.id_actividad }}">
+                    <input type="hidden" name="bloque_id" value="{{ it.bloque_id }}">
+                    <input type="hidden" name="dia_idx" value="{{ it.dia_idx }}">
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                    {% if it.already_added %}
+                      <button type="submit" class="greenBotton_White btn-add-small is-disabled" disabled>
+                        Añadido ✓
+                      </button>
+                    {% elif it.conflict %}
+                      <button type="button" class="btn-add-small is-disabled" disabled
+                              title="Este bloque se cruza con otra actividad">
+                        Horario ocupado
+                      </button>
+                    {% else %}
+                      <button type="submit" class="greenBotton_White btn-add-small">
+                        Añadir
+                      </button>
+                    {% endif %}
+                  </form>
+                {% endif %}
+              </div>
+              {% if not forloop.last %}<hr class="result-sep">{% endif %}
+            {% endfor %}
+
             {% else %}
               <p class="text-muted mb-0">No hay horarios cargados para esta actividad.</p>
             {% endif %}
@@ -135,19 +176,34 @@
             </div>
 
             {% if request.user.is_authenticated %}
-              {% if a.user_has_calificado %}
-                <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
-                  class="yellowBotton_Black mt-2 d-block">
-                  Editar calificación
-                </a>
-              {% else %}
-                <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
-                  class="yellowBotton_Black mt-2 d-block">
-                  Calificar
-                </a>
-              {% endif %}
-            {% endif %}
-
+  {% if a.user_has_calificado %}
+    {% if a.user_has_participacion %}
+      <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.get_full_path|urlencode }}"
+         class="yellowBotton_Black mt-2 d-block">
+        Editar calificación
+      </a>
+    {% else %}
+      <span class="yellowBotton_Black mt-2 d-block is-disabled"
+            aria-disabled="true" tabindex="-1"
+            title="Disponible solo para participantes">
+        Editar calificación
+      </span>
+    {% endif %}
+  {% else %}
+    {% if a.user_has_participacion %}
+      <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.get_full_path|urlencode }}"
+         class="yellowBotton_Black mt-2 d-block">
+        Calificar
+      </a>
+    {% else %}
+      <span class="yellowBotton_Black mt-2 d-block is-disabled"
+            aria-disabled="true" tabindex="-1"
+            title="Debes haber participado para calificar">
+        Calificar
+      </span>
+    {% endif %}
+  {% endif %}
+{% endif %}
 
           </div>
         </div>
