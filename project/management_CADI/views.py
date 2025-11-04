@@ -1,15 +1,18 @@
 import datetime as dt
+from django.utils import timezone
+from datetime import datetime, timedelta
+from django.contrib import messages
+from django.views.decorators.http import require_POST
 from django.db import transaction, IntegrityError  # Import correction
 from django.shortcuts import render, redirect, get_object_or_404
 from django.utils.text import slugify
 from django.urls import reverse
 from collections import defaultdict
 from django.db.models import Avg
-from django.http import Http404
 from django.contrib.auth.decorators import login_required
 from universitaryWellbeing.models import (
     ActividadesGrupos, Actividades, TiposActividad, GruposActividad, Grupos,
-    HorariosBloque, HorariosActividad, CalificacionesActividad
+    HorariosBloque, HorariosActividad, CalificacionesActividad, Participantes, Participaciones, HorariosParticipante
 )
 
 def _draft_keys(grupo_actividad_id, actividad_id=None):
@@ -25,6 +28,7 @@ DIAS_REV = {
     0: "Lunes", 1: "Martes", 2: "Miércoles",
     3: "Jueves", 4: "Viernes", 5: "Sábado", 6: "Domingo"
 }
+
 
 def is_admin(user):
     return user.is_authenticated and user.is_staff
@@ -205,6 +209,7 @@ def createActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
         "modo": "create",
     })
 
+
 @superuser_required
 @login_required
 def editActivity(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id):
@@ -367,25 +372,154 @@ def editActivity(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_
         "modo": "edit",
     })
 
+
+
+def next_datetime_for_weekday(dia_semana: int, t_inicio, t_fin):
+    """
+    Devuelve (dt_inicio, dt_fin) aware en timezone local para la próxima ocurrencia
+    del dia_semana dado (0=lunes..6=domingo). Si hoy es el mismo día y el bloque ya
+    terminó, avanza a la próxima semana.
+    """
+    now = timezone.localtime()
+    base = now.date()
+    hoy_idx = base.weekday()
+
+    # cuántos días hasta el próximo 'dia_semana'
+    delta = (dia_semana - hoy_idx) % 7
+
+    # Construir candidate datetimes (aware)
+    fecha_obj = base + timedelta(days=delta)
+    dt_fin_candidate = timezone.make_aware(datetime.combine(fecha_obj, t_fin))
+    dt_inicio_candidate = timezone.make_aware(datetime.combine(fecha_obj, t_inicio))
+
+    # Si es hoy (delta == 0) y la hora de fin ya pasó (<= ahora) -> mover a próxima semana
+    if delta == 0 and dt_fin_candidate <= now:
+        fecha_obj = base + timedelta(days=7)
+        dt_inicio_candidate = timezone.make_aware(datetime.combine(fecha_obj, t_inicio))
+        dt_fin_candidate    = timezone.make_aware(datetime.combine(fecha_obj, t_fin))
+
+    return dt_inicio_candidate, dt_fin_candidate
+
+@login_required
+@require_POST
+def add_slot_to_schedule(request, grupo_nombre, grupo_id, grupo_actividad_id):
+    """
+    Añade un bloque/día (HorariosBloque + dia_semana) al horario del participante,
+    calculando la próxima ocurrencia a partir de hoy.
+    """
+    # 1) Resolver participante
+    try:
+        participante = Participantes.objects.get(user=request.user)
+    except Participantes.DoesNotExist:
+        messages.error(request, "No se encontró un perfil de participante asociado a tu usuario.")
+        return redirect(request.POST.get("next") or request.META.get("HTTP_REFERER") or "/")
+
+    actividad_id = request.POST.get("actividad_id")
+    bloque_id    = request.POST.get("bloque_id")
+    dia_idx_str  = request.POST.get("dia_idx")
+    next_url     = request.POST.get("next") or request.META.get("HTTP_REFERER") or "/"
+
+    # Validación
+    if not (actividad_id and bloque_id and dia_idx_str):
+        messages.error(request, "Solicitud incompleta para agregar el horario.")
+        return redirect(next_url)
+
+    try:
+        dia_idx = int(dia_idx_str)
+    except ValueError:
+        messages.error(request, "Día inválido.")
+        return redirect(next_url)
+
+    actividad = get_object_or_404(Actividades, pk=actividad_id)
+    bloque    = get_object_or_404(HorariosBloque, pk=bloque_id, actividades_id_actividad=actividad)
+
+    # 2) Calcular próxima fecha para ese día
+    dt_inicio, dt_fin = next_datetime_for_weekday(
+        dia_semana=dia_idx,
+        t_inicio=bloque.hora_inicio,
+        t_fin=bloque.hora_fin
+    )
+
+    # 3) Evitar duplicados del mismo “slot” ya agregado (misma act + mismas horas)
+    #    NOTA: Usamos sólo horas para identificar el slot, la fecha cambia semana a semana.
+    ya_existe = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        actividades_id_actividad=actividad,
+        fecha_inicio__time=bloque.hora_inicio,
+        fecha_fin__time=bloque.hora_fin,
+    ).exists()
+    if ya_existe:
+        messages.info(request, "Este bloque ya está en tu horario.")
+        return redirect(next_url)
+
+    # 3.5) Comprobar conflictos con otros slots del participante para el MISMO día de la semana
+    MARGIN = timedelta(minutes=1)
+    # obtener weekday del dt_inicio (aquí dt_inicio es aware)
+    wd = dt_inicio.weekday()
+    # traer slots del participante que ocurren en ese mismo weekday (comparar usando .weekday() de fecha)
+    existing_slots = HorariosParticipante.objects.filter(participantes_id_participante=participante)
+    for ex in existing_slots:
+        ex_s = timezone.localtime(ex.fecha_inicio)
+        ex_e = timezone.localtime(ex.fecha_fin)
+        if ex_s.weekday() != wd:
+            continue
+        # comparar horas usando datetimes sobre fecha dummy
+        base_date = dt.date(2000,1,1)
+        new_s = datetime.combine(base_date, dt_inicio.timetz().replace(tzinfo=None))
+        new_e = datetime.combine(base_date, dt_fin.timetz().replace(tzinfo=None))
+        existing_s = datetime.combine(base_date, ex_s.time())
+        existing_e = datetime.combine(base_date, ex_e.time())
+
+        if (new_s < (existing_e - MARGIN)) and (existing_s < (new_e - MARGIN)):
+            messages.error(request, "No se puede agregar: el horario se cruza con otra actividad en tu calendario.")
+            return redirect(next_url)
+
+    # 4) Insertar (si pasó las validaciones)
+    try:
+        HorariosParticipante.objects.create(
+            participantes_id_participante=participante,
+            titulo=f"{actividad.nombre}",
+            fecha_inicio=dt_inicio,
+            fecha_fin=dt_fin,
+            fuente_manual="S",
+            actividades_id_actividad=actividad,
+            notas=f"Bloque {bloque.hora_inicio.strftime('%H:%M')}–{bloque.hora_fin.strftime('%H:%M')}",
+        )
+        messages.success(request, "Bloque añadido a tu horario.")
+    except IntegrityError:
+        # Colisión por unique_together exacto de timestamps
+        messages.info(request, "Ya tenías algo igual en ese horario.")
+    except Exception:
+        messages.error(request, "No se pudo agregar el bloque a tu horario.")
+    return redirect(next_url)
+
+# margen de 1 minuto para contiguos (Ejemplo: La actividad A finaliza a 14:00 y la actividad B 
+# comienza a 14:00; no hay choques con este margen al intentar agregar los horarios A y B choque)
+MARGEN_MINUTOS = 1
+
 @login_required
 def showActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id, grupos_id_grupo=grupo)
 
-    # Verificar si el nombre del grupo coincide con el slug real
+    # Canonical slug
     slug_real = slugify(grupo.nombre)
     if grupo_nombre != slug_real:
         return redirect("management_cadi:listar_actividades", slug_real, grupo.id_grupo, grupo_actividad.id_grupo_actividad)
 
-    # URL para crear actividad
     crear_url = reverse("management_cadi:crear_actividad", kwargs={
         "grupo_nombre": slug_real,
         "grupo_id": grupo.id_grupo,
         "grupo_actividad_id": grupo_actividad.id_grupo_actividad,
     })
 
-    # Obtener las actividades asociadas al grupo
-    actividades_ids = ActividadesGrupos.objects.filter(grupos_actividad_id=grupo_actividad_id).values_list("actividad_id", flat=True)
+    # Actividades del grupo
+    actividades_ids = list(
+        ActividadesGrupos.objects
+        .filter(grupos_actividad_id=grupo_actividad_id)
+        .values_list("actividad_id", flat=True)
+    )
+
     actividades = list(
         Actividades.objects
         .filter(id_actividad__in=actividades_ids)
@@ -393,15 +527,15 @@ def showActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
         .order_by("nombre")
     )
 
-    # Traer bloques y días de las actividades
+    # === Bloques y días ===
     bloques = list(
         HorariosBloque.objects
-        .filter(actividades_id_actividad__in=[a["id_actividad"] for a in actividades])
+        .filter(actividades_id_actividad__in=actividades_ids)
         .values("id_horario_bloque", "actividades_id_actividad", "profesor", "lugar", "hora_inicio", "hora_fin")
     )
     dias = list(
         HorariosActividad.objects
-        .filter(horario_bloque_id__in=[b["id_horario_bloque"] for b in bloques])
+        .filter(horario_bloque_id__in=[b["id_horario_bloque"] for b in bloques] if bloques else [])
         .values("horario_bloque_id", "dia_semana")
     )
 
@@ -409,68 +543,142 @@ def showActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     for d in dias:
         dias_por_bloque[d["horario_bloque_id"]].append(d["dia_semana"])
 
-    # Construir la salida "día a día"
     daywise_por_act = defaultdict(list)
     for b in bloques:
-        bdias = sorted(dias_por_bloque.get(b["id_horario_bloque"], []))
-        for d in bdias:
+        for d in sorted(dias_por_bloque.get(b["id_horario_bloque"], [])):
             daywise_por_act[b["actividades_id_actividad"]].append({
-                "dia": DIAS_REV[d],
+                "dia": DIAS_REV.get(d, str(d)),
+                "dia_idx": d,  # necesario para POST y para mapear weekday
                 "horario": f'{b["hora_inicio"].strftime("%H:%M")}–{b["hora_fin"].strftime("%H:%M")}',
                 "espacio": b["lugar"],
                 "profesor": b["profesor"],
+                "bloque_id": b["id_horario_bloque"],  # necesario en POST
+                "t_ini": b["hora_inicio"],            # para marcar disabled
+                "t_fin": b["hora_fin"],               # para marcar disabled
             })
 
-    # Calcular y asignar el promedio de calificación y la imagen correspondiente a cada actividad
+    # === Calificación promedio + imagen ===
     for a in actividades:
-        # Calcular el promedio de las calificaciones
-        promedio_calificacion = CalificacionesActividad.objects.filter(actividades_id_actividad=a["id_actividad"]).aggregate(Avg('estrellas'))['estrellas__avg']
-        promedio_calificacion = promedio_calificacion if promedio_calificacion is not None else 0
+        prom = CalificacionesActividad.objects.filter(
+            actividades_id_actividad=a["id_actividad"]
+        ).aggregate(Avg("estrellas"))["estrellas__avg"] or 0
 
-        # Asignar el promedio de calificación
-        a["promedio_calificacion"] = promedio_calificacion
+        a["promedio_calificacion"] = prom
 
-        # Asignar la imagen de la calificación según el promedio
-        if promedio_calificacion == 0:
-            a["rating_image"] = 'rating_0_0.png'
-        elif 0 < promedio_calificacion <= 0.5:
-            a["rating_image"] = 'rating_0_5.png'
-        elif 0.5 < promedio_calificacion <= 1:
-            a["rating_image"] = 'rating_1_0.png'
-        elif 1 < promedio_calificacion <= 1.5:
-            a["rating_image"] = 'rating_1_5.png'
-        elif 1.5 < promedio_calificacion <= 2:
-            a["rating_image"] = 'rating_2_0.png'
-        elif 2 < promedio_calificacion <= 2.5:
-            a["rating_image"] = 'rating_2_5.png'
-        elif 2.5 < promedio_calificacion <= 3:
-            a["rating_image"] = 'rating_3_0.png'
-        elif 3 < promedio_calificacion <= 3.5:
-            a["rating_image"] = 'rating_3_5.png'
-        elif 3.5 < promedio_calificacion <= 4:
-            a["rating_image"] = 'rating_4_0.png'
-        elif 4 < promedio_calificacion <= 4.5:
-            a["rating_image"] = 'rating_4_5.png'
+        if prom == 0:
+            a["rating_image"] = "rating_0_0.png"
+        elif 0 < prom <= 0.5:
+            a["rating_image"] = "rating_0_5.png"
+        elif 0.5 < prom <= 1:
+            a["rating_image"] = "rating_1_0.png"
+        elif 1 < prom <= 1.5:
+            a["rating_image"] = "rating_1_5.png"
+        elif 1.5 < prom <= 2:
+            a["rating_image"] = "rating_2_0.png"
+        elif 2 < prom <= 2.5:
+            a["rating_image"] = "rating_2_5.png"
+        elif 2.5 < prom <= 3:
+            a["rating_image"] = "rating_3_0.png"
+        elif 3 < prom <= 3.5:
+            a["rating_image"] = "rating_3_5.png"
+        elif 3.5 < prom <= 4:
+            a["rating_image"] = "rating_4_0.png"
+        elif 4 < prom <= 4.5:
+            a["rating_image"] = "rating_4_5.png"
         else:
-            a["rating_image"] = 'rating_5_0.png'
+            a["rating_image"] = "rating_5_0.png"
 
-        # Asignar URL de edición
         a["editar_url"] = reverse("management_cadi:editar_actividad", kwargs={
             "grupo_nombre": slug_real,
             "grupo_id": grupo.id_grupo,
             "grupo_actividad_id": grupo_actividad.id_grupo_actividad,
             "actividad_id": a["id_actividad"],
         })
-        # Asignar los bloques y días de la actividad
         a["items_dia"] = daywise_por_act.get(a["id_actividad"], [])
 
-    for a in actividades:
-        ya_califico = CalificacionesActividad.objects.filter(
-            actividades_id_actividad=a["id_actividad"],
-            participantes_id_participante__user=request.user
-        ).exists()
-        a["user_has_calificado"] = ya_califico
+    # === Marcar calificado / participación del usuario ===
+    calificados_ids, participados_ids = set(), set()
+    participante = None
+    try:
+        participante = Participantes.objects.get(user=request.user)
+    except Participantes.DoesNotExist:
+        participante = None
 
+    if participante and actividades_ids:
+        calificados_ids = set(
+            CalificacionesActividad.objects
+            .filter(participantes_id_participante=participante,
+                    actividades_id_actividad__in=actividades_ids)
+            .values_list("actividades_id_actividad", flat=True)
+        )
+
+        participados_ids = set(
+            Participaciones.objects
+            .filter(participantes_id_participante=participante,
+                    actividades_id_actividad__in=actividades_ids)
+            .values_list("actividades_id_actividad", flat=True)
+        )
+
+    for a in actividades:
+        aid = a["id_actividad"]
+        a["user_has_calificado"]    = (aid in calificados_ids)
+        a["user_has_participacion"] = (aid in participados_ids)
+
+    # Tolerancia: 1 minuto (permitir encadenar actividades que terminan a la misma hora)
+    MARGIN = timedelta(minutes=1)
+
+    added_set = set()   # (actividad_id, dia_idx, t_ini, t_fin)
+    conflict_set = set()  # (actividad_id, dia_idx, t_ini, t_fin) -> marcar por item
+
+    if participante:
+        # Traer todos los horarios del participante (futuros y recientes son relevantes)
+        user_slots = list(
+            HorariosParticipante.objects.filter(
+                participantes_id_participante=participante
+            ).values("fecha_inicio", "fecha_fin", "actividades_id_actividad")
+        )
+
+        # Normalizar a listado por weekday y horas
+        user_by_weekday = defaultdict(list)  # weekday -> list of (start_time, end_time, actividad_id)
+        for s in user_slots:
+            fi = timezone.localtime(s["fecha_inicio"])
+            ff = timezone.localtime(s["fecha_fin"])
+            wd = fi.weekday()
+            user_by_weekday[wd].append((fi.time(), ff.time(), s.get("actividades_id_actividad")))
+
+        # Para cada actividad en la página, marcar sus items
+        for a in actividades:
+            aid = a["id_actividad"]
+            for it in a["items_dia"]:
+                item_day = it["dia_idx"]
+                t_ini = it["t_ini"]
+                t_fin = it["t_fin"]
+
+                # 1) Ya agregado exactamente? -> buscar en user_by_weekday[item_day]
+                added = False
+                for (u_ini, u_fin, u_aid) in user_by_weekday.get(item_day, []):
+                    # comparar tiempos exactamente (mismo actividad_id y mismas horas)
+                    if (u_aid == aid) and (u_ini == t_ini) and (u_fin == t_fin):
+                        added = True
+                        break
+                it["already_added"] = added
+
+                # 2) Hay conflicto con cualquier slot existente del usuario ese mismo día?
+                conflict = False
+                for (u_ini, u_fin, u_aid) in user_by_weekday.get(item_day, []):
+                    # convertir a datetimes para comparar con margen
+                    # usamos una fecha dummy (no importa la fecha exacta, solo la comparación por tiempo)
+                    base_date = dt.date(2000,1,1)
+                    new_s = datetime.combine(base_date, t_ini)
+                    new_e = datetime.combine(base_date, t_fin)
+                    ex_s  = datetime.combine(base_date, u_ini)
+                    ex_e  = datetime.combine(base_date, u_fin)
+
+                    # conflict si (new_s < ex_e - MARGIN) and (ex_s < new_e - MARGIN)
+                    if (new_s < (ex_e - MARGIN)) and (ex_s < (new_e - MARGIN)):
+                        conflict = True
+                        break
+                it["conflict"] = conflict
 
     return render(request, "listar_actividades.html", {
         "grupo": grupo,
@@ -478,6 +686,7 @@ def showActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
         "actividades": actividades,
         "crear_url": crear_url,
     })
+
 
 @login_required
 def showGroupActivities(request, grupo_nombre, grupo_id):
@@ -502,6 +711,7 @@ def showGroupActivities(request, grupo_nombre, grupo_id):
         "grupos_actividad": grupos_actividad,
         "descripcion": descripcion,
     })
+
 
 @login_required
 @superuser_required

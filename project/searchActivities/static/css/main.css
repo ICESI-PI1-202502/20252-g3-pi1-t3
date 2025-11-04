@@ -1,3 +1,6 @@
+/* ============================
+   Estructura general y responsive
+============================ */
 .input-group {
   max-width: 100%;
   margin-right: 10px;
@@ -29,6 +32,9 @@ button.btn-outline-secondary {
   }
 }
 
+/* ============================
+   Tarjeta de búsqueda y resultados
+============================ */
 .search-card {
   border: 1px solid #eaeaea;
   border-radius: 16px;
@@ -70,6 +76,9 @@ button.btn-outline-secondary {
   margin: 10px 0;
 }
 
+/* ============================
+   Chips y filtros
+============================ */
 .chip {
   display: inline-flex;
   align-items: center;
@@ -106,7 +115,50 @@ button.btn-outline-secondary {
   border-color: #ddd;
 }
 
-/* Evitar que el hover amarillo gane cuando está deshabilitado */
+/* ============================
+   Botones pequeños de añadir
+============================ */
+.btn-add-small {
+  padding: 6px 12px;
+  font-size: .9rem;
+  line-height: 1.1;
+  border-radius: 10px;
+  white-space: nowrap;
+  border: none;
+  transition: 0.2s ease;
+}
+
+/* Verde de añadir */
+.greenBotton_White {
+  background-color: #4DB979;
+  color: white;
+  border: 1px solid #3ea466;
+}
+
+.greenBotton_White:hover:not(.is-disabled) {
+  background-color: #3ea466;
+  transform: scale(1.05);
+}
+
+/* Estado "Añadido ✓" */
+.greenBotton_White.is-disabled {
+  background-color: #A0D6B4 !important;
+  color: #f9f9f9 !important;
+  cursor: not-allowed !important;
+  opacity: 0.9;
+}
+
+/* Estado "Horario ocupado" */
+.btn-add-small.is-disabled {
+  background-color: #e5e7eb !important;
+  color: #6b7280 !important;
+  cursor: not-allowed !important;
+  opacity: 0.9;
+}
+
+/* ============================
+   Botones amarillos de calificación
+============================ */
 .yellowBotton_Black.is-disabled,
 .yellowBotton_Black.is-disabled:hover,
 .yellowBotton_Black.is-disabled:focus,
@@ -124,7 +176,6 @@ span.yellowBotton_Black.is-disabled {
   opacity: .9;
 }
 
-/* Redefine el hover del botón amarillo SOLO si NO está deshabilitado */
 .yellowBotton_Black:not(.is-disabled):hover {
   background-color: #d9df55;
   transform: scale(1.05);

@@ -129,14 +129,42 @@
           <div class="result-body">
             {% if a.items_dia %}
               {% for it in a.items_dia %}
-                <div class="item-row">
+              <div class="item-row d-flex justify-content-between align-items-center">
+                <div>
                   <div><strong>Día:</strong> {{ it.dia }}</div>
                   <div><strong>Horario:</strong> {{ it.horario }}</div>
                   <div><strong>Espacio:</strong> {{ it.espacio|default:"—" }}</div>
                   <div><strong>Profesor:</strong> {{ it.profesor|default:"—" }}</div>
                 </div>
-                {% if not forloop.last %}<hr class="result-sep">{% endif %}
-              {% endfor %}
+
+                {% if request.user.is_authenticated and not request.user.is_superuser %}
+                  <form method="post" action="{% url 'searchActivities:add_slot_from_search' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="actividad_id" value="{{ a.id_actividad }}">
+                    <input type="hidden" name="bloque_id" value="{{ it.bloque_id }}">
+                    <input type="hidden" name="dia_idx" value="{{ it.dia_idx }}">
+                    <input type="hidden" name="next" value="{{ request.get_full_path }}">
+
+                    {% if it.already_added %}
+                      <button type="submit" class="greenBotton_White btn-add-small is-disabled" disabled>
+                        Añadido ✓
+                      </button>
+                    {% elif it.conflict %}
+                      <button type="button" class="btn-add-small is-disabled" disabled
+                              title="Este bloque se cruza con otra actividad">
+                        Horario ocupado
+                      </button>
+                    {% else %}
+                      <button type="submit" class="greenBotton_White btn-add-small">
+                        Añadir
+                      </button>
+                    {% endif %}
+                  </form>
+                {% endif %}
+              </div>
+              {% if not forloop.last %}<hr class="result-sep">{% endif %}
+            {% endfor %}
+
             {% else %}
               <p class="text-muted mb-0">No hay horarios cargados para esta actividad.</p>
             {% endif %}
