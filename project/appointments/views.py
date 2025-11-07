@@ -382,56 +382,59 @@ def _set_estado(cita, nombre: str):
     est.nombre = nombre
     est.save(update_fields=["nombre"])
 
-#@require_POST
 @login_required
 def appointment_cancel(request, id: int):
     me = get_object_or_404(Participantes, user_id=request.user.id)
     cita = get_object_or_404(
-        Citas.objects.select_related("participantes_id_participante",
-                                     "participantes_id_participante2",
-                                     "agenda_psicologos_id_agenda_slot"),
-        pk=id
+        Citas.objects.select_related(
+            "participantes_id_participante",
+            "participantes_id_participante2",
+            "agenda_psicologos_id_agenda_slot",
+        ),
+        pk=id,
     )
 
-    # Permisos: dueño de la cita (estudiante), el profesional o admin
-    if not (me.id_participante in (cita.participantes_id_participante_id,
-                                   cita.participantes_id_participante2_id)
-            or request.user.is_superuser):
+    if not (
+        me.id_participante in (
+            cita.participantes_id_participante_id,
+            cita.participantes_id_participante2_id,
+        ) or request.user.is_superuser
+    ):
         raise Http404()
 
     try:
         with transaction.atomic():
-            # estado
+            # 1) Estado
             _set_estado(cita, "Cancelada")
 
-            # liberar slot (si existía y estaba RESERVADO)
+            # 2) Liberar slot por PK (escribe directo en DB)
             if cita.agenda_psicologos_id_agenda_slot_id:
-                slot = cita.agenda_psicologos_id_agenda_slot
-                try:
-                    if getattr(slot, "estado_slot", "").upper() == "RESERVADO":
-                        slot.estado_slot = "DISPONIBLE"
-                        slot.save(update_fields=["estado_slot"])
-                except Exception:
-                    pass
+                updated = AgendaPsicologos.objects.filter(
+                    pk=cita.agenda_psicologos_id_agenda_slot_id
+                ).update(estado_slot="DISPONIBLE")
+                # opcional: asegurar que sí actualizó
+                # if updated != 1:
+                #     raise RuntimeError("No se pudo liberar el slot")
 
-            # borrar eventos de calendario
+            # 3) Borrar eventos calendario
             HorariosParticipante.objects.filter(citas_id_cita=cita).delete()
 
-            # historial
+            # 4) Historial
             HistorialCitas.objects.create(
                 citas_id_cita=cita,
                 participantes_id_participante=me,
                 fecha=now(),
-                nota="Cita cancelada."
+                nota="Cita cancelada.",
             )
 
         messages.success(request, "Cita cancelada.")
     except Exception as e:
         messages.error(request, f"No se pudo cancelar: {e}")
 
-    # redirige a la lista apropiada
     go_pro = (me.id_participante == cita.participantes_id_participante2_id)
     return redirect("appointments:pro_list" if go_pro else "appointments:list")
+
+
 
 #@require_POST
 @login_required
