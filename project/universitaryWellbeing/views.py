@@ -305,21 +305,17 @@ def ver_notificaciones(request):
 
 
 
-
-
-
 @login_required
 def completar_perfil(request):
     """
     Vista para que el usuario complete su perfil la primera vez.
-    Solo se muestra si el participante no tiene rol válido asignado.
+    Solo se muestra si el participante no tiene tipo_participante asignado.
     """
     try:
         participante = Participantes.objects.get(user=request.user)
         
-        # Si ya tiene un rol válido (no es Invitado/Temporal), redirigir a preferencias
-        if participante.roles_id_rol and \
-           participante.roles_id_rol.nombre_rol.lower() not in ['invitado', 'temporal']:
+        # ✅ Si ya tiene tipo_participante válido, redirigir a preferencias
+        if participante.tipo_participante:
             return redirect('preferences')
             
     except Participantes.DoesNotExist:
@@ -327,96 +323,107 @@ def completar_perfil(request):
         logout(request)
         return redirect('login')
     
-    # Obtener todos los roles disponibles (excepto Invitado/Temporal)
-    roles = Roles.objects.exclude(
-        nombre_rol__in=['Invitado', 'Temporal']
-    ).order_by('nombre_rol')
-    
     if request.method == 'POST':
-        rol_nombre = request.POST.get('rol')  # 'estudiante', 'trabajador', etc.
+        tipo_nombre = request.POST.get('tipo_participante', '').strip().lower()  # ✅ CAMBIO AQUÍ
         
-        if not rol_nombre:
+        if not tipo_nombre:
             messages.error(request, 'Debes seleccionar tu vínculo con la universidad.')
             return render(request, 'completar_perfil.html', {
-                'roles': roles,
                 'participante': participante
             })
         
         try:
-            # 🔧 CORRECCIÓN: Mapear el nombre del rol del HTML al nombre real en la BD
-            mapeo_roles = {
+            # ✅ Mapeo de valores del formulario a nombres en tipos_participante
+            mapeo_tipos = {
                 'estudiante': 'Estudiante',
-                'trabajador': 'Trabajador',  # o el nombre exacto que tengas en la BD
+                'trabajador': 'Docente',  # O el nombre que tengas en la BD
                 'egresado': 'Egresado',
-                'invitado': 'Invitado'
+                'invitado': 'Otro'  # O el nombre que tengas en la BD
             }
             
-            nombre_rol_bd = mapeo_roles.get(rol_nombre.lower())
+            nombre_tipo_bd = mapeo_tipos.get(tipo_nombre)
             
-            if not nombre_rol_bd:
-                messages.error(request, 'Rol no válido.')
+            if not nombre_tipo_bd:
+                messages.error(request, 'Tipo de participante no válido.')
                 return render(request, 'completar_perfil.html', {
-                    'roles': roles,
                     'participante': participante
                 })
             
-            # Buscar el rol por nombre (no por ID)
-            rol = Roles.objects.get(nombre_rol__iexact=nombre_rol_bd)
+            # ✅ Buscar el tipo_participante en la base de datos
+            from .models import TiposParticipante
+            tipo_participante = TiposParticipante.objects.get(nombre__iexact=nombre_tipo_bd)
             
-            # Actualizar participante con el rol seleccionado
-            participante.roles_id_rol = rol
+            # ✅ Asignar tipo_participante (NO cambiar el rol - roles_id_rol se mantiene como 'Invitado')
+            participante.tipo_participante = tipo_participante
             
-            # Campos opcionales según el rol seleccionado
-            rol_nombre_lower = rol_nombre.lower()
-            
-            if 'estudiante' in rol_nombre_lower:
+            # Procesar campos según el tipo
+            if tipo_nombre == 'estudiante':
+                # CAMPOS REQUERIDOS
                 semestre = request.POST.get('semestre', '').strip()
                 programa = request.POST.get('programa', '').strip()
                 facultad = request.POST.get('facultad', '').strip()
-    
-                if semestre and semestre.isdigit():
+                
+                if not semestre:
+                    messages.error(request, 'El semestre es obligatorio para estudiantes.')
+                    return render(request, 'completar_perfil.html', {'participante': participante})
+                
+                if not programa:
+                    messages.error(request, 'El programa académico es obligatorio para estudiantes.')
+                    return render(request, 'completar_perfil.html', {'participante': participante})
+                
+                if semestre.isdigit():
                     participante.semestre = int(semestre)
-                if programa:
-                    participante.programa = programa
-                if facultad:
-                    participante.facultad = facultad
+                
+                participante.programa = programa
+                participante.facultad = facultad
+                
+                # Género opcional
+                genero = request.POST.get('genero', '').strip()
+                if genero:
+                    participante.genero = genero
             
-            elif 'trabajador' in rol_nombre_lower:
+            elif tipo_nombre == 'trabajador':
+                # Para trabajador, solo género y facultad son opcionales
                 facultad = request.POST.get('facultad', '').strip()
+                genero = request.POST.get('genero', '').strip()
+                
                 if facultad:
                     participante.facultad = facultad
+                if genero:
+                    participante.genero = genero
             
-            elif 'egresado' in rol_nombre_lower:
+            elif tipo_nombre == 'egresado':
+                # Para egresado, programa y género son opcionales
                 programa = request.POST.get('programa', '').strip()
+                genero = request.POST.get('genero', '').strip()
+                
                 if programa:
                     participante.programa = programa
+                if genero:
+                    participante.genero = genero
             
-            # Agregar género (común para todos los roles)
-            genero = request.POST.get('genero', '').strip()
-            if genero:
-                participante.genero = genero
+            elif tipo_nombre == 'invitado':
+                # Para invitado, solo género es opcional
+                genero = request.POST.get('genero', '').strip()
+                if genero:
+                    participante.genero = genero
             
-            # Guardar participante actualizado
+            # Guardar cambios
             participante.save()
             
-            # Asignar al grupo de Django si el rol tiene uno
-            if rol.grupo_d:
-                request.user.groups.add(rol.grupo_d)
-            
-            messages.success(request, f'¡Perfil completado exitosamente como {rol.nombre_rol}!')
+            messages.success(request, f'¡Perfil completado exitosamente como {tipo_participante.nombre}!')
             
             # Redirigir a preferencias
             return redirect('preferences')
             
-        except Roles.DoesNotExist:
-            messages.error(request, f'No se encontró el rol "{nombre_rol_bd}" en la base de datos.')
+        except TiposParticipante.DoesNotExist:
+            messages.error(request, f'No se encontró el tipo "{nombre_tipo_bd}" en la base de datos.')
         except ValueError as e:
-            messages.error(request, 'Error en los datos ingresados. Verifica que el semestre sea un número.')
+            messages.error(request, 'Error en los datos ingresados. Verifica la información.')
         except Exception as e:
             messages.error(request, f'Error al completar el perfil: {str(e)}')
     
     # GET request
     return render(request, 'completar_perfil.html', {
-        'roles': roles,
         'participante': participante
     })

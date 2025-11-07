@@ -49,42 +49,65 @@ def enviar_email(asunto, mensaje, destinatarios):
 
 # ========== FUNCIONES CORREGIDAS CON LÓGICA CLARA ==========
 
+# ========== FUNCIONES CORREGIDAS - AGRUPADAS POR ESTUDIANTE ==========
+
 def obtener_alertas_riesgo():
     """
-    RIESGO CRÍTICO: Estudiantes con muy pocas asistencias Y mucha inactividad
-    - Menos de 2 asistencias totales
-    - Sin asistir en los últimos 21 días
+    RIESGO CRÍTICO: Agrupa por estudiante, lista sus actividades en riesgo
     """
     config = ConfiguracionNotificaciones.obtener_config()
+
+
+    # ✅ USAR timezone.now() en lugar de datetime.now()
     fecha_limite = timezone.now().date() - timedelta(days=config.dias_riesgo_critico)
-    
-    return (
+     
+    # Obtener participaciones en riesgo
+    participaciones = (
         Participaciones.objects
         .annotate(
             total_asistencias=Count('asistencias', distinct=True),
             ultima_asistencia=Max('asistencias__fecha')
         )
-        .filter(
-            total_asistencias__lte=config.umbral_riesgo_critico
-        )
+        .filter(total_asistencias__lte=config.umbral_riesgo_critico)
         .filter(
             Q(ultima_asistencia__lt=fecha_limite) | Q(ultima_asistencia__isnull=True)
         )
         .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('total_asistencias', 'ultima_asistencia')
     )
+    
+    # Agrupar por estudiante
+    estudiantes_riesgo = {}
+    for part in participaciones:
+        estudiante_id = part.participantes_id_participante.id_participante
+        
+        if estudiante_id not in estudiantes_riesgo:
+            estudiantes_riesgo[estudiante_id] = {
+                'participante': part.participantes_id_participante,
+                'actividades': [],
+                'total_asistencias_minimas': 999,
+            }
+        
+        estudiantes_riesgo[estudiante_id]['actividades'].append({
+            'nombre': part.actividades_id_actividad.nombre,
+            'asistencias': part.total_asistencias,
+            'ultima_fecha': part.ultima_asistencia
+        })
+        
+        # Guardar la menor cantidad de asistencias
+        if part.total_asistencias < estudiantes_riesgo[estudiante_id]['total_asistencias_minimas']:
+            estudiantes_riesgo[estudiante_id]['total_asistencias_minimas'] = part.total_asistencias
+    
+    return list(estudiantes_riesgo.values())
 
 
 def obtener_estudiantes_poca_asistencia():
     """
-    BAJA ASISTENCIA: Estudiantes con pocas asistencias pero NO en riesgo crítico
-    - Entre 3 y 5 asistencias
-    - Han asistido en las últimas 3 semanas
+    BAJA ASISTENCIA: Agrupa por estudiante
     """
     config = ConfiguracionNotificaciones.obtener_config()
     fecha_limite_actividad = timezone.now().date() - timedelta(days=21)
     
-    return (
+    participaciones = (
         Participaciones.objects
         .annotate(
             total_asistencias=Count('asistencias', distinct=True),
@@ -96,45 +119,82 @@ def obtener_estudiantes_poca_asistencia():
         )
         .filter(ultima_asistencia__gte=fecha_limite_actividad)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('total_asistencias')
     )
+    
+    estudiantes_baja = {}
+    for part in participaciones:
+        estudiante_id = part.participantes_id_participante.id_participante
+        
+        if estudiante_id not in estudiantes_baja:
+            estudiantes_baja[estudiante_id] = {
+                'participante': part.participantes_id_participante,
+                'actividades': [],
+                'total_participaciones': 0,
+            }
+        
+        estudiantes_baja[estudiante_id]['actividades'].append({
+            'nombre': part.actividades_id_actividad.nombre,
+            'asistencias': part.total_asistencias,
+        })
+        estudiantes_baja[estudiante_id]['total_participaciones'] += part.total_asistencias
+    
+    return list(estudiantes_baja.values())
 
 
 def obtener_estudiantes_inactivos():
     """
-    INACTIVOS: Estudiantes con participación previa pero sin asistir recientemente
-    - Tienen más de 5 asistencias históricas
-    - No han asistido en los últimos 14 días
+    INACTIVOS: Agrupa por estudiante
     """
     config = ConfiguracionNotificaciones.obtener_config()
     fecha_limite = timezone.now().date() - timedelta(days=config.dias_inactividad)
     
-    return (
+    participaciones = (
         Participaciones.objects
         .annotate(
             total_asistencias=Count('asistencias', distinct=True),
             ultima_asistencia=Max('asistencias__fecha')
         )
-        .filter(
-            total_asistencias__gte=config.umbral_baja_asistencia
-        )
+        .filter(total_asistencias__gte=config.umbral_baja_asistencia)
         .filter(
             Q(ultima_asistencia__lt=fecha_limite) | Q(ultima_asistencia__isnull=True)
         )
         .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('-total_asistencias')
     )
+    
+    estudiantes_inactivos = {}
+    for part in participaciones:
+        estudiante_id = part.participantes_id_participante.id_participante
+        
+        if estudiante_id not in estudiantes_inactivos:
+            estudiantes_inactivos[estudiante_id] = {
+                'participante': part.participantes_id_participante,
+                'actividades': [],
+                'dias_inactivo': 0,
+            }
+        
+        estudiantes_inactivos[estudiante_id]['actividades'].append({
+            'nombre': part.actividades_id_actividad.nombre,
+            'ultima_asistencia': part.ultima_asistencia,
+        })
+        
+        # Calcular días de inactividad
+        if part.ultima_asistencia:
+            dias = (timezone.now().date() - part.ultima_asistencia).days
+            if dias > estudiantes_inactivos[estudiante_id]['dias_inactivo']:
+                estudiantes_inactivos[estudiante_id]['dias_inactivo'] = dias
+    
+    return list(estudiantes_inactivos.values())
 
 
 def obtener_proximos_reconocimientos():
     """
-    PRÓXIMOS A RECONOCIMIENTO: Estudiantes cerca de alcanzar el objetivo
+    PRÓXIMOS A RECONOCIMIENTO: Agrupa por estudiante
     """
     config = ConfiguracionNotificaciones.obtener_config()
     meta = config.asistencias_reconocimiento
     margen = config.margen_proximo_reconocimiento
     
-    return (
+    participaciones = (
         Participaciones.objects
         .annotate(
             total_asistencias=Count('asistencias', distinct=True),
@@ -148,31 +208,72 @@ def obtener_proximos_reconocimientos():
             total_asistencias__lt=meta
         )
         .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('-total_asistencias')
     )
+    
+    estudiantes_proximos = {}
+    for part in participaciones:
+        estudiante_id = part.participantes_id_participante.id_participante
+        
+        if estudiante_id not in estudiantes_proximos:
+            estudiantes_proximos[estudiante_id] = {
+                'participante': part.participantes_id_participante,
+                'actividades': [],
+                'menor_faltante': 999,
+            }
+        
+        estudiantes_proximos[estudiante_id]['actividades'].append({
+            'nombre': part.actividades_id_actividad.nombre,
+            'asistencias': part.total_asistencias,
+            'faltantes': part.asistencias_faltantes,
+        })
+        
+        if part.asistencias_faltantes < estudiantes_proximos[estudiante_id]['menor_faltante']:
+            estudiantes_proximos[estudiante_id]['menor_faltante'] = part.asistencias_faltantes
+    
+    return list(estudiantes_proximos.values())
 
 
 def obtener_estudiantes_destacados():
     """
-    DESTACADOS: Estudiantes con excelente participación
+    DESTACADOS: Agrupa por estudiante
     """
     config = ConfiguracionNotificaciones.obtener_config()
     
-    return (
+    participaciones = (
         Participaciones.objects
         .annotate(total_asistencias=Count('asistencias', distinct=True))
         .filter(total_asistencias__gte=config.asistencias_destacado)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('-total_asistencias')
     )
+    
+    estudiantes_destacados = {}
+    for part in participaciones:
+        estudiante_id = part.participantes_id_participante.id_participante
+        
+        if estudiante_id not in estudiantes_destacados:
+            estudiantes_destacados[estudiante_id] = {
+                'participante': part.participantes_id_participante,
+                'actividades': [],
+                'total_asistencias': 0,
+            }
+        
+        estudiantes_destacados[estudiante_id]['actividades'].append({
+            'nombre': part.actividades_id_actividad.nombre,
+            'asistencias': part.total_asistencias,
+        })
+        estudiantes_destacados[estudiante_id]['total_asistencias'] += part.total_asistencias
+    
+    return list(estudiantes_destacados.values())
+
 
 
 def obtener_estudiantes_activos(dias_actividad=14):
     """
-    ACTIVOS: Estudiantes con actividad reciente
+    ACTIVOS: Estudiantes con actividad reciente (agrupados por estudiante)
     """
     fecha_limite = timezone.now().date() - timedelta(days=dias_actividad)
-    return (
+    
+    participaciones = (
         Participaciones.objects
         .annotate(
             asistencias_recientes=Count(
@@ -183,22 +284,46 @@ def obtener_estudiantes_activos(dias_actividad=14):
         )
         .filter(asistencias_recientes__gte=1)
         .select_related('participantes_id_participante', 'actividades_id_actividad')
-        .order_by('-asistencias_recientes')
     )
+    
+    estudiantes_activos = {}
+    for part in participaciones:
+        estudiante_id = part.participantes_id_participante.id_participante
+        
+        if estudiante_id not in estudiantes_activos:
+            estudiantes_activos[estudiante_id] = {
+                'participante': part.participantes_id_participante,
+                'actividades': [],
+                'total_asistencias_recientes': 0,
+            }
+        
+        estudiantes_activos[estudiante_id]['actividades'].append({
+            'nombre': part.actividades_id_actividad.nombre,
+            'asistencias_recientes': part.asistencias_recientes,
+        })
+        estudiantes_activos[estudiante_id]['total_asistencias_recientes'] += part.asistencias_recientes
+    
+    return list(estudiantes_activos.values())
 
 
-# ========== VISTA PRINCIPAL ==========
+  
+
+# ========== VISTA PRINCIPAL ACTUALIZADA ==========
+# Analytics_Reports/views.py
 
 def recomendaciones(request):
-    """Vista principal para mostrar recomendaciones automáticas"""
+    """Vista principal con estudiantes únicos - SIN envío manual"""
     
-    # Obtener todas las categorías
     alertas_riesgo = obtener_alertas_riesgo()
     poca_asistencia = obtener_estudiantes_poca_asistencia()
     estudiantes_inactivos = obtener_estudiantes_inactivos()
     proximos_reconocimientos = obtener_proximos_reconocimientos()
     estudiantes_destacados = obtener_estudiantes_destacados()
     estudiantes_activos = obtener_estudiantes_activos()
+    
+    # ELIMINAR ESTE BLOQUE COMPLETO:
+    # if request.GET.get('enviar_notificaciones') == '1':
+    #     ... todo el código de envío manual ...
     
     context = {
         'alertas_riesgo': alertas_riesgo,
@@ -211,9 +336,7 @@ def recomendaciones(request):
         'config': ConfiguracionNotificaciones.obtener_config()
     }
     
- 
     return render(request, "recomendaciones.html", context)
-
 
 # ========== NOTIFICACIONES ==========
  
@@ -276,237 +399,750 @@ def analytics_index(request):
     return render(request, "index.html")
 
 
-def analisis_comportamiento(request): 
+
+
+
+
+
+
+
+
+#Fin de recomendaciones
+################333
+##################33
+####################
+
+
+
+
+
+
+import csv
+import json
+from django.shortcuts import render
+from django.http import HttpResponse
+from django.db.models import Count, Min, Max, Avg
+ 
+# === ROLES DEL SISTEMA (solo usuarios reales) ===
+ROLES_SISTEMA = ['Estudiante', 'Trabajador', 'Egresado', 'Invitado']
+
+def analisis_comportamiento(request):
+    # === FILTROS (sin min_frecuencia) ===
     tipo_actividad = request.GET.get("tipo_actividad")
-    min_frecuencia = request.GET.get("min_frecuencia")
     export = request.GET.get("export")
-    mostrar_todos = request.GET.get("mostrar_todos")  # Nuevo parámetro
+    mostrar_todos = request.GET.get("mostrar_todos")
+    rol_filtro = request.GET.get("rol")
+    facultad_filtro = request.GET.get("facultad")
+    genero_filtro = request.GET.get("genero")
+    semestre_filtro = request.GET.get("semestre")
+
+    # has_filters SIN min_frecuencia
+    has_filters = bool(tipo_actividad or mostrar_todos or
+                      rol_filtro or facultad_filtro or genero_filtro or semestre_filtro)
+
+    # Datos para gráficos
+    datos_grafico_frecuencia = []
+    datos_grafico_roles = []
+    datos_grafico_facultades = []
+    datos_grafico_tipos_actividad = []
+    datos_grafico_reincidencia = []
+
+    data = None
+    facultades_unicas = 0
+    roles_unicos = 0
+    tipos_actividad_unicos = 0
     
-    # Verificar si hay al menos un filtro aplicado o se solicitó mostrar todos
-    has_filters = bool(tipo_actividad or min_frecuencia or mostrar_todos)
-    
-    # Solo consultar si hay filtros o si se está exportando
+    # === NUEVAS MÉTRICAS RF4.1 ===
+    total_participaciones = 0
+    promedio_participaciones = 0
+    porcentaje_reincidencia = 0
+    total_nuevos = 0
+
     if has_filters or export:
-        # Base queryset: contamos participaciones por participante y tipo de actividad
-        data = (
-            Participaciones.objects.values(
-                "participantes_id_participante__nombre",
-                "participantes_id_participante__correo",
-                "participantes_id_participante__semestre",
-                "participantes_id_participante__facultad",
-                "participantes_id_participante__roles_id_rol__nombre_rol",
-                "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
-            )
-            .annotate(total=Count("id_participacion"))
-            .order_by("participantes_id_participante__semestre")
+        # Base: participaciones por usuario
+        queryset = Participaciones.objects.values(
+            "participantes_id_participante__nombre",
+            "participantes_id_participante__correo",
+            "participantes_id_participante__semestre",
+            "participantes_id_participante__facultad",
+            "participantes_id_participante__genero",
+            "participantes_id_participante__roles_id_rol__nombre_rol",
+            "participantes_id_participante",
+            "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+        ).annotate(
+            total=Count("id_participacion"),
+            primera_participacion=Min("fecha_inscripcion"),
+            ultima_participacion=Max("fecha_inscripcion")
+        ).order_by("-total")
+
+        # === FILTRAR SOLO ROLES DEL SISTEMA ===
+        queryset = queryset.filter(
+            participantes_id_participante__roles_id_rol__nombre_rol__in=ROLES_SISTEMA
         )
 
-        # Filtro por tipo de actividad
+        # Aplicar filtros del usuario (SIN min_frecuencia)
         if tipo_actividad:
-            data = data.filter(
+            queryset = queryset.filter(
                 actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
             )
+        if rol_filtro:
+            queryset = queryset.filter(participantes_id_participante__roles_id_rol__id_rol=rol_filtro)
+        if facultad_filtro:
+            queryset = queryset.filter(participantes_id_participante__facultad=facultad_filtro)
+        if genero_filtro:
+            queryset = queryset.filter(participantes_id_participante__genero=genero_filtro)
+        if semestre_filtro:
+            queryset = queryset.filter(participantes_id_participante__semestre=semestre_filtro)
 
-        # Filtro por frecuencia mínima
-        if min_frecuencia:
-            try:
-                min_freq = int(min_frecuencia)
-                data = data.filter(total__gte=min_freq)
-            except ValueError:
-                pass
+        data = list(queryset)
 
-        # --- EXPORTACIÓN CSV ---
+        # === ESTADÍSTICAS ÚNICAS (para cards de resumen) ===
+        if data:
+            facultades_unicas = len(set(item.get("participantes_id_participante__facultad") 
+                                        for item in data 
+                                        if item.get("participantes_id_participante__facultad")))
+            
+            roles_unicos = len(set(item.get("participantes_id_participante__roles_id_rol__nombre_rol") 
+                                   for item in data 
+                                   if item.get("participantes_id_participante__roles_id_rol__nombre_rol")))
+            
+            tipos_actividad_unicos = len(set(item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo") 
+                                              for item in data 
+                                              if item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo")))
+            
+            # === MÉTRICAS RF4.1 ===
+            total_participaciones = sum(item['total'] for item in data)
+            participantes_unicos_count = len(set(item['participantes_id_participante'] for item in data))
+            promedio_participaciones = round(total_participaciones / participantes_unicos_count, 1) if participantes_unicos_count > 0 else 0
+
+        # === REINCIDENCIA: nuevos vs reincidentes (RF4.1) ===
+        participantes_unicos = {item['participantes_id_participante'] for item in data}
+        nuevos = reincidentes = 0
+
+        for p_id in participantes_unicos:
+            count = Participaciones.objects.filter(participantes_id_participante_id=p_id).count()
+            if count > 1:
+                reincidentes += 1
+            else:
+                nuevos += 1
+        
+        total_nuevos = nuevos
+        porcentaje_reincidencia = round((reincidentes / len(participantes_unicos) * 100), 1) if participantes_unicos else 0
+
+        # === GRÁFICO: Frecuencia de participación ===
+        freq = {'Alta': 0, 'Media': 0, 'Baja': 0}
+        for item in data:
+            t = item['total']
+            if t >= 5:
+                freq['Alta'] += 1
+            elif t >= 2:
+                freq['Media'] += 1
+            else:
+                freq['Baja'] += 1
+
+        datos_grafico_frecuencia = [
+            {'label': 'Alta (5+)', 'value': freq['Alta']},
+            {'label': 'Media (2–4)', 'value': freq['Media']},
+            {'label': 'Baja (1)', 'value': freq['Baja']}
+        ]
+
+        # === GRÁFICO: Roles (solo sistema) ===
+        roles_count = {}
+        for item in data:
+            rol = item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol")
+            roles_count[rol] = roles_count.get(rol, 0) + 1
+
+        datos_grafico_roles = [
+            {'label': rol.title(), 'value': count}
+            for rol, count in sorted(roles_count.items(), key=lambda x: x[1], reverse=True)
+        ]
+
+        # === GRÁFICO: Facultades (top 10) - RF4.2 ===
+        fac_count = {}
+        for item in data:
+            fac = item.get("participantes_id_participante__facultad", "No especificada")
+            if fac and fac != "No especificada":
+                fac_count[fac] = fac_count.get(fac, 0) + 1
+
+        datos_grafico_facultades = [
+            {'label': fac, 'value': count}
+            for fac, count in sorted(fac_count.items(), key=lambda x: x[1], reverse=True)[:10]
+        ]
+
+        # === GRÁFICO: Tipos de actividad - RF4.2 ===
+        tipos_count = {}
+        for item in data:
+            tipo = item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Otro")
+            if tipo and tipo != "Otro":
+                tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
+
+        datos_grafico_tipos_actividad = [
+            {'label': tipo, 'value': count}
+            for tipo, count in sorted(tipos_count.items(), key=lambda x: x[1], reverse=True)
+        ]
+
+        # === GRÁFICO: Reincidencia ===
+        datos_grafico_reincidencia = [
+            {'label': 'Nuevos', 'value': nuevos},
+            {'label': 'Reincidentes', 'value': reincidentes}
+        ]
+
+        # === EXPORTAR CSV ===
         if export == "csv":
-            response = HttpResponse(content_type="text/csv")
-            response["Content-Disposition"] = 'attachment; filename="analisis_comportamiento.csv"'
+            response = HttpResponse(content_type="text/csv; charset=utf-8")
+            response['Content-Disposition'] = 'attachment; filename="estadisticas_participacion.csv"'
+            response.write('\ufeff')  # BOM para Excel
 
             writer = csv.writer(response)
             writer.writerow([
-                "Usuario", "Correo", "Semestre", "Facultad",
-                "Rol", "Tipo de Actividad", "Total Participaciones", "Frecuencia"
+                "Nombre", "Correo", "Semestre", "Facultad", "Género",
+                "Rol", "Tipo Actividad", "Participaciones", "Frecuencia",
+                "Primera vez", "Última vez"
             ])
 
             for item in data:
-                total = item["total"]
-                if total >= 5:
-                    frecuencia = "Alta"
-                elif total >= 2:
-                    frecuencia = "Media"
-                else:
-                    frecuencia = "Baja"
-
+                total = item['total']
+                freq_label = "Alta" if total >= 5 else "Media" if total >= 2 else "Baja"
                 writer.writerow([
-                    item.get("participantes_id_participante__nombre", "N/A"),
+                    item.get("participantes_id_participante__nombre", "Anónimo"),
                     item.get("participantes_id_participante__correo", "N/A"),
                     item.get("participantes_id_participante__semestre", "N/A"),
-                    item.get("participantes_id_participante__facultad", "Sin especificar"),
-                    item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol"),
-                    item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Sin especificar"),
+                    item.get("participantes_id_participante__facultad", "No especificada"),
+                    item.get("participantes_id_participante__genero", "No especificado"),
+                    item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol").title(),
+                    item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Otro"),
                     total,
-                    frecuencia
+                    freq_label,
+                    item.get("primera_participacion", "N/A"),
+                    item.get("ultima_participacion", "N/A")
                 ])
-
             return response
-    else:
-        # No hay filtros aplicados, no mostrar datos
-        data = None
 
-    # --- Render normal ---
+    # === Opciones de filtros (solo roles del sistema) ===
     tipos_actividad = TiposActividad.objects.all().order_by("nombre_tipo")
+    roles = Roles.objects.filter(nombre_rol__in=ROLES_SISTEMA).order_by("nombre_rol")
+    facultades = (Participantes.objects
+                  .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
+                  .exclude(facultad__isnull=True)
+                  .exclude(facultad='')
+                  .values_list('facultad', flat=True).distinct().order_by('facultad'))
+    generos = (Participantes.objects
+               .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
+               .exclude(genero__isnull=True)
+               .exclude(genero='')
+               .values_list('genero', flat=True).distinct())
+    semestres = (Participantes.objects
+                 .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
+                 .exclude(semestre__isnull=True)
+                 .values_list('semestre', flat=True).distinct().order_by('semestre'))
 
-    return render(
-        request,
-        "analisis.html",
-        {
-            "data": data,
-            "tipos_actividad": tipos_actividad,
-            "has_filters": has_filters,
-            "mostrar_todos": mostrar_todos,
-        }
-    )
+    
+    # Al final de la vista, antes del return render:
+    # === Agregar al final de la vista, antes del return render ===
 
- 
+#  
+
+    return render(request, "analisis.html", {
+    "data": data,
+    "tipos_actividad": tipos_actividad,
+    "roles": roles,
+    "facultades": facultades,
+    "generos": generos,
+    "semestres": semestres,
+    "has_filters": has_filters,
+    "mostrar_todos": mostrar_todos,
+    # Estadísticas únicas
+    "facultades_unicas": facultades_unicas,
+    "roles_unicos": roles_unicos,
+    "tipos_actividad_unicos": tipos_actividad_unicos,
+    # === MÉTRICAS RF4.1 ===
+    "total_participaciones": total_participaciones,
+    "promedio_participaciones": promedio_participaciones,
+    "porcentaje_reincidencia": porcentaje_reincidencia,
+    "total_nuevos": total_nuevos,
+    # === NUEVO: Detectar filtro de tipo actividad ===
+    "tipo_actividad_filtrado": tipo_actividad,  # ← AGREGAR ESTA LÍNEA
+    "tipo_actividad_nombre": TiposActividad.objects.get(id_tipo=tipo_actividad).nombre_tipo if tipo_actividad else None,  # ← AGREGAR ESTA LÍNEA
+    # Gráficos
+    "datos_grafico_frecuencia": json.dumps(datos_grafico_frecuencia),
+    "datos_grafico_roles": json.dumps(datos_grafico_roles),
+    "datos_grafico_facultades": json.dumps(datos_grafico_facultades),
+    "datos_grafico_tipos_actividad": json.dumps(datos_grafico_tipos_actividad),
+    "datos_grafico_reincidencia": json.dumps(datos_grafico_reincidencia),
+ })
+
 def participantes_list(request):
     participantes = Participantes.objects.all().order_by("nombre")
     return render(request, "participantes.html", {"participantes": participantes})
+ 
 
+
+from django.db.models import Count, Min, Max
+from django.utils.dateparse import parse_date
+from datetime import datetime, date
+import json
 
 def comparaciones(request):
-    tiempo = request.GET.get("tiempo", "todos")
-    agrupacion = request.GET.get("agrupacion", "facultad")
-    semestre_filtro = request.GET.get("semestre_filtro", "")
+    """Vista mejorada con periodos intersemestrales, filtros por año y múltiples tipos de gráficas"""
     
-    # Variable para controlar si se debe ejecutar la consulta
-    ejecutar_consulta = True
+    tipo_comparacion = request.GET.get("tipo", "periodos_semestrales")
+    agrupacion = request.GET.get("agrupacion", "ninguna")
+    metrica = request.GET.get("metrica", "participaciones")
+    tipo_grafica = request.GET.get("tipo_grafica", "barras")
+    
+    # Filtros para periodos semestrales
+    periodos_semestrales = request.GET.getlist("periodos_semestrales[]")
+    año_inicio_filtro = request.GET.get("año_inicio")
+    año_fin_filtro = request.GET.get("año_fin")
+    
+    # Para comparación de periodos personalizados
+    periodo1_inicio = request.GET.get("periodo1_inicio")
+    periodo1_fin = request.GET.get("periodo1_fin")
+    periodo2_inicio = request.GET.get("periodo2_inicio")
+    periodo2_fin = request.GET.get("periodo2_fin")
+    
+    ejecutar_consulta = False
     mensaje_filtro = None
+    datos_comparacion = []
     
-    # Verificar si los filtros están completos según el tipo de tiempo seleccionado
-    if tiempo == "semestre" and not semestre_filtro:
-        ejecutar_consulta = False
-        mensaje_filtro = "Selecciona un número de semestre para ver los resultados."
-    elif tiempo == "periodo":
-        inicio_str = request.GET.get("inicio")
-        fin_str = request.GET.get("fin")
-        if not inicio_str or not fin_str:
-            ejecutar_consulta = False
-            mensaje_filtro = "Selecciona las fechas de inicio y fin para ver los resultados."
-    
-    resultados = []
-    
-    if ejecutar_consulta:
-        # Lógica de filtrado temporal
-        participaciones_query = Participaciones.objects
-        asistencias_query = Asistencias.objects
-        participantes_query = Participantes.objects
+    # ========== HELPER: Convertir periodo semestral a rango de fechas ==========
+    def periodo_a_fechas(periodo):
+        """
+        Convierte periodo tipo "2024-1", "2024-Intersemestral-1", "2024-2" a fechas
+        Retorna objetos date (no datetime)
+        """
+        partes = periodo.split("-")
+        año = partes[0]
         
-        if tiempo == "semestre" and semestre_filtro:
-            # Filtrar por semestre del estudiante (1, 2, 3, 4, etc.)
-            participaciones_query = participaciones_query.filter(
-                participantes_id_participante__semestre=semestre_filtro
-            )
-            participantes_query = participantes_query.filter(
-                semestre=semestre_filtro
-            )
-            # Para asistencias, filtramos a través de la relación con participaciones
-            asistencias_query = asistencias_query.filter(
-                participaciones_id_participacion__participantes_id_participante__semestre=semestre_filtro
-            )
+        if len(partes) == 2:
+            semestre = partes[1]
+            if semestre == "1":
+                # Semestre 1: Enero - Junio
+                return parse_date(f"{año}-01-01"), parse_date(f"{año}-06-15")
+            elif semestre == "2":
+                # Semestre 2: Agosto - Diciembre
+                return parse_date(f"{año}-08-01"), parse_date(f"{año}-12-15")
         
-        elif tiempo == "periodo":
-            inicio_str = request.GET.get("inicio")
-            fin_str = request.GET.get("fin")
+        elif len(partes) == 3 and partes[1] == "Intersemestral":
+            intersemestre = partes[2]
+            if intersemestre == "1":
+                # Intersemestral 1: Junio - Julio (entre semestre 1 y 2)
+                return parse_date(f"{año}-06-16"), parse_date(f"{año}-07-31")
+            elif intersemestre == "2":
+                # Intersemestral 2: Diciembre - Enero siguiente
+                return parse_date(f"{año}-12-16"), parse_date(f"{int(año)+1}-01-31")
+        
+        return None, None
+    
+    # ========== HELPER: Convertir fecha de DB a date si es datetime ==========
+    def normalizar_fecha(fecha):
+        """Convierte datetime a date si es necesario"""
+        if isinstance(fecha, datetime):
+            return fecha.date()
+        return fecha
+    
+    # ========== COMPARACIÓN ENTRE PERIODOS SEMESTRALES ==========
+    if tipo_comparacion == "periodos_semestrales":
+        if len(periodos_semestrales) < 2:
+            mensaje_filtro = "Selecciona al menos 2 periodos semestrales para comparar."
+        else:
+            ejecutar_consulta = True
             
-            if inicio_str and fin_str:
-                try:
-                    inicio = parse_date(inicio_str.strip())
-                    fin = parse_date(fin_str.strip())
-                    if inicio and fin:
-                        participaciones_query = participaciones_query.filter(
-                            fecha_inscripcion__range=[inicio, fin]
+            for periodo in periodos_semestrales:
+                inicio, fin = periodo_a_fechas(periodo)
+                
+                if not inicio or not fin:
+                    continue
+                
+                participaciones = Participaciones.objects.filter(
+                    fecha_inscripcion__range=[inicio, fin]
+                )
+                
+                # SIN AGRUPAR - Solo totales
+                if agrupacion == "ninguna":
+                    if metrica == "participaciones":
+                        total = participaciones.count()
+                    
+                    elif metrica == "nuevos":
+                        participantes_ids = participaciones.values_list(
+                            'participantes_id_participante', flat=True
+                        ).distinct()
+                        
+                        nuevos = 0
+                        for p_id in participantes_ids:
+                            primera = (
+                                Participaciones.objects
+                                .filter(participantes_id_participante=p_id)
+                                .order_by('fecha_inscripcion')
+                                .first()
+                            )
+                            if primera:
+                                fecha_primera = normalizar_fecha(primera.fecha_inscripcion)
+                                if inicio <= fecha_primera <= fin:
+                                    nuevos += 1
+                        total = nuevos
+                    
+                    elif metrica == "reincidentes":
+                        participantes_ids = participaciones.values_list(
+                            'participantes_id_participante', flat=True
+                        ).distinct()
+                        
+                        reincidentes = 0
+                        for p_id in participantes_ids:
+                            anteriores = (
+                                Participaciones.objects
+                                .filter(participantes_id_participante=p_id)
+                                .filter(fecha_inscripcion__lt=inicio)
+                            )
+                            if anteriores.exists():
+                                reincidentes += 1
+                        total = reincidentes
+                    
+                    datos_comparacion.append({
+                        'label': periodo,
+                        'datos': [{'categoria': 'Total', 'total': total}],
+                        'total': total
+                    })
+                
+                # CON AGRUPACIÓN
+                else:
+                    if agrupacion == "facultad":
+                        campo = "participantes_id_participante__facultad"
+                    elif agrupacion == "genero":
+                        campo = "participantes_id_participante__genero"
+                    elif agrupacion == "rol":
+                        campo = "participantes_id_participante__roles_id_rol__nombre_rol"
+                    elif agrupacion == "semestre_academico":
+                        campo = "participantes_id_participante__semestre"
+                    
+                    if metrica == "participaciones":
+                        resultados = (
+                            participaciones
+                            .values(campo)
+                            .annotate(total=Count("id_participacion"))
+                            .order_by(campo)
                         )
-                        asistencias_query = asistencias_query.filter(
-                            fecha__range=[inicio, fin]
-                        )
-                except (ValueError, TypeError):
-                    pass
-        
-        # Lógica de agrupación
-        if agrupacion == "facultad":
-            resultados = (
-                participaciones_query
-                .values("participantes_id_participante__facultad")
-                .annotate(total=Count("id_participacion"))
-                .order_by("participantes_id_participante__facultad")
-            )
-        elif agrupacion == "genero":
-            resultados = (
-                participaciones_query
-                .values("participantes_id_participante__genero")
-                .annotate(total=Count("id_participacion"))
-                .order_by("participantes_id_participante__genero")
-            )
-        elif agrupacion == "rol":
-            resultados = (
-                participaciones_query
-                .values("participantes_id_participante__roles_id_rol__nombre_rol")
-                .annotate(total=Count("id_participacion"))
-                .order_by("participantes_id_participante__roles_id_rol__nombre_rol")
-            )
-        elif agrupacion == "semestre":
-            resultados = (
-                participaciones_query
-                .values("participantes_id_participante__semestre")
-                .annotate(total=Count("id_participacion"))
-                .order_by("participantes_id_participante__semestre")
-            )
-        
-        # Métricas generales
-        total_asistencias = asistencias_query.count()
-        nuevos = participantes_query.count()
-        reincidencia = (
-            participaciones_query
-            .values("participantes_id_participante")
-            .annotate(total=Count("id_participacion"))
-            .filter(total__gt=1)
-            .count()
-        )
-        
-        metricas = {
-            "total_asistencias": total_asistencias,
-            "nuevos": nuevos,
-            "reincidencia": reincidencia,
-        }
-    else:
-        # No se ejecuta consulta, métricas en 0
-        metricas = {
-            "total_asistencias": 0,
-            "nuevos": 0,
-            "reincidencia": 0,
-        }
+                    
+                    elif metrica == "nuevos":
+                        resultados = []
+                        grupos = participaciones.values_list(campo, flat=True).distinct()
+                        
+                        for grupo in grupos:
+                            participantes_grupo = participaciones.filter(**{campo: grupo}).values_list(
+                                'participantes_id_participante', flat=True
+                            ).distinct()
+                            
+                            nuevos = 0
+                            for p_id in participantes_grupo:
+                                primera = (
+                                    Participaciones.objects
+                                    .filter(participantes_id_participante=p_id)
+                                    .order_by('fecha_inscripcion')
+                                    .first()
+                                )
+                                if primera:
+                                    fecha_primera = normalizar_fecha(primera.fecha_inscripcion)
+                                    if inicio <= fecha_primera <= fin:
+                                        nuevos += 1
+                            
+                            resultados.append({campo: grupo, 'total': nuevos})
+                    
+                    elif metrica == "reincidentes":
+                        resultados = []
+                        grupos = participaciones.values_list(campo, flat=True).distinct()
+                        
+                        for grupo in grupos:
+                            participantes_grupo = participaciones.filter(**{campo: grupo}).values_list(
+                                'participantes_id_participante', flat=True
+                            ).distinct()
+                            
+                            reincidentes = 0
+                            for p_id in participantes_grupo:
+                                anteriores = (
+                                    Participaciones.objects
+                                    .filter(participantes_id_participante=p_id)
+                                    .filter(fecha_inscripcion__lt=inicio)
+                                )
+                                if anteriores.exists():
+                                    reincidentes += 1
+                            
+                            resultados.append({campo: grupo, 'total': reincidentes})
+                    
+                    datos_comparacion.append({
+                        'label': periodo,
+                        'datos': list(resultados),
+                        'total': sum(r['total'] for r in resultados)
+                    })
     
-    # Obtener lista de semestres disponibles desde la base de datos
-    semestres_disponibles = (
-        Participantes.objects
-        .values_list('semestre', flat=True)
-        .distinct()
-        .order_by('semestre')
-    )
-    # Filtrar valores nulos y convertir a lista
-    semestres_disponibles = [s for s in semestres_disponibles if s is not None]
+    # ========== COMPARACIÓN ENTRE PERIODOS PERSONALIZADOS ==========
+    elif tipo_comparacion == "periodos_personalizados":
+        if not all([periodo1_inicio, periodo1_fin, periodo2_inicio, periodo2_fin]):
+            mensaje_filtro = "Completa las fechas de ambos periodos para comparar."
+        else:
+            ejecutar_consulta = True
+            
+            periodos = [
+                {
+                    'inicio': parse_date(periodo1_inicio),
+                    'fin': parse_date(periodo1_fin),
+                    'label': f'Periodo 1 ({periodo1_inicio} a {periodo1_fin})'
+                },
+                {
+                    'inicio': parse_date(periodo2_inicio),
+                    'fin': parse_date(periodo2_fin),
+                    'label': f'Periodo 2 ({periodo2_inicio} a {periodo2_fin})'
+                }
+            ]
+            
+            for periodo in periodos:
+                participaciones = Participaciones.objects.filter(
+                    fecha_inscripcion__range=[periodo['inicio'], periodo['fin']]
+                )
+                
+                # SIN AGRUPAR
+                if agrupacion == "ninguna":
+                    if metrica == "participaciones":
+                        total = participaciones.count()
+                    elif metrica == "nuevos":
+                        participantes_ids = participaciones.values_list(
+                            'participantes_id_participante', flat=True
+                        ).distinct()
+                        
+                        nuevos = 0
+                        for p_id in participantes_ids:
+                            primera = (
+                                Participaciones.objects
+                                .filter(participantes_id_participante=p_id)
+                                .order_by('fecha_inscripcion')
+                                .first()
+                            )
+                            if primera:
+                                fecha_primera = normalizar_fecha(primera.fecha_inscripcion)
+                                if periodo['inicio'] <= fecha_primera <= periodo['fin']:
+                                    nuevos += 1
+                        total = nuevos
+                    
+                    elif metrica == "reincidentes":
+                        participantes_ids = participaciones.values_list(
+                            'participantes_id_participante', flat=True
+                        ).distinct()
+                        
+                        reincidentes = 0
+                        for p_id in participantes_ids:
+                            anteriores = (
+                                Participaciones.objects
+                                .filter(participantes_id_participante=p_id)
+                                .filter(fecha_inscripcion__lt=periodo['inicio'])
+                            )
+                            if anteriores.exists():
+                                reincidentes += 1
+                        total = reincidentes
+                    
+                    datos_comparacion.append({
+                        'label': periodo['label'],
+                        'datos': [{'categoria': 'Total', 'total': total}],
+                        'total': total
+                    })
+                
+                # CON AGRUPACIÓN
+                else:
+                    if agrupacion == "facultad":
+                        campo = "participantes_id_participante__facultad"
+                    elif agrupacion == "genero":
+                        campo = "participantes_id_participante__genero"
+                    elif agrupacion == "rol":
+                        campo = "participantes_id_participante__roles_id_rol__nombre_rol"
+                    elif agrupacion == "semestre_academico":
+                        campo = "participantes_id_participante__semestre"
+                    
+                    if metrica == "participaciones":
+                        resultados = (
+                            participaciones
+                            .values(campo)
+                            .annotate(total=Count("id_participacion"))
+                            .order_by(campo)
+                        )
+                    
+                    elif metrica == "nuevos":
+                        resultados = []
+                        grupos = participaciones.values_list(campo, flat=True).distinct()
+                        
+                        for grupo in grupos:
+                            participantes_grupo = participaciones.filter(**{campo: grupo}).values_list(
+                                'participantes_id_participante', flat=True
+                            ).distinct()
+                            
+                            nuevos = 0
+                            for p_id in participantes_grupo:
+                                primera = (
+                                    Participaciones.objects
+                                    .filter(participantes_id_participante=p_id)
+                                    .order_by('fecha_inscripcion')
+                                    .first()
+                                )
+                                if primera:
+                                    fecha_primera = normalizar_fecha(primera.fecha_inscripcion)
+                                    if periodo['inicio'] <= fecha_primera <= periodo['fin']:
+                                        nuevos += 1
+                            
+                            resultados.append({campo: grupo, 'total': nuevos})
+                    
+                    elif metrica == "reincidentes":
+                        resultados = []
+                        grupos = participaciones.values_list(campo, flat=True).distinct()
+                        
+                        for grupo in grupos:
+                            participantes_grupo = participaciones.filter(**{campo: grupo}).values_list(
+                                'participantes_id_participante', flat=True
+                            ).distinct()
+                            
+                            reincidentes = 0
+                            for p_id in participantes_grupo:
+                                anteriores = (
+                                    Participaciones.objects
+                                    .filter(participantes_id_participante=p_id)
+                                    .filter(fecha_inscripcion__lt=periodo['inicio'])
+                                )
+                                if anteriores.exists():
+                                    reincidentes += 1
+                            
+                            resultados.append({campo: grupo, 'total': reincidentes})
+                    
+                    datos_comparacion.append({
+                        'label': periodo['label'],
+                        'datos': list(resultados),
+                        'total': sum(r['total'] for r in resultados)
+                    })
+    
+    # ========== PREPARAR DATOS PARA GRÁFICAS ==========
+    datos_grafica = {
+        'labels': [],
+        'datasets': []
+    }
+    
+    if ejecutar_consulta and datos_comparacion:
+        # Sin agrupar - gráfica simple
+        if agrupacion == "ninguna":
+            datos_grafica['labels'] = [grupo['label'] for grupo in datos_comparacion]
+            datos_grafica['datasets'] = [{
+                'label': metrica.capitalize(),
+                'data': [grupo['total'] for grupo in datos_comparacion],
+                'backgroundColor': 'rgba(0, 123, 255, 0.6)',
+                'borderColor': '#007bff',
+                'borderWidth': 2,
+                'fill': tipo_grafica == 'area'
+            }]
+        
+        # Con agrupación - gráfica comparativa
+        else:
+            categorias = set()
+            for grupo in datos_comparacion:
+                for dato in grupo['datos']:
+                    if agrupacion == "facultad":
+                        cat = dato.get('participantes_id_participante__facultad', 'Sin especificar')
+                    elif agrupacion == "genero":
+                        cat = dato.get('participantes_id_participante__genero', 'Sin especificar')
+                    elif agrupacion == "rol":
+                        cat = dato.get('participantes_id_participante__roles_id_rol__nombre_rol', 'Sin especificar')
+                    elif agrupacion == "semestre_academico":
+                        cat = f"Semestre {dato.get('participantes_id_participante__semestre', 'N/A')}"
+                    categorias.add(cat)
+            
+            datos_grafica['labels'] = sorted(list(categorias))
+            
+            colores = [
+                'rgba(0, 123, 255, 0.6)',
+                'rgba(40, 167, 69, 0.6)',
+                'rgba(255, 193, 7, 0.6)',
+                'rgba(220, 53, 69, 0.6)',
+                'rgba(111, 66, 193, 0.6)',
+                'rgba(23, 162, 184, 0.6)'
+            ]
+            
+            colores_borde = ['#007bff', '#28a745', '#ffc107', '#dc3545', '#6f42c1', '#17a2b8']
+            
+            for idx, grupo in enumerate(datos_comparacion):
+                valores = []
+                datos_dict = {}
+                
+                for dato in grupo['datos']:
+                    if agrupacion == "facultad":
+                        key = dato.get('participantes_id_participante__facultad', 'Sin especificar')
+                    elif agrupacion == "genero":
+                        key = dato.get('participantes_id_participante__genero', 'Sin especificar')
+                    elif agrupacion == "rol":
+                        key = dato.get('participantes_id_participante__roles_id_rol__nombre_rol', 'Sin especificar')
+                    elif agrupacion == "semestre_academico":
+                        key = f"Semestre {dato.get('participantes_id_participante__semestre', 'N/A')}"
+                    datos_dict[key] = dato['total']
+                
+                for categoria in datos_grafica['labels']:
+                    valores.append(datos_dict.get(categoria, 0))
+                
+                datos_grafica['datasets'].append({
+                    'label': grupo['label'],
+                    'data': valores,
+                    'backgroundColor': colores[idx % len(colores)],
+                    'borderColor': colores_borde[idx % len(colores_borde)],
+                    'borderWidth': 2,
+                    'fill': tipo_grafica == 'area'
+                })
+    
+    # ========== GENERAR PERIODOS DISPONIBLES CON FILTRO POR AÑO ==========
+    periodos_disponibles = []
+    años_disponibles = []
+    fecha_min = Participaciones.objects.aggregate(Min('fecha_inscripcion'))['fecha_inscripcion__min']
+    fecha_max = Participaciones.objects.aggregate(Max('fecha_inscripcion'))['fecha_inscripcion__max']
+    
+    if fecha_min and fecha_max:
+        # Normalizar fechas si son datetime
+        fecha_min = normalizar_fecha(fecha_min)
+        fecha_max = normalizar_fecha(fecha_max)
+        
+        año_min = fecha_min.year
+        año_max = fecha_max.year
+        
+        # Generar lista de años disponibles
+        años_disponibles = list(range(año_min, año_max + 1))
+        
+        # Aplicar filtro de años si se seleccionó
+        if año_inicio_filtro and año_fin_filtro:
+            año_inicio_rango = int(año_inicio_filtro)
+            año_fin_rango = int(año_fin_filtro)
+        else:
+            # Por defecto mostrar últimos 3 años
+            año_inicio_rango = max(año_min, año_max - 2)
+            año_fin_rango = año_max
+        
+        # Generar periodos (semestrales + intersemestrales)
+        for año in range(año_inicio_rango, año_fin_rango + 1):
+            periodos_disponibles.append(f"{año}-1")
+            periodos_disponibles.append(f"{año}-Intersemestral-1")
+            periodos_disponibles.append(f"{año}-2")
+            if año < año_fin_rango:
+                periodos_disponibles.append(f"{año}-Intersemestral-2")
     
     context = {
-        "tiempo": tiempo,
+        "tipo_comparacion": tipo_comparacion,
         "agrupacion": agrupacion,
-        "semestre_filtro": semestre_filtro,
-        "semestres_disponibles": semestres_disponibles,
-        "resultados": resultados,
-        "metricas": metricas,
+        "metrica": metrica,
+        "tipo_grafica": tipo_grafica,
+        "periodos_semestrales": periodos_semestrales,
+        "periodos_disponibles": periodos_disponibles,
+        "años_disponibles": años_disponibles,
+        "año_inicio_filtro": int(año_inicio_filtro) if año_inicio_filtro else (años_disponibles[-3] if len(años_disponibles) >= 3 else años_disponibles[0] if años_disponibles else None),
+        "año_fin_filtro": int(año_fin_filtro) if año_fin_filtro else (años_disponibles[-1] if años_disponibles else None),
+        "datos_comparacion": datos_comparacion,
+        "datos_grafica": json.dumps(datos_grafica),
         "ejecutar_consulta": ejecutar_consulta,
         "mensaje_filtro": mensaje_filtro,
+        "periodo1_inicio": periodo1_inicio,
+        "periodo1_fin": periodo1_fin,
+        "periodo2_inicio": periodo2_inicio,
+        "periodo2_fin": periodo2_fin,
     }
     
     return render(request, "comparaciones.html", context)
-
 
 
 

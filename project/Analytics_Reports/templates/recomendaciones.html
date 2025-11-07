@@ -9,380 +9,424 @@
 
 {% block extra_css %}
 <style>
-    .alert-card {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        margin-bottom: 20px;
-        overflow: hidden;
+    .dashboard-container {
+        max-width: 1400px;
+        margin: 0 auto;
     }
     
-    .alert-header {
-        padding: 15px 20px;
-        font-weight: bold;
-        color: white;
-    }
-    
-    .alert-content {
-        padding: 20px;
-    }
-    
-    .alert-danger .alert-header { background-color: #dc3545; }
-    .alert-warning .alert-header { background-color: #ffc107; color: #212529; }
-    .alert-success .alert-header { background-color: #28a745; }
-    .alert-info .alert-header { background-color: #17a2b8; }
-    
-    .student-item {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 10px;
-        border-bottom: 1px solid #eee;
-    }
-    
-    .student-item:last-child {
-        border-bottom: none;
-    }
-    
-    .student-info {
-        flex: 1;
-    }
-    
-    .student-name {
-        font-weight: 500;
-        margin-bottom: 4px;
-    }
-    
-    .student-details {
-        font-size: 0.9em;
-        color: #666;
-    }
-    
-    .badge {
-        padding: 4px 8px;
-        border-radius: 12px;
-        font-size: 0.8em;
-        font-weight: 500;
-    }
-    
-    .badge-danger {
-        background-color: #dc3545;
-        color: white;
-    }
-    
-    .badge-warning {
-        background-color: #ffc107;
-        color: #212529;
-    }
-    
-    .badge-success {
-        background-color: #28a745;
-        color: white;
-    }
-    
-    .badge-info {
-        background-color: #17a2b8;
-        color: white;
-    }
-    
-    .action-buttons {
-        margin-top: 15px;
-    }
-    
-    .btn {
-        padding: 8px 16px;
-        border: none;
-        border-radius: 4px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        margin-right: 10px;
-        font-size: 0.9em;
-    }
-    
-    .btn-primary {
-        background-color: #007bff;
-        color: white;
-    }
-    
-    .btn-success {
-        background-color: #28a745;
-        color: white;
-    }
-    
-    .btn-secondary {
-        background-color: #6c757d;
-        color: white;
-    }
-    
-    .stats-grid {
+    .stats-overview {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
         gap: 20px;
         margin-bottom: 30px;
     }
     
     .stat-card {
         background: white;
-        border-radius: 8px;
-        padding: 20px;
-        text-align: center;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        position: relative;
+        overflow: hidden;
     }
     
-    .stat-number {
-        font-size: 2em;
-        font-weight: bold;
-        color: #007bff;
+    .stat-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
     }
+    
+    .stat-card.danger::before { background: #dc3545; }
+    .stat-card.warning::before { background: #ffc107; }
+    .stat-card.info::before { background: #17a2b8; }
+    .stat-card.success::before { background: #28a745; }
+    
+    .stat-number {
+        font-size: 2.5em;
+        font-weight: bold;
+        margin-bottom: 5px;
+    }
+    
+    .stat-card.danger .stat-number { color: #dc3545; }
+    .stat-card.warning .stat-number { color: #ffc107; }
+    .stat-card.info .stat-number { color: #17a2b8; }
+    .stat-card.success .stat-number { color: #28a745; }
     
     .stat-label {
         color: #666;
-        font-size: 0.9em;
-        margin-top: 5px;
+        font-size: 0.95em;
     }
+    
+    .stat-icon {
+        position: absolute;
+        right: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 3em;
+        opacity: 0.1;
+    }
+    
+    .action-bar {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 30px;
+        flex-wrap: wrap;
+    }
+    
+    .btn-action {
+        padding: 12px 24px;
+        border-radius: 8px;
+        border: none;
+        font-weight: 500;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: all 0.3s ease;
+    }
+    
+    .btn-action:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .btn-primary { 
+        background: linear-gradient(135deg, #007bff 0%, #0056b3 100%); 
+        color: white; 
+    }
+    
+    .btn-secondary { 
+        background: #6c757d; 
+        color: white; 
+    }
+    
+    .btn-info { 
+        background: #17a2b8; 
+        color: white; 
+    }
+    
+    .charts-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .chart-card {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+    }
+    
+    .chart-title {
+        font-size: 1.2em;
+        font-weight: 600;
+        margin-bottom: 20px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .chart-container {
+        position: relative;
+        height: 300px;
+    }
+    
+    .details-section {
+        background: white;
+        border-radius: 12px;
+        padding: 25px;
+        box-shadow: 0 2px 15px rgba(0,0,0,0.08);
+        margin-bottom: 25px;
+    }
+    
+    .collapsible-header {
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .collapsible-header:hover {
+        background: #e9ecef;
+    }
+    
+    .student-list {
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    
+    .student-item {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .student-item:hover {
+        background: #f8f9fa;
+    }
+    
+    .badge {
+        padding: 5px 12px;
+        border-radius: 20px;
+        font-size: 0.85em;
+        font-weight: 500;
+    }
+    
+    .badge-danger { background: #dc3545; color: white; }
+    .badge-warning { background: #ffc107; color: #212529; }
+    .badge-info { background: #17a2b8; color: white; }
+    .badge-success { background: #28a745; color: white; }
     
     .empty-state {
         text-align: center;
-        color: #666;
-        font-style: italic;
-        padding: 20px;
+        padding: 40px;
+        color: #999;
     }
     
-    .last-updated {
-        font-size: 0.8em;
-        color: #999;
-        text-align: right;
-        margin-bottom: 20px;
+    .empty-state i {
+        font-size: 3em;
+        margin-bottom: 15px;
+        opacity: 0.3;
     }
 </style>
 {% endblock %}
 
-{% block content %}
-<div class="container-fluid">
-    <div class="row">
-        <div class="col-12">
-            <h2>
-                <i class="fas fa-chart-line"></i>
-                Recomendaciones y Alertas Automáticas
-            </h2>
-            
-            <div class="last-updated">
-                Última actualización: {{ fecha_actualizacion|date:"d/m/Y H:i" }}
-            </div>
-            
-            <!-- Estadísticas generales -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-number">{{ poca_asistencia|length }}</div>
-                    <div class="stat-label">Baja Asistencia</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">{{ estudiantes_inactivos|length }}</div>
-                    <div class="stat-label">Estudiantes Inactivos</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">{{ proximos_reconocimientos|length }}</div>
-                    <div class="stat-label">Próximos a Reconocimiento</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">{{ estudiantes_destacados|length }}</div>
-                    <div class="stat-label">Estudiantes Destacados</div>
-                </div>
-                <div class="stat-card">
-                  <div class="stat-number">{{ estudiantes_activos|length }}</div>
-                  <div class="stat-label">Estudiantes Activos</div>
-              </div>
-            </div>
-            
-            <!-- Botones de acción -->
-            <div class="action-buttons">
-                <a href="?enviar_notificaciones=1" class="btn btn-primary">
-                    <i class="fas fa-envelope"></i>
-                    Enviar Notificaciones Automáticas
-                </a>
-                <a href="{% url 'Analytics_Reports:configurar_notificaciones' %}" class="btn btn-secondary">
-                    <i class="fas fa-cog"></i>
-                    Configurar Alertas
-                </a>
-              
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- Alertas de Riesgo Crítico -->
-        <div class="col-md-6">
-            <div class="alert-card alert-danger">
-                <div class="alert-header">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Alertas de Riesgo Crítico ({{ alertas_riesgo|length }})
-                </div>
-                <div class="alert-content">
-                    {% if alertas_riesgo %}
-                        {% for estudiante in alertas_riesgo %}
-                            <div class="student-item">
-                                <div class="student-info">
-                                    <div class="student-name">{{ estudiante.participantes_id_participante.nombre }} {{ estudiante.participantes_id_participante.apellido }}</div>
-                                    <div class="student-details">
-                                        {{ estudiante.actividades_id_actividad.nombre }} • 
-                                        {{ estudiante.total_asistencias }} asistencias
-                                    </div>
-                                </div>
-                                <span class="badge badge-danger">Riesgo Alto</span>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="fas fa-check-circle"></i>
-                            No hay estudiantes en riesgo crítico
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Estudiantes con Poca Asistencia -->
-        <div class="col-md-6">
-            <div class="alert-card alert-warning">
-                <div class="alert-header">
-                    <i class="fas fa-user-clock"></i>
-                    Baja Asistencia ({{ poca_asistencia|length }})
-                </div>
-                <div class="alert-content">
-                    {% if poca_asistencia %}
-                        {% for estudiante in poca_asistencia %}
-                            <div class="student-item">
-                                <div class="student-info">
-                                    <div class="student-name">{{ estudiante.participantes_id_participante.nombre }} {{ estudiante.participantes_id_participante.apellido }}</div>
-                                    <div class="student-details">
-                                        {{ estudiante.actividades_id_actividad.nombre }} • 
-                                        {{ estudiante.total_asistencias }} asistencias
-                                    </div>
-                                </div>
-                                <span class="badge badge-warning">{{ estudiante.total_asistencias }} asistencias</span>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="fas fa-thumbs-up"></i>
-                            Todos los estudiantes tienen buena asistencia
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <div class="row">
-        <!-- Estudiantes Inactivos -->
-        <div class="col-md-6">
-            <div class="alert-card alert-info">
-                <div class="alert-header">
-                    <i class="fas fa-user-times"></i>
-                    Estudiantes Inactivos ({{ estudiantes_inactivos|length }})
-                </div>
-                <div class="alert-content">
-                    {% if estudiantes_inactivos %}
-                        {% for estudiante in estudiantes_inactivos %}
-                            <div class="student-item">
-                                <div class="student-info">
-                                    <div class="student-name">{{ estudiante.participantes_id_participante.nombre }} {{ estudiante.participantes_id_participante.apellido }}</div>
-                                    <div class="student-details">
-                                        {{ estudiante.actividades_id_actividad.nombre }}
-                                    </div>
-                                </div>
-                                <span class="badge badge-info">Sin actividad reciente</span>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="fas fa-users"></i>
-                            Todos los estudiantes están activos
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-        
-        <!-- Próximos a Reconocimiento -->
-        <div class="col-md-6">
-            <div class="alert-card alert-success">
-                <div class="alert-header">
-                    <i class="fas fa-trophy"></i>
-                    Próximos a Reconocimiento ({{ proximos_reconocimientos|length }})
-                </div>
-                <div class="alert-content">
-                    {% if proximos_reconocimientos %}
-                        {% for estudiante in proximos_reconocimientos %}
-                            <div class="student-item">
-                                <div class="student-info">
-                                    <div class="student-name">{{ estudiante.participantes_id_participante.nombre }} {{ estudiante.participantes_id_participante.apellido }}</div>
-                                    <div class="student-details">
-                                        {{ estudiante.actividades_id_actividad.nombre }} • 
-                                        Faltan {{ estudiante.asistencias_faltantes }} asistencias
-                                    </div>
-                                </div>
-                                <span class="badge badge-success">{{ estudiante.total_asistencias }}/10</span>
-                            </div>
-                        {% endfor %}
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="fas fa-medal"></i>
-                            No hay estudiantes próximos a reconocimientos
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Estudiantes Destacados -->
-    <div class="row">
-        <div class="col-12">
-            <div class="alert-card alert-success">
-                <div class="alert-header">
-                    <i class="fas fa-star"></i>
-                    Estudiantes Destacados ({{ estudiantes_destacados|length }})
-                </div>
-                <div class="alert-content">
-                    {% if estudiantes_destacados %}
-                        <div class="row">
-                            {% for estudiante in estudiantes_destacados %}
-                                <div class="col-md-4">
-                                    <div class="student-item">
-                                        <div class="student-info">
-                                            <div class="student-name">{{ estudiante.participantes_id_participante.nombre }} {{ estudiante.participantes_id_participante.apellido }}</div>
-                                            <div class="student-details">
-                                                {{ estudiante.actividades_id_actividad.nombre }}<br>
-                                                {{ estudiante.total_asistencias }} asistencias
-                                            </div>
-                                        </div>
-                                        <span class="badge badge-success">Destacado</span>
-                                    </div>
-                                </div>
-                            {% endfor %}
-                        </div>
-                    {% else %}
-                        <div class="empty-state">
-                            <i class="fas fa-chart-line"></i>
-                            No hay estudiantes destacados aún
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-function actualizarDatos() {
-    location.reload();
-}
-
-// Auto-refresh cada 5 minutos
-setTimeout(function() {
-    location.reload();
-}, 300000);
+document.addEventListener('DOMContentLoaded', function() {
+    // Configuración común de gráficos
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom'
+            }
+        }
+    };
+    
+    // Gráfico de distribución de alertas
+    const alertasCtx = document.getElementById('chartAlertas');
+    if (alertasCtx) {
+        new Chart(alertasCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Riesgo Crítico', 'Baja Asistencia', 'Inactivos', 'Activos'],
+                datasets: [{
+                    data: [
+                        {{ alertas_riesgo|length }},
+                        {{ poca_asistencia|length }},
+                        {{ estudiantes_inactivos|length }},
+                        {{ estudiantes_activos|length }}
+                    ],
+                    backgroundColor: [
+                        '#dc3545',
+                        '#ffc107',
+                        '#17a2b8',
+                        '#28a745'
+                    ],
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                ...commonOptions,
+                plugins: {
+                    ...commonOptions.plugins,
+                    title: {
+                        display: false
+                    }
+                }
+            }
+        });
+    }
+    
+    // Gráfico de reconocimientos y destacados
+    const reconocimientosCtx = document.getElementById('chartReconocimientos');
+    if (reconocimientosCtx) {
+        new Chart(reconocimientosCtx, {
+            type: 'bar',
+            data: {
+                labels: ['Próximos a Reconocimiento', 'Destacados'],
+                datasets: [{
+                    label: 'Estudiantes',
+                    data: [
+                        {{ proximos_reconocimientos|length }},
+                        {{ estudiantes_destacados|length }}
+                    ],
+                    backgroundColor: [
+                        'rgba(40, 167, 69, 0.7)',
+                        'rgba(40, 167, 69, 0.9)'
+                    ],
+                    borderColor: '#28a745',
+                    borderWidth: 2
+                }]
+            },
+            options: {
+                ...commonOptions,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+    }
+    
+    // Toggle detalles colapsables
+    document.querySelectorAll('.collapsible-header').forEach(header => {
+        header.addEventListener('click', function() {
+            const content = this.nextElementSibling;
+            const icon = this.querySelector('.toggle-icon');
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                icon.classList.remove('fa-chevron-down');
+                icon.classList.add('fa-chevron-up');
+            } else {
+                content.style.display = 'none';
+                icon.classList.remove('fa-chevron-up');
+                icon.classList.add('fa-chevron-down');
+            }
+        });
+    });
+});
 </script>
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <h2 style="margin-bottom: 10px;">
+        <i class="fas fa-chart-line"></i>
+        Sistema de Recomendaciones Automáticas
+    </h2>
+    
+    <p style="color: #666; margin-bottom: 30px;">
+        Última actualización: {{ fecha_actualizacion|date:"d/m/Y H:i" }}
+    </p>
+    
+    <!-- Estadísticas generales -->
+    <div class="stats-overview">
+        <div class="stat-card danger">
+            <div class="stat-number">{{ alertas_riesgo|length }}</div>
+            <div class="stat-label">Riesgo Crítico</div>
+            <i class="fas fa-exclamation-triangle stat-icon"></i>
+        </div>
+        <div class="stat-card warning">
+            <div class="stat-number">{{ poca_asistencia|length }}</div>
+            <div class="stat-label">Baja Asistencia</div>
+            <i class="fas fa-user-clock stat-icon"></i>
+        </div>
+        <div class="stat-card info">
+            <div class="stat-number">{{ estudiantes_inactivos|length }}</div>
+            <div class="stat-label">Inactivos</div>
+            <i class="fas fa-user-times stat-icon"></i>
+        </div>
+        <div class="stat-card success">
+            <div class="stat-number">{{ estudiantes_destacados|length }}</div>
+            <div class="stat-label">Destacados</div>
+            <i class="fas fa-star stat-icon"></i>
+        </div>
+    </div>
+    
+    <!-- REEMPLAZAR CON: -->
+<div class="alert alert-info" style="margin-bottom: 30px; border-radius: 12px;">
+    <i class="fas fa-info-circle"></i>
+    <strong>Sistema Automático Activo:</strong>
+    Las notificaciones se envían automáticamente según la programación configurada.
+    <a href="{% url 'Analytics_Reports:configurar_notificaciones' %}" style="margin-left: 10px;">
+        Ver configuración →
+    </a>
+</div>
+    
+    <!-- Gráficos -->
+    <div class="charts-grid">
+        <div class="chart-card">
+            <div class="chart-title">
+                <i class="fas fa-chart-pie"></i>
+                Distribución de Estudiantes
+            </div>
+            <div class="chart-container">
+                <canvas id="chartAlertas"></canvas>
+            </div>
+        </div>
+        
+        <div class="chart-card">
+            <div class="chart-title">
+                <i class="fas fa-trophy"></i>
+                Reconocimientos y Destacados
+            </div>
+            <div class="chart-container">
+                <canvas id="chartReconocimientos"></canvas>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Detalles colapsables -->
+    {% if alertas_riesgo %}
+    <div class="details-section">
+        <div class="collapsible-header">
+            <div>
+                <i class="fas fa-exclamation-triangle" style="color: #dc3545;"></i>
+                <strong>Estudiantes en Riesgo Crítico ({{ alertas_riesgo|length }})</strong>
+            </div>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="student-list" style="display: none;">
+            {% for est in alertas_riesgo %}
+                <div class="student-item">
+                    <div>
+                        <strong>{{ est.participante.nombre }} {{ est.participante.apellido }}</strong>
+                        <div style="font-size: 0.85em; color: #666;">
+                            {{ est.actividades|length }} actividad{% if est.actividades|length != 1 %}es{% endif %}
+                        </div>
+                    </div>
+                    <span class="badge badge-danger">{{ est.total_asistencias_minimas }} asist.</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if estudiantes_destacados %}
+    <div class="details-section">
+        <div class="collapsible-header">
+            <div>
+                <i class="fas fa-star" style="color: #28a745;"></i>
+                <strong>Estudiantes Destacados ({{ estudiantes_destacados|length }})</strong>
+            </div>
+            <i class="fas fa-chevron-down toggle-icon"></i>
+        </div>
+        <div class="student-list" style="display: none;">
+            {% for est in estudiantes_destacados %}
+                <div class="student-item">
+                    <div>
+                        <strong>{{ est.participante.nombre }} {{ est.participante.apellido }}</strong>
+                        <div style="font-size: 0.85em; color: #666;">
+                            {{ est.actividades|length }} actividad{% if est.actividades|length != 1 %}es{% endif %}
+                        </div>
+                    </div>
+                    <span class="badge badge-success">⭐ {{ est.total_asistencias }} asist.</span>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

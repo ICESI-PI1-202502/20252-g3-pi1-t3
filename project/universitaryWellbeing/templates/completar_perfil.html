@@ -239,59 +239,58 @@
                 ¿Cuál es tu vínculo con la universidad?
             </h2>
 
-            <!-- Solo mostrar roles sin permisos (beneficiarios) -->
-            <div class="roles-grid">
-                <label class="role-item" onclick="selectRole(this, 'estudiante')">
-                    <input 
-                        type="radio" 
-                        name="rol" 
-                        value="estudiante" 
-                        id="rol_estudiante"
-                        required
-                    >
-                    Estudiante
-                </label>
+           <div class="roles-grid">
+    <label class="role-item" onclick="selectRole(this, 'estudiante')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="estudiante" 
+            id="rol_estudiante"
+            required
+        >
+        Estudiante
+    </label>
 
-                <label class="role-item" onclick="selectRole(this, 'trabajador')">
-                    <input 
-                        type="radio" 
-                        name="rol" 
-                        value="trabajador" 
-                        id="rol_trabajador"
-                        required
-                    >
-                    Trabajador (Docente, Administrativo, etc.)
-                </label>
+    <label class="role-item" onclick="selectRole(this, 'trabajador')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="trabajador" 
+            id="rol_trabajador"
+            required
+        >
+        Trabajador (Docente, Administrativo, etc.)
+    </label>
 
-                <label class="role-item" onclick="selectRole(this, 'egresado')">
-                    <input 
-                        type="radio" 
-                        name="rol" 
-                        value="egresado" 
-                        id="rol_egresado"
-                        required
-                    >
-                    Egresado
-                </label>
+    <label class="role-item" onclick="selectRole(this, 'egresado')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="egresado" 
+            id="rol_egresado"
+            required
+        >
+        Egresado
+    </label>
 
-                <label class="role-item" onclick="selectRole(this, 'invitado')">
-                    <input 
-                        type="radio" 
-                        name="rol" 
-                        value="invitado" 
-                        id="rol_invitado"
-                        required
-                    >
-                    Invitado/Externo
-                </label>
-            </div>
+    <label class="role-item" onclick="selectRole(this, 'invitado')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="invitado" 
+            id="rol_invitado"
+            required
+        >
+        Invitado/Externo
+    </label>
+</div>
 
             <!-- Campos extra - ESTUDIANTE -->
             <div id="extra-estudiante" class="extra-fields">
                 <h4>📚 Información adicional - Estudiante</h4>
                 <div class="field-group">
                     <div class="field">
-                        <select name="semestre" id="semestre_estudiante" required>
+                        <select name="semestre" id="semestre_estudiante">
                             <option value="">Selecciona tu semestre *</option>
                             {% for i in "123456789"|make_list %}
                             <option value="{{ forloop.counter }}">Semestre {{ forloop.counter }}</option>
@@ -311,7 +310,7 @@
                 </div>
                 <div class="field-group">
                     <div class="field" style="grid-column: 1 / -1;">
-                        <select name="programa" id="programa_estudiante" required>
+                        <select name="programa" id="programa_estudiante">
                             <option value="">Selecciona tu programa académico *</option>
                             <optgroup label="Ciencias de la Salud">
                                 <option value="Bacteriología y Laboratorio Clínico" data-facultad="Ciencias de la Salud">Bacteriología y Laboratorio Clínico</option>
@@ -349,7 +348,6 @@
                                 <option value="Sociología" data-facultad="Ciencias Humanas">Sociología</option>
                             </optgroup>
                         </select>
-                        <!-- Campo oculto para la facultad (se llena automáticamente) -->
                         <input type="hidden" name="facultad" id="facultad_estudiante">
                     </div>
                 </div>
@@ -441,7 +439,9 @@
         document.getElementById('rol_' + roleName).checked = true;
         currentRole = roleName;
         
-        // Habilitar botón
+        console.log('✅ Rol seleccionado:', roleName);
+        
+        // ✅ SIEMPRE habilitar el botón cuando se selecciona un rol
         document.getElementById('submitBtn').disabled = false;
         
         // Ocultar todos los campos extra
@@ -455,33 +455,78 @@
         if (extraFields) {
             extraFields.classList.add('show');
         }
+        
+        // ✅ Remover atributo required de campos que no pertenecen al rol actual
+        removeRequiredFromOtherRoles(roleName);
     }
     
-    // 🎯 NUEVO: Auto-llenar la facultad cuando se selecciona un programa
-    document.getElementById('programa_estudiante').addEventListener('change', function() {
-        const selectedOption = this.options[this.selectedIndex];
-        const facultad = selectedOption.getAttribute('data-facultad');
+    // ✅ NUEVA FUNCIÓN: Remover required de otros roles
+    function removeRequiredFromOtherRoles(selectedRole) {
+        const allRoles = ['estudiante', 'trabajador', 'egresado', 'invitado'];
         
-        if (facultad) {
-            document.getElementById('facultad_estudiante').value = facultad;
-            console.log('✅ Facultad auto-completada:', facultad);
-        }
-    });
+        allRoles.forEach(rol => {
+            const section = document.getElementById('extra-' + rol);
+            if (section) {
+                const inputs = section.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (rol === selectedRole) {
+                        // Solo estudiante tiene campos requeridos
+                        if (rol === 'estudiante') {
+                            if (input.id === 'semestre_estudiante' || input.id === 'programa_estudiante') {
+                                // No cambiar nada, mantener validación en frontend si existe
+                            }
+                        }
+                    } else {
+                        // Remover required de roles no seleccionados
+                        input.removeAttribute('required');
+                    }
+                });
+            }
+        });
+    }
     
-    // 🔧 Validar y limpiar campos antes de enviar
-    document.getElementById('profileForm').addEventListener('submit', function(e) {
-        if (!document.querySelector('input[name="rol"]:checked')) {
-            e.preventDefault();
-            alert('Por favor, selecciona tu vínculo con la universidad.');
-            return;
-        }
+    // Auto-llenar la facultad cuando se selecciona un programa (estudiante)
+    const programaSelect = document.getElementById('programa_estudiante');
+    if (programaSelect) {
+        programaSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const facultad = selectedOption.getAttribute('data-facultad');
+            
+            if (facultad) {
+                document.getElementById('facultad_estudiante').value = facultad;
+                console.log('✅ Facultad auto-completada:', facultad);
+            }
+        });
+    }
+    
+    // Validar antes de enviar
+    // Validar antes de enviar
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    if (!document.querySelector('input[name="tipo_participante"]:checked')) {  // ✅ CAMBIO AQUÍ
+        e.preventDefault();
+        alert('Por favor, selecciona tu vínculo con la universidad.');
+        return;
+    }
 
-        console.log('🚀 Enviando formulario. Rol seleccionado:', currentRole);
-
-        // 🎯 NUEVO: Si es estudiante, verificar que tenga facultad
+    console.log('🚀 Enviando formulario. Tipo seleccionado:', currentRole);
+    
+        // ✅ Validación específica para estudiantes
         if (currentRole === 'estudiante') {
+            const semestre = document.getElementById('semestre_estudiante').value;
             const programa = document.getElementById('programa_estudiante').value;
             const facultad = document.getElementById('facultad_estudiante').value;
+            
+            if (!semestre) {
+                e.preventDefault();
+                alert('Por favor, selecciona tu semestre.');
+                return;
+            }
+            
+            if (!programa) {
+                e.preventDefault();
+                alert('Por favor, selecciona tu programa académico.');
+                return;
+            }
             
             if (programa && !facultad) {
                 e.preventDefault();
@@ -490,10 +535,10 @@
                 return;
             }
             
-            console.log('📚 Estudiante - Programa:', programa, '| Facultad:', facultad);
+            console.log('📚 Estudiante - Semestre:', semestre, '| Programa:', programa, '| Facultad:', facultad);
         }
 
-        // Deshabilitar todos los campos que NO pertenecen al rol actual
+        // ✅ Deshabilitar todos los campos que NO pertenecen al rol actual
         const allRoles = ['estudiante', 'trabajador', 'egresado', 'invitado'];
         allRoles.forEach(rol => {
             if (rol !== currentRole) {
@@ -501,19 +546,21 @@
                 if (section) {
                     section.querySelectorAll('input, select').forEach(input => {
                         input.disabled = true;
-                        console.log('❌ Deshabilitado:', input.name, 'del rol', rol);
+                        console.log('❌ Deshabilitado campo:', input.name, 'del rol', rol);
                     });
                 }
             }
         });
 
-        // Verificar qué se está enviando
+        // Log de datos que se envían
         const formData = new FormData(this);
-        console.log('\n📦 Datos que se enviarán:');
+        console.log('\n📦 Datos finales enviados:');
         for (let [key, value] of formData.entries()) {
-            console.log(`  ${key}: "${value}"`);
+            if (value) {  // Solo mostrar valores no vacíos
+                console.log(`  ${key}: "${value}"`);
+            }
         }
     });
-</script>
+    </script>
     
 {% endblock %}
