@@ -1,0 +1,22 @@
+{% extends "base.html" %}
+{% block title %}Citas psicológicas{% endblock %}
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="row justify-content-center g-3">
+      <section class="col-12 col-md-8 col-lg-6">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4 text-center">
+            <h2 class="mb-3">Citas psicológicas</h2>
+            <p class="text-muted mb-4">Elige una opción</p>
+            <div class="d-grid gap-3">
+              <a class="btn btn-primary btn-lg" href="{% url 'appointments:create' %}">Agendar cita</a>
+              <a class="btn btn-outline-secondary btn-lg" href="{% url 'appointments:list' %}">Mis citas</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}
