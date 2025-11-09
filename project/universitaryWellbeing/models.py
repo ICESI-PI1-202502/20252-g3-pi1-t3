@@ -610,3 +610,15 @@ class TorneosEquipos(models.Model):
         managed = False
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
+
+class Noticias(models.Model):
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    imagen = models.ImageField(upload_to='noticias/')
+    fecha_publicacion = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo
+    class Meta:
+        db_table = 'noticias'
+        ordering = ['-fecha_publicacion']

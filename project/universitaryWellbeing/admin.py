@@ -7,7 +7,7 @@ from .models import (
     HistorialCitas, HistorialParticipaciones, HorariosParticipante,
     InscripcionesPsu, MotivosCita, Notificaciones, Participaciones, Partidos,
     Preferencias, PreferenciasActividades, ProyectosSociales,
-    RolesParticipacion, TiposActividad, TiposNotificacion, TorneosEquipos
+    RolesParticipacion, TiposActividad, TiposNotificacion, TorneosEquipos,Noticias
 )
 
 # -----------------------
@@ -37,6 +37,10 @@ class RolesAdmin(admin.ModelAdmin):
     list_display = ('id_rol', 'nombre_rol', 'grupo_d')
     search_fields = ('nombre_rol',)
 
+@admin.register(Noticias)
+class NoticiaAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'fecha_publicacion')
+    search_fields = ('titulo',)
 # -----------------------
 # READ-ONLY MODELS
 # -----------------------

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad, Noticias
 from .forms import UserLoginForm, UserRegisterForm
 from typing import List
 from datetime import datetime, timedelta
@@ -201,7 +201,8 @@ def home_user(request):
     
     user = request.user
     actividades = Actividades.objects.values("nombre") 
-   # actividades_recomendadas = get_recommendations_for_user(user)
+    actividades_recomendadas = get_recommendations_for_user(user)
+    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
     horario = get_user_schedule(user)
     calendario = get_user_calendar(user)
 
@@ -212,11 +213,12 @@ def home_user(request):
 
 
     context = {
-       # "actividades_recomendadas": actividades_recomendadas,
+        "actividades_recomendadas": actividades_recomendadas,
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
         "user_rol": user_rol,  #  agregado aquí
+        "noticias": noticias,
     }
 
     return render(request, "home_user.html", context)
@@ -264,7 +266,7 @@ def profile(request):
 
     notificaciones_no_leidas = notificaciones.filter(leida=False).count()
 
-    # 👤 Rol del usuario (por si lo necesita el menú lateral)
+    # Rol del usuario (por si lo necesita el menú lateral)
     user_rol = participante.roles_id_rol.nombre_rol if participante.roles_id_rol else None
 
     # Actividades del participante

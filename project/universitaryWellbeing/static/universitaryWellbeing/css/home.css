@@ -617,3 +617,140 @@ Esto son los estilos de las notificaciones
                 right: -10px;
             }
         }
+
+/* ---------- SLIDER DE NOTICIAS CORREGIDO ---------- */
+.noticia-slider {
+  position: relative;
+  width: 80%;
+  max-width: 720px;
+  margin: 1rem auto 0 auto;
+  overflow: visible;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+/* Cada noticia (slide) */
+.noticia-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease-in-out, visibility 0s linear 0.8s;
+}
+
+.noticia-slide.active {
+  opacity: 1;
+  visibility: visible;
+  position: relative;
+  z-index: 2;
+}
+
+/* Imagen */
+.noticia-slide img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 16px 16px 0 0;
+  object-fit: cover;
+}
+
+/* Bloque azul */
+.noticia-content {
+  position: relative;
+  padding: 1.25rem 1.5rem 2rem;
+  background: linear-gradient(180deg, #233b9a, #1e3a8a);
+  color: #fff;
+  border-radius: 0 0 16px 16px;
+}
+
+/* Textos */
+.noticia-content h6,
+.noticia-content h5,
+.noticia-content p {
+  color: #fff !important;
+}
+
+/* Barra de progreso */
+.noticia-slide .progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  width: 0%;
+  background: linear-gradient(90deg, #60a5fa, #8b5cf6);
+  transition: width 4s linear;
+  border-radius: 0 0 16px 16px;
+}
+
+/* Botones de navegación - CENTRADOS DINÁMICAMENTE */
+.btn-nav {
+  position: absolute;
+  /* top será controlado por JavaScript */
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  font-size: 2rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 100;
+  color: #1e3a8a;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  line-height: 1;
+}
+
+.btn-nav.prev {
+  left: 15px;
+}
+
+.btn-nav.next {
+  right: 15px;
+}
+
+.btn-nav:hover {
+  background: #1e3a8a;
+  color: #fff;
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .noticia-slider {
+    width: 95%;
+  }
+  
+  .btn-nav {
+    font-size: 1.6rem;
+    padding: 0.4rem 0.65rem;
+  }
+  
+  .btn-nav.prev {
+    left: 10px;
+  }
+  
+  .btn-nav.next {
+    right: 10px;
+  }
+}
+
+/* Modal */
+#noticiaModal .modal-header {
+  background: linear-gradient(90deg, #1e3a8a, #233b9a);
+  border-bottom: none;
+}
+
+#noticiaModal .modal-body img {
+  max-height: 380px;
+  object-fit: cover;
+}
+
+#noticiaModal .modal-body {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}

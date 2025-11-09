@@ -33,7 +33,7 @@ def analytics_index(request):
 def analisis_comportamiento(request): 
     tipo_actividad = request.GET.get("tipo_actividad")
     min_frecuencia = request.GET.get("min_frecuencia")
-    export = request.GET.get("export")  # 👈 nuevo parámetro para detectar exportación
+    export = request.GET.get("export")  #nuevo parámetro para detectar exportación
 
     # Base queryset: contamos participaciones por participante y tipo de actividad
     data = (

@@ -17,6 +17,7 @@ urlpatterns = [
     path("psu/", include("social_projects.urls")),
     path("horario/", views.schedule, name="horario"),
     path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
+    path("news/", include("news.urls", namespace="news")),
 
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
