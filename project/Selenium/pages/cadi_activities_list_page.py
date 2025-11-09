@@ -2,6 +2,8 @@
 from selenium.webdriver.common.by import By
 from selenium.common.exceptions import NoSuchElementException
 from pages.base_page import BasePage
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 
 class CADIActivitiesListPage(BasePage):
     BTN_AGREGAR = (By.LINK_TEXT, "Agregar actividad")
@@ -12,6 +14,9 @@ class CADIActivitiesListPage(BasePage):
         self.retry_click(self.BTN_AGREGAR, timeout=15)
 
     def assert_activity_title_present(self, title: str):
+        WebDriverWait(self.driver, 15).until(
+            EC.presence_of_all_elements_located(self.TITLES)
+        )
         titles = [el.text.strip() for el in self.driver.find_elements(*self.TITLES)]
         assert title in titles, f"No se encontró el título '{title}'. Títulos visibles: {titles}"
 

@@ -7,9 +7,9 @@ class NavBar(BasePage):
     SIDEBAR  = (By.ID, "sidebar")
     LINK_TOURNAMENTS = (By.CSS_SELECTOR, '#sidebar a[href="/tournaments/"]')
     LINK_SEARCH = (By.CSS_SELECTOR, '#sidebar a[href="/search/"]')
+    LINK_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/horario/"]') 
 
     def open_menu(self):
-        # Si ya está abierto, salir
         try:
             classes = self.is_present(self.SIDEBAR, timeout=5).get_attribute("class") or ""
             if "open" in classes:
@@ -39,3 +39,10 @@ class NavBar(BasePage):
             self.click(self.LINK_SEARCH)
         except Exception:
             self.click_js(self.LINK_SEARCH, timeout=5)
+
+    def go_to_schedule(self):  # <— NUEVO
+        self.open_menu()
+        try:
+            self.click(self.LINK_SCHEDULE)
+        except Exception:
+            self.click_js(self.LINK_SCHEDULE, timeout=5)
