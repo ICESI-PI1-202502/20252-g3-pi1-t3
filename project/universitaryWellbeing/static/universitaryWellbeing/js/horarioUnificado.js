@@ -14,11 +14,13 @@ document.addEventListener('DOMContentLoaded', function () {
   const fmt = new Intl.DateTimeFormat('es-CO', { dateStyle: 'medium', timeStyle: 'short' });
 
   // 3) Inicializar calendario
+
+  
   let showWeekends = true;
   const calendar = new FullCalendar.Calendar(calendarEl, {
     initialView: 'timeGridWeek',
     locale: 'es',
-    firstDay: 1,                 // Lunes
+    firstDay: 0,                 // Domingo
     height: 'auto',
     headerToolbar: false,
     expandRows: true,

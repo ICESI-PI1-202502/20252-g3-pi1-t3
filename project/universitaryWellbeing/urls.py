@@ -17,6 +17,7 @@ urlpatterns = [
     path("psu/", include("social_projects.urls")),
     path("appointments/", include("appointments.urls")),
     path("horario/", views.schedule, name="horario"),
+    path("horario/eliminar/<int:evento_id>/", views.eliminar_evento, name="eliminar_evento"),  # NUEVA RUTA
     path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
     path("calendario-unificado/", views.calendario_unificado, name="calendario_unificado"),
 
