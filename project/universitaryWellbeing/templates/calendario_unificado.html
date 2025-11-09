@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 {% load static %}
 
-{% block title %}Calendario unificado BU{% endblock %}
+{% block title %}Calendario Unificado BU{% endblock %}
 
 {% block subheaderBar %}
 <a href="javascript:history.back()" class="back-link">
@@ -17,8 +17,9 @@
 
 {% block content %}
 <div class="container calendar-shell">
-  <div class="calendar-header text-center mb-3">
-    <h2>Calendario unificado BU — Actividades</h2>
+  <div class="calendar-header text-center mb-4">
+    <h2>Calendario Unificado de Actividades</h2>
+    <p class="text-muted">Explora todas las actividades disponibles</p>
   </div>
 
   <div class="calendar-card">
@@ -26,56 +27,109 @@
     <!-- Controles -->
     <form method="get" class="calendar-controls" id="filterForm">
       <div class="controls-left">
-        <button id="btn-prev" type="button" class="btn btn-next">◀ Anterior</button>
-        <button id="btn-next" type="button" class="btn btn-next">Siguiente ▶</button>
-        <button id="btn-today" type="button" class="btn btn-today">Hoy</button>
+        <!-- Navegación -->
+        <div class="btn-group me-2">
+          <button id="btn-prev" type="button" class="btn btn-nav">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button id="btn-today" type="button" class="btn btn-today">Hoy</button>
+          <button id="btn-next" type="button" class="btn btn-nav">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
 
-        <button id="btn-month" type="button" class="btn btn-view">Mes</button>
-        <button id="btn-week"  type="button" class="btn btn-view active">Semana</button>
-        <button id="btn-day"   type="button" class="btn btn-view">Día</button>
+        <!-- Vistas -->
+        <div class="btn-group me-2">
+          <button id="btn-month" type="button" class="btn btn-view">
+            <i class="bi bi-calendar-month"></i> Mes
+          </button>
+          <button id="btn-week" type="button" class="btn btn-view active">
+            <i class="bi bi-calendar-week"></i> Semana
+          </button>
+          <button id="btn-day" type="button" class="btn btn-view">
+            <i class="bi bi-calendar-day"></i> Día
+          </button>
+        </div>
 
-        <button id="btn-weekends" type="button" class="btn btn-weekends active" title="Mostrar/Ocultar fines de semana">
-          Fines de semana
+        <!-- Fines de semana -->
+        <button id="btn-weekends" type="button" class="btn btn-weekends active">
+          <i class="bi bi-calendar2-check"></i> Fines de semana
         </button>
+
+        <!-- Filtro por tipo -->
+        <div class="filter-group me-2">
+          <label for="tipo" class="filter-label">
+            <i class="bi bi-funnel"></i> Tipo:
+          </label>
+          <select id="tipo" name="tipo" class="filter-select">
+            <option value="">Todos</option>
+            {% for t in tipos %}
+              <option value="{{ t.id_tipo }}" {% if tipo_id == t.id_tipo|stringformat:"s" %}selected{% endif %}>
+                {{ t.nombre_tipo }}
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-go">
+            <i class="bi bi-check-circle"></i>
+          </button>
+        </div>
+        
+        <!-- Ir a fecha -->
+        <div class="input-group">
+          <input type="date" id="go-date" class="date-picker" />
+          <button id="btn-go" type="button" class="btn btn-go">
+            <i class="bi bi-arrow-right-circle"></i> Ir
+          </button>
+        </div>
+        
       </div>
 
-      <div class="controls-right" style="gap:.5rem; display:flex; align-items:center;">
-        <label for="tipo" class="form-label mb-0 me-1">Tipo:</label>
-        <select id="tipo" name="tipo" class="form-select" style="min-width: 220px;">
-          <option value="">Todos</option>
-          {% for t in tipos %}
-            <option value="{{ t.id_tipo }}" {% if tipo_id == t.id_tipo|stringformat:"s" %}selected{% endif %}>
-              {{ t.nombre_tipo }}
-            </option>
-          {% endfor %}
-        </select>
-        <button type="submit" class="yellowBotton_Black">Aplicar</button>
-        <input type="date" id="go-date" class="date-picker" />
-        <button id="btn-go" type="button" class="btn whiteBotton">Ir a fecha</button>
-      </div>
+      
     </form>
 
     <div id="calendar"></div>
 
+    <!-- Leyenda dinámica con los tipos cargados -->
     <div class="legend">
-      <span class="legend-item"><span class="dot" style="background:#5454E9;"></span> Actividad</span>
+      <div class="legend-title">Tipos de actividades:</div>
+      <span class="legend-item">
+        <span class="dot" style="background:#E9683B;"></span> Deportes
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#E4EB60;"></span> Arte y Cultura
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#5454E9;"></span> Académico
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#4DB979;"></span> Bienestar
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#FF6B9D;"></span> Social
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#00BCD4;"></span> Tecnología
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#8BC34A;"></span> Salud
+      </span>
     </div>
   </div>
 </div>
 
-<!-- Modal para listar eventos del día -->
+<!-- Modal para detalles de actividades -->
 <div class="modal fade" id="dayModal" tabindex="-1" aria-labelledby="dayModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="dayModalLabel">Eventos del día</h5>
+        <h5 class="modal-title" id="dayModalLabel">Detalles</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
       </div>
       <div class="modal-body">
         <div id="day-events-list"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn blueBotton" data-bs-dismiss="modal">Cerrar</button>
+        <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
       </div>
     </div>
   </div>
@@ -85,10 +139,10 @@
 {% block extra_js %}
 {{ block.super }}
 <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
-<script src="{% static 'universitaryWellbeing/js/horarioUnificado.js' %}"></script>
 
 <script id="events-data" type="application/json">
   {{ eventos_json|safe }}
 </script>
 
+<script src="{% static 'universitaryWellbeing/js/horarioUnificado.js' %}"></script>
 {% endblock %}

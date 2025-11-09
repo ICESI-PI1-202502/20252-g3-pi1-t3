@@ -1,9 +1,12 @@
+import json
+from django.http import JsonResponse
 from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.core.validators import validate_email
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
 from .forms import UserLoginForm, UserRegisterForm
@@ -152,8 +155,6 @@ def preferences(request):
 
     return render(request, 'list_preferences.html', {'categorias': categorias})
 
-
-import json
 @login_required
 def schedule(request):
     # Obtener el participante asociado al usuario autenticado
@@ -166,23 +167,56 @@ def schedule(request):
     eventos_data = []
     for e in eventos:
         color = "#007bff"  # Azul por defecto
+        tipo_evento = "otro"
+        
         if e.actividades_id_actividad:
-            color = "#5454E9"  # Azul
+            color = "#5454E9"  # Morado para actividades
+            tipo_evento = "actividad"
         elif e.citas_id_cita:
-            color = "#E4EB60"  # Amarillo
+            color = "#E4EB60"  # Amarillo para citas
+            tipo_evento = "cita"
         elif e.partidos_id_partido:
-            color = "#E9683B"  # Naranja
+            color = "#E9683B"  # Naranja para partidos
+            tipo_evento = "partido"
 
-        eventos_data.append({
-            "title": e.titulo,
-            "start": e.fecha_inicio.isoformat(),
-            "end": e.fecha_fin.isoformat(),
-            "color": color,
-            "extendedProps": {
-                "notas": e.notas or "",
-                "fuente": "Automática" if e.fuente_manual == 'N' else "Manual"
-            }
-        })
+        # ⭐ CAMBIO CRÍTICO: Detectar si es recurrente
+        # Las actividades añadidas manualmente (fuente_manual='S') deben repetirse semanalmente
+        es_recurrente = (e.fuente_manual == 'S' and e.actividades_id_actividad is not None)
+        
+        if es_recurrente:
+            # 🔄 EVENTO RECURRENTE - Se repite cada semana
+            dia_semana = e.fecha_inicio.weekday()  # 0=Lunes, 1=Martes, ..., 6=Domingo
+            eventos_data.append({
+                "id": e.id_horario,
+                "title": e.titulo,
+                "daysOfWeek": [dia_semana],  # CLAVE: Array con el día de la semana
+                "startTime": e.fecha_inicio.strftime("%H:%M:%S"),  # Solo la hora
+                "endTime": e.fecha_fin.strftime("%H:%M:%S"),      # Solo la hora
+                "color": color,
+                "extendedProps": {
+                    "notas": e.notas or "",
+                    "fuente": "Manual",
+                    "tipo": tipo_evento,
+                    "puede_eliminar": True,
+                    "es_recurrente": True  # Marcador para el frontend
+                }
+            })
+        else:
+            # EVENTO ÚNICO - Solo aparece en su fecha específica
+            eventos_data.append({
+                "id": e.id_horario,
+                "title": e.titulo,
+                "start": e.fecha_inicio.isoformat(),  # Fecha completa
+                "end": e.fecha_fin.isoformat(),        # Fecha completa
+                "color": color,
+                "extendedProps": {
+                    "notas": e.notas or "",
+                    "fuente": "Automática" if e.fuente_manual == 'N' else "Manual",
+                    "tipo": tipo_evento,
+                    "puede_eliminar": e.fuente_manual == 'S',
+                    "es_recurrente": False
+                }
+            })
 
     context = {
         "participante": participante,
@@ -190,6 +224,45 @@ def schedule(request):
     }
     return render(request, "Horario.html", context)
 
+
+@login_required
+@require_http_methods(["POST"])
+def eliminar_evento(request, evento_id):
+    """
+    Endpoint para eliminar un evento del horario personal
+    Solo permite eliminar eventos manuales (fuente_manual = 'S')
+    """
+    try:
+        participante = get_object_or_404(Participantes, user=request.user.id)
+        
+        # Buscar el evento
+        evento = get_object_or_404(
+            HorariosParticipante,
+            id_horario=evento_id,
+            participantes_id_participante=participante.id_participante
+        )
+        
+        # Verificar que sea un evento manual
+        if evento.fuente_manual != 'S':
+            return JsonResponse({
+                'success': False,
+                'message': 'Solo puedes eliminar eventos creados manualmente'
+            }, status=403)
+        
+        # Eliminar el evento
+        titulo = evento.titulo
+        evento.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Evento "{titulo}" eliminado correctamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error al eliminar el evento: {str(e)}'
+        }, status=500)  
 
 # FullCalendar: 0=Dom,1=Lun,...6=Sab
 def _django_weekday_to_fc_dow(django_wd: int) -> int:
