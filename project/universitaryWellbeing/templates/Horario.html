@@ -17,50 +17,100 @@
 
 {% block content %}
 <div class="container calendar-shell">
-  <div class="calendar-header text-center mb-3">
-    <h2>Horario de {{ participante.nombre }}{% if participante.apellido %} {{ participante.apellido }}{% endif %}</h2>
+  <div class="calendar-header text-center mb-4">
+    <h2>Mi Horario Personal</h2>
+    <p class="text-muted">{{ participante.nombre }}{% if participante.apellido %} {{ participante.apellido }}{% endif %}</p>
   </div>
 
   <div class="calendar-card">
 
-    <!-- Controles -->
+    <!-- Controles superiores -->
     <div class="calendar-controls">
       <div class="controls-left">
-        <!-- navegación contextual -->
-        <button id="btn-prev" class="btn btn-next">◀ Anterior</button>
-        <button id="btn-next" class="btn btn-next">Siguiente ▶</button>
+        <!-- Navegación -->
+        <div class="btn-group me-2">
+          <button id="btn-prev" class="btn btn-nav">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button id="btn-today" class="btn btn-today">Hoy</button>
+          <button id="btn-next" class="btn btn-nav">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
 
-        <!-- Hoy -->
-        <button id="btn-today" class="btn btn-today">Hoy</button>
+        <!-- Vistas -->
+        <div class="btn-group me-2">
+          <button id="btn-month" class="btn btn-view">
+            <i class="bi bi-calendar-month"></i> Mes
+          </button>
+          <button id="btn-week" class="btn btn-view active">
+            <i class="bi bi-calendar-week"></i> Semana
+          </button>
+          <button id="btn-day" class="btn btn-view">
+            <i class="bi bi-calendar-day"></i> Día
+          </button>
+        </div>
 
-        <!-- Cambiar vista -->
-        <button id="btn-month" class="btn btn-view">Mes</button>
-        <button id="btn-week" class="btn btn-view active">Semana</button>
-        <button id="btn-day" class="btn btn-view">Día</button>
-
-        <!-- Fines de semana -->
-        <button id="btn-weekends" class="btn btn-weekends active" title="Mostrar/Ocultar fines de semana">
-          Fines de semana
+        <!-- Opciones -->
+        <button id="btn-weekends" class="btn btn-weekends active">
+          <i class="bi bi-calendar2-check"></i> Fines de semana
         </button>
       </div>
 
       <div class="controls-right">
-        <input type="date" id="go-date" class="date-picker" />
-        <button id="btn-go" class="btn whiteBotton">Ir a fecha</button>
+        <div class="input-group">
+          <input type="date" id="go-date" class="date-picker" />
+          <button id="btn-go" class="btn btn-go">
+            <i class="bi bi-arrow-right-circle"></i> Ir
+          </button>
+        </div>
       </div>
     </div>
 
+    <!-- Calendario -->
     <div id="calendar"></div>
 
+    <!-- Leyenda -->
     <div class="legend">
-      <span class="legend-item"><span class="dot dot-actividad"></span> Actividad</span>
-      <span class="legend-item"><span class="dot dot-cita"></span> Cita</span>
-      <span class="legend-item"><span class="dot dot-partido"></span> Partido</span>
+      <div class="legend-title">Tipos de eventos:</div>
+      <span class="legend-item">
+        <span class="dot dot-actividad"></span> Actividad
+      </span>
+      <span class="legend-item">
+        <span class="dot dot-cita"></span> Cita
+      </span>
+      <span class="legend-item">
+        <span class="dot dot-partido"></span> Partido
+      </span>
+      <span class="legend-item">
+        <span class="dot dot-otro"></span> Otro
+      </span>
     </div>
   </div>
 </div>
 
-<!-- Modal Bootstrap para listar eventos del día -->
+<!-- Modal de detalles del evento -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="eventModalLabel">Detalles del Evento</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="event-details"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+        <button type="button" id="btn-delete-event" class="btn btn-danger" style="display: none;">
+          <i class="bi bi-trash"></i> Eliminar Evento
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de eventos del día -->
 <div class="modal fade" id="dayModal" tabindex="-1" aria-labelledby="dayModalLabel" aria-hidden="true">
   <div class="modal-dialog modal-dialog-centered modal-lg">
     <div class="modal-content">
@@ -72,7 +122,34 @@
         <div id="day-events-list"></div>
       </div>
       <div class="modal-footer">
-        <button class="btn blueBotton" data-bs-dismiss="modal">Cerrar</button>
+        <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="confirmDeleteLabel">
+          <i class="bi bi-exclamation-triangle"></i> Confirmar Eliminación
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar este evento de tu horario?</p>
+        <div class="alert alert-warning">
+          <strong>Advertencia:</strong> Esta acción no se puede deshacer.
+        </div>
+        <div id="confirm-delete-details"></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+        <button type="button" id="btn-confirm-delete" class="btn btn-danger">
+          <i class="bi bi-trash"></i> Sí, Eliminar
+        </button>
       </div>
     </div>
   </div>
@@ -80,19 +157,22 @@
 {% endblock %}
 
 {% block extra_js %}
-
 {{ block.super }}
-  <!-- Bootstrap  -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<!-- Bootstrap  -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- FullCalendar -->
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+<!-- FullCalendar -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
 
-  <!-- JSON de eventos -->
-  <script id="events-data" type="application/json">
-    {{ eventos_json|safe }}
-  </script>
+<!-- JSON de eventos -->
+<script id="events-data" type="application/json">
+  {{ eventos_json|safe }}
+</script>
 
-  <script src="{% static 'universitaryWellbeing/js/horario.js' %}"></script>
+<!-- CSRF Token -->
+<script>
+  const csrfToken = '{{ csrf_token }}';
+</script>
+
+<script src="{% static 'universitaryWellbeing/js/horario.js' %}"></script>
 {% endblock %}
-
