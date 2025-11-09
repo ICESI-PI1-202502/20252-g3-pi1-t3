@@ -134,6 +134,7 @@
         {% endblock %}
     </nav>
 
+
     <!-- SIDEBAR -->
     <div id="sidebar" class="sidebar">
 
@@ -151,14 +152,19 @@
             <a href="{% url 'admin:index' %}">Panel de Administrador</a>
             <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
             <a href="{% url 'Analytics_Reports:analytics_index' %}">Analítica y reportes</a>
+            <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
+
         {% else %}
             <a href="{% url 'searchActivities:search' %}">Buscar</a>
-            <a href="{% url 'horario' %}">Calendario</a>
+            <a href="{% url 'horario' %}">Horario</a>
+            <a href="{% url 'calendario_unificado' %}">Calendario unificado BU</a>
             <a href="#">¿Quiénes Somos?</a>
             <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
             <a href="#">Eventos y Servicios</a>
             <a href="{% url 'tournaments:list' %}">Torneos</a>
-            <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
+            <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales</a>
+            <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
+
 
             {# Opción adicional para Profesor #}
             {% if user_rol == "Profesor" %}
@@ -174,6 +180,21 @@
     <div id="overlay" class="overlay"></div>
 
     <main>
+
+        {# --- Flash messages (default global) --- #}
+        {% block flash_messages %}
+            {% if messages %}
+            <div class="container mt-3">
+                {% for message in messages %}
+                <div class="alert alert-{% if 'error' in message.tags %}danger{% elif 'success' in message.tags %}success{% elif 'warning' in message.tags %}warning{% elif 'info' in message.tags %}info{% else %}secondary{% endif %} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% endblock %}
+
         {% block content %}
         <!-- specify content -->
         {% endblock %}

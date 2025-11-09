@@ -36,3 +36,13 @@
   .category-item:hover {
     background: #e4ebff;
   }
+
+
+
+.is-disabled { 
+  opacity: 0.6; 
+  background: #bbb; 
+  color: #333; 
+  border: 1px solid #999; 
+  cursor: not-allowed; 
+}

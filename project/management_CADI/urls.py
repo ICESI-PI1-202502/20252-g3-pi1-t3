@@ -30,4 +30,10 @@ urlpatterns = [
         views.scheduleDraft,
         name="schedule_draft_edit",
     ),
+
+    path(
+        "grupos/<slug:grupo_nombre>/<int:grupo_id>/<int:grupo_actividad_id>/add-slot/",
+        views.add_slot_to_schedule,
+        name="add_slot_to_schedule",
+    ),
 ]

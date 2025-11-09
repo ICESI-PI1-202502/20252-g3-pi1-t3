@@ -9,6 +9,16 @@
 </a>
 {% endblock %}
 
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+<style>
+  .block-row { display:flex; align-items:center; gap:12px; }
+  .block-info { flex:1; }
+  .btn-add-small { padding:6px 12px; font-size:.9rem; line-height:1.1; border-radius:10px; white-space:nowrap; }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
   <h2 class="text-center">{{ grupo_actividad.nombre }}</h2>
@@ -18,55 +28,86 @@
   <div class="row mt-4">
     {% for a in actividades %}
     <div class="col-md-4 text-center mb-4">
-      <div class="card shadow-sm p-3">
+      <div class="card shadow-sm p-3 position-relative">
 
         {% if request.user.is_superuser %}
-        <!-- Ícono editar -->
         <a href="{{ a.editar_url }}" class="position-absolute" style="top:8px; right:8px;">
           <img src="{% static 'management_CADI/images/create/edit.png' %}" alt="Editar" style="width:24px;height:24px;">
         </a>
-        {% else %}
         {% endif %}
 
         <h5 class="mt-2">{{ a.nombre }}</h5>
 
         {% if a.items_dia %}
-        <div class="text-start" style="font-size: 0.95rem;">
-          {% for it in a.items_dia %}
-          <div class="mb-2">
-            <div><strong>Día:</strong> {{ it.dia }}</div>
-            <div><strong>Horario:</strong> {{ it.horario }}</div>
-            <div><strong>Espacio:</strong> {{ it.espacio|default:"—" }}</div>
-            <div><strong>Profesor:</strong> {{ it.profesor|default:"—" }}</div>
+          <div class="text-start" style="font-size: 0.95rem;">
+            {% for it in a.items_dia %}
+              <div class="mb-2 block-row">
+                <div class="block-info">
+                  <div><strong>Día:</strong> {{ it.dia }}</div>
+                  <div><strong>Horario:</strong> {{ it.horario }}</div>
+                  <div><strong>Espacio:</strong> {{ it.espacio|default:"—" }}</div>
+                  <div><strong>Profesor:</strong> {{ it.profesor|default:"—" }}</div>
+                </div>
+
+                {% if request.user.is_authenticated and not request.user.is_superuser %}
+                  <form method="post"
+                        action="{% url 'management_cadi:add_slot_to_schedule' grupo.nombre|slugify grupo.id_grupo grupo_actividad.id_grupo_actividad %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="actividad_id" value="{{ a.id_actividad }}">
+                    <input type="hidden" name="bloque_id"    value="{{ it.bloque_id }}">
+                    <input type="hidden" name="dia_idx"      value="{{ it.dia_idx }}">
+                    <input type="hidden" name="next"         value="{{ request.get_full_path }}">
+
+                    {% if it.already_added %}
+                      <button type="submit" class="greenBotton_White btn-add-small is-disabled" disabled
+                              title="Este bloque ya está en tu horario">
+                        Añadido ✓
+                      </button>
+                    {% elif it.conflict %}
+                      <button type="button" class="btn-add-small is-disabled" disabled
+                              title="No puedes agregar: este bloque se cruza con otro en tu horario">
+                        Horario ocupado
+                      </button>
+                    {% else %}
+                      <button type="submit" class="greenBotton_White btn-add-small"
+                              title="Añadir este bloque a tu horario">
+                        Añadir
+                      </button>
+                    {% endif %}
+
+
+                  </form>
+                {% endif %}
+              </div>
+              {% if not forloop.last %}<hr class="my-2">{% endif %}
+            {% endfor %}
           </div>
-          {% if not forloop.last %}
-          <hr class="my-2">
-          {% endif %}
-          {% endfor %}
-        </div>
         {% else %}
-        <p>—</p>
+          <p>—</p>
         {% endif %}
 
-        <!-- Mostrar la calificación -->
         <div class="mt-3">
           <strong>Calificación Promedio:</strong>
-          <img src="{% static 'images/rating/'|add:a.rating_image %}" alt="Calificación"
-            style="width: 100px; height: auto;">
+          <img src="{% static 'images/rating/'|add:a.rating_image %}" alt="Calificación" style="width: 100px; height: auto;">
         </div>
 
-        {% if not request.user.is_superuser %}
-          {% if request.user.is_authenticated %}
-            {% if a.user_has_calificado %}
-              <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
-                class="yellowBotton_Black mt-2 d-block">
-                Editar calificación
-              </a>
+        {# Botones de calificar con la misma lógica que ya usas en “buscar” #}
+        {% if not request.user.is_superuser and request.user.is_authenticated %}
+          {% if a.user_has_calificado %}
+            {% if a.user_has_participacion %}
+              <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.get_full_path|urlencode }}"
+                 class="yellowBotton_Black mt-2 d-block">Editar calificación</a>
             {% else %}
-              <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.path }}" 
-                class="yellowBotton_Black mt-2 d-block">
-                Calificar
-              </a>
+              <span class="yellowBotton_Black mt-2 d-block is-disabled" aria-disabled="true" tabindex="-1"
+                    title="Disponible solo para participantes">Editar calificación</span>
+            {% endif %}
+          {% else %}
+            {% if a.user_has_participacion %}
+              <a href="{% url 'searchActivities:calificar_actividad' a.id_actividad %}?next={{ request.get_full_path|urlencode }}"
+                 class="yellowBotton_Black mt-2 d-block">Calificar</a>
+            {% else %}
+              <span class="yellowBotton_Black mt-2 d-block is-disabled" aria-disabled="true" tabindex="-1"
+                    title="Debes haber participado para calificar">Calificar</span>
             {% endif %}
           {% endif %}
         {% endif %}
@@ -75,18 +116,14 @@
     </div>
     {% endfor %}
   </div>
+
+  {% else %}
+    <p class="text-center mt-4">Aún no hay actividades.</p>
+  {% endif %}
+
   <br><br>
-  {% else %}
-    <br><br>
-    <p class="text-center mt-4">No hay actividades aún.</p>
-  {% endif %}
-
   {% if request.user.is_superuser %}
-  <center>
-    <a href="{{ crear_url }}?reset=1" class="yellowBotton_Black">Agregar actividad</a>
-  </center>
-  {% else %}
+    <center><a href="{{ crear_url }}?reset=1" class="yellowBotton_Black">Agregar actividad</a></center>
   {% endif %}
-
 </div>
 {% endblock %}

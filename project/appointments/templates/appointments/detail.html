@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Confirmación de cita{% endblock %}
+
+{% block subheaderBar %}
+<a href="{% url 'appointments:create' %}" class="back-link"><i class="bi bi-arrow-left"></i> Regresar</a>
+{% endblock %}
+
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <section class="col-12 col-md-10 col-lg-8">
+        {% if messages %}{% for m in messages %}
+          <div class="alert alert-success">{{ m }}</div>
+        {% endfor %}{% endif %}
+
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h2 class="page-title text-center mb-3">Cita psicológica</h2>
+            <p class="text-center text-muted mb-4">Confirmación de agendamiento</p>
+
+            <dl class="row">
+              <dt class="col-sm-4">Código</dt><dd class="col-sm-8">{{ codigo }}</dd>
+              <dt class="col-sm-4">Profesional</dt><dd class="col-sm-8">{{ profesional.nombre }} {{ profesional.apellido }}</dd>
+              <dt class="col-sm-4">Estudiante</dt><dd class="col-sm-8">{{ estudiante.nombre }} {{ estudiante.apellido }}</dd>
+              <dt class="col-sm-4">Estado</dt><dd class="col-sm-8">{{ estado }}</dd>
+              <dt class="col-sm-4">Fecha y hora</dt>
+              <dd class="col-sm-8">{{ inicio|date:"D d/m/Y · H:i" }} — {{ fin|date:"H:i" }}</dd>
+              <dt class="col-sm-4">Lugar</dt><dd class="col-sm-8">{{ lugar }}</dd>
+              {% if motivo %}<dt class="col-sm-4">Motivo</dt><dd class="col-sm-8">{{ motivo }}</dd>{% endif %}
+              {% if observaciones %}<dt class="col-sm-4">Observaciones</dt><dd class="col-sm-8">{{ observaciones }}</dd>{% endif %}
+            </dl>
+
+            <div class="d-flex gap-2 mt-4">
+              <a class="btn btn-outline-secondary" href="{% url 'appointments:create' %}">Agendar otra</a>
+              <a class="btn btn-primary" href="{% url 'horario' %}">Ver en mi calendario</a>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}
