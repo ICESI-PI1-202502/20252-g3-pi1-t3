@@ -48,9 +48,7 @@ INSTALLED_APPS = [
     'tournaments',
     'social_projects',
     'notificaciones',
-
-    
- 
+    'appointments', 
 
 ]
 
@@ -228,7 +226,7 @@ CELERY_BEAT_SCHEDULE = {
 import sys
 
 if any(cmd in sys.argv for cmd in ("test", "pytest")):
-    MIGRATION_MODULES = {"universitaryWellbeing": None}
+    MIGRATION_MODULES = {"universitaryWellbeing": None, "appointments.tests": None}
 
     args = " ".join(sys.argv)
 
@@ -243,6 +241,8 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
         INSTALLED_APPS += ["management_CADI.tests.apps.ManagementCADITestsConfig"]
     elif " searchActivities" in args or args.endswith("searchActivities"):
         INSTALLED_APPS += ["searchActivities.tests.apps.SearchActivitiesTestsConfig"]
+    elif " appointments" in args or args.endswith("appointments"):
+        INSTALLED_APPS += ["appointments.tests.apps.AppointmentsTestsConfig"]
 
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
