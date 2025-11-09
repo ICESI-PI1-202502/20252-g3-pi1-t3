@@ -60,3 +60,45 @@ class CADIActivityFormPage(BasePage):
         is_valid = self.driver.execute_script("return document.querySelector('form').checkValidity();")
         validation_msg = self.driver.execute_script("return arguments[0].validationMessage;", nombre_el)
         return is_valid, (validation_msg or "")
+
+    def submit_with_negative_aforo_expect_min_error(self, name, tipo, aforo, requiere_inscripcion, descripcion=""):
+        # nombre (requerido)
+        self.type(self.INPUT_NOMBRE, name)
+
+        # tipo (requerido)
+        select_tipo = self.is_present(self.SELECT_TIPO, timeout=15)
+        try:
+            Select(select_tipo).select_by_visible_text(tipo)
+        except Exception:
+            wanted = (tipo or "").strip().lower()
+            for opt in select_tipo.find_elements(By.TAG_NAME, "option"):
+                if opt.text.strip().lower() == wanted:
+                    opt.click()
+                    break
+
+        # aforo negativo para gatillar min=1
+        if aforo is not None:
+            self.type(self.INPUT_AFORO, str(aforo))
+
+        # descripción (opcional)
+        if descripcion:
+            self.type(self.TEXT_DESC, descripcion)
+
+        # requiere_inscripcion (requerido)
+        if requiere_inscripcion:
+            sel_req = self.is_present(self.SELECT_REQ, timeout=15)
+            txt = requiere_inscripcion.strip()
+            try:
+                Select(sel_req).select_by_visible_text(txt)
+            except Exception:
+                Select(sel_req).select_by_value('si' if txt.lower().startswith('s') else 'no')
+
+        # intentar enviar
+        self.scroll_into_view(self.BTN_CREAR, timeout=15)
+        self.retry_click(self.BTN_CREAR, timeout=15)
+
+        # leer validez y mensaje del input number[min=1]
+        is_valid = self.driver.execute_script("return document.querySelector('form').checkValidity();")
+        aforo_el = self.is_present(self.INPUT_AFORO, timeout=10)
+        validation_msg = self.driver.execute_script("return arguments[0].validationMessage;", aforo_el)
+        return is_valid, (validation_msg or "")
