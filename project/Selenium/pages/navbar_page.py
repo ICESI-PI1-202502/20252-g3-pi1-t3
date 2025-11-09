@@ -6,6 +6,7 @@ class NavBar(BasePage):
     MENU_BTN = (By.ID, "menu-btn")
     SIDEBAR  = (By.ID, "sidebar")
     LINK_TOURNAMENTS = (By.CSS_SELECTOR, '#sidebar a[href="/tournaments/"]')
+    LINK_SEARCH = (By.CSS_SELECTOR, '#sidebar a[href="/search/"]')
 
     def open_menu(self):
         # Si ya está abierto, salir
@@ -30,3 +31,11 @@ class NavBar(BasePage):
 
     def go_to_tournaments(self):
         self.click(self.LINK_TOURNAMENTS)
+
+    def go_to_search(self):
+        self.open_menu()
+        # Click normal, fallback JS para evitar overlays
+        try:
+            self.click(self.LINK_SEARCH)
+        except Exception:
+            self.click_js(self.LINK_SEARCH, timeout=5)
