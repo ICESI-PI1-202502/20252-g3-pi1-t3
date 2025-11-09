@@ -4,20 +4,21 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from pages.register_page import RegisterPage
 import time
 import psycopg2
+
 
 
 # =========================
 # CONFIGURACIÓN DEL DRIVER
 # =========================
 def crear_driver(detach=True):
-    opciones = webdriver.ChromeOptions()
+    options = webdriver.ChromeOptions()
     if detach:
-        opciones.add_experimental_option("detach", True)
-    service = Service(ChromeDriverManager().install())
-    driver = webdriver.Chrome(service=service, options=opciones)
+        options.add_experimental_option("detach", True)
+    service = Service(executable_path="chromedriver.exe")  # en project/Selenium/
+    driver = webdriver.Chrome(service=service, options=options)
     driver.maximize_window()
     return driver
 
