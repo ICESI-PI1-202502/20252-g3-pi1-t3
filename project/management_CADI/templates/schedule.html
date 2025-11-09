@@ -1,80 +1,90 @@
-{% extends "form_base.html" %}
+{% extends "base.html" %}
 {% load static %}
 
-{% block title %}{% if modo == 'edit' %}Editar horario{% else %}Añadir horario{% endif %}{% endblock %}
-{% block form_title %}{% if modo == 'edit' %}Editar horario{% else %}Añadir horario{% endif %}{% endblock %}
+{% block title %}{% if modo == 'edit' %}Editar horarios{% else %}Agregar horarios{% endif %}{% endblock %}
 
-{% block form_fields %}
-<div class="row text-center mb-4">
-  <div class="col-md-6">
-    <h6>Nombre del profesor a cargo de la actividad</h6>
-    <input type="text" name="profesor" class="form-control text-center" maxlength="50"
-           value="{{ draft.profesor|default:'' }}" required>
-  </div>
+{% block content %}
+<div class="container mt-4">
+  <h2 class="text-center">{% if modo == 'edit' %}Editar horarios{% else %}Agregar horarios{% endif %}</h2>
 
-  <div class="col-md-6">
-    <div class="row text-center mb-4">
+  <form method="post" class="mt-3">
+    {% csrf_token %}
+    <div class="row g-3">
       <div class="col-md-6">
-        <h6>Hora de inicio</h6>
-        <select name="hora_inicio" class="form-control text-center" required>
-          <option value="" disabled {% if not draft.hora_inicio %}selected{% endif %}>Selecciona hora</option>
-          {% for hora in horas %}
-            <option value="{{ hora }}" {% if draft.hora_inicio == hora %}selected{% endif %}>{{ hora }}</option>
+        <label class="form-label">Profesor</label>
+        <input type="text" name="profesor" class="form-control text-center" maxlength="150"
+               value="{{ last.profesor|default:'' }}">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label">Espacio</label>
+        <input type="text" name="lugar" class="form-control text-center" maxlength="150"
+               value="{{ last.lugar|default:'' }}">
+      </div>
+
+      <div class="col-md-3">
+        <label class="form-label">Hora inicio</label>
+        <select name="hora_inicio" class="form-select text-center">
+          <option value="">--</option>
+          {% for h in horas %}
+            <option value="{{ h }}" {% if last.hora_inicio == h %}selected{% endif %}>{{ h }}</option>
           {% endfor %}
         </select>
       </div>
-      <div class="col-md-6">
-        <h6>Hora de finalización</h6>
-        <select name="hora_fin" class="form-control text-center" required>
-          <option value="" disabled {% if not draft.hora_fin %}selected{% endif %}>Selecciona hora</option>
-          {% for hora in horas %}
-            <option value="{{ hora }}" {% if draft.hora_fin == hora %}selected{% endif %}>{{ hora }}</option>
+      <div class="col-md-3">
+        <label class="form-label">Hora fin</label>
+        <select name="hora_fin" class="form-select text-center">
+          <option value="">--</option>
+          {% for h in horas %}
+            <option value="{{ h }}" {% if last.hora_fin == h %}selected{% endif %}>{{ h }}</option>
           {% endfor %}
         </select>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label d-block">Días</label>
+        <div class="d-flex flex-wrap gap-3 justify-content-center">
+          {% for d in dias_semana %}
+            {% with val=d|lower %}
+            <label class="form-check-label">
+              <input type="checkbox" name="dias" class="form-check-input"
+                     value="{{ d }}" {% if d in last.dias %}checked{% endif %}>
+              {{ d }}
+            </label>
+            {% endwith %}
+          {% endfor %}
+        </div>
       </div>
     </div>
-  </div>
+
+    <div class="mt-4 text-center">
+      <button class="greenBotton_White me-3" name="action" value="add_block" type="submit">Agregar bloque</button>
+      <button class="blueBotton" name="action" value="done" type="submit">Terminar</button>
+    </div>
+  </form>
+
+  <hr class="my-4">
+
+  <h4 class="text-center">Bloques agregados</h4>
+  {% if bloques and bloques|length > 0 %}
+    <div class="row mt-3">
+      {% for b in bloques %}
+      <div class="col-md-6 mb-3">
+        <div class="card p-3">
+          <p><strong>Profesor:</strong> {{ b.profesor|default:"—" }}</p>
+          <p><strong>Espacio:</strong> {{ b.lugar|default:"—" }}</p>
+          <p><strong>Horario:</strong> {{ b.hora_inicio }} – {{ b.hora_fin }}</p>
+          <p><strong>Días:</strong> {{ b.dias|join:", " }}</p>
+          <form method="post" class="mt-2">
+            {% csrf_token %}
+            <input type="hidden" name="idx" value="{{ forloop.counter0 }}">
+            <button name="action" value="delete_block" class="deleteButton">Eliminar</button>
+          </form>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-center">Aún no has agregado bloques.</p>
+  {% endif %}
 </div>
-
-<center><h6>Días de semana</h6></center>
-<br>
-<table style="margin:auto; border-collapse: collapse;">
-  <tr>
-    {% for dia in dias_semana|slice:":3" %}
-      <td style="padding: 5px; text-align: center;">
-        <label class="category-item">
-          <input type="checkbox" name="dias" value="{{ dia }}"
-                 {% if draft.dias and dia in draft.dias %}checked{% endif %}>
-          {{ dia }}
-        </label>
-      </td>
-    {% endfor %}
-  </tr>
-  <tr>
-    {% for dia in dias_semana|slice:"3:6" %}
-      <td style="padding: 5px; text-align: center;">
-        <label class="category-item">
-          <input type="checkbox" name="dias" value="{{ dia }}"
-                 {% if draft.dias and dia in draft.dias %}checked{% endif %}>
-          {{ dia }}
-        </label>
-      </td>
-    {% endfor %}
-  </tr>
-  <tr>
-    <td style="padding: 5px; text-align: center;">
-      <label class="category-item">
-        <input type="checkbox" name="dias" value="{{ dias_semana.6 }}"
-               {% if draft.dias and dias_semana.6 in draft.dias %}checked{% endif %}>
-        {{ dias_semana.6 }}
-      </label>
-    </td>
-  </tr>
-</table>
-{% endblock %}
-
-{% block form_button %}
-<button type="submit" class="yellowBotton_Black">
-  {% if modo == 'edit' %}Actualizar horario{% else %}Guardar horario y volver{% endif %}
-</button>
 {% endblock %}

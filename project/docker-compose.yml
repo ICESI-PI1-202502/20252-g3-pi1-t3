@@ -1,0 +1,71 @@
+name: bienestar-universitario
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: bienestar-universitario
+    container_name: bienestar-container
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+  db:
+    image: postgres:18
+    container_name: database-container
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: h9TZan8icTf3hjsn
+      POSTGRES_DB: postgres
+    volumes:
+      - postgres_data:/var/lib/postgresql/app 
+    ports:
+    - "5432:5432"
+
+  # Redis (broker de mensajes para Celery)
+  redis:
+    image: redis:alpine
+    container_name: redis-container
+    ports:
+      - "6379:6379"
+    environment:
+      - TZ=America/Bogota
+
+  # Celery Worker (procesa tareas)
+  celery:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-worker
+    command: celery -A BienestarUniversitario worker -l info
+    depends_on:
+      - redis
+      - app
+    volumes:
+      - .:/app
+    environment:
+      - TZ=America/Bogota
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+  # Celery Beat (programa tareas)
+  celery-beat:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: celery-beat
+    command: celery -A BienestarUniversitario beat -l info
+    depends_on:
+      - redis
+      - app
+    volumes:
+      - .:/app
+    environment:
+      - TZ=America/Bogota
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/0
+
+volumes:
+ postgres_data:

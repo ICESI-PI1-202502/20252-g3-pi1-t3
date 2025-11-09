@@ -1,0 +1,5 @@
+2025-10-20 14:30:15 | Alerta: 8 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-10-20 14:30:16 | ¡Estás cerca de un reconocimiento, Juan! | juan.perez123@example.com
+2025-10-20 14:30:18 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
+2025-10-20 14:30:20 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
+2025-10-20 14:30:22 | Alerta: 165 estudiantes inactivos | admin@academia.com, coordinador@academia.com

@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=0.8">
 	<title>Iniciar Sesión</title>
 	<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/login.css' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
 
 </head>
 
@@ -19,10 +19,11 @@
 		<div class="hola-de-nuevo">¡Hola de nuevo!</div>
 		<form method="POST" action="">
 			{% csrf_token %}
-            <!-- Cédula -->
+			<!-- Cédula -->
 			<div class="field" id="ccField">
 				<div class="value">
-					<input type="text" id="cedula" name="cedula" placeholder="Cédula" value="{{ cedula|default:'' }}">
+					<input type="text" id="cedula" name="cedula" placeholder="Cédula" autocomplete="off"
+						value="{{ cedula|default:'' }}">
 
 				</div>
 			</div>
@@ -57,12 +58,12 @@
 			{% if messages %}
 			<div class="messages">
 				{% for message in messages %}
-				<div class="message">{{ message }}</div>
+				<div class="message {{ message.tags }}">{{ message }}</div>
 				{% endfor %}
 			</div>
 			{% endif %}
 
-            <input type="hidden" name="is_admin" value="false" id="isAdminField">
+			<input type="hidden" name="is_admin" value="false" id="isAdminField">
 
 			<div class="botn-agregar" id="loginButton">
 				<div class="botn-agregar-child"></div>
@@ -70,6 +71,7 @@
 			</div>
 		</form>
 		<a class="registrarse" href="{% url 'register' %}">Registrarse</a>
+		<a class="recuperar" href="{% url 'password_reset' %}">¿Olvidaste tu contraseña?</a>
 
 		<div class="universidad-icesi-calle-container">
 			<p class="universidad-icesi-calle">Universidad Icesi, Calle 18 No. 122-135</p>
@@ -85,7 +87,7 @@
 	</div>
 
 
-<script src="{% static 'universitaryWellbeing/js/login.js' %}"></script>
+	<script src="{% static 'universitaryWellbeing/js/login.js' %}"></script>
 </body>
 
 </html>

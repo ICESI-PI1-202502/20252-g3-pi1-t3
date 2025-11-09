@@ -1,17 +1,14 @@
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User,Group
+from django.core.exceptions import ValidationError
+from django.core.validators import MinValueValidator, MaxValueValidator
 import os
 
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
-    lugar = models.CharField(max_length=150, blank=True, null=True)
-
-    
-    fecha_inicio = models.DateTimeField(blank=True, null=True)
-    fecha_fin = models.DateTimeField(blank=True, null=True)
 
     requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
     modalidad = models.CharField(max_length=1, blank=True, null=True)
@@ -20,20 +17,59 @@ class Actividades(models.Model):
     fecha_apertura_ins = models.DateTimeField(blank=True, null=True)
     fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
 
-    tipos_actividad_id_tipo = models.ForeignKey('TiposActividad', models.DO_NOTHING, db_column='tipos_actividad_id_tipo', blank=True, null=True)
-    id_tipo = models.FloatField(blank=True, null=True)
+    tipos_actividad_id_tipo = models.ForeignKey(
+        'TiposActividad',
+        models.DO_NOTHING,
+        db_column='tipos_actividad_id_tipo',
+        blank=True, null=True
+    )
+
+    #id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
         db_column='act_grup_id',
         blank=True, null=True
     )
-    profesor = models.CharField(max_length=150, blank=True, null=True)
-    dias_semana = models.CharField(max_length=150, blank=True, null=True)
+
+    promedio_calificacion = models.FloatField(default=0, blank=True, null=True)
 
     class Meta:
         managed = False
         db_table = 'actividades'
+
+
+# Estos son nuevos modelos para la solucón del problema
+class HorariosBloque(models.Model):
+    id_horario_bloque = models.BigAutoField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(
+        Actividades, models.DO_NOTHING, db_column='actividades_id_actividad'
+    )
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'horarios_bloque'
+
+class HorariosActividad(models.Model):
+    id_horario = models.BigAutoField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(
+        Actividades, models.DO_NOTHING, db_column='actividades_id_actividad'
+    )
+    horario_bloque = models.ForeignKey(
+        HorariosBloque, models.DO_NOTHING, db_column='horario_bloque_id', null=True, blank=True
+    )
+    dia_semana = models.SmallIntegerField()
+
+    hora_inicio = models.TimeField(blank=True, null=True)
+    hora_fin = models.TimeField(blank=True, null=True)
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    class Meta:
+        managed = False
+        db_table = 'horarios_actividad'
 
 
 class ActividadesGrupos(models.Model):
@@ -124,18 +160,31 @@ class AuthUserUserPermissions(models.Model):
         db_table = 'auth_user_user_permissions'
         unique_together = (('user', 'permission'),)
 
-class CalificacionesActividad(models.Model):
 
+CALIFICACION_CHOICES = [(i, str(i)) for i in range(6)]
+
+class CalificacionesActividad(models.Model):
     id_calificacion = models.BigAutoField(primary_key=True)
-    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad')
-    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    estrellas = models.IntegerField()
+    actividades_id_actividad = models.ForeignKey('Actividades', on_delete=models.DO_NOTHING, db_column='actividades_id_actividad')
+    participantes_id_participante = models.ForeignKey('Participantes', on_delete=models.DO_NOTHING, db_column='participantes_id_participante')
+    
+    estrellas = models.SmallIntegerField(
+        null=True, blank=True, choices=CALIFICACION_CHOICES,
+        validators=[MinValueValidator(0), MaxValueValidator(5)],
+        default=0
+    )
     comentario = models.CharField(max_length=500, blank=True, null=True)
-    fecha = models.DateTimeField()
+    fecha = models.DateTimeField(auto_now_add=True)  # Por defecto se asigna la fecha actual al crear la calificación
+
     class Meta:
-        managed = False
+        managed = False  
         db_table = 'calificaciones_actividad'
-        unique_together = (('actividades_id_actividad', 'participantes_id_participante'),)
+        unique_together = (('actividades_id_actividad', 'participantes_id_participante'),)  # Única combinación de actividad y participante
+
+    def save(self, *args, **kwargs):
+        if not self.fecha:
+            self.fecha = models.DateTimeField(auto_now_add=True)  # Si no se pasa la fecha, se pone la actual
+        super().save(*args, **kwargs)
 
 class Citas(models.Model):
 
@@ -295,11 +344,10 @@ def actividad_upload_to(instance, filename):
 
     filename = f"{actividad_slug}.{ext}"
     
-    # ruta final: media/<grupo_id>/<actividad_slug>/<actividad_slug>.ext
     return os.path.join(str(grupo_id), actividad_slug, filename)
 
 class GruposActividad(models.Model):
-    # 👇 coincide con bigint identity en Postgres
+    
     id_grupo_actividad = models.BigAutoField(
         db_column='id_grupo_actividad', primary_key=True
     )
@@ -354,9 +402,15 @@ class HorariosParticipante(models.Model):
         db_table = 'horarios_participante'
         unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
 
-
-
-
+def clean(self):
+    # Buscar solapamientos con otros eventos del mismo participante
+    conflictos = HorariosParticipante.objects.filter(
+        participantes_id_participante=self.participantes_id_participante,
+        fecha_inicio__lt=self.fecha_fin,
+        fecha_fin__gt=self.fecha_inicio
+    ).exclude(id_horario=self.id_horario)
+    if conflictos.exists():
+        raise ValidationError("Conflicto de hora: ya tienes una actividad, cita o materia en este horario.")
 
 class InscripcionesPsu(models.Model):
 
@@ -379,17 +433,32 @@ class MotivosCita(models.Model):
         managed = False
         db_table = 'motivos_cita'
 
-class Notificaciones(models.Model):
 
+class Notificaciones(models.Model):
     id_notificacion = models.BigAutoField(primary_key=True)
     mensaje = models.CharField(max_length=500)
     fecha = models.DateTimeField()
-    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    tipos_notificacion_id_tipo_notificacion = models.ForeignKey('TiposNotificacion', models.DO_NOTHING, db_column='tipos_notificacion_id_tipo_notificacion')
+    participantes_id_participante = models.ForeignKey(
+        'Participantes',
+        models.DO_NOTHING,
+        db_column='participantes_id_participante'
+    )
+    tipos_notificacion_id_tipo_notificacion = models.ForeignKey(
+        'TiposNotificacion',
+        models.DO_NOTHING,
+        db_column='tipos_notificacion_id_tipo_notificacion'
+    )
+    leida = models.BooleanField(default=False)
+    
+    #  NUEVO: Fecha de creación real de la notificación
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
-        managed = False
+        managed = False  #  CAMBIO: Dejar en False para no tocar otras tablas
         db_table = 'notificaciones'
+    
+    def __str__(self):
+        return f"{self.mensaje[:50]}..."
 
 class Participaciones(models.Model):
 
@@ -499,6 +568,7 @@ class RolesParticipacion(models.Model):
 class TiposActividad(models.Model):
     id_tipo = models.FloatField(primary_key=True)
     nombre_tipo = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -524,6 +594,7 @@ class Torneos(models.Model):
 )
     reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
     aforo_equipos = models.BigIntegerField(null=True, blank=True)
+    limite_inscripcion = models.DateTimeField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -539,3 +610,15 @@ class TorneosEquipos(models.Model):
         managed = False
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
+
+class Noticias(models.Model):
+    titulo = models.CharField(max_length=200)
+    descripcion = models.TextField()
+    imagen = models.ImageField(upload_to='noticias/')
+    fecha_publicacion = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo
+    class Meta:
+        db_table = 'noticias'
+        ordering = ['-fecha_publicacion']

@@ -1,16 +1,16 @@
 from datetime import date
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.core.validators import validate_email
-from django.contrib.auth.models import User
-from django.contrib import messages
-from django.shortcuts import redirect, render
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad, Noticias
 from .forms import UserLoginForm, UserRegisterForm
 from typing import List
+from datetime import datetime, timedelta
+from django.utils import timezone
+from .models import Notificaciones
 
 def user_login(request):
     if request.method == "POST":
@@ -155,22 +155,78 @@ def preferences(request):
 
     return render(request, 'list_preferences.html', {'categorias': categorias})
 
+
+import json
+@login_required
+def schedule(request):
+    # Obtener el participante asociado al usuario autenticado
+    participante = get_object_or_404(Participantes, user=request.user.id)
+
+    # Consultar todos los horarios del participante
+    eventos = HorariosParticipante.objects.filter(participantes_id_participante=participante.id_participante)
+
+    # Construir los eventos en formato compatible con FullCalendar
+    eventos_data = []
+    for e in eventos:
+        color = "#007bff"  # Azul por defecto
+        if e.actividades_id_actividad:
+            color = "#28a745"  # Verde
+        elif e.citas_id_cita:
+            color = "#ffc107"  # Amarillo
+        elif e.partidos_id_partido:
+            color = "#dc3545"  # Rojo
+
+        eventos_data.append({
+            "title": e.titulo,
+            "start": e.fecha_inicio.isoformat(),
+            "end": e.fecha_fin.isoformat(),
+            "color": color,
+            "extendedProps": {
+                "notas": e.notas or "",
+                "fuente": "Automática" if e.fuente_manual == 'N' else "Manual"
+            }
+        })
+
+    context = {
+        "participante": participante,
+        "eventos_json": json.dumps(eventos_data)
+    }
+    return render(request, "Horario.html", context)
+
 @login_required
 def home_user(request):
+     
+    if request.user.is_superuser:
+        return render(request, "pageNotFound-404.html", status=404)
+    
     user = request.user
-    actividades = Actividades.objects.values("nombre")  # asumiendo que el campo se llama 'nombre'
+    actividades = Actividades.objects.values("nombre") 
     actividades_recomendadas = get_recommendations_for_user(user)
+    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
     horario = get_user_schedule(user)
     calendario = get_user_calendar(user)
+
+ # Intentamos obtener el rol del participante
+    #participante = Participantes.objects.filter(usuario=user).select_related('roles_id_rol').first()
+    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
+    user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
+
 
     context = {
         "actividades_recomendadas": actividades_recomendadas,
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
+        "user_rol": user_rol,  #  agregado aquí
+        "noticias": noticias,
     }
 
     return render(request, "home_user.html", context)
+
+@login_required
+def home_admin(request):
+        
+    return render(request, "home_admin.html")
 
 def get_recommendations_for_user(user):
     try:
@@ -198,21 +254,43 @@ def get_user_calendar(user):
     except Participantes.DoesNotExist:
         return []
 
-@login_required
-def home_admin(request):
-    return render(request, "home_admin.html")
 
 @login_required
 def profile(request):
     participante = Participantes.objects.get(user=request.user)
+
+    #  Obtener notificaciones de este participante
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante=participante
+    ).order_by('-fecha')
+
+    notificaciones_no_leidas = notificaciones.filter(leida=False).count()
+
+    # Rol del usuario (por si lo necesita el menú lateral)
+    user_rol = participante.roles_id_rol.nombre_rol if participante.roles_id_rol else None
+
+    # Actividades del participante
     try:
         preferencia = Preferencias.objects.get(participantes_id_participante=participante)
-        actividades: List[PreferenciasActividades] = preferencia.actividades.all()  # type: ignore # Esto funciona en Django pero Pylance lo marca falso positivo
+        actividades = preferencia.actividades.all()  # type: ignore
     except Preferencias.DoesNotExist:
         actividades = []
 
     context = {
         "participante": participante,
         "actividades": actividades,
+        "notificaciones": notificaciones,
+        "notificaciones_no_leidas": notificaciones_no_leidas,
+        "user_rol": user_rol,
     }
+
     return render(request, "profile.html", context)
+
+@login_required
+def ver_notificaciones(request):
+    notificaciones = Notificaciones.objects.filter(
+        participantes_id_participante__user=request.user
+    ).order_by('-fecha')
+    return render(request, "notificaciones/notificaciones.html", {
+        "notificaciones": notificaciones
+    })

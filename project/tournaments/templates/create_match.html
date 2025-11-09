@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Registrar partido — {{ tournament.nombre }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+{% endblock %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <section class="col-12 col-md-10 col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+            <h2 class="page-title text-center mb-3">Registrar partido</h2>
+            <p class="text-center text-muted mb-4">{{ tournament.nombre }} · {{ tournament.disciplina }}</p>
+
+            <form method="post" action="{% url 'tournaments:matches_create' tournament.id %}" class="mx-auto" style="max-width: 560px;">
+              {% csrf_token %}
+
+              <div class="row g-3">
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Equipo A</label>
+                  <select name="equipo_a" class="form-select" required>
+                    <option value="" selected disabled>Selecciona equipo</option>
+                    {% for team in teams %}
+                      <option value="{{ team.id_equipo }}">{{ team.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Equipo B</label>
+                  <select name="equipo_b" class="form-select" required>
+                    <option value="" selected disabled>Selecciona equipo</option>
+                    {% for team in teams %}
+                      <option value="{{ team.id_equipo }}">{{ team.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Inicio</label>
+                  <input type="datetime-local" name="inicio" class="form-control" required>
+                </div>
+
+                <div class="col-12 col-md-6">
+                  <label class="form-label">Fin</label>
+                  <input type="datetime-local" name="fin" class="form-control" required>
+                </div>
+
+                <div class="col-12">
+                  <label class="form-label">Lugar (opcional)</label>
+                  <input type="text" name="lugar" class="form-control" placeholder="Cancha 3 / Coliseo / ...">
+                </div>
+              </div>
+
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-success" type="submit">Aprobar y publicar</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}

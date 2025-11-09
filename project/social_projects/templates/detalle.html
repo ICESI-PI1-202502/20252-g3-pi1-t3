@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}{{ p.nombre }} · PSU{% endblock %}
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'social_projects/css/main.css' %}">
+{% endblock %}
+
+{% block subheaderBar %}
+  <a href="javascript:history.back()" class="back-link text-decoration-none d-inline-flex align-items-center gap-2">
+    <i class="bi bi-arrow-left"></i> <span>Regresar</span>
+  </a>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="detail-wrapper">
+    <h2 class="detail-title">{{ p.nombre }}</h2>
+
+    {% with fi=p.fecha_inicio ff=p.fecha_fin %}
+      <p class="detail-meta">
+        <b>Fecha:</b>
+        {% if fi and ff %}{{ fi|date:"d M Y" }} – {{ ff|date:"d M Y" }}{% else %}—{% endif %}
+      </p>
+    {% endwith %}
+
+    <p class="detail-meta">
+      <b>Aforo:</b>
+      {% if cupo_total %} {{ cupo_usado }}/{{ cupo_total }}
+      {% else %} — {% endif %}
+    </p>
+
+    {% if p.descripcion %}
+      <div class="detail-desc"><p>{{ p.descripcion }}</p></div>
+    {% endif %}
+
+    <div class="mt-3">
+      {% if ya_inscrito %}
+        <button class="btn btn-secondary" disabled>Ya inscrito</button>
+      {% elif not cupo_disponible %}
+        <button class="btn btn-secondary" disabled>Sin cupos</button>
+      {% else %}
+        <form method="post" action="{% url 'social_projects:inscribirse_psu' p.id_proyecto %}">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-primary"
+              {% if ya_inscrito or not cupo_disponible %}disabled{% endif %}>
+          Inscribirme
+          </button>
+        </form>
+      {% endif %}
+      <a href="{% url 'social_projects:consultar_duda' p.id_proyecto %}" class="btn btn-outline-info mt-2">
+      Consultar dudas al coordinador
+      </a>
+
+      {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+      {{ message }}
+      <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+  {% endfor %}
+{% endif %}
+
+    </div>
+  </div>
+</div>
+{% endblock %}

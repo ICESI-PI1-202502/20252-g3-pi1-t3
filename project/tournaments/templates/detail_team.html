@@ -1,49 +1,124 @@
 {% extends "base.html" %}
 {% load static %}
-{% block content %}
+
+{% block title %}{{ tournament.nombre }} — Bienestar Universitario{% endblock %}
+
+{% block extra_css %}
 <link rel="stylesheet" href="{% static 'tournaments/css/main.css' %}">
+{% endblock %}
 
-<div class="tournament-detail centered-only">
-  <section class="tournament-info centered">
-    <h2 class="page-title">{{ tournament.nombre }}</h2>
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
 
-    {% with fi=tournament.fecha_inicio ff=tournament.fecha_fin %}
-      <p class="meta">
-        <b>Fechas:</b>
-        {% if fi and ff %}{{ fi|date:"d M Y" }} – {{ ff|date:"d M Y" }}{% else %}—{% endif %}
-      </p>
-    {% endwith %}
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <section class="col-12 col-md-10 col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4 text-center">
 
-    <p class="meta"><b>Disciplina:</b> {{ tournament.disciplina|default:"—" }}</p>
+            <h2 class="page-title mb-2">{{ tournament.nombre }}</h2>
 
-    {% if tournament.aforo_equipos %}
-      <p class="meta"><b>Aforo de equipos:</b> {{ tournament.aforo_equipos }}</p>
-    {% endif %}
+            {% with fi=tournament.fecha_inicio ff=tournament.fecha_fin %}
+              <p class="meta mb-1">
+                <b>Fechas:</b>
+                {% if fi and ff %}{{ fi|date:"d M Y" }} – {{ ff|date:"d M Y" }}{% else %}—{% endif %}
+              </p>
+            {% endwith %}
 
-    <h3 class="section-title">Equipos registrados</h3>
-    <ul class="list">
-      {% for team in teams %}
-        <li>{{ team.nombre }}</li>
-      {% empty %}
-        <li>Aún no hay equipos.</li>
-      {% endfor %}
-    </ul>
+            <p class="meta mb-1"><b>Disciplina:</b> {{ tournament.disciplina|default:"—" }}</p>
 
-    <div class="actions">
-      {% if my_team_id %}
-        <a class="btn" href="{% url 'tournaments:manage_team' tournament.id my_team_id %}">
-          Gestionar mi equipo
-        </a>
+            {% if tournament.aforo_equipos %}
+              <p class="meta"><b>Aforo de equipos:</b> {{ tournament.aforo_equipos }}</p>
+            {% endif %}
+
+            <h3 class="section-title mt-4 mb-2">Equipos registrados</h3>
+
+            <ul class="list list-unstyled text-start mx-auto" style="max-width: 480px;">
+              {% for team in teams %}
+                <li class="py-1 border-bottom">{{ team.nombre }}</li>
+              {% empty %}
+                <li class="py-1">Aún no hay equipos.</li>
+              {% endfor %}
+            </ul>
+
+            <div class="actions mt-4 d-flex flex-wrap gap-2 justify-content-center">
+              {% if my_team_id %}
+                <a class="btn btn-primary" href="{% url 'tournaments:manage_team' tournament.id my_team_id %}">
+                  Gestionar mi equipo
+                </a>
+             {% endif %}
+              <a class="btn btn-outline-primary" href="{% url 'tournaments:create_team' tournament.id %}">
+                Crear equipo
+              </a>
+              <a class="btn btn-primary" href="{% url 'tournaments:join_team' tournament.id %}">
+                Unirme a un equipo
+              </a>
+
+              {# SOLO ADMIN: Registrar partido #}
+              {% if can_manage and tournament.aforo_equipos %}
+                <a class="btn btn-success" href="{% url 'tournaments:matches_create' tournament.id %}">
+                  Registrar partido
+                </a>
+              {% endif %}
+          </div>
+
+{# Lista de partidos #}
+<h3 class="section-title mt-5 mb-2">Partidos</h3>
+<div class="table-responsive">
+  <table class="table table-sm align-middle">
+    <thead>
+      <tr>
+        <th>Fecha</th>
+        <th>Partido</th>
+        <th>Estado</th>
+        <th>Marcador</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for m in matches %}
+        <tr>
+          <td>
+            {% if m.fecha_inicio %}{{ m.fecha_inicio|date:"d M Y H:i" }}{% else %}—{% endif %}
+          </td>
+          <td>
+            {{ m.equipos_id_equipo.nombre }} vs {{ m.equipos_id_equipo2.nombre }}
+            {% if m.lugar %}<div class="text-muted small">Lugar: {{ m.lugar }}</div>{% endif %}
+          </td>
+          <td>{{ m.estado|default:"PROGRAMADO" }}</td>
+          <td>
+            {% if m.marcador_a != None and m.marcador_b != None %}
+              {{ m.marcador_a }} - {{ m.marcador_b }}
+            {% else %}—{% endif %}
+          </td>
+           {% if can_manage %}
+        <td>
+          {% if m.estado != "FINALIZADO" %}
+            <a class="btn btn-sm btn-outline-primary"
+               href="{% url 'tournaments:match_result' m.id_partido %}">
+              Cargar resultado
+            </a>
+          {% else %}
+            <span class="text-muted small">Listo</span>
+          {% endif %}
+        </td>
       {% endif %}
-
-      <a class="btn outline" href="{% url 'tournaments:create_team' tournament.id %}">
-        Crear equipo
-      </a>
-
-      <a class="btn" href="{% url 'tournaments:join_team' tournament.id %}">
-        Unirme a un equipo
-      </a>
-    </div>
-  </section>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="text-center">Aún no hay partidos.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
 </div>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
 {% endblock %}
