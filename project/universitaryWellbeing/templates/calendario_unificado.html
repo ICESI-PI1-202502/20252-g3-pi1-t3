@@ -1,0 +1,148 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Calendario Unificado BU{% endblock %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+<link rel="stylesheet" href="{% static 'universitaryWellbeing/css/horario.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="container calendar-shell">
+  <div class="calendar-header text-center mb-4">
+    <h2>Calendario Unificado de Actividades</h2>
+    <p class="text-muted">Explora todas las actividades disponibles</p>
+  </div>
+
+  <div class="calendar-card">
+
+    <!-- Controles -->
+    <form method="get" class="calendar-controls" id="filterForm">
+      <div class="controls-left">
+        <!-- Navegación -->
+        <div class="btn-group me-2">
+          <button id="btn-prev" type="button" class="btn btn-nav">
+            <i class="bi bi-chevron-left"></i>
+          </button>
+          <button id="btn-today" type="button" class="btn btn-today">Hoy</button>
+          <button id="btn-next" type="button" class="btn btn-nav">
+            <i class="bi bi-chevron-right"></i>
+          </button>
+        </div>
+
+        <!-- Vistas -->
+        <div class="btn-group me-2">
+          <button id="btn-month" type="button" class="btn btn-view">
+            <i class="bi bi-calendar-month"></i> Mes
+          </button>
+          <button id="btn-week" type="button" class="btn btn-view active">
+            <i class="bi bi-calendar-week"></i> Semana
+          </button>
+          <button id="btn-day" type="button" class="btn btn-view">
+            <i class="bi bi-calendar-day"></i> Día
+          </button>
+        </div>
+
+        <!-- Fines de semana -->
+        <button id="btn-weekends" type="button" class="btn btn-weekends active">
+          <i class="bi bi-calendar2-check"></i> Fines de semana
+        </button>
+
+        <!-- Filtro por tipo -->
+        <div class="filter-group me-2">
+          <label for="tipo" class="filter-label">
+            <i class="bi bi-funnel"></i> Tipo:
+          </label>
+          <select id="tipo" name="tipo" class="filter-select">
+            <option value="">Todos</option>
+            {% for t in tipos %}
+              <option value="{{ t.id_tipo }}" {% if tipo_id == t.id_tipo|stringformat:"s" %}selected{% endif %}>
+                {{ t.nombre_tipo }}
+              </option>
+            {% endfor %}
+          </select>
+          <button type="submit" class="btn btn-go">
+            <i class="bi bi-check-circle"></i>
+          </button>
+        </div>
+        
+        <!-- Ir a fecha -->
+        <div class="input-group">
+          <input type="date" id="go-date" class="date-picker" />
+          <button id="btn-go" type="button" class="btn btn-go">
+            <i class="bi bi-arrow-right-circle"></i> Ir
+          </button>
+        </div>
+        
+      </div>
+
+      
+    </form>
+
+    <div id="calendar"></div>
+
+    <!-- Leyenda dinámica con los tipos cargados -->
+    <div class="legend">
+      <div class="legend-title">Tipos de actividades:</div>
+      <span class="legend-item">
+        <span class="dot" style="background:#E9683B;"></span> Deportes
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#E4EB60;"></span> Arte y Cultura
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#5454E9;"></span> Académico
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#4DB979;"></span> Bienestar
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#FF6B9D;"></span> Social
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#00BCD4;"></span> Tecnología
+      </span>
+      <span class="legend-item">
+        <span class="dot" style="background:#8BC34A;"></span> Salud
+      </span>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para detalles de actividades -->
+<div class="modal fade" id="dayModal" tabindex="-1" aria-labelledby="dayModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="dayModalLabel">Detalles</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+      </div>
+      <div class="modal-body">
+        <div id="day-events-list"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-primary" data-bs-dismiss="modal">Cerrar</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+{{ block.super }}
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script id="events-data" type="application/json">
+  {{ eventos_json|safe }}
+</script>
+
+<script src="{% static 'universitaryWellbeing/js/horarioUnificado.js' %}"></script>
+{% endblock %}

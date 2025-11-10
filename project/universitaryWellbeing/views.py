@@ -1,16 +1,24 @@
+import json
+from django.http import JsonResponse
 from datetime import date
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import login, logout
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_http_methods
 from django.core.validators import validate_email
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad, Noticias
 from .forms import UserLoginForm, UserRegisterForm
-from typing import List
-from datetime import datetime, timedelta
+from .models import Notificaciones, HorariosBloque
+from django.contrib.auth import views as auth_views
+from django.core.cache import cache
+from django.http import HttpResponseForbidden
+from django.core.mail import send_mail
+from django.urls import reverse_lazy
 from django.utils import timezone
-from .models import Notificaciones
+from datetime import datetime, date
+from collections import defaultdict
 
 # ========== LOGIN ==========
 def user_login(request):
@@ -121,24 +129,6 @@ def register(request):
 
     return render(request, "auth/register.html", {'form': form})
 
-
-#class AdminLoginView(LoginView):
-    template_name = 'login.html'
-
-    def form_valid(self, form):
-        user = form.get_user()
-        
-        if is_role_admin(user):
-            return redirect('home_admin')
-        else:
-            messages.error(self.request, 'No tienes permisos de administrador')
-            return redirect('login')
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Credenciales incorrectas')
-        return super().form_invalid(form)
-
-
 def user_logout(request):
     logout(request)
     messages.success(request, "Sesión cerrada correctamente")
@@ -174,8 +164,6 @@ def preferences(request):
 
     return render(request, 'list_preferences.html', {'categorias': categorias})
 
-
-import json
 @login_required
 def schedule(request):
     # Obtener el participante asociado al usuario autenticado
@@ -188,23 +176,56 @@ def schedule(request):
     eventos_data = []
     for e in eventos:
         color = "#007bff"  # Azul por defecto
+        tipo_evento = "otro"
+        
         if e.actividades_id_actividad:
-            color = "#28a745"  # Verde
+            color = "#5454E9"  # Morado para actividades
+            tipo_evento = "actividad"
         elif e.citas_id_cita:
-            color = "#ffc107"  # Amarillo
+            color = "#E4EB60"  # Amarillo para citas
+            tipo_evento = "cita"
         elif e.partidos_id_partido:
-            color = "#dc3545"  # Rojo
+            color = "#E9683B"  # Naranja para partidos
+            tipo_evento = "partido"
 
-        eventos_data.append({
-            "title": e.titulo,
-            "start": e.fecha_inicio.isoformat(),
-            "end": e.fecha_fin.isoformat(),
-            "color": color,
-            "extendedProps": {
-                "notas": e.notas or "",
-                "fuente": "Automática" if e.fuente_manual == 'N' else "Manual"
-            }
-        })
+        # ⭐ CAMBIO CRÍTICO: Detectar si es recurrente
+        # Las actividades añadidas manualmente (fuente_manual='S') deben repetirse semanalmente
+        es_recurrente = (e.fuente_manual == 'S' and e.actividades_id_actividad is not None)
+        
+        if es_recurrente:
+            # 🔄 EVENTO RECURRENTE - Se repite cada semana
+            dia_semana = e.fecha_inicio.weekday()  # 0=Lunes, 1=Martes, ..., 6=Domingo
+            eventos_data.append({
+                "id": e.id_horario,
+                "title": e.titulo,
+                "daysOfWeek": [dia_semana],  # CLAVE: Array con el día de la semana
+                "startTime": e.fecha_inicio.strftime("%H:%M:%S"),  # Solo la hora
+                "endTime": e.fecha_fin.strftime("%H:%M:%S"),      # Solo la hora
+                "color": color,
+                "extendedProps": {
+                    "notas": e.notas or "",
+                    "fuente": "Manual",
+                    "tipo": tipo_evento,
+                    "puede_eliminar": True,
+                    "es_recurrente": True  # Marcador para el frontend
+                }
+            })
+        else:
+            # EVENTO ÚNICO - Solo aparece en su fecha específica
+            eventos_data.append({
+                "id": e.id_horario,
+                "title": e.titulo,
+                "start": e.fecha_inicio.isoformat(),  # Fecha completa
+                "end": e.fecha_fin.isoformat(),        # Fecha completa
+                "color": color,
+                "extendedProps": {
+                    "notas": e.notas or "",
+                    "fuente": "Automática" if e.fuente_manual == 'N' else "Manual",
+                    "tipo": tipo_evento,
+                    "puede_eliminar": e.fuente_manual == 'S',
+                    "es_recurrente": False
+                }
+            })
 
     context = {
         "participante": participante,
@@ -212,33 +233,275 @@ def schedule(request):
     }
     return render(request, "Horario.html", context)
 
+
+@login_required
+@require_http_methods(["POST"])
+def delete_event(request, evento_id):
+    """
+    Endpoint para eliminar un evento del horario personal
+    Solo permite eliminar eventos manuales (fuente_manual = 'S')
+    """
+    try:
+        participante = get_object_or_404(Participantes, user=request.user.id)
+        
+        # Buscar el evento
+        evento = get_object_or_404(
+            HorariosParticipante,
+            id_horario=evento_id,
+            participantes_id_participante=participante.id_participante
+        )
+        
+        # Verificar que sea un evento manual
+        if evento.fuente_manual != 'S':
+            return JsonResponse({
+                'success': False,
+                'message': 'Solo puedes eliminar eventos creados manualmente'
+            }, status=403)
+        
+        # Eliminar el evento
+        titulo = evento.titulo
+        evento.delete()
+        
+        return JsonResponse({
+            'success': True,
+            'message': f'Evento "{titulo}" eliminado correctamente'
+        })
+        
+    except Exception as e:
+        return JsonResponse({
+            'success': False,
+            'message': f'Error al eliminar el evento: {str(e)}'
+        }, status=500)  
+
+# FullCalendar: 0=Dom,1=Lun,...6=Sab
+def _django_weekday_to_fc_dow(django_wd: int) -> int:
+    # Django: 1=Dom ... 7=Sab  -> FC: 0=Dom ... 6=Sab
+    return django_wd % 7
+
+@login_required
+def unified_calendar(request):
+
+    tipo_id = request.GET.get("tipo")  # string or None
+
+    # Catálogo de tipos para el filtro (una sola consulta)
+    tipos = list(
+        TiposActividad.objects
+        .values("id_tipo", "nombre_tipo")
+        .order_by("nombre_tipo")
+    )
+
+    # ACTIVIDADES base (con filtro opcional por tipo)
+    qs_acts = Actividades.objects.all()
+    if tipo_id:
+        qs_acts = qs_acts.filter(tipos_actividad_id_tipo=tipo_id)
+
+    acts_rows = list(
+        qs_acts.select_related("tipos_actividad_id_tipo")
+        .values(
+            "id_actividad",
+            "nombre",
+            "descripcion",
+            "tipos_actividad_id_tipo",                      # id del tipo
+            "tipos_actividad_id_tipo__nombre_tipo",        # nombre del tipo
+        )
+    )
+
+    # Mapa en memoria: id_actividad -> info (incluye tipo)
+    acts_by_id = {
+        r["id_actividad"]: {
+            "nombre": r["nombre"],
+            "descripcion": r["descripcion"] or "",
+            "tipo_id": r["tipos_actividad_id_tipo"],
+            "tipo_nombre": r["tipos_actividad_id_tipo__nombre_tipo"],
+        }
+        for r in acts_rows
+    }
+
+    act_ids = list(acts_by_id.keys())
+
+    if not act_ids:
+        ctx = {
+            "tipos": tipos,
+            "tipo_id": str(tipo_id) if tipo_id else "",
+            "eventos_json": "[]",
+        }
+        return render(request, "calendario_unificado.html", ctx)
+
+    # Bloques (una consulta)
+    bloques = list(
+        HorariosBloque.objects
+        .filter(actividades_id_actividad__in=act_ids)
+        .values(
+            "id_horario_bloque",
+            "actividades_id_actividad",
+            "profesor",
+            "lugar",
+            "hora_inicio",
+            "hora_fin",
+        )
+    )
+
+    # Días por bloque (una consulta)
+    bloque_ids = [b["id_horario_bloque"] for b in bloques] or []
+    dias = list(
+        HorariosActividad.objects
+        .filter(horario_bloque_id__in=bloque_ids)
+        .values("horario_bloque_id", "dia_semana")
+    )
+
+    dias_por_bloque = defaultdict(list)
+    for d in dias:
+        dias_por_bloque[d["horario_bloque_id"]].append(d["dia_semana"])
+
+    # Construcción de eventos (todo en memoria, sin más consultas)
+    eventos = []
+    for b in bloques:
+        act_id = b["actividades_id_actividad"]
+        act = acts_by_id.get(act_id)
+        if not act:
+            continue
+
+        start_time = b["hora_inicio"].strftime("%H:%M:%S")
+        end_time   = b["hora_fin"].strftime("%H:%M:%S")
+
+        for django_wd in sorted(dias_por_bloque.get(b["id_horario_bloque"], [])):
+            fc_dow = _django_weekday_to_fc_dow(django_wd)
+            eventos.append({
+                "title": act["nombre"],
+                "daysOfWeek": [fc_dow],          # 0..6
+                "startTime": start_time,
+                "endTime": end_time,
+                "display": "block",
+                "color": "#5454E9",
+                "extendedProps": {
+                    "tipo": act["tipo_nombre"],
+                    "actividad_id": act_id,
+                    "bloque_id": b["id_horario_bloque"],
+                    "profesor": b["profesor"] or "",
+                    "espacio": b["lugar"] or "",
+                    "descripcion": act["descripcion"],
+                }
+            })
+
+    ctx = {
+        "tipos": tipos,
+        "tipo_id": str(tipo_id) if tipo_id else "",
+        "eventos_json": json.dumps(eventos, ensure_ascii=False, separators=(",", ":")),
+    }
+    return render(request, "calendario_unificado.html", ctx)
+
+
+def obtener_eventos_del_dia(participante, fecha):
+    """
+    Obtiene todos los eventos (únicos y recurrentes) para una fecha específica
+    """
+    dia_semana = fecha.weekday()
+    eventos = []
+    
+    print(f"Buscando eventos para: {fecha} - {fecha.strftime('%A')} (día {dia_semana})")
+    
+    # 1. Eventos únicos de la fecha
+    eventos_unicos = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        fecha_inicio__date=fecha
+    )
+    
+    print(f"Eventos únicos encontrados: {eventos_unicos.count()}")
+    
+    for ev in eventos_unicos:
+        eventos.append({
+            'titulo': ev.titulo,
+            'fecha_inicio': ev.fecha_inicio,
+            'fecha_fin': ev.fecha_fin,
+            'notas': ev.notas or '',
+            'tipo': 'único',
+            'id': ev.id_horario
+        })
+    
+    # 2. Eventos recurrentes que caen en este día de la semana
+    eventos_recurrentes = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        fuente_manual='S',
+        actividades_id_actividad__isnull=False
+    )
+    
+    print(f"Eventos recurrentes totales: {eventos_recurrentes.count()}")
+    
+    for ev in eventos_recurrentes:
+        # Obtener el día de la semana del evento original
+        dia_evento = ev.fecha_inicio.weekday()
+        print(f"   - {ev.titulo}: día {dia_evento} ({['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][dia_evento]}) | Buscando: {dia_semana} ({['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][dia_semana]})")
+        
+        if dia_evento == dia_semana:
+            # Usar timezone.localtime para asegurar zona horaria correcta
+            hora_inicio = ev.fecha_inicio.time()
+            hora_fin = ev.fecha_fin.time()
+            
+            eventos.append({
+                'titulo': ev.titulo,
+                'fecha_inicio': datetime.combine(fecha, hora_inicio),
+                'fecha_fin': datetime.combine(fecha, hora_fin),
+                'notas': ev.notas or '',
+                'tipo': 'recurrente',
+                'id': ev.id_horario
+            })
+            print(f"      MATCH! Agregado.")
+    
+    # Ordenar por hora
+    eventos.sort(key=lambda x: x['fecha_inicio'].time())
+    print(f"Total eventos a mostrar: {len(eventos)}")
+    
+    return eventos
+
+
 @login_required
 def home_user(request):
-     
     if request.user.is_superuser:
         return render(request, "pageNotFound-404.html", status=404)
     
     user = request.user
-    actividades = Actividades.objects.values("nombre") 
-   # actividades_recomendadas = get_recommendations_for_user(user)
-    horario = get_user_schedule(user)
-    calendario = get_user_calendar(user)
-
- # Intentamos obtener el rol del participante
+    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
+    
+    # Datos para el home
+    actividades = Actividades.objects.values("nombre")[:10]
+    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
+    actividades_recomendadas = get_recommendations_for_user(user)
+    
+    ahora = timezone.localtime(timezone.now())
+    hoy = ahora.date()
+    # Datos para el home
+    actividades = Actividades.objects.values("nombre")[:10]
+    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
+    
+    # EVENTOS DE HOY para el mini calendario
+    eventos_hoy = obtener_eventos_del_dia(participante, hoy)[:5]  # Máximo 5 eventos
+    
+    # Horario general (próximos 10 eventos)
+    horario = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        fecha_inicio__gte=timezone.now()
+    ).order_by('fecha_inicio')[:10]
+    
+    # Calendario actividades (próximas 5)
+    calendario = Actividades.objects.all()[:5]
+    
+     # Intentamos obtener el rol del participante
     #participante = Participantes.objects.filter(usuario=user).select_related('roles_id_rol').first()
     participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
     user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
 
-
     context = {
-       # "actividades_recomendadas": actividades_recomendadas,
+        "today": hoy,  # Para mostrar la fecha
+        "eventos_hoy": eventos_hoy,  # Eventos del día
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
-        "user_rol": user_rol,  #  agregado aquí
+        "user_rol": user_rol,
+        "noticias": noticias,
     }
 
     return render(request, "home_user.html", context)
+
 
 @login_required
 def home_admin(request):
@@ -283,7 +546,7 @@ def profile(request):
 
     notificaciones_no_leidas = notificaciones.filter(leida=False).count()
 
-    # 👤 Rol del usuario (por si lo necesita el menú lateral)
+    # Rol del usuario (por si lo necesita el menú lateral)
     user_rol = participante.roles_id_rol.nombre_rol if participante.roles_id_rol else None
 
     # Actividades del participante
@@ -436,3 +699,78 @@ def completar_perfil(request):
     return render(request, 'completar_perfil.html', {
         'participante': participante
     })
+# ============================================
+# VISTAS DE PASSWORD RESET PERSONALIZADAS
+# ============================================
+class RateLimitedPasswordResetView(auth_views.PasswordResetView):
+    """Vista de password reset con rate limiting (3 intentos por hora)"""
+    template_name = 'auth/password_reset.html'
+    email_template_name = 'auth/reg/password_reset_email.html'
+    subject_template_name = 'auth/reg/password_reset_subject.txt'
+    success_url = reverse_lazy('password_reset_done')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Rate limiting por IP
+        ip = self.get_client_ip(request)
+        cache_key = f'password_reset_{ip}'
+        
+        attempts = cache.get(cache_key, 0)
+        
+        if attempts >= 3:  # Máximo 3 intentos por hora
+            messages.error(
+                request,
+                'Demasiados intentos de recuperación de contraseña. '
+                'Por favor intenta nuevamente en 1 hora.'
+            )
+            return HttpResponseForbidden(
+                'Demasiados intentos. Intenta en 1 hora.'
+            )
+        
+        # Incrementar contador de intentos
+        cache.set(cache_key, attempts + 1, 3600)  # 1 hora en segundos
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_client_ip(self, request):
+        """Obtener la IP del cliente (considera proxies)"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """Vista de confirmación que envía notificación de cambio exitoso"""
+    template_name = 'auth/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+    
+    def form_valid(self, form):
+        # Llamar al método padre primero para cambiar la contraseña
+        response = super().form_valid(form)
+        
+        # Obtener el usuario
+        user = form.user
+        
+        # Enviar email de notificación de cambio exitoso
+        try:
+            send_mail(
+                subject='Tu contraseña ha sido cambiada - BU App',
+                message=(
+                    f'Hola {user.first_name or user.username},\n\n'
+                    f'Tu contraseña fue cambiada exitosamente el {timezone.now().strftime("%d/%m/%Y a las %H:%M")}.\n\n'
+                    f'Si NO fuiste tú quien realizó este cambio, '
+                    f'contacta a soporte inmediatamente en jhonjhonshon4@gmail.com.\n\n'
+                    f'Saludos,\n'
+                    f'El equipo de Bienestar Universitario'
+                ),
+                from_email='BU App <jhonjhonshon4@gmail.com>',
+                recipient_list=[user.email],
+                fail_silently=True,  # No interrumpir el flujo si falla el email
+            )
+        except Exception as e:
+            # Log del error pero no interrumpir el proceso
+            print(f"Error enviando email de notificación: {e}")
+        
+        return response

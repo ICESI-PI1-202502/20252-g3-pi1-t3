@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}{% if is_pro %}Agenda de atención{% else %}Mis citas{% endif %}{% endblock %}
+
+{% block subheaderBar %}
+<a href="{% url 'appointments:home' %}" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="card shadow-sm border-0">
+      <div class="card-body p-4">
+        <h2 class="mb-3">{% if is_pro %}Agenda de atención{% else %}Mis citas{% endif %}</h2>
+
+        {% if items %}
+          <div class="table-responsive">
+            <table class="table align-middle">
+              <thead>
+                <tr>
+                  <th>Fecha</th>
+                  <th>Hora</th>
+                  <th>{% if is_pro %}Estudiante{% else %}Profesional{% endif %}</th>
+                  <th>Lugar</th>
+                  <th>Estado</th>
+                  <th class="text-end">Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for i in items %}
+                <tr>
+                  <td>{{ i.inicio|date:"D d/m/Y" }}</td>
+                  <td>{{ i.inicio|date:"H:i" }}–{{ i.fin|date:"H:i" }}</td>
+                  <td>{{ i.estudiante|default:i.profesional }}</td>
+                  <td>{{ i.lugar }}</td>
+                  <td>{{ i.estado }}</td>
+                  <td class="text-end text-nowrap">
+                    <a class="btn btn-sm btn-outline-primary" href="{% url 'appointments:detail' i.id %}">Ver</a>
+
+                    {# Acciones para profesional (o habilitar para estudiante con allow_student_actions=True) #}
+                    {% if is_pro or allow_student_actions %}
+                      <form method="post" action="{% url 'appointments:cancel' i.id %}"
+                            class="d-inline ms-1" data-oneshot>
+                        {% csrf_token %}
+                        <button class="btn btn-sm btn-outline-danger"
+                                onclick="return confirm('¿Cancelar esta cita?');">
+                          Cancelar
+                        </button>
+                      </form>
+
+                      <form method="post" action="{% url 'appointments:reschedule' i.id %}"
+                            class="d-inline ms-1" data-oneshot>
+                        {% csrf_token %}
+                        <input type="datetime-local" name="new_fecha" required
+                               class="form-control form-control-sm d-inline-block"
+                               style="width: 205px; vertical-align: middle;">
+                        <button class="btn btn-sm btn-outline-secondary ms-1">
+                          Reprogramar
+                        </button>
+                      </form>
+                    {% endif %}
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% else %}
+          <p class="text-muted mb-0">No tienes citas registradas.</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</main>
+
+{# Evitar doble envío en botones de acción #}
+<script>
+  document.querySelectorAll('form[data-oneshot]').forEach(f => {
+    f.addEventListener('submit', () => {
+      const btn = f.querySelector('button[type="submit"],button:not([type])');
+      if (btn) { btn.disabled = true; btn.classList.add('disabled'); }
+    });
+  });
+</script>
+{% endblock %}

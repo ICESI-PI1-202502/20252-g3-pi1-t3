@@ -57,3 +57,7 @@
     text-align: center;
     text-shadow: 1px 1px 4px rgba(0,0,0,0.7);
 }
+
+footer {
+  margin-top: auto;  /* Se pega al final */
+}

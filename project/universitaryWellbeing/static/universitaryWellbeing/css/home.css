@@ -409,11 +409,228 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   cursor: pointer;
 }
 
+/* ---------- SLIDER DE NOTICIAS CORREGIDO ---------- */
+.noticia-slider {
+  position: relative;
+  width: 80%;
+  max-width: 720px;
+  margin: 1rem auto 0 auto;
+  overflow: visible;
+  border-radius: 16px;
+  background: transparent;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
 
+/* Cada noticia (slide) */
+.noticia-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.8s ease-in-out, visibility 0s linear 0.8s;
+}
 
+.noticia-slide.active {
+  opacity: 1;
+  visibility: visible;
+  position: relative;
+  z-index: 2;
+}
 
+/* Imagen */
+.noticia-slide img {
+  width: 100%;
+  height: 400px;              /* Altura fija para todas las imágenes */
+  display: block;
+  border-radius: 16px 16px 0 0;
+  object-fit: cover;          /* Recorta manteniendo proporción */
+  object-position: center;    /* Centra la imagen */
+}
 
+/* Bloque azul */
+.noticia-content {
+  position: relative;
+  padding: 1.25rem 1.5rem 2rem;
+  background: linear-gradient(180deg, #233b9a, #1e3a8a);
+  color: #fff;
+  border-radius: 0 0 16px 16px;
+}
 
+/* Textos */
+.noticia-content h6,
+.noticia-content h5,
+.noticia-content p {
+  color: #fff !important;
+}
+
+/* Barra de progreso */
+.noticia-slide .progress-bar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  width: 0%;
+  background: linear-gradient(90deg, #60a5fa, #8b5cf6);
+  transition: width 4s linear;
+  border-radius: 0 0 16px 16px;
+}
+
+/* Botones de navegación - CENTRADOS DINÁMICAMENTE */
+.btn-nav {
+  position: absolute;
+  /* top será controlado por JavaScript */
+  transform: translateY(-50%);
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
+  font-size: 2rem;
+  padding: 0.5rem 0.8rem;
+  border-radius: 50%;
+  cursor: pointer;
+  z-index: 100;
+  color: #1e3a8a;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+  transition: all 0.3s ease;
+  line-height: 1;
+}
+
+.btn-nav.prev {
+  left: 15px;
+}
+
+.btn-nav.next {
+  right: 15px;
+}
+
+.btn-nav:hover {
+  background: #1e3a8a;
+  color: #fff;
+  transform: translateY(-50%) scale(1.15);
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Tablets y pantallas pequeñas */
+@media (max-width: 992px) {
+  .noticia-slider {
+    width: 90%;
+    min-height: 500px;
+    margin-bottom: 4rem;  /* Más espacio en tablets */
+  }
+  
+  .noticia-slide img {
+    height: 350px;
+  }
+}
+
+/* Móviles */
+@media (max-width: 768px) {
+  .noticia-slider {
+    width: 95%;
+    min-height: 450px;
+    margin-bottom: 5rem;  /* MÁS ESPACIO EN MÓVILES */
+  }
+  
+  .noticia-slide img {
+    height: 300px;
+  }
+  
+  .noticia-content {
+    padding: 1rem 1.25rem 1.75rem;
+  }
+  
+  .noticia-content h5 {
+    font-size: 1.1rem;
+  }
+  
+  .noticia-content p {
+    font-size: 0.9rem;
+  }
+  
+  .btn-nav {
+    font-size: 1.6rem;
+    padding: 0.4rem 0.65rem;
+  }
+  
+  .btn-nav.prev {
+    left: 10px;
+  }
+  
+  .btn-nav.next {
+    right: 10px;
+  }
+}
+
+/* Móviles pequeños */
+@media (max-width: 576px) {
+  .noticia-slider {
+    width: 98%;
+    min-height: 420px;
+    margin-bottom: 6rem;  /* MÁXIMO ESPACIO EN MÓVILES PEQUEÑOS */
+  }
+  
+  .noticia-slide img {
+    height: 250px;
+  }
+  
+  .noticia-content {
+    padding: 0.875rem 1rem 1.5rem;
+  }
+  
+  .noticia-content h5 {
+    font-size: 1rem;
+  }
+  
+  .noticia-content p {
+    font-size: 0.85rem;
+  }
+  
+  .btn-nav {
+    font-size: 1.4rem;
+    padding: 0.3rem 0.5rem;
+  }
+}
+
+/* Modal */
+#noticiaModal .modal-header {
+  background: linear-gradient(90deg, #1e3a8a, #233b9a);
+  border-bottom: none;
+}
+
+#noticiaModal .modal-body img {
+  max-height: 380px;
+  object-fit: cover;
+}
+
+#noticiaModal .modal-body {
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+/* universitaryWellbeing/static/universitaryWellbeing/css/news.css */
+
+.descripcion-texto {
+    white-space: pre-wrap;        /* Preserva saltos de línea */
+    word-wrap: break-word;        /* Rompe palabras largas */
+    line-height: 1.6;             /* Espaciado entre líneas */
+    text-align: justify;          /* Justificar texto */
+}
+
+.descripcion-texto p {
+    margin-bottom: 1rem;
+}
+
+/* Estilos para listas en descripción */
+.descripcion-texto ol,
+.descripcion-texto ul {
+    margin-left: 1.5rem;
+    margin-bottom: 1rem;
+}
+
+.descripcion-texto li {
+    margin-bottom: 0.5rem;
+}
 
 
 /* 
@@ -617,3 +834,145 @@ Esto son los estilos de las notificaciones
                 right: -10px;
             }
         }
+
+.accordion-body {
+    padding: 1rem;
+}
+
+#horario-mini table {
+    font-size: 0.9rem;
+}
+
+#horario-mini .table th {
+    background: #f8f9fa;
+}
+
+.sticky-top {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+
+
+/* Mini Calendario Widget */
+.mini-calendar-widget {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 12px;
+    padding: 1.5rem;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.mini-calendar-header {
+    text-align: center;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 2px solid rgba(255,255,255,0.2);
+}
+
+.calendar-date-display {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.day-name {
+    font-size: 0.875rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.9;
+}
+
+.day-number {
+    font-size: 3rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.month-year {
+    font-size: 1rem;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+.today-events {
+    background: white;
+    border-radius: 8px;
+    padding: 1rem;
+    color: #333;
+    min-height: 200px;
+}
+
+.today-events h6 {
+    color: #667eea;
+    font-weight: 600;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #f0f0f0;
+}
+
+.event-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.event-item {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.event-item:last-child {
+    border-bottom: none;
+}
+
+.event-time {
+    color: #667eea;
+    font-size: 0.875rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.event-title {
+    font-weight: 500;
+    color: #333;
+    font-size: 0.95rem;
+}
+
+.event-notes {
+    font-size: 0.8rem;
+    padding-left: 1.25rem;
+}
+
+/* Botón Ver Completo */
+.mini-calendar-widget .btn-primary {
+    background: rgba(255,255,255,0.2);
+    border: 2px solid white;
+    color: white;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.mini-calendar-widget .btn-primary:hover {
+    background: white;
+    color: #667eea;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .day-number {
+        font-size: 2.5rem;
+    }
+    
+    .mini-calendar-widget {
+        padding: 1rem;
+    }
+}
