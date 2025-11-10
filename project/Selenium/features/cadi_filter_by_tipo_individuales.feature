@@ -2,7 +2,7 @@ Feature: CADI - Filtro por tipo de actividad (Deportes Individuales)
 
   Scenario: Ver resultados de "Deportes Individuales" y encontrar "Ajedrez"
     Given I am on the login page
-    When I login with username "488192423" and password "Daniel_2005"
+    When I login with username "23871289" and password "Pablito_200"
     And I open the sidebar menu
     And I go to the search page from the menu
     And I open the CADI search filters
