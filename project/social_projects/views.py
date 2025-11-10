@@ -132,7 +132,7 @@ def detalle_proyecto(request, pk):
 @login_required
 def inscribirse_psu(request, pk):
     logger.info("inscribirse_psu: INICIO method=%s user=%s", request.method, request.user.id)
-    messages.info(request, f"Llegó a inscribirse_psu con method={request.method}")
+    
 
     p = get_object_or_404(ProyectosSociales, pk=pk)
     participante = _current_participante(request.user)

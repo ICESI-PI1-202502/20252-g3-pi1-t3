@@ -30,7 +30,7 @@ def step_impl(context):
 
 @then("I should see the admin panel")
 def step_impl(context):
-    assert context.login_page.login_admin_exitoso()
+    assert context.login_page.login_admin_exitoso(), "Admin link not visible or user lacks admin role."
 
 def after_scenario(context, scenario):
     if hasattr(context, "driver"):
