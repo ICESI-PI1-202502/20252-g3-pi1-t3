@@ -4,6 +4,7 @@ from django.contrib.auth.models import User,Group
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import os
+from django_resized import ResizedImageField
 
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
@@ -610,3 +611,24 @@ class TorneosEquipos(models.Model):
         managed = False
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
+
+class Noticias(models.Model):
+    titulo = models.CharField(max_length=200)
+    enunciado = models.CharField(max_length=300)
+    autor = models.CharField(max_length=100)
+    descripcion = models.TextField()
+    imagen = ResizedImageField(
+        size=[800, 450],           # Tamaño máximo [ancho, alto]
+        crop=None,                 # None = No cortar, mantener proporción
+        quality=85,                # Calidad JPEG (0-100)
+        keep_meta=False,           # Eliminar metadatos EXIF
+        force_format='JPEG',       # Convertir a JPEG
+        upload_to='noticias/'
+    )
+    fecha_publicacion = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.titulo
+    class Meta:
+        db_table = 'noticias'
+        ordering = ['-fecha_publicacion']

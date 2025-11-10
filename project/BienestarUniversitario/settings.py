@@ -128,6 +128,7 @@ LANGUAGE_CODE = 'en-us'
 
  #  Zona horaria de Colombia
 TIME_ZONE = 'America/Bogota'
+USE_TZ = True
 
 # Habilitar internacionalización
 USE_I18N = True

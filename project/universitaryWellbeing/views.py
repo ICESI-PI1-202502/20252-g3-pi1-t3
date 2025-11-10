@@ -8,9 +8,16 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.validators import validate_email
-from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad
+from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad, Noticias
 from .forms import UserLoginForm, UserRegisterForm
 from .models import Notificaciones, HorariosBloque
+from django.contrib.auth import views as auth_views
+from django.core.cache import cache
+from django.http import HttpResponseForbidden
+from django.core.mail import send_mail
+from django.urls import reverse_lazy
+from django.utils import timezone
+from datetime import datetime, date
 
 def user_login(request):
     if request.method == "POST":
@@ -102,23 +109,6 @@ def register(request):
         form = UserRegisterForm()
 
     return render(request, "auth/register.html", {'form': form})
-
-
-#class AdminLoginView(LoginView):
-    template_name = 'login.html'
-
-    def form_valid(self, form):
-        user = form.get_user()
-        
-        if is_role_admin(user):
-            return redirect('home_admin')
-        else:
-            messages.error(self.request, 'No tienes permisos de administrador')
-            return redirect('login')
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Credenciales incorrectas')
-        return super().form_invalid(form)
 
 def user_logout(request):
     logout(request)
@@ -384,33 +374,121 @@ def calendario_unificado(request):
     return render(request, "calendario_unificado.html", ctx)
 
 
+def obtener_eventos_del_dia(participante, fecha):
+    """
+    Obtiene todos los eventos (únicos y recurrentes) para una fecha específica
+    """
+    dia_semana = fecha.weekday()
+    eventos = []
+    
+    print(f"🔍 Buscando eventos para: {fecha} - {fecha.strftime('%A')} (día {dia_semana})")
+    
+    # 1. Eventos únicos de la fecha
+    eventos_unicos = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        fecha_inicio__date=fecha
+    )
+    
+    print(f"📅 Eventos únicos encontrados: {eventos_unicos.count()}")
+    
+    for ev in eventos_unicos:
+        eventos.append({
+            'titulo': ev.titulo,
+            'fecha_inicio': ev.fecha_inicio,
+            'fecha_fin': ev.fecha_fin,
+            'notas': ev.notas or '',
+            'tipo': 'único',
+            'id': ev.id_horario
+        })
+    
+    # 2. Eventos recurrentes que caen en este día de la semana
+    eventos_recurrentes = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        fuente_manual='S',
+        actividades_id_actividad__isnull=False
+    )
+    
+    print(f"🔄 Eventos recurrentes totales: {eventos_recurrentes.count()}")
+    
+    for ev in eventos_recurrentes:
+        # Obtener el día de la semana del evento original
+        dia_evento = ev.fecha_inicio.weekday()
+        print(f"   - {ev.titulo}: día {dia_evento} ({['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][dia_evento]}) | Buscando: {dia_semana} ({['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][dia_semana]})")
+        
+        if dia_evento == dia_semana:
+            # Usar timezone.localtime para asegurar zona horaria correcta
+            hora_inicio = ev.fecha_inicio.time()
+            hora_fin = ev.fecha_fin.time()
+            
+            eventos.append({
+                'titulo': ev.titulo,
+                'fecha_inicio': datetime.combine(fecha, hora_inicio),
+                'fecha_fin': datetime.combine(fecha, hora_fin),
+                'notas': ev.notas or '',
+                'tipo': 'recurrente',
+                'id': ev.id_horario
+            })
+            print(f"      ✅ MATCH! Agregado.")
+    
+    # Ordenar por hora
+    eventos.sort(key=lambda x: x['fecha_inicio'].time())
+    print(f"✅ Total eventos a mostrar: {len(eventos)}")
+    
+    return eventos
+
+    
+    # Ordenar por hora
+    eventos.sort(key=lambda x: x['fecha_inicio'].time())
+    return eventos
+
 @login_required
 def home_user(request):
-     
     if request.user.is_superuser:
         return render(request, "pageNotFound-404.html", status=404)
     
     user = request.user
-    actividades = Actividades.objects.values("nombre") 
-   # actividades_recomendadas = get_recommendations_for_user(user)
-    horario = get_user_schedule(user)
-    calendario = get_user_calendar(user)
-
- # Intentamos obtener el rol del participante
+    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
+    
+    # Datos para el home
+    actividades = Actividades.objects.values("nombre")[:10]
+    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
+    actividades_recomendadas = get_recommendations_for_user(user)
+    
+    ahora = timezone.localtime(timezone.now())
+    hoy = ahora.date()
+    # Datos para el home
+    actividades = Actividades.objects.values("nombre")[:10]
+    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
+    
+    # ⭐ EVENTOS DE HOY para el mini calendario
+    eventos_hoy = obtener_eventos_del_dia(participante, hoy)[:5]  # Máximo 5 eventos
+    
+    # Horario general (próximos 10 eventos)
+    horario = HorariosParticipante.objects.filter(
+        participantes_id_participante=participante,
+        fecha_inicio__gte=timezone.now()
+    ).order_by('fecha_inicio')[:10]
+    
+    # Calendario actividades (próximas 5)
+    calendario = Actividades.objects.all()[:5]
+    
+     # Intentamos obtener el rol del participante
     #participante = Participantes.objects.filter(usuario=user).select_related('roles_id_rol').first()
     participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
     user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
 
-
     context = {
-       # "actividades_recomendadas": actividades_recomendadas,
+        "today": hoy,  # Para mostrar la fecha
+        "eventos_hoy": eventos_hoy,  # Eventos del día
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
-        "user_rol": user_rol,  #  agregado aquí
+        "user_rol": user_rol,
+        "noticias": noticias,
     }
 
     return render(request, "home_user.html", context)
+
 
 @login_required
 def home_admin(request):
@@ -483,3 +561,79 @@ def ver_notificaciones(request):
     return render(request, "notificaciones/notificaciones.html", {
         "notificaciones": notificaciones
     })
+
+# ============================================
+# VISTAS DE PASSWORD RESET PERSONALIZADAS
+# ============================================
+class RateLimitedPasswordResetView(auth_views.PasswordResetView):
+    """Vista de password reset con rate limiting (3 intentos por hora)"""
+    template_name = 'auth/password_reset.html'
+    email_template_name = 'auth/reg/password_reset_email.html'
+    subject_template_name = 'auth/reg/password_reset_subject.txt'
+    success_url = reverse_lazy('password_reset_done')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Rate limiting por IP
+        ip = self.get_client_ip(request)
+        cache_key = f'password_reset_{ip}'
+        
+        attempts = cache.get(cache_key, 0)
+        
+        if attempts >= 3:  # Máximo 3 intentos por hora
+            messages.error(
+                request,
+                'Demasiados intentos de recuperación de contraseña. '
+                'Por favor intenta nuevamente en 1 hora.'
+            )
+            return HttpResponseForbidden(
+                'Demasiados intentos. Intenta en 1 hora.'
+            )
+        
+        # Incrementar contador de intentos
+        cache.set(cache_key, attempts + 1, 3600)  # 1 hora en segundos
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_client_ip(self, request):
+        """Obtener la IP del cliente (considera proxies)"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """Vista de confirmación que envía notificación de cambio exitoso"""
+    template_name = 'auth/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+    
+    def form_valid(self, form):
+        # Llamar al método padre primero para cambiar la contraseña
+        response = super().form_valid(form)
+        
+        # Obtener el usuario
+        user = form.user
+        
+        # Enviar email de notificación de cambio exitoso
+        try:
+            send_mail(
+                subject='Tu contraseña ha sido cambiada - BU App',
+                message=(
+                    f'Hola {user.first_name or user.username},\n\n'
+                    f'Tu contraseña fue cambiada exitosamente el {timezone.now().strftime("%d/%m/%Y a las %H:%M")}.\n\n'
+                    f'Si NO fuiste tú quien realizó este cambio, '
+                    f'contacta a soporte inmediatamente en jhonjhonshon4@gmail.com.\n\n'
+                    f'Saludos,\n'
+                    f'El equipo de Bienestar Universitario'
+                ),
+                from_email='BU App <jhonjhonshon4@gmail.com>',
+                recipient_list=[user.email],
+                fail_silently=True,  # No interrumpir el flujo si falla el email
+            )
+        except Exception as e:
+            # Log del error pero no interrumpir el proceso
+            print(f"Error enviando email de notificación: {e}")
+        
+        return response
