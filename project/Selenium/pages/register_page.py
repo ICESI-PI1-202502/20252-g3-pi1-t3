@@ -15,7 +15,6 @@ class RegisterPage(BasePage):
     MENSAJE_EXITO = (By.XPATH, "//*[contains(text(), 'Usuario registrado con éxito. Ahora puede iniciar sesión.')]")
     MENSAJE_ERROR = (By.XPATH, "//*[contains(text(), 'This field is required.')]")
 
-    # --- Acciones ---
     def abrir_formulario(self):
         self.click(self.LINK_REGISTRARSE)
         time.sleep(2)
@@ -29,14 +28,13 @@ class RegisterPage(BasePage):
         self.click(self.BOTON_REGISTRAR)
         time.sleep(2)
 
-    # --- Validaciones ---
     def registro_exitoso(self):
         return self.is_visible(self.MENSAJE_EXITO)
 
     def registro_error(self):
         return self.is_visible(self.MENSAJE_ERROR)
 
-    # --- Limpieza (usa tu misma lógica original) ---
+
     def eliminar_usuario_existente(self):
         try:
             conn = psycopg2.connect(
