@@ -163,7 +163,11 @@
             <a href="#">Eventos y Servicios</a>
             <a href="{% url 'tournaments:list' %}">Torneos</a>
             <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales</a>
+            {% if es_psicologo %}
+            <a href="{% url 'appointments:pro_list' %}">Gestionar citas</a>
+            {% else %}
             <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
+            {% endif %}
 
 
             {# Opción adicional para Profesor #}
