@@ -414,7 +414,7 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   position: relative;
   width: 80%;
   max-width: 720px;
-  margin: 1rem auto 0 auto;
+  margin: 1rem auto 3rem auto;
   overflow: visible;
   border-radius: 16px;
   background: transparent;
@@ -423,30 +423,45 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
 
 /* Cada noticia (slide) */
 .noticia-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: none;                 /* CAMBIO CLAVE: display none por defecto */
   width: 100%;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.8s ease-in-out, visibility 0s linear 0.8s;
+  transition: opacity 0.6s ease-in-out;
+  overflow: hidden;
+  border-radius: 16px;
 }
 
 .noticia-slide.active {
-  opacity: 1;
-  visibility: visible;
+  display: block;
+  animation: fadeIn 0.6s ease-in-out forwards;                /* CAMBIO CLAVE: display block cuando activo */
+}
+
+/* Animación de fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Contenedor de imagen */
+.noticia-img {
   position: relative;
-  z-index: 2;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  background-color: #f0f0f0;
 }
 
 /* Imagen */
 .noticia-slide img {
   width: 100%;
-  height: 400px;              /* Altura fija para todas las imágenes */
+  height: 100%;
   display: block;
   border-radius: 16px 16px 0 0;
-  object-fit: cover;          /* Recorta manteniendo proporción */
-  object-position: center;    /* Centra la imagen */
+  object-fit: cover;
+  object-position: center;
 }
 
 /* Bloque azul */
@@ -463,6 +478,23 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
 .noticia-content h5,
 .noticia-content p {
   color: #fff !important;
+  margin-bottom: 0.5rem;
+}
+
+.noticia-content h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.noticia-content p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.noticia-content .btn {
+  margin-top: 0.5rem;
 }
 
 /* Barra de progreso */
@@ -470,18 +502,17 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
-  height: 4px;
   width: 0%;
+  height: 4px;
   background: linear-gradient(90deg, #60a5fa, #8b5cf6);
-  transition: width 4s linear;
-  border-radius: 0 0 16px 16px;
+  transition: width 6.5s linear;
+  border-radius: 0;
 }
 
-/* Botones de navegación - CENTRADOS DINÁMICAMENTE */
+/* Botones de navegación */
 .btn-nav {
   position: absolute;
-  /* top será controlado por JavaScript */
+  top: 200%;
   transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.95);
   border: none;
@@ -497,55 +528,22 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
 }
 
 .btn-nav.prev {
-  left: 15px;
+  left: -20px;                   /* FUERA del slider */
 }
 
 .btn-nav.next {
-  right: 15px;
+  right: -20px;                  /* FUERA del slider */
 }
-
 .btn-nav:hover {
   background: #1e3a8a;
   color: #fff;
   transform: translateY(-50%) scale(1.15);
   box-shadow: 0 6px 15px rgba(0, 0, 0, 0.4);
 }
-
-/* Tablets y pantallas pequeñas */
-@media (max-width: 992px) {
-  .noticia-slider {
-    width: 90%;
-    min-height: 500px;
-    margin-bottom: 4rem;  /* Más espacio en tablets */
-  }
-  
-  .noticia-slide img {
-    height: 350px;
-  }
-}
-
-/* Móviles */
+/* Responsive */
 @media (max-width: 768px) {
   .noticia-slider {
     width: 95%;
-    min-height: 450px;
-    margin-bottom: 5rem;  /* MÁS ESPACIO EN MÓVILES */
-  }
-  
-  .noticia-slide img {
-    height: 300px;
-  }
-  
-  .noticia-content {
-    padding: 1rem 1.25rem 1.75rem;
-  }
-  
-  .noticia-content h5 {
-    font-size: 1.1rem;
-  }
-  
-  .noticia-content p {
-    font-size: 0.9rem;
   }
   
   .btn-nav {
@@ -559,36 +557,6 @@ html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table
   
   .btn-nav.next {
     right: 10px;
-  }
-}
-
-/* Móviles pequeños */
-@media (max-width: 576px) {
-  .noticia-slider {
-    width: 98%;
-    min-height: 420px;
-    margin-bottom: 6rem;  /* MÁXIMO ESPACIO EN MÓVILES PEQUEÑOS */
-  }
-  
-  .noticia-slide img {
-    height: 250px;
-  }
-  
-  .noticia-content {
-    padding: 0.875rem 1rem 1.5rem;
-  }
-  
-  .noticia-content h5 {
-    font-size: 1rem;
-  }
-  
-  .noticia-content p {
-    font-size: 0.85rem;
-  }
-  
-  .btn-nav {
-    font-size: 1.4rem;
-    padding: 0.3rem 0.5rem;
   }
 }
 
