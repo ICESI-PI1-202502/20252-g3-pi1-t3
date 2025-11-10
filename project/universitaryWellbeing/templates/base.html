@@ -143,7 +143,7 @@
   {% if request.user.is_superuser %}
     {# === ADMINISTRADOR (SUPERUSER) === #}
     <a href="{% url 'cadi_admin' %}">Administrar oferta</a>
-    <a href="#">Gestionar eventos y servicios</a>
+    <!-- <a href="#">Gestionar eventos y servicios</a> -->
     <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
     <a href="{% url 'admin:index' %}">Panel de Administrador</a>
     <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
@@ -157,9 +157,8 @@
     <a href="{% url 'searchActivities:search' %}">Buscar</a>
     <a href="{% url 'horario' %}">Horario</a>
     <a href="{% url 'calendario_unificado' %}">Horario unificado BU</a>
-    <a href="#">¿Quiénes Somos?</a>
     <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
-    <a href="#">Eventos y Servicios</a>
+    <!-- <a href="#">Eventos y Servicios</a> -->
     <a href="{% url 'tournaments:list' %}">Torneos</a>
     <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
 
