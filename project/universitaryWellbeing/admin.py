@@ -7,7 +7,7 @@ from .models import (
     HistorialCitas, HistorialParticipaciones, HorariosParticipante,
     InscripcionesPsu, MotivosCita, Notificaciones, Participaciones, Partidos,
     Preferencias, PreferenciasActividades, ProyectosSociales,
-    RolesParticipacion, TiposActividad, TiposNotificacion, TorneosEquipos
+    RolesParticipacion, TiposActividad, TiposNotificacion, TorneosEquipos,Noticias
 )
 
 # -----------------------
@@ -36,6 +36,20 @@ class ParticipantesAdmin(admin.ModelAdmin):
 class RolesAdmin(admin.ModelAdmin):
     list_display = ('id_rol', 'nombre_rol', 'grupo_d')
     search_fields = ('nombre_rol',)
+
+# universitaryWellbeing/admin.py
+
+@admin.register(Noticias)
+class NoticiaAdmin(admin.ModelAdmin):
+    list_display = ('titulo', 'autor', 'fecha_publicacion')
+    search_fields = ('titulo',)
+    readonly_fields = ('fecha_publicacion',)
+    exclude = ('autor',)  # Ocultar campo autor del formulario
+    
+    def save_model(self, request, obj, form, change):
+        """Asignar automáticamente 'Administración Bienestar Universitario' como autor"""
+        obj.autor = "Administración Bienestar Universitario"
+        super().save_model(request, obj, form, change)
 
 # -----------------------
 # READ-ONLY MODELS
