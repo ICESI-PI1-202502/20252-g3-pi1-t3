@@ -1,5 +1,3 @@
-// universitaryWellbeing/static/universitaryWellbeing/js/news_home.js
-
 document.addEventListener("DOMContentLoaded", function () {
     const slides = document.querySelectorAll(".noticia-slide");
     const nextBtn = document.getElementById("nextNoticia");

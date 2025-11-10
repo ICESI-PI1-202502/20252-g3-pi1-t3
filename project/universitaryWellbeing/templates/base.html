@@ -208,7 +208,8 @@
                 <a href="{% url 'Analytics_Reports:analytics_index' %}">
                     <i class="bi bi-graph-up"></i> Analítica y Reportes
                 </a>
-            
+            {% endif %}
+        {% endif %}
 
         {% if request.user.is_superuser %}
             <a href="#">Gestionar eventos y servicios</a>
