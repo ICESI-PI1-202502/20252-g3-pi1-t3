@@ -32,13 +32,18 @@
                 <tr>
                   <td>{{ i.inicio|date:"D d/m/Y" }}</td>
                   <td>{{ i.inicio|date:"H:i" }}–{{ i.fin|date:"H:i" }}</td>
-                  <td>{{ i.estudiante|default:i.profesional }}</td>
+                  <td>
+                    {% if is_pro %}
+                      {{ i.estudiante }}
+                    {% else %}
+                      {{ i.profesional }}
+                    {% endif %}
+                  </td>
                   <td>{{ i.lugar }}</td>
                   <td>{{ i.estado }}</td>
                   <td class="text-end text-nowrap">
                     <a class="btn btn-sm btn-outline-primary" href="{% url 'appointments:detail' i.id %}">Ver</a>
 
-                    {# Acciones para profesional (o habilitar para estudiante con allow_student_actions=True) #}
                     {% if is_pro or allow_student_actions %}
                       <form method="post" action="{% url 'appointments:cancel' i.id %}"
                             class="d-inline ms-1" data-oneshot>
@@ -74,7 +79,6 @@
   </div>
 </main>
 
-{# Evitar doble envío en botones de acción #}
 <script>
   document.querySelectorAll('form[data-oneshot]').forEach(f => {
     f.addEventListener('submit', () => {
