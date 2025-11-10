@@ -136,112 +136,82 @@
     </nav>
 
 
-    <!-- SIDEBAR -->
-    <!-- SIDEBAR -->
-<!-- templates/base.html - SECCIÓN DEL SIDEBAR MODIFICADA -->
+    <!-- templates/base.html – SIDEBAR LIMPIO -->
 <div id="sidebar" class="sidebar">
-    <a href="{% url 'home' %}">Inicio</a>
+  <a href="{% url 'home' %}">Inicio</a>
 
-    {% if request.user.is_superuser %}
-        <!-- === ADMINISTRADOR (SUPERUSER) === -->
-        <a href="{% url 'cadi_admin' %}">Administrar oferta</a>
-        <a href="#">Gestionar eventos y servicios</a>
-        <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
-        <a href="{% url 'admin:index' %}">Panel de Administrador</a>
-        <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
-        
+  {% if request.user.is_superuser %}
+    {# === ADMINISTRADOR (SUPERUSER) === #}
+    <a href="{% url 'cadi_admin' %}">Administrar oferta</a>
+    <a href="#">Gestionar eventos y servicios</a>
+    <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
+    <a href="{% url 'admin:index' %}">Panel de Administrador</a>
+    <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
+    <a href="{% url 'Analytics_Reports:analytics_index' %}">
+      <i class="bi bi-graph-up"></i> Analítica y Reportes
+    </a>
+    <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
+
+  {% else %}
+    {# === OPCIONES COMUNES (usuarios autenticados) === #}
+    <a href="{% url 'searchActivities:search' %}">Buscar</a>
+    <a href="{% url 'horario' %}">Horario</a>
+    <a href="{% url 'calendario_unificado' %}">Horario unificado BU</a>
+    <a href="#">¿Quiénes Somos?</a>
+    <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
+    <a href="#">Eventos y Servicios</a>
+    <a href="{% url 'tournaments:list' %}">Torneos</a>
+    <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
+
+    {# === OPCIONES ESPECÍFICAS POR ROL (variables opcionales en context) === #}
+    {% if user.is_authenticated %}
+      {% if es_coordinador %}
         <a href="{% url 'Analytics_Reports:analytics_index' %}">
-            <i class="bi bi-graph-up"></i> Analítica y Reportes
+          <i class="bi bi-graph-up"></i> Analítica y Reportes
         </a>
-    
-    {% else %}
-        <!-- === OPCIONES COMUNES (todos los usuarios autenticados) === -->
-        <a href="{% url 'searchActivities:search' %}">Buscar</a>
-        <a href="{% url 'horario' %}">Calendario</a>
-        <a href="#">¿Quiénes Somos?</a>
-        <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
-        <a href="#">Eventos y Servicios</a>
-        <a href="{% url 'tournaments:list' %}">Torneos</a>
-        <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
-
-        <!-- === OPCIONES ESPECÍFICAS POR ROL === -->
-        {% if user.is_authenticated %}
-            
-            <!-- COORDINADOR -->
-            {% if es_coordinador %}
-                <a href="{% url 'Analytics_Reports:analytics_index' %}">
-                    <i class="bi bi-graph-up"></i> Analítica y Reportes
-                </a>
-                <a href="#">
-                    <i class="bi bi-gear"></i> Gestionar mis actividades
-                </a>
-            
-            <!-- DOCENTE/PROFESOR -->
-            {% elif es_profesor %}
-                <a href="{% url 'Analytics_Reports:dashboard_docente' %}">
-                    <i class="bi bi-person-workspace"></i> Mi Dashboard
-                </a>
-                <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">
-                    <i class="bi bi-clipboard-check"></i> Registrar Asistencia
-                </a>
-            
-            <!-- PSICÓLOGO -->
-            {% elif es_psicologo %}
-                <a href="#">
-                    <i class="bi bi-calendar-heart"></i> Gestionar Citas
-                </a>
-                <a href="{% url 'Analytics_Reports:analytics_index' %}">
-                    <i class="bi bi-graph-up"></i> Reportes
-                </a>
-            
-            <!--  ESTUDIANTE - ACCESO DIRECTO A SU HISTORIAL -->
-            {% elif user_rol == 'Estudiante' %}
-                <a href="{% url 'Analytics_Reports:mi_historial' %}">
-                    <i class="bi bi-clock-history"></i> Mi Historial y Progreso
-                </a>
-                <a href="{% url 'profile' %}">
-                    <i class="bi bi-person-circle"></i> Mi Perfil
-                </a>
-            
-            <!-- ADMIN BIENESTAR -->
-            {% elif es_admin_bienestar %}
-                <a href="{% url 'Analytics_Reports:analytics_index' %}">
-                    <i class="bi bi-graph-up"></i> Analítica y Reportes
-                </a>
-            
-
-        {% if request.user.is_superuser %}
-            <a href="#">Gestionar eventos y servicios</a>
-            <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
-            <a href="{% url 'admin:index' %}">Panel de Administrador</a>
-            <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales (PSU)</a>
-            <a href="{% url 'Analytics_Reports:analytics_index' %}">Analítica y reportes</a>
-            <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
-
-        {% else %}
-            <a href="{% url 'searchActivities:search' %}">Buscar</a>
-            <a href="{% url 'horario' %}">Horario</a>
-            <a href="{% url 'calendario_unificado' %}">Horario unificado BU</a>
-            <a href="#">¿Quiénes Somos?</a>
-            <a href="{% url 'cadi_admin' %}">Nuestra oferta</a>
-            <a href="#">Eventos y Servicios</a>
-            <a href="{% url 'tournaments:list' %}">Torneos</a>
-            <a href="{% url 'social_projects:lista_proyectos' %}">Proyectos Sociales</a>
-            {% if es_psicologo %}
-            <a href="{% url 'appointments:pro_list' %}">Gestionar citas</a>
-            {% else %}
-            <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
-            {% endif %}
-
-
-            {# Opción adicional para Profesor #}
-            {% if user_rol == "Profesor" %}
-                <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">Registrar asistencia</a>
-            {% endif %}
-        {% endif %}
+        <a href="#">
+          <i class="bi bi-gear"></i> Gestionar mis actividades
+        </a>
+      {% elif es_profesor %}
+        <a href="{% url 'Analytics_Reports:dashboard_docente' %}">
+          <i class="bi bi-person-workspace"></i> Mi Dashboard
+        </a>
+        <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">
+          <i class="bi bi-clipboard-check"></i> Registrar Asistencia
+        </a>
+      {% elif es_psicologo %}
+        <a href="{% url 'appointments:pro_list' %}">
+          <i class="bi bi-calendar-heart"></i> Gestionar Citas
+        </a>
+        <a href="{% url 'Analytics_Reports:analytics_index' %}">
+          <i class="bi bi-graph-up"></i> Reportes
+        </a>
+      {% elif user_rol == 'Estudiante' %}
+        <a href="{% url 'Analytics_Reports:mi_historial' %}">
+          <i class="bi bi-clock-history"></i> Mi Historial y Progreso
+        </a>
+        <a href="{% url 'profile' %}">
+          <i class="bi bi-person-circle"></i> Mi Perfil
+        </a>
+      {% elif es_admin_bienestar %}
+        <a href="{% url 'Analytics_Reports:analytics_index' %}">
+          <i class="bi bi-graph-up"></i> Analítica y Reportes
+        </a>
+      {% endif %}
     {% endif %}
 
-    <a href="{% url 'logout' %}">Cerrar sesión</a>
+    {# Citas: si NO es psicólogo, mostrar el acceso de estudiante #}
+    {% if not es_psicologo %}
+      <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
+    {% endif %}
+
+    {# Extra professor: conservar acceso rápido si así lo usan #}
+    {% if user_rol == "Profesor" %}
+      <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">Registrar asistencia</a>
+    {% endif %}
+  {% endif %}
+
+  <a href="{% url 'logout' %}">Cerrar sesión</a>
 </div>
 
     <!-- Fondo oscuro para cerrar -->
