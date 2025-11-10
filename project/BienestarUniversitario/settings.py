@@ -80,6 +80,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'universitaryWellbeing.context_processors.notificaciones_context',
+                "universitaryWellbeing.context_processors.role_flags",
                 'universitaryWellbeing.context_processors.user_rol',  # ← Sin 'e' al final
 
             ],
