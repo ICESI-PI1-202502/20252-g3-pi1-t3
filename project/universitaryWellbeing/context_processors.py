@@ -81,3 +81,24 @@ def notificaciones_context(request):
         "notificaciones": notificaciones[:10],  # solo las primeras 10 para el menú
         "notificaciones_no_leidas": no_leidas,
     }
+
+def role_flags(request):
+    es_psicologo = False
+    user_rol = None
+    if request.user.is_authenticated:
+        p = (
+            Participantes.objects
+            .select_related("roles_id_rol")
+            .filter(user_id=request.user.id)
+            .first()
+        )
+        if p and p.roles_id_rol:
+            user_rol = p.roles_id_rol.nombre_rol
+            # bandera por id o por nombre, para mayor robustez
+            es_psicologo = (getattr(p.roles_id_rol, "id_rol", None) == 10) or (
+                p.roles_id_rol.nombre_rol.strip().lower().startswith("psicol")
+            )
+    return {
+        "es_psicologo": es_psicologo,
+        "user_rol": user_rol,   # por si lo usas en otros templates
+    }

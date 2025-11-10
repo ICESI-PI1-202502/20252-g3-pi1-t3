@@ -39,7 +39,7 @@ Una plataforma web diseñada para mejorar la experiencia universitaria de los es
 
 ## ¿Cómo Acceder?
 
-Visita nuestra plataforma en: [URL_del_sitio]
+Visita nuestra plataforma en: [https://mi-bienestar-universitario.onrender.com]
 
 ### Para Entrar:
 1. Ingresa con tu cédula y contraseña

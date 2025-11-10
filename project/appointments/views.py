@@ -59,8 +59,9 @@ def _get_professionals():
         .select_related("user", "roles_id_rol")
         .filter(user__is_active=True)
         .filter(
-            Q(roles_id_rol__id_rol=5) |
-            Q(roles_id_rol__nombre_rol__iexact="Psicólogo")
+            Q(roles_id_rol__id_rol=10) |                  # rol Psicólogo
+            Q(roles_id_rol__nombre_rol__iexact="Psicólogo") |
+            Q(user__is_staff=True) | Q(user__is_superuser=True)
         )
         .order_by("nombre", "apellido")
         .distinct()
@@ -69,7 +70,6 @@ def _get_professionals():
         {"id": p.id_participante, "nombre": f"{p.nombre} {p.apellido}".strip() or p.correo}
         for p in qs
     ]
-
 
 
 def _overlap_q(inicio, fin):
