@@ -64,6 +64,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'universitaryWellbeing.middleware.AsignarGrupoMiddleware',
 ]
 
 ROOT_URLCONF = 'BienestarUniversitario.urls'
@@ -78,8 +79,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'universitaryWellbeing.context_processors.user_role',  
                 'universitaryWellbeing.context_processors.notificaciones_context',
+                'universitaryWellbeing.context_processors.user_rol',  # ← Sin 'e' al final
+
             ],
         },
     },
@@ -219,14 +221,31 @@ CACHES = {
 
 from celery.schedules import crontab
 
-# Tareas periódicas
 CELERY_BEAT_SCHEDULE = {
+    # Notificaciones existentes (cada 1 minuto)
     'generar-notificaciones-diarias': {
         'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
-        'schedule': crontab(minute='*/1'),  # cada 1 minutos
+        'schedule': crontab(minute='*/1'),
+    },
+    
+     #  AGREGAR SOLO: Reconocimientos (RF8.1 - Premios)
+    'verificar-reconocimientos-alcanzados': {
+        'task': 'Analytics_Reports.tasks.verificar_y_otorgar_reconocimientos',
+        'schedule': crontab(minute='*/1'),  # Diario 8 PM
+    },
+    
+    #  AGREGAR: Inasistencias (RF8.1 - Inasistencias)
+    'verificar-inasistencias-inscritos': {
+        'task': 'Analytics_Reports.tasks.verificar_inasistencias_inscritos',
+        'schedule': crontab(minute='*/1'),  # Diario 10 PM
+    },
+    
+    #  AGREGAR: Encuestas (RF8.2)
+    'enviar-encuestas-retroalimentacion': {
+        'task': 'Analytics_Reports.tasks.enviar_encuestas_retroalimentacion',
+        'schedule': crontab(minute='*/1'),  # Diario 6 PM
     },
 }
-
 
 
 

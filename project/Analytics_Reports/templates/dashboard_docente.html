@@ -1,0 +1,146 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard_docente.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<!-- Pasar datos de Django a JavaScript -->
+<script>
+    window.docenteData = {
+        totalActividades: {{ total_mis_actividades }},
+        datosActividades: {{ datos_actividades_populares|safe }}
+    };
+</script>
+<script src="{% static 'js/dashboard_docente.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-person-workspace"></i> 
+                Dashboard de {{ nombre_docente }}
+            </h2>
+            <p class="text-muted">{{ facultad }}</p>
+        </div>
+    </div>
+
+    <!-- Métricas principales -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-music-note-list" style="font-size: 2rem; color: #007bff;"></i>
+                    <h3 class="mt-2">{{ total_mis_actividades }}</h3>
+                    <p>{% if total_mis_actividades == 1 %}Mi Actividad{% else %}Mis Actividades{% endif %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-people-fill" style="font-size: 2rem; color: #28a745;"></i>
+                    <h3 class="mt-2">{{ total_asistentes }}</h3>
+                    <p>Total Estudiantes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-graph-up" style="font-size: 2rem; color: #ffc107;"></i>
+                    <h3 class="mt-2">{{ promedio_asistencia }}</h3>
+                    <p>Promedio Asistencia</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top estudiantes y Actividades populares -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-trophy"></i> Estudiantes Más Activos
+                </div>
+                <div class="card-body">
+                    {% if top_estudiantes %}
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th class="text-center">Asistencias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for est in top_estudiantes %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'Analytics_Reports:historial_participante' est.id_participante %}" 
+                                       class="text-decoration-none">
+                                        <strong>{{ est.nombre }} {{ est.apellido }}</strong>
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ est.total_asistencias }}</span>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="2" class="text-center text-muted py-3">
+                                    No hay estudiantes con asistencias registradas aún.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No hay estudiantes registrados aún.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Actividades populares -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-star"></i> 
+                    {% if total_mis_actividades == 1 %}
+                        Mi Actividad
+                    {% else %}
+                        Mis Actividades Más Populares
+                    {% endif %}
+                </div>
+                <div class="card-body">
+                    {% if total_mis_actividades > 0 %}
+                        <canvas id="chartMisActividades"></canvas>
+                    {% else %}
+                        <p class="text-muted text-center py-3">No tienes actividades asignadas.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botones de acción -->
+    <div class="row">
+        <div class="col-12">
+            <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}" 
+               class="btn btn-primary">
+                <i class="bi bi-clipboard-check"></i> Registrar Asistencia
+            </a>
+            {% if total_mis_actividades > 1 %}
+            <a href="{% url 'Analytics_Reports:comparar_mis_grupos' %}" 
+               class="btn btn-info">
+                <i class="bi bi-bar-chart"></i> Comparar Mis Grupos
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

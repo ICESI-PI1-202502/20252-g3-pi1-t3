@@ -1,23 +1,65 @@
 from universitaryWellbeing.models import Notificaciones, Participantes
 
-def user_role(request):
-    """Agrega información del rol del usuario al contexto global"""
-    context = {}
+#def user_rol(request):  # ← Nombre de la función
+#    if request.user.is_authenticated:
+#        try:
+#            participante = request.user.participantes_set.first()
+#            if participante and participante.roles_id_rol:
+#                return {
+#                    'user_rol': participante.roles_id_rol.nombre_rol.title(),
+#                    'user_grupos': request.user.groups.all()
+#                }
+#        except:
+#            pass
+#    return {'user_rol': None, 'user_grupos': []}
+
+
+# universitaryWellbeing/context_processors.py
+# Agregar esto a settings.py en TEMPLATES['OPTIONS']['context_processors']:
+# 'universitaryWellbeing.context_processors.user_role_processor',
+
+
+# universitaryWellbeing/context_processors.py
+# Agregar esto a settings.py en TEMPLATES['OPTIONS']['context_processors']:
+# 'universitaryWellbeing.context_processors.user_role_processor',
+
+def user_rol(request):
+    """
+    Context processor que agrega el rol del usuario a todas las plantillas
+    """
+    context = {
+        'user_rol': None,
+        'es_coordinador': False,
+        'es_profesor': False,
+        'es_psicologo': False,
+        'es_admin_bienestar': False,
+        'es_super_admin': False,
+    }
     
     if request.user.is_authenticated:
         try:
-            participante = Participantes.objects.select_related('roles_id_rol').get(user=request.user)
-            context['user_participante'] = participante
-            context['user_rol'] = participante.roles_id_rol.nombre_rol
-        except Participantes.DoesNotExist:
-            context['user_participante'] = None
-            context['user_rol'] = None
-    else:
-        context['user_participante'] = None
-        context['user_rol'] = None
+            # Obtener el participante asociado al usuario
+            participante = request.user.participantes_set.first()
+            
+            if participante and participante.roles_id_rol:
+                # Normalizar el nombre del rol (minúsculas y sin espacios extras)
+                rol_nombre = participante.roles_id_rol.nombre_rol.lower().strip()
+                
+                # Agregar el nombre del rol original
+                context['user_rol'] = participante.roles_id_rol.nombre_rol
+                
+                # Flags booleanos para cada rol (comparación flexible)
+                context['es_coordinador'] = rol_nombre in ['coordinador', 'coordinator']
+                context['es_profesor'] = rol_nombre in ['profesor', 'teacher']
+                context['es_psicologo'] = rol_nombre in ['psicologo', 'psicólogo', 'psychologist']
+                context['es_admin_bienestar'] = rol_nombre in ['admin_bienestar', 'admin bienestar']
+                context['es_super_admin'] = rol_nombre in ['super_admin', 'super admin', 'superadmin']
+                
+        except Exception as e:
+            # Log del error pero no interrumpir
+            print(f"Error en context processor: {e}")
     
     return context
-
 
 def notificaciones_context(request):
     """

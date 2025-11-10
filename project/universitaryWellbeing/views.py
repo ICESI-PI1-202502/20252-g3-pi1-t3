@@ -20,6 +20,7 @@ from django.utils import timezone
 from datetime import datetime, date
 from collections import defaultdict
 
+# ========== LOGIN ==========
 def user_login(request):
     if request.method == "POST":
         form = UserLoginForm(request.POST)
@@ -33,19 +34,29 @@ def user_login(request):
             # Obtener el participante relacionado con el usuario
             try:
                 participante = Participantes.objects.get(user=form.user)
-            except Participantes.DoesNotExist:
-                participante = None
-
-            # Si el participante no tiene preferencias, redirigir a la función 'preferences'
-            if participante:
+                
+                # ✅ PASO 1: Verificar si tiene tipo_participante asignado
+                if not participante.tipo_participante:
+                    messages.info(request, '¡Bienvenido! Por favor completa tu perfil para continuar.')
+                    return redirect("completar_perfil")
+                
+                # ✅ PASO 2: Si tiene tipo_participante, verificar preferencias
                 tiene_preferencias = Preferencias.objects.filter(
                     participantes_id_participante=participante
                 ).exists()
+                
                 if not tiene_preferencias:
+                    messages.info(request, 'Ahora selecciona tus preferencias de actividades.')
                     return redirect("preferences")
-
-            # Si tiene preferencias o no es admin -> home normal
-            return redirect("home")
+                
+                # ✅ PASO 3: Todo está completo, ir al home
+                messages.success(request, f'¡Bienvenido de nuevo, {participante.nombre}!')
+                return redirect("home")
+                
+            except Participantes.DoesNotExist:
+                messages.error(request, 'No se encontró tu perfil de participante.')
+                logout(request)
+                return redirect("login")
 
         else:
             for error in form.errors.values():
@@ -56,10 +67,12 @@ def user_login(request):
     return render(request, "login.html", {"form": form})
 
 
+ 
+
 def is_role_admin(user):
     return user.groups.filter(name="admin").exists() or user.is_superuser
 
-
+# ========== REGISTRO ==========
 def register(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
@@ -82,7 +95,14 @@ def register(request):
                 last_name=last_name
             )
 
-            rol = Roles.objects.get(nombre_rol='Estudiante')
+            # ✅ ROL POR DEFECTO: Estudiante (ÚNICO ROL ASIGNADO POR CÓDIGO)
+            try:
+                rol_estudiante = Roles.objects.get(nombre_rol='Estudiante')
+            except Roles.DoesNotExist:
+                messages.error(request, 'Error: No se encontró el rol "Estudiante" en la base de datos.')
+                return redirect("register")
+            
+            # ✅ CREAR PARTICIPANTE SIN tipo_participante (se asigna en completar_perfil)
             Participantes.objects.create(
                 user=user,
                 id_participante=cedula,
@@ -93,14 +113,12 @@ def register(request):
                 facultad="",
                 programa="",
                 genero="",
-                estado_activo="S",  # o lo que necesites por defecto
-                roles_id_rol=rol
+                estado_activo="S",
+                roles_id_rol=rol_estudiante,  # ✅ Siempre "Estudiante"
+                tipo_participante=None  # ✅ NULL - se asigna después
             )
 
-            if rol.grupo_d:
-                user.groups.add(rol.grupo_d)
-
-            messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
+            messages.success(request, "Usuario registrado con éxito. Ahora puedes iniciar sesión.")
             return redirect("login")
         else:
             for error in form.errors.values():
@@ -380,7 +398,7 @@ def obtener_eventos_del_dia(participante, fecha):
     dia_semana = fecha.weekday()
     eventos = []
     
-    print(f"🔍 Buscando eventos para: {fecha} - {fecha.strftime('%A')} (día {dia_semana})")
+    print(f"Buscando eventos para: {fecha} - {fecha.strftime('%A')} (día {dia_semana})")
     
     # 1. Eventos únicos de la fecha
     eventos_unicos = HorariosParticipante.objects.filter(
@@ -388,7 +406,7 @@ def obtener_eventos_del_dia(participante, fecha):
         fecha_inicio__date=fecha
     )
     
-    print(f"📅 Eventos únicos encontrados: {eventos_unicos.count()}")
+    print(f"Eventos únicos encontrados: {eventos_unicos.count()}")
     
     for ev in eventos_unicos:
         eventos.append({
@@ -407,7 +425,7 @@ def obtener_eventos_del_dia(participante, fecha):
         actividades_id_actividad__isnull=False
     )
     
-    print(f"🔄 Eventos recurrentes totales: {eventos_recurrentes.count()}")
+    print(f"Eventos recurrentes totales: {eventos_recurrentes.count()}")
     
     for ev in eventos_recurrentes:
         # Obtener el día de la semana del evento original
@@ -427,11 +445,11 @@ def obtener_eventos_del_dia(participante, fecha):
                 'tipo': 'recurrente',
                 'id': ev.id_horario
             })
-            print(f"      ✅ MATCH! Agregado.")
+            print(f"      MATCH! Agregado.")
     
     # Ordenar por hora
     eventos.sort(key=lambda x: x['fecha_inicio'].time())
-    print(f"✅ Total eventos a mostrar: {len(eventos)}")
+    print(f"Total eventos a mostrar: {len(eventos)}")
     
     return eventos
 
@@ -455,7 +473,7 @@ def home_user(request):
     actividades = Actividades.objects.values("nombre")[:10]
     noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
     
-    # ⭐ EVENTOS DE HOY para el mini calendario
+    # EVENTOS DE HOY para el mini calendario
     eventos_hoy = obtener_eventos_del_dia(participante, hoy)[:5]  # Máximo 5 eventos
     
     # Horario general (próximos 10 eventos)
@@ -557,6 +575,130 @@ def ver_notificaciones(request):
         "notificaciones": notificaciones
     })
 
+
+
+@login_required
+def completar_perfil(request):
+    """
+    Vista para que el usuario complete su perfil la primera vez.
+    Solo se muestra si el participante no tiene tipo_participante asignado.
+    """
+    try:
+        participante = Participantes.objects.get(user=request.user)
+        
+        # ✅ Si ya tiene tipo_participante válido, redirigir a preferencias
+        if participante.tipo_participante:
+            return redirect('preferences')
+            
+    except Participantes.DoesNotExist:
+        messages.error(request, 'No se encontró tu perfil de participante.')
+        logout(request)
+        return redirect('login')
+    
+    if request.method == 'POST':
+        tipo_nombre = request.POST.get('tipo_participante', '').strip().lower()  # ✅ CAMBIO AQUÍ
+        
+        if not tipo_nombre:
+            messages.error(request, 'Debes seleccionar tu vínculo con la universidad.')
+            return render(request, 'completar_perfil.html', {
+                'participante': participante
+            })
+        
+        try:
+            # ✅ Mapeo de valores del formulario a nombres en tipos_participante
+            mapeo_tipos = {
+                'estudiante': 'Estudiante',
+                'trabajador': 'Docente',  # O el nombre que tengas en la BD
+                'egresado': 'Egresado',
+                'invitado': 'Otro'  # O el nombre que tengas en la BD
+            }
+            
+            nombre_tipo_bd = mapeo_tipos.get(tipo_nombre)
+            
+            if not nombre_tipo_bd:
+                messages.error(request, 'Tipo de participante no válido.')
+                return render(request, 'completar_perfil.html', {
+                    'participante': participante
+                })
+            
+            # ✅ Buscar el tipo_participante en la base de datos
+            from .models import TiposParticipante
+            tipo_participante = TiposParticipante.objects.get(nombre__iexact=nombre_tipo_bd)
+            
+            # ✅ Asignar tipo_participante (NO cambiar el rol - roles_id_rol se mantiene como 'Invitado')
+            participante.tipo_participante = tipo_participante
+            
+            # Procesar campos según el tipo
+            if tipo_nombre == 'estudiante':
+                # CAMPOS REQUERIDOS
+                semestre = request.POST.get('semestre', '').strip()
+                programa = request.POST.get('programa', '').strip()
+                facultad = request.POST.get('facultad', '').strip()
+                
+                if not semestre:
+                    messages.error(request, 'El semestre es obligatorio para estudiantes.')
+                    return render(request, 'completar_perfil.html', {'participante': participante})
+                
+                if not programa:
+                    messages.error(request, 'El programa académico es obligatorio para estudiantes.')
+                    return render(request, 'completar_perfil.html', {'participante': participante})
+                
+                if semestre.isdigit():
+                    participante.semestre = int(semestre)
+                
+                participante.programa = programa
+                participante.facultad = facultad
+                
+                # Género opcional
+                genero = request.POST.get('genero', '').strip()
+                if genero:
+                    participante.genero = genero
+            
+            elif tipo_nombre == 'trabajador':
+                # Para trabajador, solo género y facultad son opcionales
+                facultad = request.POST.get('facultad', '').strip()
+                genero = request.POST.get('genero', '').strip()
+                
+                if facultad:
+                    participante.facultad = facultad
+                if genero:
+                    participante.genero = genero
+            
+            elif tipo_nombre == 'egresado':
+                # Para egresado, programa y género son opcionales
+                programa = request.POST.get('programa', '').strip()
+                genero = request.POST.get('genero', '').strip()
+                
+                if programa:
+                    participante.programa = programa
+                if genero:
+                    participante.genero = genero
+            
+            elif tipo_nombre == 'invitado':
+                # Para invitado, solo género es opcional
+                genero = request.POST.get('genero', '').strip()
+                if genero:
+                    participante.genero = genero
+            
+            # Guardar cambios
+            participante.save()
+            
+            messages.success(request, f'¡Perfil completado exitosamente como {tipo_participante.nombre}!')
+            
+            # Redirigir a preferencias
+            return redirect('preferences')
+            
+        except TiposParticipante.DoesNotExist:
+            messages.error(request, f'No se encontró el tipo "{nombre_tipo_bd}" en la base de datos.')
+        except ValueError as e:
+            messages.error(request, 'Error en los datos ingresados. Verifica la información.')
+        except Exception as e:
+            messages.error(request, f'Error al completar el perfil: {str(e)}')
+    
+    # GET request
+    return render(request, 'completar_perfil.html', {
+        'participante': participante
+    })
 # ============================================
 # VISTAS DE PASSWORD RESET PERSONALIZADAS
 # ============================================
