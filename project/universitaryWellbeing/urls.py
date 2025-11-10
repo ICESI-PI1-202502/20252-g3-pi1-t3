@@ -17,9 +17,9 @@ urlpatterns = [
     path("psu/", include("social_projects.urls")),
     path("appointments/", include("appointments.urls")),
     path("horario/", views.schedule, name="horario"),
-    path("horario/eliminar/<int:evento_id>/", views.eliminar_evento, name="eliminar_evento"),  # NUEVA RUTA
+    path("horario/eliminar/<int:evento_id>/", views.delete_event, name="eliminar_evento"),  
     path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
-    path("calendario-unificado/", views.calendario_unificado, name="calendario_unificado"),
+    path("calendario-unificado/", views.unified_calendar, name="calendario_unificado"),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),
