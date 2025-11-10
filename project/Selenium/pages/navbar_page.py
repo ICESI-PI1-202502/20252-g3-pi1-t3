@@ -1,6 +1,7 @@
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from pages.base_page import BasePage
+from selenium.webdriver.support import expected_conditions as EC
 
 class NavBar(BasePage):
     MENU_BTN = (By.ID, "menu-btn")
@@ -10,6 +11,9 @@ class NavBar(BasePage):
     LINK_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/horario/"]') 
     LINK_ANALYTICS = (By.CSS_SELECTOR, '#sidebar a[href="/analytics-reports/"]')
     LINK_PSU         = (By.CSS_SELECTOR, '#sidebar a[href="/psu/proyectos/"]')
+    LINK_UNIFIED_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/calendario-unificado/"]')
+    LINK_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/horario/"]')
+
 
     def open_menu(self):
         try:
@@ -60,3 +64,20 @@ class NavBar(BasePage):
         self.open_menu()
         try: self.click(self.LINK_PSU)
         except Exception: self.click_js(self.LINK_PSU, timeout=5)
+
+    def go_to_unified_schedule(self):
+        self.open_menu()
+        try:
+            self.click(self.LINK_UNIFIED_SCHEDULE)
+        except Exception:
+            self.click_js(self.LINK_UNIFIED_SCHEDULE, timeout=5)
+        WebDriverWait(self.driver, 15).until(EC.url_contains("/calendario-unificado"))
+
+    def go_to_schedule(self):
+        self.open_menu()
+        try:
+            self.click(self.LINK_SCHEDULE)
+        except Exception:
+            self.click_js(self.LINK_SCHEDULE, timeout=5)
+        WebDriverWait(self.driver, 15).until(EC.url_contains("/horario"))
+
