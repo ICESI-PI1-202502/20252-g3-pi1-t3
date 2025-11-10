@@ -20,7 +20,7 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center">
                         <div class="me-4">
-                            <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                            <i class="bi bi-person-circle profile-icon"></i>
                         </div>
                         <div>
                             <h2 class="mb-1">{{ participante.nombre }} {{ participante.apellido }}</h2>
@@ -40,11 +40,11 @@
     </div>
 
     <!-- ✅ PROGRESO HACIA CAMISETA -->
-    <div class="card mb-4 shadow-sm" style="border-left: 5px solid #ffc107;">
+    <div class="card mb-4 shadow-sm card-camiseta">
         <div class="card-body">
             <div class="row align-items-center">
                 <div class="col-md-3 text-center">
-                    <div style="font-size: 4rem;">🎽</div>
+                    <div class="camiseta-icon">🎽</div>
                     <h5 class="mb-0">Tu Camiseta</h5>
                 </div>
                 <div class="col-md-6">
@@ -56,10 +56,10 @@
                             <span class="badge bg-warning text-dark fs-6">Faltan {{ progreso_camiseta.falta }}</span>
                         {% endif %}
                     </div>
-                    <div class="progress" style="height: 35px;">
-                        <div class="progress-bar {% if progreso_camiseta.alcanzado %}bg-success{% else %}bg-warning{% endif %}" 
+                    <div class="progress progress-camiseta">
+                        <div class="progress-bar {% if progreso_camiseta.alcanzado %}bg-success{% else %}bg-warning{% endif %} progress-bar-camiseta" 
                              role="progressbar" 
-                             style="width: {{ progreso_camiseta.porcentaje }}%; font-size: 1.1rem; font-weight: bold;"
+                             style="width: {{ progreso_camiseta.porcentaje }}%;"
                              aria-valuenow="{{ progreso_camiseta.porcentaje }}" 
                              aria-valuemin="0" 
                              aria-valuemax="100">
@@ -92,10 +92,10 @@
     <!-- Métrica simple: Solo total de asistencias -->
     <div class="row mb-4">
         <div class="col-md-12">
-            <div class="card text-center shadow-sm" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <div class="card text-center shadow-sm card-total-asistencias">
                 <div class="card-body py-4">
-                    <i class="bi bi-check-circle-fill" style="font-size: 3.5rem; opacity: 0.9;"></i>
-                    <h1 class="mt-3 mb-1" style="font-size: 4rem; font-weight: bold;">{{ stats.presente }}</h1>
+                    <i class="bi bi-check-circle-fill total-asistencias-icon"></i>
+                    <h1 class="mt-3 mb-1 total-asistencias-numero">{{ stats.presente }}</h1>
                     <h4 class="mb-0">Total de Asistencias Registradas</h4>
                 </div>
             </div>
@@ -126,14 +126,13 @@
                         <tr>
                             <td><strong>{{ actividad.nombre }}</strong></td>
                             <td class="text-center">
-                                <span class="badge bg-success" style="font-size: 1.1rem; padding: 0.5rem 1rem;">
+                                <span class="badge bg-success badge-asistencias">
                                     {{ actividad.presente }}
                                 </span>
                             </td>
-                            <td class="text-center" style="width: 30%;">
-                                <div class="progress" style="height: 25px;">
-                                    <div class="progress-bar bg-success" 
-                                         style="width: 100%; font-weight: bold;">
+                            <td class="text-center col-progreso">
+                                <div class="progress progress-actividad">
+                                    <div class="progress-bar bg-success progress-bar-actividad">
                                         {{ actividad.presente }} asistencias
                                     </div>
                                 </div>
@@ -154,7 +153,7 @@
                 <i class="bi bi-clock-history"></i> 
                 Mi Historial Completo
             </h5>
-            <span class="badge bg-success" style="font-size: 1rem;">{{ stats.presente }} asistencias</span>
+            <span class="badge bg-success badge-historial">{{ stats.presente }} asistencias</span>
         </div>
         <div class="card-body">
             {% if asistencias %}
@@ -162,7 +161,7 @@
                 <table class="table table-hover">
                     <thead class="table-light">
                         <tr>
-                            <th style="width: 20%;">Fecha</th>
+                            <th class="col-fecha">Fecha</th>
                             <th>Actividad</th>
                         </tr>
                     </thead>
@@ -178,7 +177,7 @@
                             </td>
                             <td>
                                 <div class="d-flex align-items-center">
-                                    <i class="bi bi-check-circle-fill text-success me-2" style="font-size: 1.5rem;"></i>
+                                    <i class="bi bi-check-circle-fill text-success me-2 check-icon"></i>
                                     <strong>{{ asistencia.participaciones_id_participacion.actividades_id_actividad.nombre }}</strong>
                                 </div>
                             </td>
@@ -190,7 +189,7 @@
             </div>
             {% else %}
             <div class="text-center py-5">
-                <i class="bi bi-inbox" style="font-size: 3rem; opacity: 0.3;"></i>
+                <i class="bi bi-inbox empty-icon"></i>
                 <p class="text-muted mt-3">Aún no tienes asistencias registradas</p>
                 <p class="text-muted">¡Participa en las actividades para empezar a acumular asistencias!</p>
             </div>

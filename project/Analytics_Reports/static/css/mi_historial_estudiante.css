@@ -1,3 +1,4 @@
+/* ===== ESTILOS GENERALES ===== */
 .card {
     border: none;
     transition: transform 0.2s, box-shadow 0.2s;
@@ -12,6 +13,46 @@
     box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075) !important;
 }
 
+/* ===== PERFIL DE USUARIO ===== */
+.profile-icon {
+    font-size: 4rem;
+}
+
+/* ===== TARJETA DE CAMISETA ===== */
+.card-camiseta {
+    border-left: 5px solid #ffc107;
+}
+
+.camiseta-icon {
+    font-size: 4rem;
+}
+
+.progress-camiseta {
+    height: 35px;
+}
+
+.progress-bar-camiseta {
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* ===== TARJETA TOTAL ASISTENCIAS ===== */
+.card-total-asistencias {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.total-asistencias-icon {
+    font-size: 3.5rem;
+    opacity: 0.9;
+}
+
+.total-asistencias-numero {
+    font-size: 4rem;
+    font-weight: bold;
+}
+
+/* ===== TABLA ===== */
 .table th {
     font-weight: 600;
     text-transform: uppercase;
@@ -28,10 +69,30 @@
     background-color: #f8f9fa;
 }
 
+/* ===== COLUMNAS ESPECÍFICAS DE TABLA ===== */
+.col-fecha {
+    width: 20%;
+}
+
+.col-progreso {
+    width: 30%;
+}
+
+/* ===== BADGES ===== */
 .badge {
     padding: 0.5em 0.75em;
 }
 
+.badge-asistencias {
+    font-size: 1.1rem;
+    padding: 0.5rem 1rem;
+}
+
+.badge-historial {
+    font-size: 1rem;
+}
+
+/* ===== BARRAS DE PROGRESO ===== */
 .progress {
     background-color: #e9ecef;
     border-radius: 10px;
@@ -41,6 +102,26 @@
     border-radius: 10px;
 }
 
+.progress-actividad {
+    height: 25px;
+}
+
+.progress-bar-actividad {
+    width: 100%;
+    font-weight: bold;
+}
+
+/* ===== ICONOS ===== */
+.check-icon {
+    font-size: 1.5rem;
+}
+
+.empty-icon {
+    font-size: 3rem;
+    opacity: 0.3;
+}
+
+/* ===== ALERTAS ===== */
 .alert {
     border-left: 4px solid #28a745;
     border-radius: 0.5rem;

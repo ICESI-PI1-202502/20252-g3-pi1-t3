@@ -430,7 +430,7 @@ def configurar_notificaciones(request):
             print(f"asistencias_destacado: {config.asistencias_destacado}")
             print("==================================\n")
             
-            messages.success(request, '✅ Configuración guardada correctamente.')
+            ###messages.success(request, '✅ Configuración guardada correctamente.')
             return redirect('Analytics_Reports:configurar_notificaciones')
             
         except ValueError as e:
