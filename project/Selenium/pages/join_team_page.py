@@ -9,7 +9,7 @@ class JoinTeamPage(BasePage):
     def select_team_by_name(self, team_visible_text):
         sel = self.is_visible(self.SELECT_TEAM, timeout=10)
         s = Select(sel)
-        # tolera " (máx: N)"
+      
         for o in s.options:
             if team_visible_text in (o.text or ""):
                 s.select_by_visible_text(o.text)
@@ -26,7 +26,7 @@ class JoinTeamPage(BasePage):
         """
         sel = self.is_present(self.SELECT_TEAM, timeout=10)
 
-        # Asegura que el <select> quede vacío y con foco (esto ayuda a que el navegador muestre el tooltip)
+       
         self.driver.execute_script("""
             const el = arguments[0];
             el.value = '';
@@ -34,16 +34,13 @@ class JoinTeamPage(BasePage):
             el.dispatchEvent(new Event('change', {bubbles:true}));
         """, sel)
 
-        # Intentar enviar vacío
         self.click(self.BTN_SUBMIT)
 
-        # El form NO debe ser válido
         is_valid = self.driver.execute_script("return document.querySelector('form').checkValidity();")
 
-        # Forzar el tooltip nativo (como en el create)
+    
         self.driver.execute_script("document.querySelector('form').reportValidity();")
 
-        # Mensaje nativo del <select required>
         validation_msg = self.driver.execute_script("return arguments[0].validationMessage || '';", sel)
 
         return is_valid, (validation_msg or "")
