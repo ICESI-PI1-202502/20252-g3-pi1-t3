@@ -151,7 +151,7 @@ def crear_torneo(request):
                 disciplinas_id_disciplina_id=disciplina_id,
                 fecha_inicio=fecha_inicio,
                 fecha_fin=fecha_fin,
-                estados_torneo_id_estado_torneo_id=1,  
+                estados_torneo_id_estado_torneo_id=97,  
                 reglas_elegibilidad=None,
                 aforo_equipos=(aforo or None),
                 limite_inscripcion=limite_inscripcion,
@@ -704,7 +704,6 @@ def partidos_crear(request, id: int):
                 marcador_a=None,
                 marcador_b=None,
             )
-        messages.success(request, "Partido creado correctamente.")
         return redirect("tournaments:detail", torneo.id_torneo)
     except IntegrityError as e:
         messages.error(request, f"No se pudo crear el partido (integridad): {e}")
@@ -713,13 +712,17 @@ def partidos_crear(request, id: int):
 
     return redirect("tournaments:detail", torneo.id_torneo)
 
+from django.utils import timezone
+from django.db import transaction
+
 @login_required
 def partido_resultado(request, match_id: int):
     if not is_admin(request.user):
         messages.error(request, "No tienes permisos para cargar resultados.")
-        
-        tor_id = Partidos.objects.filter(pk=match_id).values_list("torneos_id_torneo_id", flat=True).first()
-        return redirect("tournaments:detail", tor_id) if tor_id else redirect("tournaments:list")
+        tor_id = (Partidos.objects.filter(pk=match_id)
+                  .values_list("torneos_id_torneo_id", flat=True).first())
+        return redirect("tournaments:detail", id=tor_id) if tor_id else redirect("tournaments:list")
+        #                                        ^^^^^^^^  usa kwargs
 
     m = get_object_or_404(
         Partidos.objects.select_related("equipos_id_equipo", "equipos_id_equipo2", "torneos_id_torneo"),
@@ -736,54 +739,44 @@ def partido_resultado(request, match_id: int):
         "prefill": {
             "marcador_a": m.marcador_a,
             "marcador_b": m.marcador_b,
-            "estado": m.estado or "FINALIZADO",
         },
     }
 
     if request.method == "GET":
         return render(request, "record_result.html", ctx)
 
-    # POST
-    estado = (request.POST.get("estado") or "").strip().upper()
+    # POST (solo "FINALIZADO", sin estado cancelado)
     ma_raw = (request.POST.get("marcador_a") or "").strip()
     mb_raw = (request.POST.get("marcador_b") or "").strip()
 
     errors = []
-    if estado not in ("FINALIZADO", "CANCELADO"):
-        errors.append("Estado inválido.")
-
-    if estado == "FINALIZADO":
-        if not ma_raw.isdigit() or not mb_raw.isdigit():
-            errors.append("Los marcadores deben ser enteros ≥ 0.")
-        else:
-            ma = int(ma_raw)
-            mb = int(mb_raw)
-            if ma < 0 or mb < 0:
-                errors.append("Los marcadores no pueden ser negativos.")
+    if not ma_raw.isdigit() or not mb_raw.isdigit():
+        errors.append("Los marcadores deben ser enteros ≥ 0.")
     else:
-        # cancelado → ignoramos marcadores
-        ma = None
-        mb = None
+        ma = int(ma_raw); mb = int(mb_raw)
+        if ma < 0 or mb < 0:
+            errors.append("Los marcadores no pueden ser negativos.")
 
     if errors:
         for e in errors:
             messages.error(request, e)
-        ctx["prefill"].update({"marcador_a": ma_raw, "marcador_b": mb_raw, "estado": estado})
+        ctx["prefill"].update({"marcador_a": ma_raw, "marcador_b": mb_raw})
         return render(request, "record_result.html", ctx)
 
     try:
         with transaction.atomic():
-            m.estado = estado
+            m.estado = "FINALIZADO"
             m.marcador_a = ma
             m.marcador_b = mb
-            # aseguramos fecha_fin si estaba vacía
-            if m.fecha_fin is None and estado in ("FINALIZADO", "CANCELADO"):
+            if m.fecha_fin is None:
                 m.fecha_fin = timezone.now()
             m.save()
 
-        messages.success(request, "Resultado guardado.")
-        return redirect("tournaments:detail", m.torneos_id_torneo)
+        messages.success(request, "Resultado guardado correctamente.")
+        return redirect("tournaments:detail", id=m.torneos_id_torneo_id)   # ← usa el id
+        
     except Exception as e:
         messages.error(request, f"No se pudo guardar el resultado: {e}")
         return render(request, "record_result.html", ctx)
+
 
