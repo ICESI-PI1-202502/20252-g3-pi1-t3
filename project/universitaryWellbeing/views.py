@@ -18,6 +18,7 @@ from django.core.mail import send_mail
 from django.urls import reverse_lazy
 from django.utils import timezone
 from datetime import datetime, date
+from collections import defaultdict
 
 def user_login(request):
     if request.method == "POST":
@@ -217,7 +218,7 @@ def schedule(request):
 
 @login_required
 @require_http_methods(["POST"])
-def eliminar_evento(request, evento_id):
+def delete_event(request, evento_id):
     """
     Endpoint para eliminar un evento del horario personal
     Solo permite eliminar eventos manuales (fuente_manual = 'S')
@@ -260,9 +261,7 @@ def _django_weekday_to_fc_dow(django_wd: int) -> int:
     return django_wd % 7
 
 @login_required
-def calendario_unificado(request):
-    from collections import defaultdict
-    import json
+def unified_calendar(request):
 
     tipo_id = request.GET.get("tipo")  # string or None
 
@@ -436,10 +435,6 @@ def obtener_eventos_del_dia(participante, fecha):
     
     return eventos
 
-    
-    # Ordenar por hora
-    eventos.sort(key=lambda x: x['fecha_inicio'].time())
-    return eventos
 
 @login_required
 def home_user(request):
@@ -533,7 +528,7 @@ def profile(request):
 
     notificaciones_no_leidas = notificaciones.filter(leida=False).count()
 
-    # 👤 Rol del usuario (por si lo necesita el menú lateral)
+    # Rol del usuario (por si lo necesita el menú lateral)
     user_rol = participante.roles_id_rol.nombre_rol if participante.roles_id_rol else None
 
     # Actividades del participante

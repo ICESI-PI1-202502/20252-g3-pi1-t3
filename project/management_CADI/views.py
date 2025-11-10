@@ -84,7 +84,7 @@ def cadi_index(request):
 
 @superuser_required
 @login_required
-def createActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
+def create_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
     slug_real = slugify(grupo_actividad.grupos_id_grupo.nombre)
     tipos = TiposActividad.objects.all().order_by("id_tipo")
@@ -212,7 +212,7 @@ def createActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
 
 @superuser_required
 @login_required
-def editActivity(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id):
+def edit_Activity(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id, grupos_id_grupo=grupo)
     actividad = get_object_or_404(Actividades, pk=actividad_id)
@@ -498,7 +498,7 @@ def add_slot_to_schedule(request, grupo_nombre, grupo_id, grupo_actividad_id):
 MARGEN_MINUTOS = 1
 
 @login_required
-def showActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
+def show_Activities(request, grupo_nombre, grupo_id, grupo_actividad_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id, grupos_id_grupo=grupo)
 
@@ -689,7 +689,7 @@ def showActivities(request, grupo_nombre, grupo_id, grupo_actividad_id):
 
 
 @login_required
-def showGroupActivities(request, grupo_nombre, grupo_id):
+def show_Group_Activities(request, grupo_nombre, grupo_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
     grupos_actividad = GruposActividad.objects.filter(grupos_id_grupo=grupo)
 
@@ -715,7 +715,7 @@ def showGroupActivities(request, grupo_nombre, grupo_id):
 
 @login_required
 @superuser_required
-def createGroupActivity(request, grupo_nombre, grupo_id):
+def create_Group_Activity(request, grupo_nombre, grupo_id):
     grupo = get_object_or_404(Grupos, pk=grupo_id)
 
     slug_real = slugify(grupo.nombre)
@@ -746,7 +746,7 @@ def createGroupActivity(request, grupo_nombre, grupo_id):
 
 @login_required
 @superuser_required
-def scheduleDraft(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id=None):
+def schedule_Draft(request, grupo_nombre, grupo_id, grupo_actividad_id, actividad_id=None):
     grupo_actividad = get_object_or_404(GruposActividad, pk=grupo_actividad_id)
     grupo = grupo_actividad.grupos_id_grupo
     slug_real = slugify(grupo.nombre)

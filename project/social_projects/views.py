@@ -55,9 +55,6 @@ def crear_proyecto_social(request):
         return redirect("social_projects:lista_proyectos")
 
     participante = _current_participante(request.user)
-    if not participante:
-        messages.error(request, "No se encontró tu registro de participante.")
-        return redirect("social_projects:lista_proyectos")
 
     if request.method == "POST":
         nombre = (request.POST.get("nombre") or "").strip()

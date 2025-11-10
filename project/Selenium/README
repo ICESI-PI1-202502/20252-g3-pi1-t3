@@ -1,0 +1,15 @@
+Para correr cualquier test porfavor usar 
+
+behave features/{nombredel archivo .feature a probar}.feature
+
+ejemplo:
+behave features/cadi_personal_schedule_psych_appointment.feature
+
+NOTA:
+La gran mayoria de test relacionados con crear cosas, solo se pueden hacer una vez, puesto a que sicreas
+turas con el mismo nombre, el sistema no las deja crear. Por lo tanto, he puesto en los features nombre y
+datos validos para que se puedan realizar todos los test con total facilidad, algo a tomar en cuenta
+
+porfavor ejecutar cadi_personal_schedule_view_event.feature antes de cadi_personal_schedule_delete_event.feature
+no preguntes porfavor. :D
+

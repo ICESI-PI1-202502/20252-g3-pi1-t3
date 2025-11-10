@@ -337,8 +337,6 @@ def search(request):
     ctx['actividades'] = acts
     return render(request, "search.html", ctx)
 
-
-
 @login_required
 def rateActivity(request, actividad_id):
     actividad = get_object_or_404(Actividades, pk=actividad_id)
