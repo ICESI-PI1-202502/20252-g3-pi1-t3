@@ -56,7 +56,9 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: celery-beat
-    command: celery -A BienestarUniversitario beat -l info
+    command: >
+        bash -c "rm -f celerybeat-schedule celerybeat-schedule.db &&
+        celery -A BienestarUniversitario beat -l info"
     depends_on:
       - redis
       - app

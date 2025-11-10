@@ -10,100 +10,299 @@
 {% block extra_css %}
 {{ block.super }}
 <link rel="stylesheet" href="{% static 'css/analisis_comportamiento.css' %}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+    .chart-container {
+        position: relative;
+        height: 300px;
+        margin-bottom: 30px;
+    }
+    .dashboard-section {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        margin-bottom: 20px;
+    }
+</style>
 {% endblock %}
 
 {% block content %}
 <div class="container mt-4">
-    <h2>Análisis del Comportamiento Estudiantil</h2>
-    <p>Registra y segmenta la participación de los usuarios (estudiantes, profesores, egresados) en función de frecuencia y tipo de actividad.</p>
+    <h2><i class="fas fa-chart-line"></i> Análisis del Comportamiento Estudiantil</h2>
+    <p class="text-muted">
+         Registra y segmenta la participación por frecuencia, tipo y perfil | 
+         Estadísticas globales y rankings
+    </p>
 
     <!-- Buscador / Filtros -->
     <form method="GET" action="{% url 'Analytics_Reports:analisis_comportamiento' %}" class="mb-3">
-        <div class="row g-2">
-            <div class="col-md-3">
-                <input type="number" name="min_frecuencia" class="form-control" placeholder="Frecuencia mínima" value="{{ request.GET.min_frecuencia|default:'' }}">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <i class="fas fa-filter"></i> Filtros de Segmentación (RF2.2)
             </div>
-            <div class="col-md-3">
-                <select name="tipo_actividad" class="form-select">
-                    <option value="">-- Tipo de actividad --</option>
-                    {% for tipo in tipos_actividad %}
-                        <option value="{{ tipo.id_tipo }}" {% if request.GET.tipo_actividad == tipo.id_tipo|stringformat:"s" %}selected{% endif %}>
-                            {{ tipo.nombre_tipo }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="col-md-3">
-                <button type="submit" class="btn btn-primary w-100">Buscar</button>
-            </div>
-            <div class="col-md-3">
-                <a href="?{% for key, value in request.GET.items %}{% if key != 'export' %}{{ key }}={{ value }}&{% endif %}{% endfor %}export=csv" 
-                   class="btn btn-success w-100">
-                    Descargar CSV
-                </a>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-3">
+                        <label class="form-label small">Tipo de actividad</label>
+                        <select name="tipo_actividad" class="form-select">
+                            <option value="">Todos</option>
+                            {% for tipo in tipos_actividad %}
+                                <option value="{{ tipo.id_tipo }}" {% if request.GET.tipo_actividad == tipo.id_tipo|stringformat:"s" %}selected{% endif %}>
+                                    {{ tipo.nombre_tipo }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <!-- Filtros de perfil (RF2.2) -->
+                    <div class="col-md-2">
+                        <label class="form-label small">Rol</label>
+                        <select name="rol" class="form-select">
+                            <option value="">Todos</option>
+                            {% for rol in roles %}
+                                <option value="{{ rol.id_rol }}" {% if request.GET.rol == rol.id_rol|stringformat:"s" %}selected{% endif %}>
+                                    {{ rol.nombre_rol }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Semestre</label>
+                        <select name="semestre" class="form-select">
+                            <option value="">Todos</option>
+                            {% for sem in semestres %}
+                                <option value="{{ sem }}" {% if request.GET.semestre == sem|stringformat:"s" %}selected{% endif %}>
+                                    {{ sem }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Facultad</label>
+                        <select name="facultad" class="form-select">
+                            <option value="">Todas</option>
+                            {% for fac in facultades %}
+                                <option value="{{ fac }}" {% if request.GET.facultad == fac %}selected{% endif %}>
+                                    {{ fac }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label small">Género</label>
+                        <select name="genero" class="form-select">
+                            <option value="">Todos</option>
+                            {% for gen in generos %}
+                                <option value="{{ gen }}" {% if request.GET.genero == gen %}selected{% endif %}>
+                                    {{ gen }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="row g-2 mt-2">
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="fas fa-search"></i> Buscar
+                        </button>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="?mostrar_todos=1" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-list"></i> Mostrar todos
+                        </a>
+                    </div>
+                    <div class="col-md-2">
+                        <a href="{% url 'Analytics_Reports:analisis_comportamiento' %}" class="btn btn-outline-secondary w-100">
+                            <i class="fas fa-redo"></i> Limpiar
+                        </a>
+                    </div>
+                    <div class="col-md-2">
+                        {% if has_filters %}
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'export' %}{{ key }}={{ value }}&{% endif %}{% endfor %}export=csv" 
+                               class="btn btn-success w-100">
+                                <i class="fas fa-download"></i> Exportar CSV
+                            </a>
+                        {% else %}
+                            <button type="button" class="btn btn-secondary w-100" disabled title="Aplica filtros primero">
+                                <i class="fas fa-download"></i> Exportar CSV
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
         </div>
     </form>
 
-    <!-- Resumen estadístico -->
+    <!-- Mensaje informativo cuando no hay filtros -->
+    {% if not has_filters %}
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Sistema de Análisis de Comportamiento Estudiantil</strong>
+        <br>
+        <small>
+            <strong>RF2:</strong> Registra frecuencia, tipo y reincidencia de participación. Segmenta por rol, semestre, facultad y género.<br>
+            <strong>RF4:</strong> Muestra métricas globales, rankings y estadísticas de asistencia.
+        </small>
+    </div>
+    {% elif mostrar_todos %}
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-check-circle"></i> 
+        <strong>Mostrando todos los registros</strong>
+    </div>
+    {% endif %}
+
+    <!-- DASHBOARDS Y GRÁFICOS -->
     {% if data %}
+    
+    <!-- === MÉTRICAS GLOBALES RF4.1 === -->
+    <h4 class="mb-3 mt-4"><i class="fas fa-chart-bar"></i> Métricas Globales</h4>
     <div class="row mb-4">
         <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
-                    <h4 class="text-primary">{{ data|length }}</h4>
-                    <p class="card-text">Total registros</p>
+                    <h3>{{ total_participaciones }}</h3>
+                    <p>Total Participaciones</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
-                    <h4 class="text-success">
-                        {% with data|length as total %}
-                            {% if total > 0 %}
-                                {{ data.0.total|floatformat:0 }}
-                            {% else %}
-                                0
-                            {% endif %}
-                        {% endwith %}
-                    </h4>
-                    <p class="card-text">Participaciones promedio</p>
+                    <h3>{{ porcentaje_reincidencia }}%</h3>
+                    <p>Tasa de Reincidencia</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
-                    <h4 class="text-info">
-                        {% regroup data by participantes_id_participante__roles_id_rol__nombre_rol as roles_agrupados %}
-                        {{ roles_agrupados|length }}
-                    </h4>
-                    <p class="card-text">Tipos de usuarios</p>
+                    <h3>{{ promedio_participaciones }}</h3>
+                    <p>Promedio por Usuario</p>
                 </div>
             </div>
         </div>
         <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
-                    <h4 class="text-warning">
-                        {% regroup data by actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo as tipos_agrupados %}
-                        {{ tipos_agrupados|length }}
-                    </h4>
-                    <p class="card-text">Tipos de actividades</p>
+                    <h3>{{ total_nuevos }}</h3>
+                    <p>Nuevos Participantes</p>
                 </div>
             </div>
         </div>
     </div>
-    {% endif %}
+
+    <!-- Resumen estadístico RF2.2 -->
+    <h4 class="mb-3"><i class="fas fa-th"></i> Resumen de Segmentación</h4>
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4>{{ data|length }}</h4>
+                    <p>Registros mostrados</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4>{{ roles_unicos }}</h4>
+                    <p>Tipos de roles</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4>{{ tipos_actividad_unicos }}</h4>
+                    <p>Tipos de actividades</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h4>{{ facultades_unicas }}</h4>
+                    <p>Facultades</p>
+                </div>
+            </div>
+        </div>
+    </div>
+         
+    <!-- GRÁFICOS -->
+    <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Análisis de Comportamiento (RF2.1)</h4>
+    <div class="row mb-4">
+        <!-- Gráfico: Distribución por frecuencia (RF2.1) -->
+        <div class="col-md-6">
+            <div class="dashboard-section">
+                <h5><i class="fas fa-chart-pie"></i> Distribución por Frecuencia</h5>
+                <small class="text-muted">Clasificación de usuarios según participación</small>
+                <div class="chart-container">
+                    <canvas id="chartFrecuencia"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico: Nuevos vs Reincidentes (RF2.1) -->
+        <div class="col-md-6">
+            <div class="dashboard-section">
+                <h5><i class="fas fa-user-friends"></i> Nuevos vs Reincidentes</h5>
+                <small class="text-muted">Fidelización de participantes</small>
+                <div class="chart-container">
+                    <canvas id="chartReincidencia"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Gráfico: Segmentación por Roles (RF2.2) -->
+        <div class="col-md-6">
+            <div class="dashboard-section">
+                <h5><i class="fas fa-users"></i> Segmentación por Roles</h5>
+                <small class="text-muted">Participación de la comunidad</small>
+                <div class="chart-container">
+                    <canvas id="chartRoles"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico: Segmentación por Facultades (RF2.2) -->
+        <div class="col-md-6">
+            <div class="dashboard-section">
+                <h5><i class="fas fa-building"></i> Top Facultades</h5>
+                <small class="text-muted">Unidades académicas más activas</small>
+                <div class="chart-container">
+                    <canvas id="chartFacultades"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- === RANKINGS RF4.2 === -->
+    <h4 class="mb-3"><i class="fas fa-trophy"></i> Actividades Más Populares </h4>
+    <div class="row mb-4">
+        {% if not tipo_actividad_filtrado %}
+            <!-- Caso: Sin filtro de tipo de actividad, mostrar gráfico normal -->
+            <div class="col-md-12">
+                <div class="dashboard-section">
+                    <h5><i class="fas fa-tasks"></i> Distribución por Tipo de Actividad</h5>
+                    <small class="text-muted">Preferencias de eventos de la comunidad</small>
+                    <div class="chart-container">
+                        <canvas id="chartTiposActividad"></canvas>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+    </div>
 
     <!-- Tabla de resultados -->
+    <h4 class="mb-3"><i class="fas fa-table"></i> Detalle por Usuario</h4>
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Resultados del Análisis</h5>
-            {% if data %}
-                <span class="badge bg-primary">{{ data|length }} registros encontrados</span>
-            {% endif %}
+            <h5 class="mb-0">Registros de Participación</h5>
+            <span class="badge bg-primary">{{ data|length }} registros</span>
         </div>
         <div class="card-body">
             <div class="table-responsive">
@@ -115,8 +314,8 @@
                             <th>Facultad</th>
                             <th>Rol</th>
                             <th>Tipo de actividad</th>
-                            <th>Total Participaciones</th>
-                            <th>Frecuencia</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Frecuencia</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -138,15 +337,15 @@
                                     {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
                                 </span>
                             </td>
-                            <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo|default:"Sin especificar" }}</td>
-                            <td>
+                            <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo|default:"Varias" }}</td>
+                            <td class="text-center">
                                 <span class="badge bg-primary fs-6">{{ item.total }}</span>
                             </td>
-                            <td>
+                            <td class="text-center">
                                 {% if item.total >= 5 %}
                                     <span class="badge bg-success">Alta</span>
                                 {% elif item.total >= 2 %}
-                                    <span class="badge bg-warning">Media</span>
+                                    <span class="badge bg-warning text-dark">Media</span>
                                 {% else %}
                                     <span class="badge bg-danger">Baja</span>
                                 {% endif %}
@@ -155,12 +354,10 @@
                         {% empty %}
                         <tr>
                             <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fas fa-search mb-2"></i>
+                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
                                 <br>
-                                No se encontraron resultados con los filtros aplicados
-                                <br>
-                                <small>Intenta ajustar los criterios de búsqueda</small>
-                            </td>
+                                <strong>No se encontraron resultados</strong>
+                             </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -170,10 +367,9 @@
     </div>
 
     <!-- Información adicional -->
-    {% if data %}
     <div class="mt-4">
         <div class="alert alert-info">
-            <h6><i class="fas fa-info-circle"></i> Información sobre la frecuencia:</h6>
+            <h6><i class="fas fa-info-circle"></i> Criterios de Frecuencia (RF2.1):</h6>
             <ul class="mb-0">
                 <li><strong>Alta:</strong> 5 o más participaciones</li>
                 <li><strong>Media:</strong> 2-4 participaciones</li>
@@ -184,5 +380,20 @@
     {% endif %}
 </div>
 
- 
+<!-- Scripts para gráficos -->
+{% if data %}
+<script src="{% static 'js/analisis_charts.js' %}"></script>
+<script>
+    // Pasar datos de Django a JavaScript
+    const datosFrecuencia = {{ datos_grafico_frecuencia|safe }};
+    const datosRoles = {{ datos_grafico_roles|safe }};
+    const datosFacultades = {{ datos_grafico_facultades|safe }};
+    const datosTiposActividad = {{ datos_grafico_tipos_actividad|safe }};
+    const datosReincidencia = {{ datos_grafico_reincidencia|safe }};
+    
+    // Inicializar gráficos
+    initCharts(datosFrecuencia, datosRoles, datosFacultades, datosTiposActividad, datosReincidencia);
+</script>
+{% endif %}
+
 {% endblock %}
