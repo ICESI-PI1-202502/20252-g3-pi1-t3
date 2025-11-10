@@ -3,3 +3,1867 @@
 2025-10-20 14:30:18 | ¡Estás cerca de un reconocimiento, Usuario! | damaral2005@gamil.com
 2025-10-20 14:30:20 | ¡Estás cerca de un reconocimiento, Usuario! | luisgabrieldfs@gmail.com
 2025-10-20 14:30:22 | Alerta: 165 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 01:20:17 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 01:20:18 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 01:20:22 | Alerta: 1 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 01:20:24 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:02:07 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 16:02:10 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:02:12 | Alerta: 1 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 16:07:18 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 16:07:20 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:07:23 | Alerta: 1 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 16:12:30 | Alerta: 2 estudiantes con baja asistencia | admin@academia.com, coordinador@academia.com
+2025-11-03 16:12:32 | ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 16:12:34 | Alerta: 1 estudiantes inactivos | admin@academia.com, coordinador@academia.com
+2025-11-03 16:56:23 | ⚠️ URGENTE: 1 estudiantes en riesgo crítico | luis.gluis.g.io.com@gmail.com
+2025-11-03 16:56:25 | 📊 1 estudiantes con baja asistencia | luis.gluis.g.io.com@gmail.com
+2025-11-03 16:56:26 | 🏆 ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-03 17:01:41 | ⚠️ URGENTE: 1 estudiantes en riesgo crítico | luis.gluis.g.io.com@gmail.com
+2025-11-03 17:01:43 | 📊 1 estudiantes con baja asistencia | luis.gluis.g.io.com@gmail.com
+2025-11-03 17:01:45 | 🏆 ¡Estás cerca de un reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-05 04:07:15 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 04:07:17 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 04:07:18 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 04:07:20 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 04:07:22 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 04:07:24 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 04:07:26 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 04:07:27 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 04:07:29 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 04:07:31 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 04:07:32 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 04:07:34 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 04:07:36 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 04:07:38 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 04:07:40 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 04:07:41 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 04:07:43 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 04:07:45 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 04:07:47 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 04:07:49 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 04:07:51 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 04:07:53 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 04:07:54 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 04:07:56 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 04:07:59 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 04:08:00 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 04:08:02 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 04:08:04 | 📊 Recordatorio de Asistencia - María Ximena | maria.narvaez@example.com
+2025-11-05 04:08:06 | 📊 Recordatorio de Asistencia - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 04:08:08 | 📊 Recordatorio de Asistencia - Ligotti | cocine957@gmail.com
+2025-11-05 04:08:10 |  ¡Estás cerca de tu reconocimiento, Carlos Daniel! | carlos.perez@example.com
+2025-11-05 04:08:12 |  ¡Estás cerca de tu reconocimiento, ghgf! | hgfhfh@gmail.com
+2025-11-05 04:08:13 |  ¡Estás cerca de tu reconocimiento, Zapffe! | luisgabrieldfs@gmail.com
+2025-11-05 05:10:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:10:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:10:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:10:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:10:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:10:12 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:10:14 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:10:16 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:10:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:10:19 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:10:21 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:10:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:10:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:10:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:10:28 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:10:30 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:10:32 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:10:34 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:10:37 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:10:39 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:10:41 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:10:42 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:10:44 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:10:46 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:10:48 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:10:50 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:10:52 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:15:34 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:15:36 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:15:38 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:15:40 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:15:42 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:15:44 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:15:45 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:15:47 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:15:49 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:15:51 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:15:53 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:15:55 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:15:57 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:15:59 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:16:01 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:16:03 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:16:04 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:16:06 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:16:08 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:16:09 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:16:11 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:16:13 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:16:14 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:16:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:16:18 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:16:20 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:16:22 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:27:21 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:27:23 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:27:25 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:27:27 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:27:29 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:27:30 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:27:32 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:27:33 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:27:35 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:27:37 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:27:38 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:27:40 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:27:42 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:27:43 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:27:45 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:27:47 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:27:49 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:27:50 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:27:52 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:27:54 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:27:56 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:27:58 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:28:00 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:28:01 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:28:03 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:28:05 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:28:06 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:31:26 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:31:28 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:31:31 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:31:33 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:31:36 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:31:38 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:31:40 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:31:42 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:31:43 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:31:46 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:31:48 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:31:50 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:31:52 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:31:54 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:31:55 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:31:57 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:31:59 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:32:01 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:32:03 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:32:03 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:32:05 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:32:05 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:32:06 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:32:07 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:32:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:32:08 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:32:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:32:10 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:32:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:32:12 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:32:14 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:32:14 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:32:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:32:16 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:32:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:32:18 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:32:19 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:32:21 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:32:23 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:32:25 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:32:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:32:29 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:32:31 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:32:33 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:32:34 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:32:37 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:32:39 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:32:41 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:32:44 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:32:46 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:32:49 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:32:51 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:32:53 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:32:55 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:33:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:33:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:33:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:33:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:33:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:33:12 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:33:14 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:33:17 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:33:18 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:33:20 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:33:23 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:33:25 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:33:26 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:33:28 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:33:31 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:33:33 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:33:35 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:33:37 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:33:39 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:33:41 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:33:43 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:33:45 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:33:47 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:33:48 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:33:48 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:33:49 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:33:50 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:34:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:34:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:34:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:34:04 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:34:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:34:05 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:34:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:34:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:34:07 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:34:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:34:08 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:34:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:34:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:34:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:34:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:34:11 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:34:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:34:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:34:13 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:34:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:34:14 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:34:15 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:34:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:34:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:34:17 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:34:17 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:34:18 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:36:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:36:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:36:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:36:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:36:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:36:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:36:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:36:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:36:16 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:36:18 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:36:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:36:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:36:23 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:36:25 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:36:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:36:29 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:36:31 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:36:33 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:36:35 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:36:37 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:36:38 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:36:40 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:36:42 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:36:44 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:36:46 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:36:47 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:36:49 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:37:03 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:37:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:37:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:37:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:37:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:37:12 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:37:14 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:37:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:37:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:37:19 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:37:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:37:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:37:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:37:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:37:28 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:37:30 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:37:32 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:37:33 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:37:35 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:37:37 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:37:39 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:37:41 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:37:42 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:37:44 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:37:46 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:37:48 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:37:50 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:38:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:38:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:38:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:38:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:38:08 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:38:10 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:38:12 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:38:13 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:38:15 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:38:17 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:38:19 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:38:20 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:38:22 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:38:24 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:38:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:38:28 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:38:30 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:38:31 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:38:33 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:38:35 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:38:37 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:38:38 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:38:40 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:38:42 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:38:44 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:38:45 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:38:47 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:39:03 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:39:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:39:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:39:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:39:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:39:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:39:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:39:14 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:39:16 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:39:18 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:39:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:39:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:39:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:39:25 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:39:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:39:29 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:39:31 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:39:33 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:39:34 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:39:36 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:39:38 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:39:40 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:39:42 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:39:44 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:39:46 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:39:47 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:39:49 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:40:03 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:40:05 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:40:07 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:40:09 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:40:11 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:40:13 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:40:15 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:40:17 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:40:19 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:40:21 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:40:24 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:40:26 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:40:28 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:40:30 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:40:31 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:40:33 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:40:35 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:40:37 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:40:39 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:40:41 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:40:43 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:40:45 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:40:47 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:40:49 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:40:50 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:40:52 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:40:54 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:41:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:41:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:41:05 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:41:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:41:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:41:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:41:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:41:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:41:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:41:18 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:41:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:41:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:41:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:41:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:41:29 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:41:31 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:41:32 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:41:34 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:41:36 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:41:37 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:41:39 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:41:40 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:41:42 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:41:44 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:41:46 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:41:48 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:41:50 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:42:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:42:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:42:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:42:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:42:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:42:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:42:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:42:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:42:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:42:18 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:42:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:42:23 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:42:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:42:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:42:28 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:42:30 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:42:32 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:42:33 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:42:35 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:42:37 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:42:39 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:42:41 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:42:43 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:42:45 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:42:46 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:42:48 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:42:50 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:43:03 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:43:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:43:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:43:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:43:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:43:12 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:43:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:43:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:43:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:43:19 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:43:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:43:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:43:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:43:25 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:43:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:43:28 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:43:30 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:43:31 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:43:33 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:43:34 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:43:36 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:43:38 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:43:39 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:43:41 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:43:43 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:43:45 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:43:46 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:44:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:44:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:44:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:44:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:44:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:44:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:44:12 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:44:14 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:44:15 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:44:17 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:44:19 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:44:21 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:44:22 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:44:24 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:44:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:44:27 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:44:29 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:44:31 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:44:33 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:44:34 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:44:36 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:44:37 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:44:39 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:44:41 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:44:42 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:44:44 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:44:46 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:45:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:45:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:45:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:45:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:45:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:45:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:45:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:45:15 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:45:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:45:18 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:45:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:45:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:45:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:45:25 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:45:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:45:29 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:45:30 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:45:32 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:45:34 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:45:36 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:45:38 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:45:39 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:45:41 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:45:43 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:45:45 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:45:46 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:45:48 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:46:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:46:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:46:05 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:46:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:46:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:46:10 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:46:12 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:46:14 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:46:16 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:46:17 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:46:19 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:46:21 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:46:23 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:46:25 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:46:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:46:28 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:46:30 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:46:32 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:46:33 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:46:35 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:46:37 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:46:38 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:46:40 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:46:41 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:46:43 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:46:44 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:46:46 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:47:03 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:47:05 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:47:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:47:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:47:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:47:12 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:47:14 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:47:16 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:47:17 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:47:19 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:47:20 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:47:22 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:47:24 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:47:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:47:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:47:29 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:47:31 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:47:32 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:47:34 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:47:36 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:47:37 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:47:39 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:47:41 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:47:42 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:47:44 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:47:46 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:47:48 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:48:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:48:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:48:05 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:48:07 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:48:09 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:48:10 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:48:12 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:48:13 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:48:15 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:48:17 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:48:19 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:48:21 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:48:23 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:48:26 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:48:27 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:48:29 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:48:31 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:48:33 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:48:35 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:48:37 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:48:40 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:48:42 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:48:44 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:48:46 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:48:48 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:48:50 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:48:51 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:49:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:49:04 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:49:06 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:49:08 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:49:10 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:49:11 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:49:13 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:49:14 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:49:16 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:49:17 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:49:18 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:49:20 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:49:21 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:49:22 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:49:24 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:49:25 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:49:26 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:49:27 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:49:28 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:49:29 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:49:30 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:49:31 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:49:33 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:49:34 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:49:35 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:49:36 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:49:37 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:50:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:50:03 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:50:04 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:50:05 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:50:06 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:50:08 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:50:09 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:50:10 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:50:11 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:50:13 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:50:14 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:50:15 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:50:16 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:50:17 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:50:19 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:50:20 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:50:21 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:50:22 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:50:23 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:50:25 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:50:26 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:50:27 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:50:28 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:50:29 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:50:30 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:50:31 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:50:32 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:51:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:51:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:51:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:51:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:51:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:51:05 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:51:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:51:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:51:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:51:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:51:08 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:51:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:51:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:51:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:51:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:51:11 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:51:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:51:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:51:13 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:51:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:51:14 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:51:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:51:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:51:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:51:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:51:17 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:51:17 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:52:01 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:52:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:52:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:52:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:52:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:52:04 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:52:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:52:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:52:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:52:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:52:07 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:52:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:52:08 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:52:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:52:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:52:10 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:52:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:52:11 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:52:12 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:52:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:52:13 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:52:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:52:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:52:15 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:52:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:52:18 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:52:18 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:53:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:53:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:53:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:53:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:53:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:53:04 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:53:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:53:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:53:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:53:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:53:07 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:53:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:53:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:53:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:53:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:53:10 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:53:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:53:11 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:53:12 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:53:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:53:13 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:53:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:53:14 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:53:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:53:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:53:17 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:53:18 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:54:01 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:54:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:54:02 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:54:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:54:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:54:04 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:54:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:54:05 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:54:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:54:06 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:54:07 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:54:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:54:08 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:54:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:54:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:54:10 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:54:10 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:54:11 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:54:12 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:54:12 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:54:13 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:54:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:54:14 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:54:15 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:54:15 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:54:16 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:54:17 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:55:01 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:55:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:55:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:55:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:55:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:55:04 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:55:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:55:05 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:55:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:55:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:55:07 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:55:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:55:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:55:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:55:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:55:10 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:55:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:55:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:55:12 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:55:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:55:13 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:55:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:55:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:55:15 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:55:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:55:16 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:55:17 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:56:02 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:56:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:56:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:56:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:56:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:56:04 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:56:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:56:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:56:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:56:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:56:07 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:56:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:56:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:56:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:56:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:56:10 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:56:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:56:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:56:12 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:56:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:56:13 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:56:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:56:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:56:15 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:56:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:56:16 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:56:17 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:57:01 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:57:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:57:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:57:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:57:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:57:05 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:57:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:57:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:57:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:57:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:57:08 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:57:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:57:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:57:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:57:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:57:11 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:57:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:57:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:57:12 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:57:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:57:14 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:57:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:57:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:57:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:57:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:57:17 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:57:18 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:58:01 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:58:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:58:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:58:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:58:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:58:04 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:58:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:58:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:58:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:58:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:58:08 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:58:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:58:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:58:09 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:58:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:58:11 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:58:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:58:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:58:13 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:58:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:58:14 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:58:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:58:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:58:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:58:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:58:17 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:58:17 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 05:59:01 | ⚠️ Alerta de Riesgo Crítico - Ismael | ismaelbarrionuevo2006@gmail.com
+2025-11-05 05:59:02 | ⚠️ Alerta de Riesgo Crítico - María Ximena | maria.narvaez@example.com
+2025-11-05 05:59:03 | ⚠️ Alerta de Riesgo Crítico - Carlos Daniel | carlos.perez@example.com
+2025-11-05 05:59:03 | ⚠️ Alerta de Riesgo Crítico - Juan | juan.montenegro@example.com
+2025-11-05 05:59:04 | ⚠️ Alerta de Riesgo Crítico - Jaime | jaime.villalobos@example.com
+2025-11-05 05:59:05 | ⚠️ Alerta de Riesgo Crítico - Óscar | oscar.trivino@example.com
+2025-11-05 05:59:05 | ⚠️ Alerta de Riesgo Crítico - Camilo | camilo.forero@example.com
+2025-11-05 05:59:06 | ⚠️ Alerta de Riesgo Crítico - Mario | mario.sinisterra@example.com
+2025-11-05 05:59:06 | ⚠️ Alerta de Riesgo Crítico - Felipe | felipe.gomez@example.com
+2025-11-05 05:59:07 | ⚠️ Alerta de Riesgo Crítico - Daniel | damaral2005@gmail.com
+2025-11-05 05:59:08 | ⚠️ Alerta de Riesgo Crítico - mariano | 456@gmail.com
+2025-11-05 05:59:08 | ⚠️ Alerta de Riesgo Crítico - Ligotti | cocine957@gmail.com
+2025-11-05 05:59:09 | ⚠️ Alerta de Riesgo Crítico - Daniel | Daniel_2005@gmail.com
+2025-11-05 05:59:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | jsjsjlskksks215@gmail.com
+2025-11-05 05:59:10 | ⚠️ Alerta de Riesgo Crítico - Ernest | adamsandler999123@gmail.com
+2025-11-05 05:59:11 | ⚠️ Alerta de Riesgo Crítico - Wessel | wessel@gmail.com
+2025-11-05 05:59:11 | ⚠️ Alerta de Riesgo Crítico - fgfd | dfgfd@gmail.com
+2025-11-05 05:59:12 | ⚠️ Alerta de Riesgo Crítico - gula | gula@gmail.com
+2025-11-05 05:59:13 | ⚠️ Alerta de Riesgo Crítico - ghjg | adamsantttdler999123@gmail.com
+2025-11-05 05:59:13 | ⚠️ Alerta de Riesgo Crítico - ghgf | fghfg@gmail.com
+2025-11-05 05:59:14 | ⚠️ Alerta de Riesgo Crítico - bnbvnv | vbnv@gmail.com
+2025-11-05 05:59:14 | ⚠️ Alerta de Riesgo Crítico - hjghjg | ghjgh@gmail.com
+2025-11-05 05:59:15 | ⚠️ Alerta de Riesgo Crítico - ghghf | hfgf@gmail.com
+2025-11-05 05:59:16 | ⚠️ Alerta de Riesgo Crítico - ghggfh | fghfgjj@gmail.com
+2025-11-05 05:59:16 | ⚠️ Alerta de Riesgo Crítico - hghfnbvn | vbnvbv@gmail.com
+2025-11-05 05:59:17 | ⚠️ Alerta de Riesgo Crítico - ghgf | hgfhfh@gmail.com
+2025-11-05 05:59:17 | ⚠️ Alerta de Riesgo Crítico - Zapffe | luisgabrieldfs@gmail.com
+2025-11-05 22:08:04 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:08:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:05 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:08:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:06 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:08:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:07 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:08 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:08:09 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:10 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:08:10 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:08:11 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:08:11 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:08:12 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:08:12 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:08:13 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:08:14 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:08:14 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:08:15 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:08:16 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:08:16 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:08:17 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:08:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:18 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:08:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:19 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:08:19 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:20 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:08:21 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:22 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:23 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:24 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:25 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:26 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:08:27 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:08:28 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:08:30 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:09:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:09:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:05 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:09:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:06 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:09:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:07 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:08 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:09:09 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:09 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:09:10 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:09:11 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:09:12 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:09:12 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:09:13 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:09:13 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:09:14 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:09:14 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:09:15 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:09:16 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:09:16 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:09:17 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:09:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:18 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:09:19 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:19 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:09:20 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:21 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:09:21 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:22 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:23 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:24 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:25 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:26 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:09:28 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:09:29 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:09:30 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:10:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:10:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:10:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:10:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:10:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:10:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:10:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:10:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:10:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:10:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:10:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:10:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:10:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:10:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:10:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:10:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:10:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:10:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:10:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:14 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:10:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:15 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:10:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:10:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:10:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:10:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:11:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:11:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:05 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:11:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:06 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:11:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:11:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:11:08 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:11:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:11:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:11:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:11:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:11:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:11:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:11:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:11:11 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:11:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:11:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:11:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:11:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:11:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:14 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:11:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:11:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:11:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:11:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:11:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:12:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:12:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:12:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:12:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:12:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:08 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:12:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:12:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:12:09 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:12:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:12:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:12:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:12:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:12:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:12:11 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:12:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:12:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:12:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:12:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:12:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:12:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:12:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:12:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:12:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:12:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:13:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:13:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:13:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:13:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:13:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:13:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:13:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:13:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:13:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:13:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:13:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:13:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:13:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:13:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:13:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:13:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:13:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:13:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:13:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:13:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:13:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:13:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:13:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:13:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:14:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:14:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:14:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:04 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:14:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:14:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:06 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:14:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:14:07 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:14:07 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:14:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:14:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:14:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:14:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:14:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:14:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:14:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:14:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:14:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:14:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:14:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:14:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:14:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:14:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:14:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:14:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:15:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:15:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:15:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:15:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:15:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:15:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:15:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:15:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:15:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:15:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:15:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:15:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:15:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:15:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:15:12 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:15:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:15:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:13 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:15:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:14 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:15:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:15 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:15:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:16 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:15:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:15:19 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:15:20 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:15:21 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:16:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:16:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:16:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:04 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:16:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:16:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:06 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:16:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:16:07 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:16:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:16:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:16:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:16:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:16:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:16:09 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:16:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:16:10 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:16:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:16:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:16:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:11 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:16:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:12 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:16:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:16:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:16:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:17:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:17:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:17:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:17:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:17:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:17:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:17:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:17:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:17:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:17:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:17:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:17:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:17:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:17:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:17:10 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:17:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:17:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:17:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:17:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:17:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:17:19 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:17:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:17:23 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:23 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:17:24 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:17:25 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:17:25 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:18:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:18:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:03 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:18:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:04 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:18:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:18:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:06 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:18:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:18:07 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:18:07 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:18:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:18:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:18:08 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:18:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:18:09 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:18:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:18:10 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:18:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:18:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:18:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:11 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:18:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:12 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:18:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:18:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:18:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:18:19 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:18:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:19:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:19:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:19:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:19:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:19:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:19:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:19:07 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:19:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:19:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:19:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:19:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:19:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:19:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:19:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:19:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:19:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:19:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:19:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:19:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:14 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:19:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:19:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:19:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:19:19 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:19:20 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:20:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:20:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:20:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:20:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:20:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:08 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:20:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:20:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:20:09 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:20:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:20:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:20:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:20:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:20:11 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:20:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:20:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:20:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:20:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:20:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:20:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:14 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:20:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:15 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:20:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:20:19 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:20:20 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:20:21 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:21:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:21:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:21:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:21:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:21:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:21:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:21:07 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:21:07 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:21:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:21:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:21:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:21:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:21:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:21:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:21:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:21:10 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:21:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:21:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:21:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:21:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:21:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:21:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:21:17 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:21:18 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:22:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:22:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:22:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:22:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:22:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:22:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:22:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:22:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:22:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:22:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:22:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:22:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:22:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:22:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:22:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:22:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:22:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:22:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:22:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:22:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:22:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:22:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:22:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:22:18 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:23:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:23:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:23:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:23:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:23:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:23:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:23:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:23:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:23:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:23:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:23:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:23:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:23:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:23:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:23:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:23:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:23:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:23:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:23:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:23:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:23:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:23:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:23:19 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:23:20 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:24:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:24:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:24:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:24:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:24:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:24:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:24:07 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:24:07 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:24:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:24:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:24:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:24:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:24:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:24:09 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:24:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:24:10 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:24:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:24:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:24:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:12 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:24:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:24:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:24:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:24:17 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:24:18 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:25:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:25:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:25:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:25:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:25:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:25:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:25:07 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:25:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:25:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:25:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:25:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:25:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:25:09 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:25:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:25:10 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:25:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:25:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:25:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:25:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:12 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:25:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:13 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:25:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:25:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:25:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:25:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:26:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:26:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:26:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:26:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:26:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:26:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:26:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:26:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:26:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:26:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:26:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:26:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:26:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:26:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:27:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:27:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:27:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:27:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:27:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:27:08 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:27:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:27:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:27:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:27:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:27:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:27:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:27:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:27:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:27:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:27:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:27:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:27:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:27:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:27:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:27:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:17 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:27:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:17 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:27:17 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:27:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:27:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:18 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:27:19 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:19 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:27:19 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:27:19 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:27:20 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:27:20 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:21 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:27:21 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:21 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:22 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:23 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:24 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:27:25 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:27:25 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:27:26 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:28:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:28:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:28:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:28:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:05 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:28:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:28:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:28:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:28:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:28:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:28:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:28:09 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:28:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:28:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:28:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:28:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:28:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:28:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:28:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:28:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:28:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:28:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:28:19 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:28:20 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:28:21 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:29:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:29:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:05 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:29:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:29:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:29:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:29:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:29:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:29:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:29:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:29:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:29:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:29:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:29:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:29:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:29:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:29:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:29:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:29:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:12 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:29:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:13 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:29:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:29:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:29:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:29:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:29:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:30:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:30:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:30:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:30:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:07 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:30:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:30:08 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:30:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:30:08 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:30:08 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:30:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:30:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:30:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:30:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:30:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:30:10 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:30:11 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:11 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:30:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:30:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:30:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:14 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:30:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:14 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:30:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:30:17 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:30:18 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:30:18 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:31:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:31:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:04 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:31:04 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:05 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:31:05 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:06 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:06 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:06 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:31:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:31:07 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:31:08 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:31:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:31:09 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:31:09 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:31:10 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:31:10 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:31:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:31:11 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:31:11 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:31:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:31:12 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:12 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:31:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:13 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:31:13 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:14 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:14 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:31:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:15 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:31:15 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:16 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:31:18 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:31:19 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:31:19 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com
+2025-11-05 22:32:03 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:03 | Inasistencia registrada - Baile (Nivel Formativo) | carlos.perez@example.com
+2025-11-05 22:32:07 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:07 | Inasistencia registrada - Guitarra Eléctrica | fghfg@gmail.com
+2025-11-05 22:32:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:08 | Inasistencia registrada - Piano | felipe.gomez@example.com
+2025-11-05 22:32:08 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:10 | Inasistencia registrada - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:10 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:11 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:11 | Inasistencia registrada - Grupo de Rock | oscar.trivino@example.com
+2025-11-05 22:32:12 | 📝 Tu opinión importa - Arte Fantástico | maria.narvaez@example.com
+2025-11-05 22:32:12 | Inasistencia registrada - Grupo de Rock | gula@gmail.com
+2025-11-05 22:32:12 | 📝 Tu opinión importa - Judo | maria.narvaez@example.com
+2025-11-05 22:32:13 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | cocine957@gmail.com
+2025-11-05 22:32:13 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:32:14 | Inasistencia registrada - Acondicionamiento FIT (Crossfit) | fghfgjj@gmail.com
+2025-11-05 22:32:14 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:32:15 | Inasistencia registrada - Entrenamiento Funcional | gula@gmail.com
+2025-11-05 22:32:15 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:32:16 | Inasistencia registrada - Entrenamiento Funcional | fghfgjj@gmail.com
+2025-11-05 22:32:16 | 📝 Tu opinión importa - Baloncesto (Nivel Formativo) | maria.narvaez@example.com
+2025-11-05 22:32:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:17 | Inasistencia registrada - Fútbol Masculino (Avanzado) | cocine957@gmail.com
+2025-11-05 22:32:17 | Inasistencia registrada - Fútbol Masculino (Avanzado) | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:32:17 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:18 | Inasistencia registrada - Ajedrez | ismaelbarrionuevo2006@gmail.com
+2025-11-05 22:32:18 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:19 | Inasistencia registrada - Natación (Formativo) | felipe.gomez@example.com
+2025-11-05 22:32:19 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:19 | Inasistencia registrada - Natación (Avanzado) | jaime.villalobos@example.com
+2025-11-05 22:32:20 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:20 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:21 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:22 | 📝 Tu opinión importa - Grupo de Rock | carlos.perez@example.com
+2025-11-05 22:32:22 | 📝 Tu opinión importa - Baile (Nivel Avanzado) | luisgabrieldfs@gmail.com
+2025-11-05 22:32:23 | 📝 Tu opinión importa - Cerámica | hgfhfh@gmail.com
+2025-11-05 22:32:24 | 📝 Tu opinión importa - Arte Fantástico | cocine957@gmail.com

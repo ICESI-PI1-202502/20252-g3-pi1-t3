@@ -1,0 +1,566 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    ¡Completa tu perfil!
+{% endblock %}
+
+{% block header_logo %}
+<span class="navbar-brand disabled-icon">
+  <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+  Bienestar Universitario
+</span>
+{% endblock %}
+
+{% block header_notifications %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Notificaciones">
+    <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+  </span>
+</div>
+{% endblock %}
+
+{% block header_avatar %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Perfil">
+    {% include 'includes/user_avatar.html' %}
+  </span>
+</div>
+{% endblock %}
+
+{% block header_sidebar_btn %}
+<div class="navbar-option ms-3">
+  <span class="disabled-icon" title="Menú">
+    <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+  </span>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/list_preferences.css' %}">
+    <style>
+        .profile-completion {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .welcome-message {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .welcome-message h2 {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .welcome-message p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .roles-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .role-item {
+            display: flex;
+            align-items: center;
+            padding: 18px 20px;
+            background: white;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 15px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .role-item:hover {
+            border-color: #00A94F;
+            background-color: #f0f9f4;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 169, 79, 0.15);
+        }
+
+        .role-item input[type="radio"] {
+            margin-right: 12px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+            accent-color: #00A94F;
+        }
+
+        .role-item.selected {
+            border-color: #00A94F;
+            background-color: #e8f5e9;
+            box-shadow: 0 4px 12px rgba(0, 169, 79, 0.2);
+        }
+
+        .extra-fields {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            display: none;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .extra-fields.show {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .extra-fields h4 {
+            font-size: 16px;
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .field-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .field {
+            margin-bottom: 0;
+        }
+
+        .field input,
+        .field select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .field input:focus,
+        .field select:focus {
+            outline: none;
+            border-color: #00A94F;
+            box-shadow: 0 0 0 3px rgba(0, 169, 79, 0.1);
+        }
+
+        .messages {
+            margin: 20px 0;
+        }
+
+        .message {
+            padding: 12px 18px;
+            border-radius: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .message.error {
+            background-color: #ffebee;
+            color: #c62828;
+            border-left: 4px solid #c62828;
+        }
+
+        .message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            border-left: 4px solid #2e7d32;
+        }
+
+        .message.info {
+            background-color: #e3f2fd;
+            color: #1565c0;
+            border-left: 4px solid #1565c0;
+        }
+
+        .greenBotton_White:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        @media (max-width: 768px) {
+            .roles-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .field-group {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <section class="list-preferences profile-completion">
+
+        <div class="welcome-message">
+            <h1 class="selecciona-el-tipo">¡Bienvenido, {{ participante.nombre }}! 👋</h1>
+            <p class="esto-nos-ayudar">
+                Para personalizar tu experiencia en Bienestar Universitario, necesitamos conocer un poco más sobre ti.
+            </p>
+        </div>
+
+        {% if messages %}
+        <div class="messages">
+            {% for message in messages %}
+            <div class="message {{ message.tags }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <form method="POST" id="profileForm">
+            {% csrf_token %}
+
+            <h2 class="selecciona-el-tipo" style="font-size: 18px; margin-bottom: 20px;">
+                ¿Cuál es tu vínculo con la universidad?
+            </h2>
+
+           <div class="roles-grid">
+    <label class="role-item" onclick="selectRole(this, 'estudiante')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="estudiante" 
+            id="rol_estudiante"
+            required
+        >
+        Estudiante
+    </label>
+
+    <label class="role-item" onclick="selectRole(this, 'trabajador')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="trabajador" 
+            id="rol_trabajador"
+            required
+        >
+        Trabajador (Docente, Administrativo, etc.)
+    </label>
+
+    <label class="role-item" onclick="selectRole(this, 'egresado')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="egresado" 
+            id="rol_egresado"
+            required
+        >
+        Egresado
+    </label>
+
+    <label class="role-item" onclick="selectRole(this, 'invitado')">
+        <input 
+            type="radio" 
+            name="tipo_participante"
+            value="invitado" 
+            id="rol_invitado"
+            required
+        >
+        Invitado/Externo
+    </label>
+</div>
+
+            <!-- Campos extra - ESTUDIANTE -->
+            <div id="extra-estudiante" class="extra-fields">
+                <h4>📚 Información adicional - Estudiante</h4>
+                <div class="field-group">
+                    <div class="field">
+                        <select name="semestre" id="semestre_estudiante">
+                            <option value="">Selecciona tu semestre *</option>
+                            {% for i in "123456789"|make_list %}
+                            <option value="{{ forloop.counter }}">Semestre {{ forloop.counter }}</option>
+                            {% endfor %}
+                            <option value="10">Semestre 10+</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <select name="genero" id="genero_estudiante">
+                            <option value="">Selecciona tu género (opcional)</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="Prefiero no decir">Prefiero no decir</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <div class="field" style="grid-column: 1 / -1;">
+                        <select name="programa" id="programa_estudiante">
+                            <option value="">Selecciona tu programa académico *</option>
+                            <optgroup label="Ciencias de la Salud">
+                                <option value="Bacteriología y Laboratorio Clínico" data-facultad="Ciencias de la Salud">Bacteriología y Laboratorio Clínico</option>
+                                <option value="Medicina" data-facultad="Ciencias de la Salud">Medicina</option>
+                                <option value="Medicina Veterinaria y Zootecnia" data-facultad="Ciencias de la Salud">Medicina Veterinaria y Zootecnia</option>
+                            </optgroup>
+                            <optgroup label="Negocios y Economía Isaac Gilinski">
+                                <option value="Administración de Empresas" data-facultad="Negocios y Economía Isaac Gilinski">Administración de Empresas</option>
+                                <option value="Economía y Negocios Internacionales" data-facultad="Negocios y Economía Isaac Gilinski">Economía y Negocios Internacionales</option>
+                                <option value="Finanzas" data-facultad="Negocios y Economía Isaac Gilinski">Finanzas</option>
+                                <option value="Mercadeo Internacional y Publicidad" data-facultad="Negocios y Economía Isaac Gilinski">Mercadeo Internacional y Publicidad</option>
+                                <option value="Negocios, Estrategia y Tecnología" data-facultad="Negocios y Economía Isaac Gilinski">Negocios, Estrategia y Tecnología</option>
+                            </optgroup>
+                            <optgroup label="Ingeniería, Diseño y Ciencias Aplicadas">
+                                <option value="Biología" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Biología</option>
+                                <option value="Diseño de Medios Interactivos" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Diseño de Medios Interactivos</option>
+                                <option value="Diseño Industrial" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Diseño Industrial</option>
+                                <option value="Ingeniería Bioquímica" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Ingeniería Bioquímica</option>
+                                <option value="Ingeniería de Sistemas" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Ingeniería de Sistemas</option>
+                                <option value="Ingeniería en Energía Inteligente" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Ingeniería en Energía Inteligente</option>
+                                <option value="Ingeniería Industrial" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Ingeniería Industrial</option>
+                                <option value="Ingeniería Telemática" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Ingeniería Telemática</option>
+                                <option value="Química" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Química</option>
+                                <option value="Química Farmacéutica" data-facultad="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Química Farmacéutica</option>
+                            </optgroup>
+                            <optgroup label="Ciencias Humanas">
+                                <option value="Antropología" data-facultad="Ciencias Humanas">Antropología</option>
+                                <option value="Ciencia Política" data-facultad="Ciencias Humanas">Ciencia Política</option>
+                                <option value="Comunicación" data-facultad="Ciencias Humanas">Comunicación</option>
+                                <option value="Derecho" data-facultad="Ciencias Humanas">Derecho</option>
+                                <option value="Licenciatura en Ciencias Sociales" data-facultad="Ciencias Humanas">Licenciatura en Ciencias Sociales</option>
+                                <option value="Licenciatura en Lenguas Extranjeras" data-facultad="Ciencias Humanas">Licenciatura en Lenguas Extranjeras</option>
+                                <option value="Música" data-facultad="Ciencias Humanas">Música</option>
+                                <option value="Psicología" data-facultad="Ciencias Humanas">Psicología</option>
+                                <option value="Sociología" data-facultad="Ciencias Humanas">Sociología</option>
+                            </optgroup>
+                        </select>
+                        <input type="hidden" name="facultad" id="facultad_estudiante">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campos extra - TRABAJADOR -->
+            <div id="extra-trabajador" class="extra-fields">
+                <h4>👔 Información adicional - Trabajador</h4>
+                <div class="field-group">
+                    <div class="field">
+                        <select name="facultad" id="facultad_trabajador">
+                            <option value="">Selecciona tu facultad/área (opcional)</option>
+                            <option value="Ciencias de la Salud">Ciencias de la Salud</option>
+                            <option value="Negocios y Economía Isaac Gilinski">Negocios y Economía</option>
+                            <option value="Barberi de Ingeniería, Diseño y Ciencias Aplicadas">Ingeniería y Diseño</option>
+                            <option value="Ciencias Humanas">Ciencias Humanas</option>
+                            <option value="Administrativa">Área Administrativa</option>
+                            <option value="Servicios Generales">Servicios Generales</option>
+                            <option value="Otra">Otra</option>
+                        </select>
+                    </div>
+                    <div class="field">
+                        <select name="genero" id="genero_trabajador">
+                            <option value="">Selecciona tu género (opcional)</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="Prefiero no decir">Prefiero no decir</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campos extra - EGRESADO -->
+            <div id="extra-egresado" class="extra-fields">
+                <h4>🎓 Información adicional - Egresado</h4>
+                <div class="field-group">
+                    <div class="field">
+                        <input type="text" name="programa" id="programa_egresado" placeholder="Programa del que te graduaste (opcional)">
+                    </div>
+                    <div class="field">
+                        <select name="genero" id="genero_egresado">
+                            <option value="">Selecciona tu género (opcional)</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="Prefiero no decir">Prefiero no decir</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Campos extra - INVITADO -->
+            <div id="extra-invitado" class="extra-fields">
+                <h4>✨ Información adicional - Invitado</h4>
+                <div class="field-group">
+                    <div class="field">
+                        <select name="genero" id="genero_invitado">
+                            <option value="">Selecciona tu género (opcional)</option>
+                            <option value="Masculino">Masculino</option>
+                            <option value="Femenino">Femenino</option>
+                            <option value="Otro">Otro</option>
+                            <option value="Prefiero no decir">Prefiero no decir</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="greenBotton_White" id="submitBtn" disabled>
+                Continuar
+            </button>
+        </form>
+
+        <div class="line-div"></div>
+
+    </section>
+
+    <script>
+    let currentRole = null;
+
+    function selectRole(element, roleName) {
+        // Remover selección previa
+        document.querySelectorAll('.role-item').forEach(option => {
+            option.classList.remove('selected');
+        });
+        
+        // Seleccionar nuevo rol
+        element.classList.add('selected');
+        document.getElementById('rol_' + roleName).checked = true;
+        currentRole = roleName;
+        
+        console.log('✅ Rol seleccionado:', roleName);
+        
+        // ✅ SIEMPRE habilitar el botón cuando se selecciona un rol
+        document.getElementById('submitBtn').disabled = false;
+        
+        // Ocultar todos los campos extra
+        document.querySelectorAll('.extra-fields').forEach(field => {
+            field.classList.remove('show');
+        });
+        
+        // Mostrar campos según el rol
+        const extraFieldsId = 'extra-' + roleName;
+        const extraFields = document.getElementById(extraFieldsId);
+        if (extraFields) {
+            extraFields.classList.add('show');
+        }
+        
+        // ✅ Remover atributo required de campos que no pertenecen al rol actual
+        removeRequiredFromOtherRoles(roleName);
+    }
+    
+    // ✅ NUEVA FUNCIÓN: Remover required de otros roles
+    function removeRequiredFromOtherRoles(selectedRole) {
+        const allRoles = ['estudiante', 'trabajador', 'egresado', 'invitado'];
+        
+        allRoles.forEach(rol => {
+            const section = document.getElementById('extra-' + rol);
+            if (section) {
+                const inputs = section.querySelectorAll('input, select');
+                inputs.forEach(input => {
+                    if (rol === selectedRole) {
+                        // Solo estudiante tiene campos requeridos
+                        if (rol === 'estudiante') {
+                            if (input.id === 'semestre_estudiante' || input.id === 'programa_estudiante') {
+                                // No cambiar nada, mantener validación en frontend si existe
+                            }
+                        }
+                    } else {
+                        // Remover required de roles no seleccionados
+                        input.removeAttribute('required');
+                    }
+                });
+            }
+        });
+    }
+    
+    // Auto-llenar la facultad cuando se selecciona un programa (estudiante)
+    const programaSelect = document.getElementById('programa_estudiante');
+    if (programaSelect) {
+        programaSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            const facultad = selectedOption.getAttribute('data-facultad');
+            
+            if (facultad) {
+                document.getElementById('facultad_estudiante').value = facultad;
+                console.log('✅ Facultad auto-completada:', facultad);
+            }
+        });
+    }
+    
+    // Validar antes de enviar
+    // Validar antes de enviar
+document.getElementById('profileForm').addEventListener('submit', function(e) {
+    if (!document.querySelector('input[name="tipo_participante"]:checked')) {  // ✅ CAMBIO AQUÍ
+        e.preventDefault();
+        alert('Por favor, selecciona tu vínculo con la universidad.');
+        return;
+    }
+
+    console.log('🚀 Enviando formulario. Tipo seleccionado:', currentRole);
+    
+        // ✅ Validación específica para estudiantes
+        if (currentRole === 'estudiante') {
+            const semestre = document.getElementById('semestre_estudiante').value;
+            const programa = document.getElementById('programa_estudiante').value;
+            const facultad = document.getElementById('facultad_estudiante').value;
+            
+            if (!semestre) {
+                e.preventDefault();
+                alert('Por favor, selecciona tu semestre.');
+                return;
+            }
+            
+            if (!programa) {
+                e.preventDefault();
+                alert('Por favor, selecciona tu programa académico.');
+                return;
+            }
+            
+            if (programa && !facultad) {
+                e.preventDefault();
+                alert('Error: No se pudo determinar la facultad. Por favor, intenta de nuevo.');
+                console.error('❌ Programa seleccionado pero sin facultad:', programa);
+                return;
+            }
+            
+            console.log('📚 Estudiante - Semestre:', semestre, '| Programa:', programa, '| Facultad:', facultad);
+        }
+
+        // ✅ Deshabilitar todos los campos que NO pertenecen al rol actual
+        const allRoles = ['estudiante', 'trabajador', 'egresado', 'invitado'];
+        allRoles.forEach(rol => {
+            if (rol !== currentRole) {
+                const section = document.getElementById('extra-' + rol);
+                if (section) {
+                    section.querySelectorAll('input, select').forEach(input => {
+                        input.disabled = true;
+                        console.log('❌ Deshabilitado campo:', input.name, 'del rol', rol);
+                    });
+                }
+            }
+        });
+
+        // Log de datos que se envían
+        const formData = new FormData(this);
+        console.log('\n📦 Datos finales enviados:');
+        for (let [key, value] of formData.entries()) {
+            if (value) {  // Solo mostrar valores no vacíos
+                console.log(`  ${key}: "${value}"`);
+            }
+        }
+    });
+    </script>
+    
+{% endblock %}

@@ -19,50 +19,83 @@
             <!-- User Info -->
             <div class="col-md-9">
                 <h3>{{ participante.nombre }} {{ participante.apellido }}</h3>
+                
                 <p><i class="bi bi-envelope"></i> <strong>Email:</strong> {{ participante.correo }}</p>
+                
                 <p><i class="bi bi-person-vcard"></i> <strong>Cédula:</strong> {{ participante.user.username }}</p>
+                
                 <p><i class="bi bi-people"></i> <strong>Rol:</strong>
                     {% if participante.roles_id_rol %}
-                    {{ participante.roles_id_rol.nombre_rol }}
+                        {{ participante.roles_id_rol.nombre_rol }}
                     {% else %}
-                    Sin rol asignado
+                        Sin rol asignado
                     {% endif %}
                 </p>
+                
                 <p><i class="bi bi-gender-ambiguous"></i> <strong>Género:</strong>
-                    {% if participante.genero %}
-                    {{ participante.genero }}
+                    {% if participante.genero and participante.genero != "" %}
+                        {{ participante.genero }}
                     {% else %}
-                    No especificado
+                        No especificado
                     {% endif %}
                 </p>
+                
                 <p><i class="bi bi-mortarboard"></i> <strong>Semestre:</strong>
                     {% if participante.semestre %}
-                    {{ participante.semestre }}
+                        {{ participante.semestre }}
                     {% else %}
-                    No especificado
+                        No aplica
                     {% endif %}
                 </p>
-                <p><strong>Facultad:</strong> {{ participante.facultad|default:"No especificado" }}</p>
-                <p><strong>Programa:</strong> {{ participante.programa|default:"No especificado" }}</p>
+                
+                <p><i class="bi bi-building"></i> <strong>Facultad:</strong>
+                    {% if participante.facultad and participante.facultad != "" %}
+                        {{ participante.facultad }}
+                    {% else %}
+                        No especificado
+                    {% endif %}
+                </p>
+                
+                <p><i class="bi bi-book"></i> <strong>Programa:</strong>
+                    {% if participante.programa and participante.programa != "" %}
+                        {{ participante.programa }}
+                    {% else %}
+                        No especificado
+                    {% endif %}
+                </p>
             </div>
         </div>
 
         <hr>
 
         <div class="mt-3">
-            <h5><i class="bi bi-list-check"></i> Preferencias</h5>
+            <h5><i class="bi bi-list-check"></i> Preferencias de Actividades</h5>
             {% if actividades %}
-            <ul class="list-group list-group-flush">
-                {% for act in actividades %}
-                <li class="list-group-item">{{ act.tipo_actividad.nombre_tipo }}</li>
-                {% endfor %}
-            </ul>
+                <ul class="list-group list-group-flush">
+                    {% for act in actividades %}
+                        <li class="list-group-item">{{ act.tipo_actividad.nombre_tipo }}</li>
+                    {% endfor %}
+                </ul>
             {% else %}
-            <p class="text-muted">No has seleccionado preferencias aún.</p>
+                <p class="text-muted">No has seleccionado preferencias aún.</p>
+                <a href="{% url 'preferences' %}" class="btn btn-primary btn-sm">
+                    <i class="bi bi-plus-circle"></i> Agregar Preferencias
+                </a>
             {% endif %}
         </div>
-        {% endblock %}
 
-        {% block extra_js %}
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
-        {% endblock %}
+        <hr>
+
+        <div class="mt-3 text-center">
+            <a href="{% url 'home' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Volver al Inicio
+            </a>
+       
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.js"></script>
+{% endblock %}
