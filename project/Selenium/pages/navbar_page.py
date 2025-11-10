@@ -23,13 +23,13 @@ class NavBar(BasePage):
         except Exception:
             pass
 
-        # Click normal → fallback JS → reintentos
+       
         try:
             self.retry_click(self.MENU_BTN, timeout=8, attempts=2)
         except Exception:
             self.click_js(self.MENU_BTN, timeout=5)
 
-        # Esperar a que el sidebar tenga la clase "open" y el link sea visible
+       
         WebDriverWait(self.driver, 10).until(
             lambda d: "open" in (d.find_element(*self.SIDEBAR).get_attribute("class") or "")
         )
@@ -40,13 +40,13 @@ class NavBar(BasePage):
 
     def go_to_search(self):
         self.open_menu()
-        # Click normal, fallback JS para evitar overlays
+    
         try:
             self.click(self.LINK_SEARCH)
         except Exception:
             self.click_js(self.LINK_SEARCH, timeout=5)
 
-    def go_to_schedule(self):  # <— NUEVO
+    def go_to_schedule(self):  
         self.open_menu()
         try:
             self.click(self.LINK_SCHEDULE)
@@ -60,7 +60,7 @@ class NavBar(BasePage):
         except Exception:
             self.click_js(self.LINK_ANALYTICS, timeout=5)
 
-    def go_to_psu_projects(self):                                  # NUEVO
+    def go_to_psu_projects(self):                        
         self.open_menu()
         try: self.click(self.LINK_PSU)
         except Exception: self.click_js(self.LINK_PSU, timeout=5)

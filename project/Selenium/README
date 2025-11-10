@@ -1,0 +1,9 @@
+Para correr cualquier test porfavor usar 
+
+behave features/{nombredel archivo .feature a probar}.feature
+
+ejemplo:
+behave features/cadi_personal_schedule_psych_appointment.feature
+
+NOTA:
+La gran mayoria de test relacionados con crear cosas, ejemplo crear un 

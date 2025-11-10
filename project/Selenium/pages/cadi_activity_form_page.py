@@ -8,7 +8,6 @@ class CADIActivityFormPage(BasePage):
     INPUT_AFORO  = (By.CSS_SELECTOR, "input[name='aforo']")
     TEXT_DESC    = (By.CSS_SELECTOR, "textarea[name='descripcion']")
     SELECT_REQ   = (By.CSS_SELECTOR, "select[name='requiere_inscripcion']")
-    # Sirve tanto para “Crear actividad” como para “Actualizar”
     BTN_CREAR    = (By.CSS_SELECTOR, "button.greenBotton_White[name='action'][value='confirm'], button.greenBotton_White")
 
     def fill_and_submit(self, name, tipo, aforo, descripcion, requiere_inscripcion):
@@ -47,7 +46,6 @@ class CADIActivityFormPage(BasePage):
         except Exception:
             pass
 
-        # asegurar vacío + eventos
         self.driver.execute_script("""
             arguments[0].value = '';
             arguments[0].dispatchEvent(new Event('input', {bubbles:true}));
@@ -62,10 +60,10 @@ class CADIActivityFormPage(BasePage):
         return is_valid, (validation_msg or "")
 
     def submit_with_negative_aforo_expect_min_error(self, name, tipo, aforo, requiere_inscripcion, descripcion=""):
-        # nombre (requerido)
+    
         self.type(self.INPUT_NOMBRE, name)
 
-        # tipo (requerido)
+ 
         select_tipo = self.is_present(self.SELECT_TIPO, timeout=15)
         try:
             Select(select_tipo).select_by_visible_text(tipo)
@@ -76,11 +74,11 @@ class CADIActivityFormPage(BasePage):
                     opt.click()
                     break
 
-        # aforo negativo para gatillar min=1
+       
         if aforo is not None:
             self.type(self.INPUT_AFORO, str(aforo))
 
-        # descripción (opcional)
+
         if descripcion:
             self.type(self.TEXT_DESC, descripcion)
 

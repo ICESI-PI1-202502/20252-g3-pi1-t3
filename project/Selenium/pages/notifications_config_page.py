@@ -25,7 +25,7 @@ class NotificationsConfigPage(BasePage):
         self.scroll_into_view(self.BTN_SAVE, timeout=10)
         self.retry_click(self.BTN_SAVE, timeout=10)
 
-        # El form debe ser inválido (min=1); tomamos mensajes nativos
+
         is_valid = self.driver.execute_script("return document.querySelector('form').checkValidity();")
         msg1 = self.driver.execute_script("return arguments[0].validationMessage;", umbral_el) or ""
         msg2 = self.driver.execute_script("return arguments[0].validationMessage;", dias_el) or ""

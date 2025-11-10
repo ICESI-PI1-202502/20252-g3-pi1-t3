@@ -14,7 +14,7 @@ class RegisterAttendancePage(BasePage):
         try:
             Select(sel).select_by_visible_text(activity_text)
         except Exception:
-            # fallback por value si lo conoces (ej: "924")
+      
             try:
                 Select(sel).select_by_value("924")
             except Exception:
@@ -25,7 +25,7 @@ class RegisterAttendancePage(BasePage):
         self.scroll_into_view(self.BTN_SUBMIT, timeout=10)
         self.retry_click(self.BTN_SUBMIT, timeout=10)
 
-        # Esperar la alerta de warning
+      
         el = WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(self.ALERT_WARNING)
         )

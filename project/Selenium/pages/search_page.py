@@ -20,7 +20,7 @@ class SearchPage(BasePage):
     CALIFICAR_LINK = (By.CSS_SELECTOR, 'a.yellowBotton_Black.mt-2.d-block[href*="/search/calificar/"]')
     SUCCESS_ALERT  = (By.CSS_SELECTOR, '.alert.alert-success.alert-dismissible')
 
-    # ---------- Acciones de búsqueda ----------
+ 
     def search_by_name(self, text: str):
         self.type(self.INPUT_Q, text)
         try:
@@ -32,7 +32,6 @@ class SearchPage(BasePage):
             EC.presence_of_all_elements_located(self.RESULT_TITLES)
         )
 
-    # ---------- Filtros ----------
     def open_filters(self):
         self.scroll_into_view(self.BTN_OPEN_FILTERS, timeout=10)
         try:
@@ -85,12 +84,12 @@ class SearchPage(BasePage):
         except Exception:
             self.click_js(self.BTN_APLICAR, timeout=6)
 
-        # Espera a que exista el contenedor de resultados y (si hay) títulos
+      
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(self.RESULTS_BOX)
         )
 
-    # ---------- Asserts ----------
+
     def assert_result_title_present(self, expected: str):
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(self.RESULTS_BOX)
@@ -100,7 +99,7 @@ class SearchPage(BasePage):
             f"No se encontró '{expected}' en resultados: {titles}"
 
     def assert_result_title_absent(self, banned: str):
-        # Si no hay títulos, también es válido (ausencia)
+      
         WebDriverWait(self.driver, 10).until(
             EC.presence_of_element_located(self.RESULTS_BOX)
         )
@@ -110,20 +109,19 @@ class SearchPage(BasePage):
         
 
     def click_first_calificar(self):
-        # Clic al primer botón "Calificar" disponible (anchor, no span deshabilitado)
+        
         self.scroll_into_view(self.CALIFICAR_LINK, timeout=10)
         try:
             self.retry_click(self.CALIFICAR_LINK, timeout=10)
         except Exception:
             self.click_js(self.CALIFICAR_LINK, timeout=6)
 
-        # Esperar a que cargue la página de calificación
         WebDriverWait(self.driver, 10).until(
             EC.url_contains("/search/calificar/")
         )
 
     def assert_rating_success(self):
-        # Tras confirmar, volvemos a /search y debe aparecer el alert success
+     
         WebDriverWait(self.driver, 10).until(EC.url_contains("/search"))
         WebDriverWait(self.driver, 10).until(
             EC.visibility_of_element_located(self.SUCCESS_ALERT)

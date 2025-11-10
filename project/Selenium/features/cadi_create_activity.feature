@@ -1,12 +1,12 @@
 Feature: CADI - Creación exitosa de actividad por administrador
 
-  Scenario: Crear actividad "Tiro con arco" en Deportes Individuales
+  Scenario: Crear actividad "Tiro con arco (Profesional)" en Deportes Individuales
     Given I am on the login page
     When I login with username "1113624957" and password "00"
     And I open CADI management from the home card
     And I open the CADI category "Deportes Individuales"
     And I click "Agregar actividad" in the CADI list
-    And I create a CADI activity named "Tiro con arco" of type "Deportes Individuales" with capacity 10, requires "No" and description:
+    And I create a CADI activity named "Tiro con arco (Profesional)" of type "Deportes Individuales" with capacity 10, requires "No" and description:
       """
       Día: Miércoles
       Horario: 17:00–19:00
@@ -17,4 +17,4 @@ Feature: CADI - Creación exitosa de actividad por administrador
       Espacio: 204 - G
       Profesor: Julián Andrés
       """
-    Then I should see the CADI activity titled "Tiro con arco" in the list
+    Then I should see the CADI activity titled "Tiro con arco (Profesional)" in the list

@@ -13,7 +13,6 @@ class TeamCreatePage(BasePage):
     def fill_form(self, nombre_equipo, responsable_id, disciplina, capacidad_min, capacidad_max):
         self.type(self.INPUT_NOMBRE, nombre_equipo)
         self.type(self.INPUT_RESP_ID, responsable_id)
-        # seleccionar disciplina por texto visible
         select_el = self.is_present(self.SELECT_DISC, timeout=10)
         Select(select_el).select_by_visible_text(disciplina)
         self.type(self.INPUT_MIN, str(capacidad_min))
@@ -23,11 +22,11 @@ class TeamCreatePage(BasePage):
         self.click(self.BTN_SUBMIT)
 
     def submit_expect_required_errors(self):
-        # Intentar enviar vacío
+  
         self.click(self.BTN_SUBMIT)
-        # El form NO debe ser válido
+ 
         is_valid = self.driver.execute_script("return document.querySelector('form').checkValidity();")
-        # Mensaje nativo del primer campo requerido (Nombre del equipo)
+   
         nombre_el = self.is_present(self.INPUT_NOMBRE, timeout=10)
         validation_msg = self.driver.execute_script("return arguments[0].validationMessage;", nombre_el)
         return is_valid, (validation_msg or "")

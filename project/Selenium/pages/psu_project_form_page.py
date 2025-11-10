@@ -12,7 +12,7 @@ class PSUProjectFormPage(BasePage):
     BTN_CONFIRM  = (By.CSS_SELECTOR, 'button.greenBotton_White')  # "Confirmar"
     ALERT_DANGER = (By.CSS_SELECTOR, '.alert.alert-danger')
 
-    # --- NUEVO: para pruebas de fechas inconsistentes ---
+ 
     def fill_name_capacity_desc(self, name: str, capacity: str, description: str = ""):
         self.type(self.INPUT_NOMBRE, name)
         self.type(self.INPUT_AFORO, str(capacity))
@@ -22,7 +22,7 @@ class PSUProjectFormPage(BasePage):
     def set_dates(self, start_yyyy_mm_dd: str, end_yyyy_mm_dd: str):
         ini = self.is_present(self.INPUT_INICIO, timeout=10)
         fin = self.is_present(self.INPUT_FIN, timeout=10)
-        # JS para evitar issues con datepicker/región
+
         self.driver.execute_script("""
             arguments[0].value = arguments[2];
             arguments[1].value = arguments[3];
@@ -43,7 +43,6 @@ class PSUProjectFormPage(BasePage):
         except Exception:
             return ""
 
-    # --- EXISTENTE: lo conservo para tu test de aforo negativo ---
     def submit_with_negative_aforo_expect_min_error(self, nombre: str, aforo_neg: int = -1):
         self.type(self.INPUT_NOMBRE, nombre)
         aforo_el = self.is_present(self.INPUT_AFORO, timeout=12)

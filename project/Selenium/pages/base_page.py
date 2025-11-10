@@ -7,7 +7,7 @@ class BasePage:
     def __init__(self, driver):
         self.driver = driver
 
-    # ---------- waits / finds ----------
+   
     def is_present(self, locator, timeout=10):
         return WebDriverWait(self.driver, timeout).until(
             EC.presence_of_element_located(locator)
@@ -25,7 +25,6 @@ class BasePage:
         except Exception:
             return False
 
-    # ---------- interactions ----------
     def open(self, url):
         self.driver.get(url)
 
@@ -69,7 +68,7 @@ class BasePage:
         try:
             el.send_keys(text)
         except ElementNotInteractableException:
-            # Fallback JS + eventos input/change
+           
             self.driver.execute_script("arguments[0].value = arguments[1];", el, text)
             self.driver.execute_script("""
                 const e1 = new Event('input', {bubbles:true});

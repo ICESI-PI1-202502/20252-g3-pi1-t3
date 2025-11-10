@@ -42,7 +42,7 @@ class PSUProjectsPage(BasePage):
 
     def search(self, text: str):
         self.type(self.INPUT_Q, text)
-        # Click normal → ENTER fallback
+
         try:
             self.retry_click(self.BTN_SEARCH, timeout=6)
         except Exception:
@@ -60,25 +60,24 @@ class PSUProjectsPage(BasePage):
         assert any(expected.lower() == t.lower() for t in titles), \
             f"No se encontró '{expected}'. Títulos: {titles}"
 
-    # NUEVO: abrir “Detalles” del proyecto cuyo título exacto coincida
+    
     def open_details_for_title(self, title: str):
-    # Ubica el <h3 class="title"> con ese texto exacto y sube al <article.card-item>
+ 
         card_h3 = (By.XPATH, f"//article[contains(@class,'card-item')]//h3[contains(@class,'title')][normalize-space()='{title}']")
         h3_el = self.is_present(card_h3, timeout=12)
 
-    # Ancestro <article> de ese <h3>
+
         article = h3_el.find_element(By.XPATH, "./ancestor::article[contains(@class,'card-item')]")
-    # Dentro del article, el botón "Detalles"
+  
         details = article.find_element(By.CSS_SELECTOR, "a.btn.btn-detail")
 
-    # Scroll + click robusto
+
         self.driver.execute_script("arguments[0].scrollIntoView({block:'center'});", details)
         try:
             details.click()
         except Exception:
             self.driver.execute_script("arguments[0].click();", details)
 
-    # Espera a que cargue la página de detalle (botón Inscribirme)
         WebDriverWait(self.driver, 12).until(
             EC.presence_of_element_located((By.XPATH, "//button[@type='submit' and contains(normalize-space(),'Inscribirme')]"))
         )
