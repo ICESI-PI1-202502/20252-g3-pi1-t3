@@ -137,10 +137,10 @@ def search(request):
 
         if PG_TRIGRAM_AVAILABLE:
             qs = qs.annotate(
-                norm_name=Unaccent(Lower(F('nombre')))
+                norm_name=Unaccent(Lower(F('nombre'))) # type: ignore
             )
             qs = qs.annotate(
-                sim=TrigramSimilarity(F('norm_name'), Unaccent(Value(q_lower)))
+                sim=TrigramSimilarity(F('norm_name'), Unaccent(Value(q_lower))) # type: ignore
             )
             tokens_and = reduce(
                 operator.and_,
