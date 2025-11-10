@@ -179,7 +179,13 @@ def obtener_estudiantes_inactivos():
         
         # Calcular días de inactividad
         if part.ultima_asistencia:
-            dias = (timezone.now().date() - part.ultima_asistencia).days
+            if isinstance(part.ultima_asistencia, datetime):
+                fecha_ultima = part.ultima_asistencia.date()
+            else:
+                fecha_ultima = part.ultima_asistencia
+
+            dias = (timezone.now().date() - fecha_ultima).days
+            
             if dias > estudiantes_inactivos[estudiante_id]['dias_inactivo']:
                 estudiantes_inactivos[estudiante_id]['dias_inactivo'] = dias
     
@@ -367,28 +373,74 @@ Equipo de Bienestar Universitario
         if correo:
             enviar_email(asunto, mensaje, [correo])
 
-
-# ========== CONFIGURACIÓN ==========
-
 def configurar_notificaciones(request):
     """Permite configurar parámetros de las notificaciones automáticas"""
     config = ConfiguracionNotificaciones.obtener_config()
     
     if request.method == 'POST':
-        config.umbral_riesgo_critico = int(request.POST.get('umbral_riesgo_critico', 2))
-        config.umbral_baja_asistencia = int(request.POST.get('umbral_baja_asistencia', 5))
-        config.dias_inactividad = int(request.POST.get('dias_inactividad', 14))
-        config.dias_riesgo_critico = int(request.POST.get('dias_riesgo_critico', 21))
-        config.asistencias_reconocimiento = int(request.POST.get('asistencias_reconocimiento', 10))
-        config.margen_proximo_reconocimiento = int(request.POST.get('margen_proximo_reconocimiento', 2))
-        config.asistencias_destacado = int(request.POST.get('asistencias_destacado', 15))
-        config.envio_automatico = request.POST.get('envio_automatico') == 'on'
-        config.frecuencia_envio = request.POST.get('frecuencia_envio', 'semanal')
-        config.emails_staff = request.POST.get('emails_staff', 'admin@academia.com')
-        
-        config.save()
-        messages.success(request, 'Configuración guardada correctamente.')
-        return redirect('Analytics_Reports:recomendaciones')
+        try:
+            # ========== DEBUG: Imprimir todos los valores POST ==========
+            print("=== DATOS POST RECIBIDOS ===")
+            for key, value in request.POST.items():
+                print(f"{key}: {value}")
+            print("============================")
+            
+            # ========== RECONOCIMIENTOS ==========
+            config.asistencias_reconocimiento = int(request.POST.get('asistencias_reconocimiento', 10))
+            config.margen_proximo_reconocimiento = int(request.POST.get('margen_proximo_reconocimiento', 2))
+            config.asistencias_destacado = int(request.POST.get('asistencias_destacado', 15))
+            
+            # DEBUG: Verificar valores antes de guardar
+            print(f"\n=== VALORES ANTES DE GUARDAR ===")
+            print(f"asistencias_reconocimiento: {config.asistencias_reconocimiento}")
+            print(f"margen_proximo_reconocimiento: {config.margen_proximo_reconocimiento}")
+            print(f"asistencias_destacado: {config.asistencias_destacado}")
+            
+            # ========== CLASIFICACIÓN ==========
+            config.umbral_baja_asistencia = int(request.POST.get('umbral_baja_asistencia', 5))
+            config.umbral_riesgo_critico = int(request.POST.get('umbral_riesgo_critico', 2))
+            config.dias_inactividad = int(request.POST.get('dias_inactividad', 14))
+            config.dias_riesgo_critico = int(request.POST.get('dias_riesgo_critico', 21))
+            
+            # ========== ENCUESTAS ==========
+            config.asistencias_minimas_encuesta = int(request.POST.get('asistencias_minimas_encuesta', 3))
+            config.dias_despues_cierre_encuesta = int(request.POST.get('dias_despues_cierre_encuesta', 3))
+            
+            # ========== GENERAL ==========
+            config.envio_automatico = request.POST.get('envio_automatico') == 'on'
+            config.frecuencia_envio = request.POST.get('frecuencia_envio', 'semanal')
+            
+            # ========== VALIDACIONES ==========
+            if config.asistencias_destacado <= config.asistencias_reconocimiento:
+                messages.error(request, f'⚠️ El umbral de destacado ({config.asistencias_destacado}) debe ser mayor al de reconocimiento ({config.asistencias_reconocimiento})')
+                return render(request, 'configurar_notificaciones.html', {'config': config})
+            
+            if config.umbral_baja_asistencia <= config.umbral_riesgo_critico:
+                messages.error(request, '⚠️ El umbral de baja asistencia debe ser mayor al de riesgo crítico')
+                return render(request, 'configurar_notificaciones.html', {'config': config})
+            
+            # ========== GUARDAR CON VERIFICACIÓN ==========
+            config.save()
+            
+            # DEBUG: Verificar que se guardó correctamente
+            config.refresh_from_db()
+            print(f"\n=== VALORES DESPUÉS DE GUARDAR ===")
+            print(f"asistencias_reconocimiento: {config.asistencias_reconocimiento}")
+            print(f"margen_proximo_reconocimiento: {config.margen_proximo_reconocimiento}")
+            print(f"asistencias_destacado: {config.asistencias_destacado}")
+            print("==================================\n")
+            
+            messages.success(request, '✅ Configuración guardada correctamente.')
+            return redirect('Analytics_Reports:configurar_notificaciones')
+            
+        except ValueError as e:
+            messages.error(request, f'❌ Error en los valores: {str(e)}')
+            print(f"ERROR ValueError: {str(e)}")
+        except Exception as e:
+            messages.error(request, f'❌ Error al guardar: {str(e)}')
+            print(f"ERROR Exception: {str(e)}")
+            import traceback
+            traceback.print_exc()
     
     return render(request, 'configurar_notificaciones.html', {'config': config})
 
@@ -1731,3 +1783,677 @@ def gestion_asistencia(request):
    
     return render(request, 'gestion_asistencia.html', context)
 
+# views.py
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
+@login_required
+def menu_analisis(request):
+    """Menú personalizado según rol del usuario"""
+    
+    # Obtener rol del usuario actual
+    try:
+        participante = request.user.participantes_set.first()
+        rol = participante.roles_id_rol.nombre_rol
+    except:
+        return redirect('login')
+    
+    # Definir opciones según rol
+    opciones = []
+    
+    if rol in ['Administrador', 'Coordinador']:
+        opciones = [
+            {
+                'titulo': 'Análisis de Comportamiento',
+                'descripcion': 'Visualiza patrones de participación global',
+                'url': 'Analytics_Reports:analisis_comportamiento',
+                'icono': 'bi-graph-up'
+            },
+            {
+                'titulo': 'Comparaciones y Estadísticas',
+                'descripcion': 'Compara periodos y métricas',
+                'url': 'Analytics_Reports:comparaciones',
+                'icono': 'bi-bar-chart'
+            },
+            {
+                'titulo': 'Recomendaciones',
+                'descripcion': 'Sistema de sugerencias automáticas',
+                'url': 'Analytics_Reports:recomendaciones',
+                'icono': 'bi-lightbulb'
+            },
+            {
+                'titulo': 'Registrar Asistencia',
+                'descripcion': 'Control manual de asistencia',
+                'url': 'Analytics_Reports:registrar_asistencia_manual',
+                'icono': 'bi-clipboard-check'
+            }
+        ]
+    
+    elif rol == 'profesor':
+        opciones = [
+            {
+                'titulo': 'Mis Actividades',
+                'descripcion': 'Análisis de tus clases y talleres',
+                'url': 'Analytics_Reports:dashboard_docente',
+                'icono': 'bi-person-workspace'
+            },
+            {
+                'titulo': 'Mis Estudiantes',
+                'descripcion': 'Seguimiento de participantes',
+                'url': 'Analytics_Reports:mis_estudiantes',
+                'icono': 'bi-people'
+            },
+            {
+                'titulo': 'Registrar Asistencia',
+                'descripcion': 'Tomar asistencia en tus clases',
+                'url': 'Analytics_Reports:registrar_asistencia_manual',
+                'icono': 'bi-clipboard-check'
+            },
+            {
+                'titulo': 'Comparar Grupos',
+                'descripcion': 'Compara tus diferentes secciones',
+                'url': 'Analytics_Reports:comparar_mis_grupos',
+                'icono': 'bi-bar-chart'
+            }
+        ]
+    
+    elif rol == 'Estudiante':
+        opciones = [
+            {
+                'titulo': 'Mi Historial',
+                'descripcion': 'Ver mis participaciones',
+                'url': 'Analytics_Reports:mi_historial',
+                'icono': 'bi-calendar-check'
+            },
+            {
+                'titulo': 'Mis Certificados',
+                'descripcion': 'Descargar certificados',
+                'url': 'Analytics_Reports:mis_certificados',
+                'icono': 'bi-award'
+            }
+        ]
+    
+    context = {
+        'rol': rol,
+        'opciones': opciones,
+        'nombre_usuario': participante.nombre
+    }
+    
+    return render(request, 'menu_analisis.html', context)
+
+
+
+
+# Reemplaza tu función dashboard_docente actual con esta:
+
+
+
+
+@login_required
+def dashboard_docente(request):
+    """Dashboard exclusivo para profesores"""
+    
+    try:
+        participante = request.user.participantes_set.first()
+        
+        if not participante:
+            messages.error(request, 'No se encontró tu perfil de participante.')
+            return redirect('home')
+        
+        rol = participante.roles_id_rol.nombre_rol.lower()
+        
+        # ✅ DEBUG
+        print(f"DEBUG - Usuario: {request.user.username}")
+        print(f"DEBUG - Rol: {rol}")
+        print(f"DEBUG - ID Participante: {participante.id_participante}")
+        
+    except Exception as e:
+        messages.error(request, f'Error al obtener perfil: {str(e)}')
+        return redirect('home')
+    
+    # Verificar que sea profesor/docente
+    if rol not in ['profesor', 'docente']:
+        messages.warning(request, 'Esta sección es solo para profesores.')
+        return redirect('Analytics_Reports:analytics_index')
+    
+    # ========== ESTRATEGIA MEJORADA: 3 MÉTODOS ==========
+    
+    # MÉTODO 1: Por campo responsable
+    mis_actividades = Actividades.objects.filter(responsable=participante)
+    print(f"DEBUG - Actividades como responsable: {mis_actividades.count()}")
+    
+    # MÉTODO 2: Por participaciones (CUALQUIER rol, no solo instructor)
+    if not mis_actividades.exists():
+        mis_participaciones_ids = Participaciones.objects.filter(
+            participantes_id_participante=participante
+        ).values_list('actividades_id_actividad', flat=True).distinct()
+        
+        mis_actividades = Actividades.objects.filter(
+            id_actividad__in=mis_participaciones_ids
+        )
+        print(f"DEBUG - Actividades por participaciones: {mis_actividades.count()}")
+    
+    # MÉTODO 3: Si el profesor tiene grupo asignado (ej: Artes Musicales)
+    if not mis_actividades.exists() and participante.facultad:
+        # Buscar actividades que mencionen su facultad en el nombre o descripción
+        mis_actividades = Actividades.objects.filter(
+            Q(nombre__icontains=participante.facultad) |
+            Q(descripcion__icontains=participante.facultad)
+        )
+        print(f"DEBUG - Actividades por facultad: {mis_actividades.count()}")
+    
+    # ✅ DEBUG FINAL
+    print(f"DEBUG - Total actividades encontradas: {mis_actividades.count()}")
+    if mis_actividades.exists():
+        print("DEBUG - Actividades encontradas:")
+        for act in mis_actividades:
+            print(f"  - {act.nombre} (ID: {act.id_actividad})")
+    
+    # Si aún no tiene actividades, mostrar mensaje
+    if not mis_actividades.exists():
+        # Verificar si tiene participaciones pero sin actividades visibles
+        total_participaciones = Participaciones.objects.filter(
+            participantes_id_participante=participante
+        ).count()
+        
+        context = {
+            'participante': participante,
+            'mensaje_sin_actividades': True,
+            'total_mis_actividades': 0,
+            'total_asistentes': 0,
+            'promedio_asistencia': 0,
+            'total_asistencias': 0,
+            'top_estudiantes': [],
+            'actividades_populares': [],
+            'datos_actividades_populares': '[]',
+            'datos_tipos_actividad': '[]',
+            'datos_evolucion_asistencia': '[]',
+            'nombre_docente': f"{participante.nombre} {participante.apellido}",
+            'facultad': participante.facultad or 'Sin facultad',
+            # ✅ NUEVO: Info de debug para el usuario
+            'debug_info': {
+                'tiene_participaciones': total_participaciones > 0,
+                'total_participaciones': total_participaciones,
+                'sugerencia': 'Contacta al administrador para asignar tus actividades como responsable.'
+            }
+        }
+        return render(request, 'dashboard_docente.html', context)
+    
+    # ========== MÉTRICAS GENERALES ==========
+    total_mis_actividades = mis_actividades.count()
+    
+    # Participaciones de ESTUDIANTES en mis actividades (excluir mi propia participación)
+    participaciones_estudiantes = Participaciones.objects.filter(
+        actividades_id_actividad__in=mis_actividades,
+        participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'
+    )
+    
+    # Total de estudiantes únicos
+    total_asistentes = participaciones_estudiantes.values(
+        'participantes_id_participante'
+    ).distinct().count()
+    
+    # Asistencias totales en mis actividades
+    total_asistencias = Asistencias.objects.filter(
+        participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
+        estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+    ).count()
+    
+    # Promedio de asistencia por actividad
+    promedio_asistencia = round(
+        total_asistencias / max(total_mis_actividades, 1), 1
+    )
+    
+    # ========== TOP ESTUDIANTES MÁS ACTIVOS ==========
+    from django.db.models import Count, Q, Sum
+
+    # OPCIÓN 1: Query más directa (RECOMENDADA)
+    top_estudiantes = (
+        Participantes.objects
+        .filter(
+            roles_id_rol__nombre_rol='Estudiante',
+            participaciones__actividades_id_actividad__in=mis_actividades
+        )
+        .annotate(
+            total_participaciones=Count(
+                'participaciones__id_participacion',
+                distinct=True
+            ),
+            total_asistencias=Count(
+                'participaciones__asistencias__id_asistencia',
+                filter=Q(
+                    participaciones__asistencias__estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+                ),
+                distinct=True
+            )
+        )
+        .filter(total_asistencias__gt=0)  # ✅ Solo estudiantes con al menos 1 asistencia
+        .values(
+            'id_participante',
+            'nombre',
+            'apellido',
+            'correo',
+            'total_participaciones',
+            'total_asistencias'
+        )
+        .order_by('-total_asistencias')[:10]
+        )
+    
+    # ========== ACTIVIDADES MÁS POPULARES ==========
+    actividades_populares = mis_actividades.annotate(
+        total_estudiantes=Count(
+            'participaciones__participantes_id_participante',
+            filter=Q(participaciones__participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'),
+            distinct=True
+        ),
+        total_asistencias=Count(
+            'participaciones__asistencias',
+            filter=Q(participaciones__asistencias__estados_asistencia_id_estado_asistencia__nombre__icontains='presente')
+        )
+    ).order_by('-total_estudiantes')[:5]
+    
+    # Preparar datos para gráfico
+    datos_actividades_populares = [
+        {
+            'label': act.nombre,
+            'value': act.total_estudiantes
+        }
+        for act in actividades_populares
+    ]
+    
+    # ========== DISTRIBUCIÓN POR TIPO DE ACTIVIDAD ==========
+    tipos_actividad_stats = mis_actividades.values(
+        'tipos_actividad_id_tipo__nombre_tipo'
+    ).annotate(
+        cantidad=Count('id_actividad')
+    ).order_by('-cantidad')
+    
+    datos_tipos_actividad = [
+        {
+            'label': tipo['tipos_actividad_id_tipo__nombre_tipo'] or 'Sin tipo',
+            'value': tipo['cantidad']
+        }
+        for tipo in tipos_actividad_stats
+    ]
+    
+    # ========== ASISTENCIA POR MES (últimos 6 meses) ==========
+    from datetime import timedelta
+    from django.db.models.functions import TruncMonth
+    
+    fecha_limite = timezone.now().date() - timedelta(days=180)
+    
+    # ✅ Compatible con PostgreSQL y MySQL
+    asistencias_por_mes = Asistencias.objects.filter(
+        participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
+        fecha__gte=fecha_limite,
+        estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+    ).annotate(
+        mes=TruncMonth('fecha')
+    ).values('mes').annotate(
+        total=Count('id_asistencia')
+    ).order_by('mes')
+    
+    datos_evolucion_asistencia = [
+        {
+            'label': item['mes'].strftime('%Y-%m') if item['mes'] else 'N/A',
+            'value': item['total']
+        }
+        for item in asistencias_por_mes
+    ]
+    
+    context = {
+        'participante': participante,
+        'total_mis_actividades': total_mis_actividades,
+        'total_asistentes': total_asistentes,
+        'promedio_asistencia': promedio_asistencia,
+        'total_asistencias': total_asistencias,
+        'top_estudiantes': top_estudiantes,
+        'actividades_populares': actividades_populares,
+        'datos_actividades_populares': json.dumps(datos_actividades_populares),
+        'datos_tipos_actividad': json.dumps(datos_tipos_actividad),
+        'datos_evolucion_asistencia': json.dumps(datos_evolucion_asistencia),
+        'nombre_docente': f"{participante.nombre} {participante.apellido}",
+        'facultad': participante.facultad or 'Sin facultad',
+        'mensaje_sin_actividades': False
+    }
+    
+    return render(request, 'dashboard_docente.html', context)
+
+
+# views.py
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.db.models import Count, Q
+from datetime import datetime
+# Reemplaza tu función mi_historial_estudiante actual con esta:
+
+@login_required
+def mi_historial_estudiante(request):
+    """Dashboard simple para estudiantes: Historial + Progreso hacia camiseta"""
+    
+    try:
+        participante = request.user.participantes_set.first()
+        
+        if not participante:
+            messages.error(request, 'No se encontró tu perfil de participante.')
+            return redirect('home')
+        
+        rol = participante.roles_id_rol.nombre_rol
+    except Exception as e:
+        messages.error(request, f'Error al obtener perfil: {str(e)}')
+        return redirect('home')
+    
+    if rol != 'Estudiante':
+        messages.warning(request, 'Esta sección es solo para estudiantes.')
+        return redirect('Analytics_Reports:analytics_index')
+    
+    # ========== OBTENER PARTICIPACIONES ==========
+    mis_participaciones = Participaciones.objects.filter(
+        participantes_id_participante=participante
+    ).select_related('actividades_id_actividad')
+    
+    # ========== OBTENER ASISTENCIAS ==========
+    asistencias = Asistencias.objects.filter(
+        participaciones_id_participacion__participantes_id_participante=participante
+    ).select_related(
+        'participaciones_id_participacion__actividades_id_actividad',
+        'estados_asistencia_id_estado_asistencia'
+    ).order_by('-fecha')
+    
+    # ========== FILTROS ==========
+    actividad_filtro = request.GET.get('actividad', '')
+    fecha_inicio = request.GET.get('fecha_inicio', '')
+    fecha_fin = request.GET.get('fecha_fin', '')
+    estado_filtro = request.GET.get('estado', '')
+    
+    if actividad_filtro:
+        asistencias = asistencias.filter(
+            participaciones_id_participacion__actividades_id_actividad__id_actividad=actividad_filtro
+        )
+    if fecha_inicio:
+        asistencias = asistencias.filter(fecha__gte=fecha_inicio)
+    if fecha_fin:
+        asistencias = asistencias.filter(fecha__lte=fecha_fin)
+    if estado_filtro:
+        asistencias = asistencias.filter(
+            estados_asistencia_id_estado_asistencia__id_estado_asistencia=estado_filtro
+        )
+    
+    # ========== ESTADÍSTICAS ==========
+    total_asistencias = asistencias.count()
+    
+    stats_estados = asistencias.values(
+        'estados_asistencia_id_estado_asistencia__nombre'
+    ).annotate(cantidad=Count('id_asistencia'))
+    
+    stats = {
+        'presente': 0,
+        'ausente': 0,
+        'justificado': 0,
+        'tardanza': 0
+    }
+    
+    for stat in stats_estados:
+        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre'].lower()
+        stats[estado_nombre] = stat['cantidad']
+    
+    porcentaje_asistencia = round((stats['presente'] / total_asistencias) * 100, 2) if total_asistencias > 0 else 0
+    
+    # ========== ESTADÍSTICAS POR ACTIVIDAD ==========
+    stats_actividades = asistencias.values(
+        'participaciones_id_participacion__actividades_id_actividad__nombre',
+        'estados_asistencia_id_estado_asistencia__nombre'
+    ).annotate(cantidad=Count('id_asistencia'))
+    
+    actividades_stats = {}
+    for stat in stats_actividades:
+        actividad_nombre = stat['participaciones_id_participacion__actividades_id_actividad__nombre']
+        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre']
+        
+        if actividad_nombre not in actividades_stats:
+            actividades_stats[actividad_nombre] = {
+                'nombre': actividad_nombre,
+                'presente': 0,
+                'ausente': 0,
+                'justificado': 0,
+                'tardanza': 0,
+                'total': 0
+            }
+        
+        actividades_stats[actividad_nombre][estado_nombre.lower()] = stat['cantidad']
+        actividades_stats[actividad_nombre]['total'] += stat['cantidad']
+    
+    for actividad in actividades_stats.values():
+        if actividad['total'] > 0:
+            actividad['porcentaje'] = round((actividad['presente'] / actividad['total']) * 100, 2)
+        else:
+            actividad['porcentaje'] = 0
+    
+    # ========================================
+    # ✅ PROGRESO HACIA CAMISETA (SOLO META PRINCIPAL)
+    # ========================================
+    config = ConfiguracionNotificaciones.obtener_config()
+    meta_camiseta = config.asistencias_reconocimiento  # Ej: 10
+    
+    # Total de asistencias "Presente" (sin filtros, cuenta todas)
+    total_presentes = Asistencias.objects.filter(
+        participaciones_id_participacion__participantes_id_participante=participante,
+        estados_asistencia_id_estado_asistencia__nombre='Presente'
+    ).count()
+    
+    # Calcular progreso simple
+    falta_para_camiseta = max(0, meta_camiseta - total_presentes)
+    porcentaje_camiseta = min(100, (total_presentes / meta_camiseta) * 100) if meta_camiseta > 0 else 0
+    ya_gano_camiseta = total_presentes >= meta_camiseta
+    
+    progreso_camiseta = {
+        'total_presentes': total_presentes,
+        'meta': meta_camiseta,
+        'falta': falta_para_camiseta,
+        'porcentaje': round(porcentaje_camiseta, 1),
+        'alcanzado': ya_gano_camiseta
+    }
+    
+    # ========== CONTEXTO ==========
+    context = {
+        'participante': participante,
+        'asistencias': asistencias,
+        'participaciones': mis_participaciones,
+        'total_asistencias': total_asistencias,
+        'stats': stats,
+        'porcentaje_asistencia': porcentaje_asistencia,
+        'actividades_stats': actividades_stats.values(),
+        'estados_asistencia': EstadosAsistencia.objects.all(),
+        'actividad_filtro': actividad_filtro,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'estado_filtro': estado_filtro,
+        'progreso_camiseta': progreso_camiseta,  # ✅ SIMPLE
+    }
+    
+    return render(request, 'mi_historial_estudiante.html', context)
+
+
+# Analytics_Reports/views.py
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+
+@login_required
+def analytics_index(request):
+    """
+    Menú principal que decide qué mostrar según el rol del usuario
+    """
+    try:
+        # ✅ CAMBIO AQUÍ: participantes_set en lugar de participante
+        participante = request.user.participantes_set.first()
+        
+        if not participante:
+            # Si no tiene participante, redirigir al home
+            return redirect('home')
+        
+        rol = participante.roles_id_rol.nombre_rol
+    except:
+        return redirect('home')
+    
+    # Contexto base
+    context = {
+        'participante': participante,
+        'rol': rol,
+        'nombre_usuario': participante.nombre
+    }
+    
+    # Decidir qué template mostrar según el rol
+    if rol == 'Administrador' or request.user.is_superuser:
+        return render(request, 'index.html', context)
+    
+    elif rol == 'Coordinador':
+        return render(request, 'index.html', context)
+    
+    elif rol == 'profesor':
+        return redirect('Analytics_Reports:dashboard_docente')
+    
+    elif rol == 'Estudiante':
+        return redirect('Analytics_Reports:mi_historial')
+    
+    else:
+        return redirect('home')
+ 
+
+
+
+from django.shortcuts import render, get_object_or_404
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+from datetime import datetime, timedelta
+ 
+@login_required
+def historial_participante(request, id_participante):
+    """
+    Vista para mostrar el historial completo de asistencia de un participante
+    """
+    # Obtener el participante
+    participante = get_object_or_404(Participantes, pk=id_participante)
+    
+    # Obtener todas las participaciones del participante
+    participaciones = Participaciones.objects.filter(
+        participantes_id_participante=participante
+    ).select_related('actividades_id_actividad')
+    
+    # Obtener todas las asistencias del participante
+    asistencias = Asistencias.objects.filter(
+        participaciones_id_participacion__participantes_id_participante=participante
+    ).select_related(
+        'participaciones_id_participacion__actividades_id_actividad',
+        'estados_asistencia_id_estado_asistencia'
+    ).order_by('-fecha')
+    
+    # Filtros opcionales
+    actividad_filtro = request.GET.get('actividad', '')
+    fecha_inicio = request.GET.get('fecha_inicio', '')
+    fecha_fin = request.GET.get('fecha_fin', '')
+    estado_filtro = request.GET.get('estado', '')
+    
+    if actividad_filtro:
+        asistencias = asistencias.filter(
+            participaciones_id_participacion__actividades_id_actividad__id_actividad=actividad_filtro
+        )
+    
+    if fecha_inicio:
+        asistencias = asistencias.filter(fecha__gte=fecha_inicio)
+    
+    if fecha_fin:
+        asistencias = asistencias.filter(fecha__lte=fecha_fin)
+    
+    if estado_filtro:
+        asistencias = asistencias.filter(
+            estados_asistencia_id_estado_asistencia__id_estado_asistencia=estado_filtro
+        )
+    
+    # Calcular estadísticas
+    total_asistencias = asistencias.count()
+    
+    # Estadísticas por estado
+    stats_estados = asistencias.values(
+        'estados_asistencia_id_estado_asistencia__nombre'
+    ).annotate(
+        cantidad=Count('id_asistencia')
+    )
+    
+    # Convertir a diccionario para fácil acceso
+    stats_dict = {
+        'presente': 0,
+        'ausente': 0,
+        'justificado': 0,
+        'tardanza': 0
+    }
+    
+    for stat in stats_estados:
+        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre'].lower()
+        stats_dict[estado_nombre] = stat['cantidad']
+    
+    # Calcular porcentaje de asistencia
+    if total_asistencias > 0:
+        porcentaje_asistencia = round(
+            (stats_dict['presente'] / total_asistencias) * 100, 2
+        )
+    else:
+        porcentaje_asistencia = 0
+    
+    # Estadísticas por actividad
+    stats_actividades = asistencias.values(
+        'participaciones_id_participacion__actividades_id_actividad__nombre',
+        'estados_asistencia_id_estado_asistencia__nombre'
+    ).annotate(
+        cantidad=Count('id_asistencia')
+    )
+    
+    # Organizar estadísticas por actividad
+    actividades_stats = {}
+    for stat in stats_actividades:
+        actividad_nombre = stat['participaciones_id_participacion__actividades_id_actividad__nombre']
+        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre']
+        
+        if actividad_nombre not in actividades_stats:
+            actividades_stats[actividad_nombre] = {
+                'nombre': actividad_nombre,
+                'presente': 0,
+                'ausente': 0,
+                'justificado': 0,
+                'tardanza': 0,
+                'total': 0
+            }
+        
+        actividades_stats[actividad_nombre][estado_nombre.lower()] = stat['cantidad']
+        actividades_stats[actividad_nombre]['total'] += stat['cantidad']
+    
+    # Calcular porcentaje de asistencia por actividad
+    for actividad in actividades_stats.values():
+        if actividad['total'] > 0:
+            actividad['porcentaje'] = round(
+                (actividad['presente'] / actividad['total']) * 100, 2
+            )
+        else:
+            actividad['porcentaje'] = 0
+    
+    # Obtener listas para filtros
+    from universitaryWellbeing.models import EstadosAsistencia
+    estados_asistencia = EstadosAsistencia.objects.all()
+    
+    context = {
+        'participante': participante,
+        'asistencias': asistencias,
+        'participaciones': participaciones,
+        'total_asistencias': total_asistencias,
+        'stats': stats_dict,
+        'porcentaje_asistencia': porcentaje_asistencia,
+        'actividades_stats': actividades_stats.values(),
+        'estados_asistencia': estados_asistencia,
+        'actividad_filtro': actividad_filtro,
+        'fecha_inicio': fecha_inicio,
+        'fecha_fin': fecha_fin,
+        'estado_filtro': estado_filtro,
+    }
+    
+    return render(request, 'historial_participante.html', context)

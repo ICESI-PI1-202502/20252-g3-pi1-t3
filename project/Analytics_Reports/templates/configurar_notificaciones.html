@@ -8,120 +8,24 @@
 {% endblock %}
 
 {% block extra_css %}
-<style>
-    .config-container {
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        padding: 30px;
-        margin-top: 20px;
-    }
-    
-    .section-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        margin: 30px 0 20px 0;
-        font-weight: bold;
-    }
-    
-    .section-header:first-child {
-        margin-top: 0;
-    }
-    
-    .section-header i {
-        margin-right: 10px;
-    }
-    
-    .form-label {
-        font-weight: 600;
-        color: #333;
-        margin-bottom: 8px;
-    }
-    
-    .form-text {
-        color: #6c757d;
-        font-size: 0.875em;
-        margin-top: 5px;
-    }
-    
-    .form-control, .form-select {
-        border-radius: 6px;
-        border: 2px solid #e0e0e0;
-        padding: 10px 15px;
-    }
-    
-    .form-control:focus, .form-select:focus {
-        border-color: #667eea;
-        box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
-    }
-    
-    .input-group-text {
-        background-color: #f8f9fa;
-        border: 2px solid #e0e0e0;
-        border-left: none;
-    }
-    
-    .btn-primary {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        border: none;
-        padding: 12px 30px;
-        font-weight: 600;
-        transition: transform 0.2s;
-    }
-    
-    .btn-primary:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
-    }
-    
-    .btn-secondary {
-        padding: 12px 30px;
-        font-weight: 600;
-    }
-    
-    .info-card {
-        background: #e7f3ff;
-        border-left: 4px solid #2196F3;
-        padding: 15px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-    }
-    
-    .info-card i {
-        color: #2196F3;
-        margin-right: 10px;
-    }
-    
-    .preview-values {
-        background: #f8f9fa;
-        padding: 15px;
-        border-radius: 6px;
-        margin-top: 10px;
-    }
-    
-    .preview-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 8px 0;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    .preview-item:last-child {
-        border-bottom: none;
-    }
-    
-    .preview-label {
-        color: #666;
-        font-size: 0.9em;
-    }
-    
-    .preview-value {
-        font-weight: 600;
-        color: #333;
-    }
-</style>
+<link rel="stylesheet" href="{% static 'css/configurar_notificaciones.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<!-- Pasar datos de Django a JavaScript -->
+<script>
+    window.configData = {
+        asistenciasReconocimiento: {{ config.asistencias_reconocimiento }},
+        margenProximo: {{ config.margen_proximo_reconocimiento }},
+        asistenciasDestacado: {{ config.asistencias_destacado }},
+        umbralBaja: {{ config.umbral_baja_asistencia }},
+        umbralRiesgo: {{ config.umbral_riesgo_critico|default:2 }},
+        diasInactividad: {{ config.dias_inactividad|default:14 }},
+        asistenciasMinEncuesta: {{ config.asistencias_minimas_encuesta|default:3 }},
+        diasDespuesEncuesta: {{ config.dias_despues_cierre_encuesta|default:3 }}
+    };
+</script>
+<script src="{% static 'js/configurar_notificaciones.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -130,7 +34,7 @@
         <div class="col-12">
             <h2>
                 <i class="fas fa-cog"></i>
-                Configuración de Alertas y Notificaciones
+                Configuración de Comunicaciones y Clasificación
             </h2>
         </div>
     </div>
@@ -140,139 +44,195 @@
             <div class="config-container">
                 <div class="info-card">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Información:</strong> Estos parámetros definen cómo se clasifican automáticamente los estudiantes y cuándo se envían notificaciones.
+                    <strong>Sistema de Clasificación y Notificaciones Positivas</strong>
+                    <br><br>
+                    ✅ Reconocimientos automáticos por logros<br>
+                    ✅ Encuestas de retroalimentación<br>
+                    📊 Clasificación de estudiantes (solo para análisis del admin)<br>
+                    ⚠️ No se envían alertas negativas a estudiantes
                 </div>
                 
-                <form method="post">
+                <form method="post" id="configForm">
                     {% csrf_token %}
                     
-                    <!-- RIESGO CRÍTICO -->
-                    <div class="section-header">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        Riesgo Crítico
-                    </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="umbral_riesgo_critico" class="form-label">Umbral de Asistencias</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="umbral_riesgo_critico" 
-                                       name="umbral_riesgo_critico" value="{{ config.umbral_riesgo_critico }}" 
-                                       min="0" max="10" required>
-                                <span class="input-group-text">asistencias</span>
-                            </div>
-                            <div class="form-text">
-                                Estudiantes con ≤ esta cantidad de asistencias totales
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-6">
-                            <label for="dias_riesgo_critico" class="form-label">Días de Inactividad Crítica</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="dias_riesgo_critico" 
-                                       name="dias_riesgo_critico" value="{{ config.dias_riesgo_critico }}" 
-                                       min="7" max="60" required>
-                                <span class="input-group-text">días</span>
-                            </div>
-                            <div class="form-text">
-                                Días sin asistir para considerar riesgo crítico
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- BAJA ASISTENCIA -->
-                    <div class="section-header">
-                        <i class="fas fa-user-clock"></i>
-                        Baja Asistencia
-                    </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="umbral_baja_asistencia" class="form-label">Umbral de Asistencias</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="umbral_baja_asistencia" 
-                                       name="umbral_baja_asistencia" value="{{ config.umbral_baja_asistencia }}" 
-                                       min="1" max="20" required>
-                                <span class="input-group-text">asistencias</span>
-                            </div>
-                            <div class="form-text">
-                                Estudiantes con menos de esta cantidad (pero activos)
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- ESTUDIANTES INACTIVOS -->
-                    <div class="section-header">
-                        <i class="fas fa-user-times"></i>
-                        Estudiantes Inactivos
-                    </div>
-                    
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <label for="dias_inactividad" class="form-label">Días de Inactividad</label>
-                            <div class="input-group">
-                                <input type="number" class="form-control" id="dias_inactividad" 
-                                       name="dias_inactividad" value="{{ config.dias_inactividad }}" 
-                                       min="1" max="60" required>
-                                <span class="input-group-text">días</span>
-                            </div>
-                            <div class="form-text">
-                                Días sin asistir para considerar inactivo (con ≥ 5 asistencias previas)
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- RECONOCIMIENTOS Y DESTACADOS -->
+                    <!-- SECCIÓN 1: RECONOCIMIENTOS -->
                     <div class="section-header">
                         <i class="fas fa-trophy"></i>
-                        Reconocimientos y Destacados
+                        Reconocimientos Automáticos
+                    </div>
+                    
+                    <div class="alert alert-success" style="font-size: 0.9em;">
+                        <i class="fas fa-check-circle"></i>
+                        <strong>Notificaciones positivas:</strong> Se envían correos automáticos cuando los estudiantes alcanzan hitos de asistencia.
                     </div>
                     
                     <div class="row g-3">
-                        <div class="col-md-4">
-                            <label for="asistencias_reconocimiento" class="form-label">Meta de Reconocimiento</label>
+                        <div class="col-md-6">
+                            <label for="asistencias_reconocimiento" class="form-label">
+                                🎽 Asistencias para Premio Principal
+                            </label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="asistencias_reconocimiento" 
                                        name="asistencias_reconocimiento" value="{{ config.asistencias_reconocimiento }}" 
-                                       min="5" max="50" required>
+                                       min="5" max="50" required inputmode="numeric">
                                 <span class="input-group-text">asistencias</span>
                             </div>
                             <div class="form-text">
-                                Asistencias necesarias para reconocimiento
+                                Meta para reconocimiento principal (ej: camiseta, certificado)
                             </div>
                         </div>
                         
-                        <div class="col-md-4">
-                            <label for="margen_proximo_reconocimiento" class="form-label">Margen de Proximidad</label>
+                        <div class="col-md-6">
+                            <label for="margen_proximo_reconocimiento" class="form-label">
+                                📧 Notificar Cuando Estén Cerca
+                            </label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="margen_proximo_reconocimiento" 
                                        name="margen_proximo_reconocimiento" value="{{ config.margen_proximo_reconocimiento }}" 
-                                       min="1" max="5" required>
-                                <span class="input-group-text">asistencias</span>
+                                       min="1" max="5" required inputmode="numeric">
+                                <span class="input-group-text">asistencias faltantes</span>
                             </div>
                             <div class="form-text">
-                                Asistencias faltantes para notificar
+                                Enviar correo motivacional cuando les falten X asistencias
                             </div>
                         </div>
                         
-                        <div class="col-md-4">
-                            <label for="asistencias_destacado" class="form-label">Estudiante Destacado</label>
+                        <div class="col-md-6">
+                            <label for="asistencias_destacado" class="form-label">
+                                ⭐ Umbral para Destacados
+                            </label>
                             <div class="input-group">
                                 <input type="number" class="form-control" id="asistencias_destacado" 
                                        name="asistencias_destacado" value="{{ config.asistencias_destacado }}" 
-                                       min="10" max="100" required>
+                                       min="10" max="100" required inputmode="numeric">
                                 <span class="input-group-text">asistencias</span>
                             </div>
                             <div class="form-text">
-                                Asistencias para clasificar como destacado
+                                Reconocimiento especial para los más comprometidos
                             </div>
                         </div>
                     </div>
                     
-                    <!-- CONFIGURACIÓN DE ENVÍOS -->
+                    <!-- SECCIÓN 2: CLASIFICACIÓN (NO ENVÍA CORREOS) -->
                     <div class="section-header">
+                        <i class="fas fa-chart-bar"></i>
+                        Umbrales de Clasificación (Solo para Análisis)
+                    </div>
+                    
+                    <div class="alert alert-warning" style="font-size: 0.9em;">
+                        <i class="fas fa-info-circle"></i>
+                        <strong>Importante:</strong> Estos umbrales solo clasifican estudiantes en el panel de recomendaciones. <strong>No se envían correos automáticos.</strong>
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="umbral_baja_asistencia" class="form-label">
+                                📊 Umbral de Baja Participación
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="umbral_baja_asistencia" 
+                                       name="umbral_baja_asistencia" value="{{ config.umbral_baja_asistencia }}" 
+                                       min="1" max="20" required inputmode="numeric">
+                                <span class="input-group-text">asistencias</span>
+                            </div>
+                            <div class="form-text">
+                                Clasificar como "baja participación" si tienen menos de X asistencias
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="umbral_riesgo_critico" class="form-label">
+                                🔴 Umbral de Riesgo Crítico
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="umbral_riesgo_critico" 
+                                       name="umbral_riesgo_critico" value="{{ config.umbral_riesgo_critico|default:2 }}" 
+                                       min="1" max="10" required inputmode="numeric">
+                                <span class="input-group-text">asistencias</span>
+                            </div>
+                            <div class="form-text">
+                                Clasificar como "riesgo" si tienen ≤ X asistencias
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="dias_inactividad" class="form-label">
+                                ⏰ Días para Considerar Inactivo
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="dias_inactividad" 
+                                       name="dias_inactividad" value="{{ config.dias_inactividad|default:14 }}" 
+                                       min="7" max="60" required inputmode="numeric">
+                                <span class="input-group-text">días</span>
+                            </div>
+                            <div class="form-text">
+                                Clasificar como "inactivo" si no asiste hace X días
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="dias_riesgo_critico" class="form-label">
+                                🚨 Días para Riesgo Crítico
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="dias_riesgo_critico" 
+                                       name="dias_riesgo_critico" value="{{ config.dias_riesgo_critico|default:21 }}" 
+                                       min="14" max="90" required inputmode="numeric">
+                                <span class="input-group-text">días</span>
+                            </div>
+                            <div class="form-text">
+                                Combinar con pocas asistencias para clasificar en riesgo
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SECCIÓN 3: ENCUESTAS -->
+                    <div class="section-header">
+                        <i class="fas fa-clipboard-check"></i>
+                        Encuestas de Retroalimentación
+                    </div>
+                    
+                    <div class="alert alert-info" style="font-size: 0.9em;">
                         <i class="fas fa-envelope"></i>
-                        Configuración de Envíos
+                        <strong>Encuestas automáticas:</strong> Se envían después de que finaliza una actividad, solo a participantes activos.
+                    </div>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="asistencias_minimas_encuesta" class="form-label">
+                                📝 Asistencias Mínimas para Encuesta
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="asistencias_minimas_encuesta" 
+                                       name="asistencias_minimas_encuesta" value="{{ config.asistencias_minimas_encuesta|default:3 }}" 
+                                       min="1" max="10" required inputmode="numeric">
+                                <span class="input-group-text">asistencias</span>
+                            </div>
+                            <div class="form-text">
+                                Solo enviar si asistió al menos X veces
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="dias_despues_cierre_encuesta" class="form-label">
+                                ⏱️ Días Después del Cierre
+                            </label>
+                            <div class="input-group">
+                                <input type="number" class="form-control" id="dias_despues_cierre_encuesta" 
+                                       name="dias_despues_cierre_encuesta" value="{{ config.dias_despues_cierre_encuesta|default:3 }}" 
+                                       min="0" max="14" required inputmode="numeric">
+                                <span class="input-group-text">días</span>
+                            </div>
+                            <div class="form-text">
+                                Enviar X días después de que cierre la actividad
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- SECCIÓN 4: CONFIGURACIÓN GENERAL -->
+                    <div class="section-header">
+                        <i class="fas fa-sliders-h"></i>
+                        Configuración General
                     </div>
                     
                     <div class="row g-3">
@@ -282,16 +242,16 @@
                                        name="envio_automatico" {% if config.envio_automatico %}checked{% endif %}
                                        style="width: 3em; height: 1.5em; cursor: pointer;">
                                 <label class="form-check-label" for="envio_automatico" style="padding-left: 10px; cursor: pointer;">
-                                    <strong>Envío automático de notificaciones</strong>
+                                    <strong>✅ Activar Sistema Automático</strong>
                                 </label>
                             </div>
                             <div class="form-text" style="padding-left: 2.5em;">
-                                Enviar emails automáticamente según la frecuencia configurada
+                                Activar reconocimientos y encuestas automáticas
                             </div>
                         </div>
                         
                         <div class="col-md-6">
-                            <label for="frecuencia_envio" class="form-label">Frecuencia de Envío</label>
+                            <label for="frecuencia_envio" class="form-label">Frecuencia de Revisión</label>
                             <select class="form-select" id="frecuencia_envio" name="frecuencia_envio">
                                 <option value="diario" {% if config.frecuencia_envio == 'diario' %}selected{% endif %}>
                                     Diario
@@ -304,21 +264,19 @@
                                 </option>
                             </select>
                             <div class="form-text">
-                                Con qué frecuencia se envían los reportes automáticos
+                                Con qué frecuencia se ejecutan las tareas automáticas
                             </div>
                         </div>
-                        
-                      
                     </div>
                     
                     <!-- BOTONES -->
                     <div class="row mt-4">
                         <div class="col-12">
-                            <button type="submit" class="btn btn-primary">
+                            <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="fas fa-save"></i>
                                 Guardar Configuración
                             </button>
-                            <a href="{% url 'Analytics_Reports:recomendaciones' %}" class="btn btn-secondary">
+                            <a href="{% url 'Analytics_Reports:recomendaciones' %}" class="btn btn-secondary btn-lg">
                                 <i class="fas fa-times"></i>
                                 Cancelar
                             </a>
@@ -331,114 +289,82 @@
         <!-- PANEL DE VISTA PREVIA -->
         <div class="col-lg-4">
             <div class="config-container">
-                <h5><i class="fas fa-eye"></i> Vista Previa de Clasificaciones</h5>
+                <h5><i class="fas fa-eye"></i> Vista Previa de Configuración</h5>
                 <p class="text-muted" style="font-size: 0.9em;">
-                    Con la configuración actual, los estudiantes se clasificarán así:
+                    Resumen de la configuración actual:
                 </p>
                 
+                <!-- NOTIFICACIONES AUTOMÁTICAS -->
                 <div class="preview-values">
-                    <h6 class="text-danger">
-                        <i class="fas fa-exclamation-triangle"></i> Riesgo Crítico
+                    <h6 class="text-success">
+                        <i class="fas fa-envelope-open-text"></i> Correos Automáticos
                     </h6>
-                    <div class="preview-item">
-                        <span class="preview-label">Asistencias:</span>
-                        <span class="preview-value">≤ {{ config.umbral_riesgo_critico }}</span>
-                    </div>
-                    <div class="preview-item">
-                        <span class="preview-label">Inactividad:</span>
-                        <span class="preview-value">> {{ config.dias_riesgo_critico }} días</span>
+                    <div class="alert alert-success" style="font-size: 0.85em; margin-top: 10px;">
+                        ✅ Reconocimientos por logros<br>
+                        ✅ Encuestas de retroalimentación<br>
+                        ❌ Sin alertas negativas
                     </div>
                 </div>
                 
+                <!-- RECONOCIMIENTOS -->
+                <div class="preview-values">
+                    <h6 class="text-primary">
+                        <i class="fas fa-trophy"></i> Reconocimientos
+                    </h6>
+                    <div class="preview-item">
+                        <span class="preview-label">Premio principal:</span>
+                        <span class="preview-value" id="preview-reconocimiento">{{ config.asistencias_reconocimiento }} asistencias</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Notificar cuando falten:</span>
+                        <span class="preview-value" id="preview-margen">{{ config.margen_proximo_reconocimiento }}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Estudiantes destacados:</span>
+                        <span class="preview-value" id="preview-destacado">≥ {{ config.asistencias_destacado }}</span>
+                    </div>
+                </div>
+                
+                <!-- CLASIFICACIÓN -->
                 <div class="preview-values">
                     <h6 class="text-warning">
-                        <i class="fas fa-user-clock"></i> Baja Asistencia
+                        <i class="fas fa-chart-bar"></i> Clasificación (Solo Admin)
                     </h6>
                     <div class="preview-item">
-                        <span class="preview-label">Asistencias:</span>
-                        <span class="preview-value">{{ config.umbral_riesgo_critico|add:1 }} - {{ config.umbral_baja_asistencia|add:-1 }}</span>
+                        <span class="preview-label">Baja participación:</span>
+                        <span class="preview-value" id="preview-baja">< {{ config.umbral_baja_asistencia }}</span>
                     </div>
                     <div class="preview-item">
-                        <span class="preview-label">Estado:</span>
-                        <span class="preview-value">Activo (últimas 3 semanas)</span>
+                        <span class="preview-label">Riesgo crítico:</span>
+                        <span class="preview-value" id="preview-riesgo">≤ {{ config.umbral_riesgo_critico|default:2 }}</span>
+                    </div>
+                    <div class="preview-item">
+                        <span class="preview-label">Inactivo hace:</span>
+                        <span class="preview-value" id="preview-inactivo">{{ config.dias_inactividad|default:14 }} días</span>
                     </div>
                 </div>
                 
+                <!-- ENCUESTAS -->
                 <div class="preview-values">
                     <h6 class="text-info">
-                        <i class="fas fa-user-times"></i> Inactivos
+                        <i class="fas fa-clipboard-check"></i> Encuestas
                     </h6>
                     <div class="preview-item">
-                        <span class="preview-label">Asistencias previas:</span>
-                        <span class="preview-value">≥ {{ config.umbral_baja_asistencia }}</span>
+                        <span class="preview-label">Asistencias mínimas:</span>
+                        <span class="preview-value" id="preview-encuesta-min">{{ config.asistencias_minimas_encuesta|default:3 }}</span>
                     </div>
                     <div class="preview-item">
-                        <span class="preview-label">Última asistencia:</span>
-                        <span class="preview-value">> {{ config.dias_inactividad }} días</span>
-                    </div>
-                </div>
-                
-                <div class="preview-values">
-                    <h6 class="text-success">
-                        <i class="fas fa-trophy"></i> Próximos a Reconocimiento
-                    </h6>
-                    <div class="preview-item">
-                        <span class="preview-label">Faltan para la meta:</span>
-                        <span class="preview-value">1 - {{ config.margen_proximo_reconocimiento }} asistencias</span>
-                    </div>
-                    <div class="preview-item">
-                        <span class="preview-label">Meta objetivo:</span>
-                        <span class="preview-value">{{ config.asistencias_reconocimiento }} asistencias</span>
-                    </div>
-                </div>
-                
-                <div class="preview-values">
-                    <h6 class="text-success">
-                        <i class="fas fa-star"></i> Destacados
-                    </h6>
-                    <div class="preview-item">
-                        <span class="preview-label">Asistencias:</span>
-                        <span class="preview-value">≥ {{ config.asistencias_destacado }}</span>
+                        <span class="preview-label">Envío después de:</span>
+                        <span class="preview-value" id="preview-encuesta-dias">{{ config.dias_despues_cierre_encuesta|default:3 }} días</span>
                     </div>
                 </div>
                 
                 <div class="alert alert-info mt-3" style="font-size: 0.85em;">
                     <i class="fas fa-info-circle"></i>
-                    <strong>Nota:</strong> Los cambios se aplican inmediatamente al guardar.
+                    Los cambios se aplican inmediatamente y afectan las próximas ejecuciones automáticas.
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-<script>
-// Validación dinámica para evitar solapamientos
-document.querySelector('form').addEventListener('submit', function(e) {
-    const riesgoCritico = parseInt(document.getElementById('umbral_riesgo_critico').value);
-    const bajaAsistencia = parseInt(document.getElementById('umbral_baja_asistencia').value);
-    const reconocimiento = parseInt(document.getElementById('asistencias_reconocimiento').value);
-    const destacado = parseInt(document.getElementById('asistencias_destacado').value);
-    
-    if (bajaAsistencia <= riesgoCritico) {
-        e.preventDefault();
-        alert('⚠️ El umbral de baja asistencia debe ser mayor al umbral de riesgo crítico');
-        return false;
-    }
-    
-    if (destacado <= reconocimiento) {
-        e.preventDefault();
-        alert('⚠️ El umbral de destacado debe ser mayor al de reconocimiento');
-        return false;
-    }
-});
-
-// Auto-actualización de vista previa (opcional)
-const inputs = document.querySelectorAll('input[type="number"]');
-inputs.forEach(input => {
-    input.addEventListener('input', function() {
-        // Aquí podrías actualizar la vista previa en tiempo real con JavaScript
-        console.log('Valor actualizado:', this.name, this.value);
-    });
-});
-</script>
 {% endblock %}

@@ -12,6 +12,7 @@ from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import Notificaciones
 
+# ========== LOGIN ==========
 def user_login(request):
     if request.method == "POST":
         form = UserLoginForm(request.POST)
@@ -26,13 +27,12 @@ def user_login(request):
             try:
                 participante = Participantes.objects.get(user=form.user)
                 
-                # PASO 1: Verificar si tiene rol válido (no NULL ni 'Invitado')
-                if participante.roles_id_rol is None or \
-                   participante.roles_id_rol.nombre_rol == 'Invitado':
+                # ✅ PASO 1: Verificar si tiene tipo_participante asignado
+                if not participante.tipo_participante:
                     messages.info(request, '¡Bienvenido! Por favor completa tu perfil para continuar.')
                     return redirect("completar_perfil")
                 
-                #  PASO 2: Si tiene rol válido, verificar preferencias
+                # ✅ PASO 2: Si tiene tipo_participante, verificar preferencias
                 tiene_preferencias = Preferencias.objects.filter(
                     participantes_id_participante=participante
                 ).exists()
@@ -41,7 +41,7 @@ def user_login(request):
                     messages.info(request, 'Ahora selecciona tus preferencias de actividades.')
                     return redirect("preferences")
                 
-                #  PASO 3: Todo está completo, ir al home
+                # ✅ PASO 3: Todo está completo, ir al home
                 messages.success(request, f'¡Bienvenido de nuevo, {participante.nombre}!')
                 return redirect("home")
                 
@@ -58,10 +58,13 @@ def user_login(request):
         form = UserLoginForm()
     return render(request, "login.html", {"form": form})
 
+
+ 
+
 def is_role_admin(user):
     return user.groups.filter(name="admin").exists() or user.is_superuser
 
-
+# ========== REGISTRO ==========
 def register(request):
     if request.method == "POST":
         form = UserRegisterForm(request.POST)
@@ -84,9 +87,14 @@ def register(request):
                 last_name=last_name
             )
 
-            rol_invitado = Roles.objects.get(nombre_rol='Invitado')
+            # ✅ ROL POR DEFECTO: Estudiante (ÚNICO ROL ASIGNADO POR CÓDIGO)
+            try:
+                rol_estudiante = Roles.objects.get(nombre_rol='Estudiante')
+            except Roles.DoesNotExist:
+                messages.error(request, 'Error: No se encontró el rol "Estudiante" en la base de datos.')
+                return redirect("register")
             
-
+            # ✅ CREAR PARTICIPANTE SIN tipo_participante (se asigna en completar_perfil)
             Participantes.objects.create(
                 user=user,
                 id_participante=cedula,
@@ -98,11 +106,11 @@ def register(request):
                 programa="",
                 genero="",
                 estado_activo="S",
-                roles_id_rol=rol_invitado    
+                roles_id_rol=rol_estudiante,  # ✅ Siempre "Estudiante"
+                tipo_participante=None  # ✅ NULL - se asigna después
             )
 
-           
-            messages.success(request, "Usuario registrado con éxito. Ahora puede iniciar sesión.")
+            messages.success(request, "Usuario registrado con éxito. Ahora puedes iniciar sesión.")
             return redirect("login")
         else:
             for error in form.errors.values():
@@ -129,6 +137,7 @@ def register(request):
     def form_invalid(self, form):
         messages.error(self.request, 'Credenciales incorrectas')
         return super().form_invalid(form)
+
 
 def user_logout(request):
     logout(request)

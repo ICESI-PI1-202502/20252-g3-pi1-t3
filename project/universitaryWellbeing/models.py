@@ -4,7 +4,6 @@ from django.contrib.auth.models import User,Group
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import os
-
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=150)
@@ -24,7 +23,6 @@ class Actividades(models.Model):
         blank=True, null=True
     )
 
-    #id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
@@ -33,10 +31,33 @@ class Actividades(models.Model):
     )
 
     promedio_calificacion = models.FloatField(default=0, blank=True, null=True)
+    
+    # ✅ NUEVO CAMPO: Responsable de la actividad
+    responsable = models.ForeignKey(
+        'Participantes',
+        models.SET_NULL,  # Si se elimina el responsable, la actividad no se elimina
+        db_column='responsable',
+        blank=True,
+        null=True,
+        related_name='actividades_responsable',  # Para evitar conflictos con otras relaciones
+        limit_choices_to={
+            'roles_id_rol__nombre_rol__in': ['Coordinador', 'Administrador', 'Docente']
+        },
+        help_text='Profesor o coordinador responsable de la actividad'
+    )
 
     class Meta:
         managed = False
         db_table = 'actividades'
+    
+    def __str__(self):
+        return self.nombre
+    
+    def obtener_responsable_nombre(self):
+        """Método helper para obtener el nombre completo del responsable"""
+        if self.responsable:
+            return f"{self.responsable.nombre} {self.responsable.apellido}"
+        return "Sin asignar"
 
 
 # Estos son nuevos modelos para la solucón del problema

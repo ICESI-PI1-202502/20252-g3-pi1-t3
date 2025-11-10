@@ -1,5 +1,5 @@
 """
-Sistema inteligente de notificaciones - SOLO POSITIVAS
+Sistema inteligente de notificaciones - CON CONFIGURACIÓN ADMIN
 Control anti-spam mediante hash_unicidad
 """
 
@@ -18,20 +18,20 @@ from .control_notificaciones import ControlNotificacionesContextual
 
 
 # ============================================
-# TAREA 1: RECONOCIMIENTOS (SOLO POSITIVO)
+# TAREA 1: RECONOCIMIENTOS (CONFIGURABLE)
 # ============================================
 @shared_task
 def verificar_y_otorgar_reconocimientos():
     """
-    ✅ Otorga reconocimientos por hitos configurables
-    ✅ SOLO mensajes positivos
+    Otorga reconocimientos por hitos configurables
+    ✅ Respeta configuración del admin
     """
     config = ConfiguracionNotificaciones.obtener_config()
     
     if not config.reconocimientos_activos:
         return '⏸️ Reconocimientos desactivados por el admin'
     
-    hitos = config.obtener_hitos()  # [10, 20, 30...]
+    hitos = config.obtener_hitos()  # Lee desde BD
     reconocimientos = 0
     
     participaciones = Participaciones.objects.filter(
@@ -52,7 +52,7 @@ def verificar_y_otorgar_reconocimientos():
             if asistencias >= hito:
                 contexto = f"hito_{hito}"
                 
-                # ✅ Control anti-spam
+                # ✅ Control anti-spam: una vez por hito PARA SIEMPRE
                 if ControlNotificacionesContextual.ya_existe_notificacion(
                     participante, 'Reconocimiento', actividad, contexto
                 ):
@@ -67,12 +67,12 @@ def verificar_y_otorgar_reconocimientos():
                     participante, 'Reconocimiento', mensaje, actividad, contexto
                 )
                 
-                if notif:
+                if notif:  # Solo si se creó
                     try:
                         send_mail(
                             subject=f"🏆 Reconocimiento - {hito} asistencias",
                             message=mensaje,
-                            from_email='bienestar@universidad.edu',
+                            from_email='luis.gluis.g.io.com@gmail.com',
                             recipient_list=[participante.correo],
                             fail_silently=True
                         )
@@ -82,72 +82,92 @@ def verificar_y_otorgar_reconocimientos():
                     reconocimientos += 1
                     break  # Solo un reconocimiento por iteración
     
-    return f'✓ {reconocimientos} reconocimientos otorgados'
+    return f'✓ {reconocimientos} reconocimientos otorgados (sin duplicados)'
 
 
 # ============================================
-# TAREA 2: CLASIFICACIÓN (NO ENVÍA CORREOS)
+# TAREA 2: INASISTENCIAS (CONFIGURABLE)
 # ============================================
 @shared_task
-def clasificar_estudiantes_para_admin():
+def verificar_inasistencias_inscritos():
     """
-    ❌ NO envía correos a estudiantes
-    ✅ Solo actualiza clasificaciones para análisis del admin
-    
-    Categorías:
-    - Riesgo crítico: ≤2 asistencias + sin asistir hace ≥21 días
-    - Baja asistencia: <5 asistencias
-    - Inactivos: sin asistir hace ≥14 días
-    - Destacados: ≥15 asistencias
+    Alerta por inasistencia prolongada
+    ✅ Respeta configuración del admin
     """
     config = ConfiguracionNotificaciones.obtener_config()
     
-    # Estos datos se usan en la vista recomendaciones.html para el admin
-    clasificados = {
-        'riesgo_critico': 0,
-        'baja_asistencia': 0,
-        'inactivos': 0,
-        'destacados': 0
-    }
+    if not config.alertas_inasistencia_activas:
+        return '⏸️ Alertas de inasistencia desactivadas por el admin'
     
+    dias_sin_asistir = config.dias_sin_asistir_alerta
+    asistencias_minimas = config.asistencias_minimas_para_alertar
+    fecha_limite = timezone.now().date() - timedelta(days=dias_sin_asistir)
+    alertas = 0
+    
+    # Solo quienes YA asistieron al menos X veces
     participaciones = Participaciones.objects.filter(
         estados_participacion_id_estado_participacion_id=1,
         actividades_id_actividad__requiere_inscripcion='S'
     ).annotate(
         total_asistencias=Count('asistencias'),
         ultima_asistencia=Max('asistencias__fecha')
+    ).filter(
+        total_asistencias__gte=asistencias_minimas,
+        ultima_asistencia__lt=fecha_limite
     ).select_related('participantes_id_participante', 'actividades_id_actividad')
     
-    ahora = timezone.now().date()
-    
     for participacion in participaciones:
-        asistencias = participacion.total_asistencias
-        ultima = participacion.ultima_asistencia
+        participante = participacion.participantes_id_participante
+        actividad = participacion.actividades_id_actividad
+        dias_ausente = (timezone.now().date() - participacion.ultima_asistencia).days
         
-        # Calcular días sin asistir
-        dias_sin_asistir = (ahora - ultima).days if ultima else 999
+        contexto = f"inasistencia_{dias_sin_asistir}dias"
         
-        # Clasificar (sin enviar correos)
-        if asistencias <= config.umbral_riesgo_critico and dias_sin_asistir >= config.dias_riesgo_critico:
-            clasificados['riesgo_critico'] += 1
-        elif asistencias < config.umbral_baja_asistencia:
-            clasificados['baja_asistencia'] += 1
-        elif dias_sin_asistir >= config.dias_inactividad:
-            clasificados['inactivos'] += 1
-        elif asistencias >= config.asistencias_destacado:
-            clasificados['destacados'] += 1
+        # ✅ Ventana temporal configurable
+        ventana_horas = None
+        if config.dias_repetir_alerta_inasistencia > 0:
+            ventana_horas = config.dias_repetir_alerta_inasistencia * 24
+        
+        if ControlNotificacionesContextual.ya_existe_notificacion(
+            participante, 'Inasistencia', actividad, contexto, ventana_horas
+        ):
+            continue
+        
+        mensaje = (
+            f"⚠️ Hemos notado tu ausencia en '{actividad.nombre}'. "
+            f"Llevas {dias_ausente} días sin asistir. "
+            f"¿Todo está bien? Estamos aquí para apoyarte."
+        )
+        
+        notif = ControlNotificacionesContextual.registrar_notificacion(
+            participante, 'Inasistencia', mensaje, actividad, contexto
+        )
+        
+        if notif:
+            try:
+                send_mail(
+                    subject=f'⚠️ Te extrañamos en {actividad.nombre}',
+                    message=mensaje,
+                    from_email='luis.gluis.g.io.com@gmail.com',
+                    recipient_list=[participante.correo],
+                    fail_silently=True
+                )
+            except:
+                pass
+            
+            alertas += 1
     
-    return f"✓ Clasificación completada: {clasificados}"
+    return f'✓ {alertas} alertas de inasistencia enviadas'
 
 
 # ============================================
-# TAREA 3: ENCUESTAS (SOLO POSITIVO)
+# TAREA 3: ENCUESTAS (CONFIGURABLE)
 # ============================================
 @shared_task
 def enviar_encuestas_retroalimentacion():
     """
-    ✅ Envía encuestas UNA VEZ por actividad finalizada
-    ✅ SOLO a quienes cumplan asistencias mínimas
+    Envía encuestas UNA VEZ por actividad finalizada
+    ✅ Respeta configuración del admin
     """
     config = ConfiguracionNotificaciones.obtener_config()
     
@@ -185,7 +205,7 @@ def enviar_encuestas_retroalimentacion():
             ).exists():
                 continue
             
-            # ✅ Control anti-spam
+            # ✅ UNA VEZ en la vida (sin ventana temporal)
             if ControlNotificacionesContextual.ya_existe_notificacion(
                 participante, 'Encuesta', actividad, 'solicitud_inicial'
             ):
@@ -205,7 +225,7 @@ def enviar_encuestas_retroalimentacion():
                     send_mail(
                         subject=f'📝 Encuesta: {actividad.nombre}',
                         message=mensaje,
-                        from_email='bienestar@universidad.edu',
+                        from_email='luis.gluis.g.io.com@gmail.com',
                         recipient_list=[participante.correo],
                         fail_silently=True
                     )
@@ -214,17 +234,17 @@ def enviar_encuestas_retroalimentacion():
                 
                 encuestas += 1
     
-    return f'✓ {encuestas} encuestas enviadas'
+    return f'✓ {encuestas} encuestas enviadas (ÚNICAS por actividad)'
 
 
 # ============================================
-# TAREA 4: RECORDATORIOS DE CITAS (POSITIVO)
+# TAREA 4: RECORDATORIOS DE CITAS (NUEVA)
 # ============================================
 @shared_task
 def enviar_recordatorios_citas():
     """
-    ✅ Recordatorios de citas psicológicas
-    ✅ Solo para citas confirmadas
+    Recordatorios de citas psicológicas
+    ✅ Respeta configuración del admin
     """
     config = ConfiguracionNotificaciones.obtener_config()
     
@@ -265,7 +285,7 @@ def enviar_recordatorios_citas():
                 send_mail(
                     subject='🩺 Recordatorio de cita',
                     message=mensaje,
-                    from_email='bienestar@universidad.edu',
+                    from_email='luis.gluis.g.io.com@gmail.com',
                     recipient_list=[cita.participantes_id_participante.correo],
                     fail_silently=True
                 )
@@ -275,61 +295,3 @@ def enviar_recordatorios_citas():
             recordatorios += 1
     
     return f'✓ {recordatorios} recordatorios de citas enviados'
-
-
-# ============================================
-# TAREA 5: CANCELACIONES DE ACTIVIDADES
-# ============================================
-@shared_task
-def notificar_cancelacion_actividad(actividad_id, motivo=""):
-    """
-    ✅ Notifica cancelaciones a todos los inscritos
-    ✅ Mensajes informativos, no negativos
-    """
-    try:
-        actividad = Actividades.objects.get(id_actividad=actividad_id)
-    except Actividades.DoesNotExist:
-        return f'❌ Actividad {actividad_id} no existe'
-    
-    participaciones = Participaciones.objects.filter(
-        actividades_id_actividad=actividad,
-        estados_participacion_id_estado_participacion_id=1
-    ).select_related('participantes_id_participante')
-    
-    notificados = 0
-    
-    for participacion in participaciones:
-        participante = participacion.participantes_id_participante
-        
-        contexto = f"cancelacion_{actividad_id}"
-        
-        if ControlNotificacionesContextual.ya_existe_notificacion(
-            participante, 'Cancelacion', actividad, contexto
-        ):
-            continue
-        
-        mensaje = (
-            f"⚠️ Información importante: La actividad '{actividad.nombre}' "
-            f"ha sido cancelada. "
-            f"{motivo if motivo else 'Te informaremos sobre nuevas fechas.'}"
-        )
-        
-        notif = ControlNotificacionesContextual.registrar_notificacion(
-            participante, 'Cancelacion', mensaje, actividad, contexto
-        )
-        
-        if notif:
-            try:
-                send_mail(
-                    subject=f'⚠️ Cancelación: {actividad.nombre}',
-                    message=mensaje,
-                    from_email='bienestar@universidad.edu',
-                    recipient_list=[participante.correo],
-                    fail_silently=True
-                )
-            except:
-                pass
-            
-            notificados += 1
-    
-    return f'✓ {notificados} notificaciones de cancelación enviadas'
