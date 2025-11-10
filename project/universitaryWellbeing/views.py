@@ -11,6 +11,12 @@ from typing import List
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import Notificaciones
+from django.contrib.auth import views as auth_views
+from django.core.cache import cache
+from django.http import HttpResponseForbidden
+from django.core.mail import send_mail
+from django.urls import reverse_lazy
+
 
 def user_login(request):
     if request.method == "POST":
@@ -103,22 +109,6 @@ def register(request):
 
     return render(request, "auth/register.html", {'form': form})
 
-
-#class AdminLoginView(LoginView):
-    template_name = 'login.html'
-
-    def form_valid(self, form):
-        user = form.get_user()
-        
-        if is_role_admin(user):
-            return redirect('home_admin')
-        else:
-            messages.error(self.request, 'No tienes permisos de administrador')
-            return redirect('login')
-
-    def form_invalid(self, form):
-        messages.error(self.request, 'Credenciales incorrectas')
-        return super().form_invalid(form)
 
 def user_logout(request):
     logout(request)
@@ -294,3 +284,80 @@ def ver_notificaciones(request):
     return render(request, "notificaciones/notificaciones.html", {
         "notificaciones": notificaciones
     })
+
+
+# ============================================
+# VISTAS DE PASSWORD RESET PERSONALIZADAS
+# ============================================
+class RateLimitedPasswordResetView(auth_views.PasswordResetView):
+    """Vista de password reset con rate limiting (3 intentos por hora)"""
+    template_name = 'auth/password_reset.html'
+    email_template_name = 'auth/reg/password_reset_email.html'
+    subject_template_name = 'auth/reg/password_reset_subject.txt'
+    success_url = reverse_lazy('password_reset_done')
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Rate limiting por IP
+        ip = self.get_client_ip(request)
+        cache_key = f'password_reset_{ip}'
+        
+        attempts = cache.get(cache_key, 0)
+        
+        if attempts >= 3:  # Máximo 3 intentos por hora
+            messages.error(
+                request,
+                'Demasiados intentos de recuperación de contraseña. '
+                'Por favor intenta nuevamente en 1 hora.'
+            )
+            return HttpResponseForbidden(
+                'Demasiados intentos. Intenta en 1 hora.'
+            )
+        
+        # Incrementar contador de intentos
+        cache.set(cache_key, attempts + 1, 3600)  # 1 hora en segundos
+        
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_client_ip(self, request):
+        """Obtener la IP del cliente (considera proxies)"""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+
+class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
+    """Vista de confirmación que envía notificación de cambio exitoso"""
+    template_name = 'auth/password_reset_confirm.html'
+    success_url = reverse_lazy('password_reset_complete')
+    
+    def form_valid(self, form):
+        # Llamar al método padre primero para cambiar la contraseña
+        response = super().form_valid(form)
+        
+        # Obtener el usuario
+        user = form.user
+        
+        # Enviar email de notificación de cambio exitoso
+        try:
+            send_mail(
+                subject='Tu contraseña ha sido cambiada - BU App',
+                message=(
+                    f'Hola {user.first_name or user.username},\n\n'
+                    f'Tu contraseña fue cambiada exitosamente el {timezone.now().strftime("%d/%m/%Y a las %H:%M")}.\n\n'
+                    f'Si NO fuiste tú quien realizó este cambio, '
+                    f'contacta a soporte inmediatamente en jhonjhonshon4@gmail.com.\n\n'
+                    f'Saludos,\n'
+                    f'El equipo de Bienestar Universitario'
+                ),
+                from_email='BU App <jhonjhonshon4@gmail.com>',
+                recipient_list=[user.email],
+                fail_silently=True,  # No interrumpir el flujo si falla el email
+            )
+        except Exception as e:
+            # Log del error pero no interrumpir el proceso
+            print(f"Error enviando email de notificación: {e}")
+        
+        return response
