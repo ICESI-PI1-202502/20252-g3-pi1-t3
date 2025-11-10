@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'universitaryWellbeing',
     'Analytics_Reports',   
     'management_CADI',
@@ -52,6 +53,7 @@ INSTALLED_APPS = [
 
 ]
 
+SITE_ID = 1
  
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -186,22 +188,19 @@ if any(cmd in sys.argv for cmd in ["test", "pytest"]):
     # Desactiva migraciones del app real que está en conflicto
     MIGRATION_MODULES = {"universitaryWellbeing": None}
 
-
-
-
-
-
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'luis.gluis.g.io.com@gmail.com'
-EMAIL_HOST_PASSWORD = 'jbrg abzk beox eipo'
-DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
+EMAIL_HOST_USER = 'jhonjhonshon4@gmail.com'
+EMAIL_HOST_PASSWORD = 'aeoa zaaf gykq uetb'
+DEFAULT_FROM_EMAIL = 'BU App <jhonjhonshon4@gmail.com>'
 
+# Mejor práctica: usar variables de entorno
+# EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
-
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hora (en segundos)
 
 # Celery y Redis
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
@@ -210,6 +209,13 @@ CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0
 # Timezone
 CELERY_TIMEZONE = 'America/Bogota'
 CELERY_ENABLE_UTC = True
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
+}
 
 from celery.schedules import crontab
 
