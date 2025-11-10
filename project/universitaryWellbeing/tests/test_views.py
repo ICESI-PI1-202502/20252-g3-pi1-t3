@@ -1,229 +1,1082 @@
-import pytest
-from unittest.mock import Mock, patch
+"""
+Tests unitarios para universitaryWellbeing/views.py
+Cobertura completa: Login, Register, Preferences, Schedule, Home, Profile
+Estilo: SimpleTestCase con mocks (siguiendo patrón Analytics_Reports)
+"""
+from django.test import SimpleTestCase, TestCase, RequestFactory
+from unittest.mock import patch, MagicMock, Mock, call
+from django.contrib.auth.models import User, Group
+from django.http import JsonResponse
+from django.core.exceptions import ValidationError
+from universitaryWellbeing import views as vw
+from universitaryWellbeing.forms import UserLoginForm, UserRegisterForm
+import json
+import datetime as dt
 
-# ================================================================
-# LOGIN LOGIC TESTS
-# ================================================================
 
-class TestLoginLogic:
-    def test_login_valido(self):
-        # Simula una función de validación propia
-        def validar_usuario(correo, contraseña):
-            return correo == "estudiante@uni.edu" and contraseña == "1234"
+# ==========================================================
+# TESTS DE HELPERS Y UTILIDADES
+# ==========================================================
+
+class HelpersTestCase(SimpleTestCase):
+    """Pruebas de funciones auxiliares"""
+
+    @patch('universitaryWellbeing.views.Group.objects')
+    def test_is_role_admin_with_group(self, mock_groups):
+        """Usuario en grupo admin debe ser admin"""
+        user = MagicMock()
+        user.is_superuser = False
+        user.groups.filter.return_value.exists.return_value = True
         
-        # Simulación de formulario
-        correo, contraseña = "estudiante@uni.edu", "1234"
-        assert validar_usuario(correo, contraseña) is True
-
-    def test_login_invalido(self):
-        def validar_usuario(correo, contraseña):
-            return correo == "estudiante@uni.edu" and contraseña == "1234"
+        result = vw.is_role_admin(user)
         
-        correo, contraseña = "mal@uni.edu", "0000"
-        assert validar_usuario(correo, contraseña) is False
+        self.assertTrue(result)
+        user.groups.filter.assert_called_once_with(name="admin")
 
-
-# ================================================================
-# REGISTER LOGIC TESTS
-# ================================================================
-
-class TestRegisterLogic:
-    def test_registro_exitoso(self):
-        usuarios = []
-        nuevo_usuario = {"email": "nuevo@uni.edu", "nombre": "Nuevo"}
+    def test_is_role_admin_superuser(self):
+        """Superuser debe ser admin"""
+        user = MagicMock()
+        user.is_superuser = True
+        user.groups.filter.return_value.exists.return_value = False
         
-        if nuevo_usuario["email"] not in [u["email"] for u in usuarios]:
-            usuarios.append(nuevo_usuario)
-            resultado = "registrado"
-        else:
-            resultado = "duplicado"
+        result = vw.is_role_admin(user)
         
-        assert resultado == "registrado"
+        self.assertTrue(result)
 
-    def test_registro_correo_duplicado(self):
-        usuarios = [{"email": "existente@uni.edu"}]
-        nuevo_usuario = {"email": "existente@uni.edu"}
+    @patch('universitaryWellbeing.views.Group.objects')
+    def test_is_role_admin_regular_user(self, mock_groups):
+        """Usuario regular no debe ser admin"""
+        user = MagicMock()
+        user.is_superuser = False
+        user.groups.filter.return_value.exists.return_value = False
         
-        if nuevo_usuario["email"] not in [u["email"] for u in usuarios]:
-            usuarios.append(nuevo_usuario)
-            resultado = "registrado"
-        else:
-            resultado = "duplicado"
+        result = vw.is_role_admin(user)
         
-        assert resultado == "duplicado"
+        self.assertFalse(result)
 
-    def test_registro_incompleto(self):
-        formulario = {"email": "user@uni.edu", "password": ""}
-        campos_requeridos = all(formulario.values())
-        assert campos_requeridos is False
-
-
-# ================================================================
-# PREFERENCES LOGIC TESTS
-# ================================================================
-
-class TestPreferencesLogic:
-    def test_crear_preferencias_nuevas(self):
-        preferencias = {}
-        user = "estudiante1"
-        nuevas = {"deporte": "fútbol", "comida": "vegetariana"}
+    def test_django_weekday_to_fc_dow(self):
+        """Debe convertir correctamente días de la semana"""
+        # Django: 1=Dom, 2=Lun, ..., 7=Sab
+        # FullCalendar: 0=Dom, 1=Lun, ..., 6=Sab
         
-        if user not in preferencias:
-            preferencias[user] = nuevas
+        self.assertEqual(vw._django_weekday_to_fc_dow(1), 1)  # Domingo
+        self.assertEqual(vw._django_weekday_to_fc_dow(2), 2)  # Lunes
+        self.assertEqual(vw._django_weekday_to_fc_dow(7), 0)  # Sábado
+
+
+# ==========================================================
+# TESTS DE LOGIN
+# ==========================================================
+
+class UserLoginTests(SimpleTestCase):
+    """Pruebas de la vista user_login"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.render')
+    def test_login_get_renders_form(self, mock_render, mock_form_class):
+        """GET debe renderizar formulario de login"""
+        mock_form_class.return_value = MagicMock()
         
-        assert preferencias[user]["deporte"] == "fútbol"
-
-    def test_usuario_con_preferencias_existentes(self):
-        preferencias = {"estudiante1": {"deporte": "baloncesto"}}
-        user = "estudiante1"
+        request = self.factory.get('/login/')
         
-        resultado = "ya tiene" if user in preferencias else "nuevo"
-        assert resultado == "ya tiene"
-
-
-# ================================================================
-# HOME USER LOGIC TESTS
-# ================================================================
-
-class TestHomeUserHelpersLogic:
-    def test_generar_recomendaciones(self):
-        preferencias = {"deporte": "fútbol"}
-        actividades = [
-            {"nombre": "Torneo de fútbol", "tipo": "deporte"},
-            {"nombre": "Clase de pintura", "tipo": "arte"},
-        ]
+        vw.user_login(request)
         
-        recomendadas = [
-            a for a in actividades if a["tipo"] == "deporte" and preferencias.get("deporte")
-        ]
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "login.html")
+        self.assertIn("form", mock_render.call_args[0][2])
+
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_login_admin_redirects_to_cadi_admin(self, mock_redirect, mock_form_class,
+                                                  mock_login_func, mock_is_admin):
+        """Admin debe redirigir a cadi_admin"""
+        mock_is_admin.return_value = True
         
-        assert len(recomendadas) == 1
-        assert recomendadas[0]["nombre"] == "Torneo de fútbol"
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock()
+        mock_form_class.return_value = mock_form
+        
+        request = self.factory.post('/login/', {'username': 'admin', 'password': 'pass'})
+        
+        vw.user_login(request)
+        
+        mock_login_func.assert_called_once()
+        mock_redirect.assert_called_once_with("cadi_admin")
 
-    def test_horario_simulado(self):
-        horario = {"Lunes": ["Clase de yoga"], "Martes": []}
-        assert "Clase de yoga" in horario["Lunes"]
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_login_user_without_preferences_redirects_to_preferences(
+        self, mock_redirect, mock_form_class, mock_login_func, 
+        mock_is_admin, mock_preferencias, mock_participantes
+    ):
+        """Usuario sin preferencias debe redirigir a preferences"""
+        mock_is_admin.return_value = False
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock()
+        mock_form_class.return_value = mock_form
+        
+        # Usuario tiene participante pero no preferencias
+        mock_participantes.get.return_value = MagicMock()
+        mock_preferencias.filter.return_value.exists.return_value = False
+        
+        request = self.factory.post('/login/', {})
+        
+        vw.user_login(request)
+        
+        mock_redirect.assert_called_once_with("preferences")
 
-    def test_calendario_simulado(self):
-        eventos = [{"fecha": "2025-10-06", "evento": "Charla de bienestar"}]
-        fechas = [e["fecha"] for e in eventos]
-        assert "2025-10-06" in fechas
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_login_user_with_preferences_redirects_to_home(
+        self, mock_redirect, mock_form_class, mock_login_func,
+        mock_is_admin, mock_preferencias, mock_participantes
+    ):
+        """Usuario con preferencias debe redirigir a home"""
+        mock_is_admin.return_value = False
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock()
+        mock_form_class.return_value = mock_form
+        
+        mock_participantes.get.return_value = MagicMock()
+        mock_preferencias.filter.return_value.exists.return_value = True
+        
+        request = self.factory.post('/login/', {})
+        
+        vw.user_login(request)
+        
+        mock_redirect.assert_called_once_with("home")
+
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_login_invalid_form_shows_errors(self, mock_redirect, mock_messages, mock_form_class):
+        """Formulario inválido debe mostrar errores"""
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = False
+        mock_form.errors = {"username": ["Usuario inválido"]}
+        mock_form_class.return_value = mock_form
+        
+        request = self.factory.post('/login/', {})
+        
+        vw.user_login(request)
+        
+        mock_messages.error.assert_called()
+        mock_redirect.assert_called_once_with("login")
 
 
-# ================================================================
-# ADMIN PROFILE & LOGOUT LOGIC TESTS
-# ================================================================
+# ==========================================================
+# TESTS DE REGISTRO
+# ==========================================================
 
-class TestAdminProfileLogoutLogic:
-    def test_home_admin_renderiza(self):
-        renderizado = True  # Simula render exitoso
-        assert renderizado is True
+class RegisterTests(SimpleTestCase):
+    """Pruebas de la vista register"""
 
-    def test_profile_con_preferencias(self):
-        admin_pref = {"notificaciones": True}
-        assert admin_pref["notificaciones"] is True
+    def setUp(self):
+        self.factory = RequestFactory()
 
-    def test_logout(self):
-        session = {"usuario": "admin"}
-        session.clear()
-        assert session == {}
-# ================================================================
-# TESTS UNITARIOS CONTRA SQL INJECTION
-# ================================================================
+    @patch('universitaryWellbeing.views.UserRegisterForm')
+    @patch('universitaryWellbeing.views.render')
+    def test_register_get_renders_form(self, mock_render, mock_form_class):
+        """GET debe renderizar formulario de registro"""
+        mock_form_class.return_value = MagicMock()
+        
+        request = self.factory.get('/register/')
+        
+        vw.register(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "auth/register.html")
+        self.assertIn("form", mock_render.call_args[0][2])
 
-class TestSQLInjectionProtection:
-    # -------------------------------------------------------------------
-    # LOGIN: asegurarse de que no evalúa SQL con strings del usuario
-    # -------------------------------------------------------------------
-    def test_login_rechaza_inyeccion(self):
-        """
-        Simula el intento de inyección SQL en el campo 'usuario'.
-        La función debería tratar la entrada como texto literal, no como código SQL.
-        """
-        input_usuario = "' OR '1'='1"
-        input_password = "cualquiercosa"
-
-        # Simula una función de login segura (como tu lógica de form.is_valid())
-        def login_seguro(usuario, password):
-            usuarios_validos = {"estudiante": "1234"}
-            return usuarios_validos.get(usuario) == password
-
-        resultado = login_seguro(input_usuario, input_password)
-
-        # Si el sistema fuera vulnerable, el login sería exitoso.
-        # Esperamos que NO lo sea.
-        assert resultado is False, "El sistema no debe aceptar inyección SQL en login."
-
-    # -------------------------------------------------------------------
-    # REGISTER: no debe aceptar inyecciones en correo o nombre
-    # -------------------------------------------------------------------
-    def test_register_no_inserta_sql_inyectado(self):
-        """
-        Simula un intento de inyección SQL en el registro de usuario.
-        Verifica que el sistema no construya consultas SQL manualmente.
-        """
-        # Datos maliciosos
-        datos_maliciosos = {
-            "email": "malicioso@uni.edu'; DROP TABLE users;--",
-            "nombre": "Atacante'); DELETE FROM users;--",
-            "password": "1234"
+    @patch('universitaryWellbeing.views.Roles.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.User.objects')
+    @patch('universitaryWellbeing.views.UserRegisterForm')
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_register_creates_user_and_participante(
+        self, mock_redirect, mock_messages, mock_form_class,
+        mock_user_model, mock_participantes, mock_roles
+    ):
+        """Registro exitoso debe crear User y Participante"""
+        # Mock form
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.cleaned_data = {
+            'cedula': '1234567890',
+            'nombre_completo': 'Juan Pérez',
+            'email': 'juan@test.com',
+            'password': 'pass123'
         }
+        mock_form_class.return_value = mock_form
+        
+        # Mock User creation
+        mock_user = MagicMock()
+        mock_user_model.create_user.return_value = mock_user
+        
+        # Mock Rol
+        mock_rol = MagicMock()
+        mock_rol.grupo_d = MagicMock()
+        mock_roles.get.return_value = mock_rol
+        
+        request = self.factory.post('/register/', {})
+        
+        vw.register(request)
+        
+        # Verificaciones
+        mock_user_model.create_user.assert_called_once()
+        create_args = mock_user_model.create_user.call_args[1]
+        self.assertEqual(create_args['username'], '1234567890')
+        self.assertEqual(create_args['email'], 'juan@test.com')
+        
+        mock_participantes.create.assert_called_once()
+        mock_messages.success.assert_called_once()
+        mock_redirect.assert_called_once_with("login")
 
-        # Mock de una función de creación de usuario segura
-        def registrar_usuario(data):
-            # Simula validación de email (como tu UserRegisterForm)
-            if "'" in data["email"] or ";" in data["email"]:
-                raise ValueError("Entrada inválida detectada")
-            return True
+    @patch('universitaryWellbeing.views.UserRegisterForm')
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_register_invalid_form_shows_errors(self, mock_redirect, mock_messages, mock_form_class):
+        """Formulario inválido debe mostrar errores"""
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = False
+        mock_form.errors = {"email": ["Email inválido"]}
+        mock_form_class.return_value = mock_form
+        
+        request = self.factory.post('/register/', {})
+        
+        vw.register(request)
+        
+        mock_messages.error.assert_called()
+        mock_redirect.assert_called_once_with("register")
 
-        with pytest.raises(ValueError):
-            registrar_usuario(datos_maliciosos)
+    @patch('universitaryWellbeing.views.Roles.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.User.objects')
+    @patch('universitaryWellbeing.views.UserRegisterForm')
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_register_nombre_con_espacios(
+        self, mock_redirect, mock_messages, mock_form_class,
+        mock_user_model, mock_participantes, mock_roles
+    ):
+        """Debe separar correctamente nombre y apellido"""
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.cleaned_data = {
+            'cedula': '1234567890',
+            'nombre_completo': 'Juan Carlos Pérez González',
+            'email': 'juan@test.com',
+            'password': 'pass123'
+        }
+        mock_form_class.return_value = mock_form
+        
+        mock_user_model.create_user.return_value = MagicMock()
+        mock_roles.get.return_value = MagicMock(grupo_d=None)
+        
+        request = self.factory.post('/register/', {})
+        
+        vw.register(request)
+        
+        create_args = mock_user_model.create_user.call_args[1]
+        self.assertEqual(create_args['first_name'], 'Juan')
+        self.assertEqual(create_args['last_name'], 'Carlos Pérez González')
 
-    # -------------------------------------------------------------------
-    # PREFERENCIAS: evitar inyección en selección de categorías
-    # -------------------------------------------------------------------
-    def test_preferences_inyeccion_en_categorias(self):
-        """
-        Verifica que la lista de categorías no sea usada directamente en una consulta SQL concatenada.
-        """
-        categorias_recibidas = ["1", "2", "3; DROP TABLE actividades;--"]
 
-        # Función simulada que validaría IDs numéricos
-        def validar_categorias(lista):
-            for item in lista:
-                if not item.isdigit():
-                    return False
-            return True
+# ==========================================================
+# TESTS DE LOGOUT
+# ==========================================================
 
-        assert validar_categorias(categorias_recibidas) is False, \
-            "Debe rechazar categorías que contengan SQL malicioso."
+class LogoutTests(SimpleTestCase):
+    """Pruebas de la vista user_logout"""
 
-    # -------------------------------------------------------------------
-    # HOME USER: evitar que consultas de filtros usen strings directos
-    # -------------------------------------------------------------------
-    def test_recomendaciones_no_usar_sql_crudo(self):
-        """
-        Simula que el filtro usa ORM seguro (Django ORM), no SQL directo.
-        """
-        with patch("universitaryWellbeing.views.Actividades.objects.filter") as mock_filter:
-            mock_filter.return_value = []
+    def setUp(self):
+        self.factory = RequestFactory()
 
-            # Simula uso normal de ORM
-            mock_filter(tipos_actividad_id_tipo__in=[1, 2, 3])
+    @patch('universitaryWellbeing.views.logout')
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_logout_clears_session(self, mock_redirect, mock_messages, mock_logout):
+        """Logout debe cerrar sesión y redirigir"""
+        request = self.factory.post('/logout/')
+        
+        vw.user_logout(request)
+        
+        mock_logout.assert_called_once_with(request)
+        mock_messages.success.assert_called_once()
+        mock_redirect.assert_called_once_with("login")
 
-            # Verifica que se llamó de forma segura (sin SQL crudo)
-            args, kwargs = mock_filter.call_args
-            assert "tipos_actividad_id_tipo__in" in kwargs
-            assert not any(isinstance(a, str) and "SELECT" in a.upper() for a in args), \
-                "No debe usar SQL crudo en las llamadas ORM."
 
-    # -------------------------------------------------------------------
-    # LOGOUT / PROFILE: sin riesgo de SQL, pero verificar manipulación segura
-    # -------------------------------------------------------------------
-    def test_logout_no_inyeccion(self):
-        """
-        Asegura que el logout limpia sesión sin evaluar cadenas del usuario.
-        """
-        session = {"user": "admin'; DROP TABLE users;--"}
-        session.clear()
-        assert session == {}, "Logout debe limpiar sesión sin ejecutar nada del contenido."
+# ==========================================================
+# TESTS DE PREFERENCIAS
+# ==========================================================
+
+class PreferencesTests(SimpleTestCase):
+    """Pruebas de la vista preferences"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_preferences_redirects_if_already_exists(self, mock_redirect, mock_participantes):
+        """Debe redirigir si ya tiene preferencias"""
+        mock_participante = MagicMock()
+        mock_participante.preferencias = MagicMock()  # hasattr será True
+        mock_participantes.get.return_value = mock_participante
+        
+        request = self.factory.get('/preferences/')
+        request.user = MagicMock()
+        
+        vw.preferences(request)
+        
+        mock_redirect.assert_called_once_with('home')
+
+    @patch('universitaryWellbeing.views.TiposActividad.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_preferences_get_renders_categories(self, mock_render, mock_participantes, mock_tipos):
+        """GET debe renderizar categorías disponibles"""
+        mock_participante = MagicMock(spec=['id_participante'])  # Sin 'preferencias'
+        mock_participantes.get.return_value = mock_participante
+        
+        mock_tipos.all.return_value = [
+            MagicMock(id_tipo=1, nombre_tipo="Deporte"),
+            MagicMock(id_tipo=2, nombre_tipo="Cultural")
+        ]
+        
+        request = self.factory.get('/preferences/')
+        request.user = MagicMock()
+        
+        vw.preferences(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], 'list_preferences.html')
+        context = mock_render.call_args[0][2]
+        self.assertIn('categorias', context)
+
+    @patch('universitaryWellbeing.views.PreferenciasActividades.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.TiposActividad.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.redirect')
+    def test_preferences_post_creates_preferencias(
+        self, mock_redirect, mock_participantes, mock_tipos,
+        mock_preferencias, mock_pref_actividades
+    ):
+        """POST debe crear preferencias del usuario"""
+        mock_participante = MagicMock(spec=['id_participante'])
+        mock_participantes.get.return_value = mock_participante
+        
+        mock_pref = MagicMock()
+        mock_preferencias.create.return_value = mock_pref
+        
+        mock_tipo = MagicMock()
+        mock_tipos.objects.get.return_value = mock_tipo
+        
+        request = self.factory.post('/preferences/')
+        request.POST = MagicMock()
+        request.POST.getlist.return_value = ['1', '2', '3']
+        request.user = MagicMock()
+        
+        vw.preferences(request)
+        
+        mock_preferencias.create.assert_called_once()
+        self.assertEqual(mock_pref_actividades.create.call_count, 3)
+        mock_redirect.assert_called_once_with('home')
+
+
+# ==========================================================
+# TESTS DE HORARIO/SCHEDULE
+# ==========================================================
+
+class ScheduleTests(SimpleTestCase):
+    """Pruebas de la vista schedule"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.HorariosParticipante.objects')
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    @patch('universitaryWellbeing.views.render')
+    def test_schedule_renders_eventos(self, mock_render, mock_get, mock_horarios):
+        """Debe renderizar eventos del participante"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        mock_get.return_value = mock_participante
+        
+        # Mock eventos
+        evento_mock = MagicMock()
+        evento_mock.id_horario = 1
+        evento_mock.titulo = "Yoga"
+        evento_mock.fecha_inicio = dt.datetime(2025, 11, 10, 10, 0)
+        evento_mock.fecha_fin = dt.datetime(2025, 11, 10, 11, 0)
+        evento_mock.actividades_id_actividad = MagicMock()
+        evento_mock.citas_id_cita = None
+        evento_mock.partidos_id_partido = None
+        evento_mock.fuente_manual = 'N'
+        evento_mock.notas = "Clase de yoga"
+        
+        mock_horarios.filter.return_value = [evento_mock]
+        
+        request = self.factory.get('/schedule/')
+        request.user = MagicMock(id=1)
+        
+        vw.schedule(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "Horario.html")
+        context = mock_render.call_args[0][2]
+        self.assertIn("eventos_json", context)
+        
+        # Verificar que eventos_json es JSON válido
+        eventos_json = json.loads(context["eventos_json"])
+        self.assertEqual(len(eventos_json), 1)
+        self.assertEqual(eventos_json[0]["title"], "Yoga")
+
+    @patch('universitaryWellbeing.views.HorariosParticipante.objects')
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    @patch('universitaryWellbeing.views.render')
+    def test_schedule_evento_recurrente(self, mock_render, mock_get, mock_horarios):
+        """Evento manual de actividad debe ser recurrente"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        mock_get.return_value = mock_participante
+        
+        evento_mock = MagicMock()
+        evento_mock.id_horario = 1
+        evento_mock.titulo = "Clase semanal"
+        evento_mock.fecha_inicio = dt.datetime(2025, 11, 10, 10, 0)  # Lunes
+        evento_mock.fecha_fin = dt.datetime(2025, 11, 10, 11, 0)
+        evento_mock.actividades_id_actividad = MagicMock()
+        evento_mock.citas_id_cita = None
+        evento_mock.partidos_id_partido = None
+        evento_mock.fuente_manual = 'S'  # Manual = recurrente
+        evento_mock.notas = None
+        
+        mock_horarios.filter.return_value = [evento_mock]
+        
+        request = self.factory.get('/schedule/')
+        request.user = MagicMock(id=1)
+        
+        vw.schedule(request)
+        
+        context = mock_render.call_args[0][2]
+        eventos_json = json.loads(context["eventos_json"])
+        
+        # Verificar que tiene daysOfWeek (recurrente)
+        self.assertIn("daysOfWeek", eventos_json[0])
+        self.assertTrue(eventos_json[0]["extendedProps"]["es_recurrente"])
+
+
+# ==========================================================
+# TESTS DE ELIMINAR EVENTO
+# ==========================================================
+
+class EliminarEventoTests(SimpleTestCase):
+    """Pruebas de la vista eliminar_evento"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    def test_eliminar_evento_manual_success(self, mock_get):
+        """Debe eliminar evento manual correctamente"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        
+        mock_evento = MagicMock()
+        mock_evento.titulo = "Mi evento"
+        mock_evento.fuente_manual = 'S'
+        
+        mock_get.side_effect = [mock_participante, mock_evento]
+        
+        request = self.factory.post('/schedule/delete/1/')
+        request.user = MagicMock(id=1)
+        
+        response = vw.eliminar_evento(request, 1)
+        
+        mock_evento.delete.assert_called_once()
+        self.assertIsInstance(response, JsonResponse)
+        data = json.loads(response.content)
+        self.assertTrue(data['success'])
+
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    def test_eliminar_evento_automatico_forbidden(self, mock_get):
+        """No debe eliminar evento automático"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        
+        mock_evento = MagicMock()
+        mock_evento.fuente_manual = 'N'  # Automático
+        
+        mock_get.side_effect = [mock_participante, mock_evento]
+        
+        request = self.factory.post('/schedule/delete/1/')
+        request.user = MagicMock(id=1)
+        
+        response = vw.eliminar_evento(request, 1)
+        
+        mock_evento.delete.assert_not_called()
+        self.assertEqual(response.status_code, 403)
+        data = json.loads(response.content)
+        self.assertFalse(data['success'])
+
+
+# ==========================================================
+# TESTS DE CALENDARIO UNIFICADO
+# ==========================================================
+
+class CalendarioUnificadoTests(SimpleTestCase):
+    """Pruebas de la vista calendario_unificado"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.HorariosActividad.objects')
+    @patch('universitaryWellbeing.views.HorariosBloque.objects')
+    @patch('universitaryWellbeing.views.Actividades.objects')
+    @patch('universitaryWellbeing.views.TiposActividad.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_calendario_unificado_renders(
+        self, mock_render, mock_tipos, mock_actividades,
+        mock_bloques, mock_horarios_act
+    ):
+        """Debe renderizar calendario con actividades"""
+        # Mock tipos
+        mock_tipos.values.return_value.order_by.return_value = []
+        
+        # Mock actividades
+        mock_qs = MagicMock()
+        mock_qs.select_related.return_value.values.return_value = [
+            {
+                'id_actividad': 1,
+                'nombre': 'Yoga',
+                'descripcion': 'Clase de yoga',
+                'tipos_actividad_id_tipo': 1,
+                'tipos_actividad_id_tipo__nombre_tipo': 'Deporte'
+            }
+        ]
+        mock_actividades.all.return_value = mock_qs
+        
+        # Mock bloques
+        mock_bloques.filter.return_value.values.return_value = [
+            {
+                'id_horario_bloque': 1,
+                'actividades_id_actividad': 1,
+                'profesor': 'Prof. Juan',
+                'lugar': 'Gimnasio',
+                'hora_inicio': dt.time(10, 0),
+                'hora_fin': dt.time(11, 0)
+            }
+        ]
+        
+        # Mock días
+        mock_horarios_act.filter.return_value.values.return_value = [
+            {'horario_bloque_id': 1, 'dia_semana': 2}  # Lunes
+        ]
+        
+        request = self.factory.get('/calendario/')
+        request.GET = {}
+        
+        vw.calendario_unificado(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "calendario_unificado.html")
+        context = mock_render.call_args[0][2]
+        self.assertIn("eventos_json", context)
+
+    @patch('universitaryWellbeing.views.TiposActividad.objects')
+    @patch('universitaryWellbeing.views.Actividades.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_calendario_unificado_filtro_tipo(self, mock_render, mock_actividades, mock_tipos):
+        """Debe filtrar por tipo de actividad"""
+        mock_tipos.values.return_value.order_by.return_value = []
+        
+        mock_qs = MagicMock()
+        mock_qs.select_related.return_value.values.return_value = []
+        mock_qs.filter.return_value = mock_qs
+        
+        mock_actividades.all.return_value = mock_qs
+        
+        request = self.factory.get('/calendario/?tipo=1')
+        request.GET = {'tipo': '1'}
+        
+        vw.calendario_unificado(request)
+        
+        # Verificar que se aplicó el filtro
+        mock_qs.filter.assert_called_once()
+
+
+# ==========================================================
+# TESTS DE HOME USER
+# ==========================================================
+
+class HomeUserTests(SimpleTestCase):
+    """Pruebas de la vista home_user"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.render')
+    def test_home_user_superuser_returns_404(self, mock_render):
+        """Superuser debe recibir 404"""
+        request = self.factory.get('/home/')
+        request.user = MagicMock()
+        request.user.is_superuser = True
+        
+        vw.home_user(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "pageNotFound-404.html")
+        self.assertEqual(mock_render.call_args[1]['status'], 404)
+
+    @patch('universitaryWellbeing.views.get_user_calendar')
+    @patch('universitaryWellbeing.views.get_user_schedule')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.Actividades.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_home_user_renders_with_context(
+        self, mock_render, mock_actividades, mock_participantes,
+        mock_schedule, mock_calendar
+    ):
+        """Debe renderizar home con contexto completo"""
+        # Mock participante con rol
+        mock_part = MagicMock()
+        mock_part.roles_id_rol.nombre_rol = "Estudiante"
+        mock_participantes.filter.return_value.select_related.return_value.first.return_value = mock_part
+        
+        mock_actividades.values.return_value = []
+        mock_schedule.return_value = []
+        mock_calendar.return_value = []
+        
+        request = self.factory.get('/home/')
+        request.user = MagicMock()
+        request.user.is_superuser = False
+        
+        vw.home_user(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "home_user.html")
+        context = mock_render.call_args[0][2]
+        self.assertIn("user_rol", context)
+        self.assertEqual(context["user_rol"], "Estudiante")
+
+
+# ==========================================================
+# TESTS DE HOME ADMIN
+# ==========================================================
+
+class HomeAdminTests(SimpleTestCase):
+    """Pruebas de la vista home_admin"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.render')
+    def test_home_admin_renders(self, mock_render):
+        """Debe renderizar home admin"""
+        request = self.factory.get('/admin-home/')
+        
+        vw.home_admin(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "home_admin.html")
+
+
+# ==========================================================
+# TESTS DE FUNCIONES AUXILIARES (get_recommendations, etc.)
+# ==========================================================
+
+class HelperFunctionsTests(SimpleTestCase):
+    """Pruebas de funciones auxiliares de vistas"""
+
+    @patch('universitaryWellbeing.views.Actividades.objects')
+    @patch('universitaryWellbeing.views.PreferenciasActividades.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_recommendations_for_user_success(
+        self, mock_participantes, mock_preferencias,
+        mock_pref_actividades, mock_actividades
+    ):
+        """Debe retornar actividades recomendadas según preferencias"""
+        mock_user = MagicMock()
+        mock_participante = MagicMock()
+        mock_participantes.get.return_value = mock_participante
+        
+        mock_pref = MagicMock()
+        mock_preferencias.get.return_value = mock_pref
+        
+        mock_pref_actividades.filter.return_value.values_list.return_value = [1, 2, 3]
+        
+        mock_actividades_qs = MagicMock()
+        mock_actividades.filter.return_value = mock_actividades_qs
+        
+        result = vw.get_recommendations_for_user(mock_user)
+        
+        self.assertEqual(result, mock_actividades_qs)
+        mock_actividades.filter.assert_called_once()
+
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_recommendations_for_user_no_participante(self, mock_participantes):
+        """Debe retornar lista vacía si no existe participante"""
+        mock_user = MagicMock()
+        mock_participantes.get.side_effect = vw.Participantes.DoesNotExist
+        
+        result = vw.get_recommendations_for_user(mock_user)
+        
+        self.assertEqual(result, [])
+
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_recommendations_for_user_no_preferencias(
+        self, mock_participantes, mock_preferencias
+    ):
+        """Debe retornar lista vacía si no existen preferencias"""
+        mock_user = MagicMock()
+        mock_participante = MagicMock()
+        mock_participantes.get.return_value = mock_participante
+        mock_preferencias.get.side_effect = vw.Preferencias.DoesNotExist
+        
+        result = vw.get_recommendations_for_user(mock_user)
+        
+        self.assertEqual(result, [])
+
+    @patch('universitaryWellbeing.views.HorariosParticipante.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_user_schedule_success(self, mock_participantes, mock_horarios):
+        """Debe retornar horarios del participante"""
+        mock_user = MagicMock()
+        mock_participante = MagicMock()
+        mock_participantes.get.return_value = mock_participante
+        
+        mock_horarios_qs = MagicMock()
+        mock_horarios.filter.return_value = mock_horarios_qs
+        
+        result = vw.get_user_schedule(mock_user)
+        
+        self.assertEqual(result, mock_horarios_qs)
+
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_user_schedule_no_participante(self, mock_participantes):
+        """Debe retornar lista vacía si no existe participante"""
+        mock_user = MagicMock()
+        mock_participantes.get.side_effect = vw.Participantes.DoesNotExist
+        
+        result = vw.get_user_schedule(mock_user)
+        
+        self.assertEqual(result, [])
+
+    @patch('universitaryWellbeing.views.Citas.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_user_calendar_success(self, mock_participantes, mock_citas):
+        """Debe retornar citas del participante"""
+        mock_user = MagicMock()
+        mock_participante = MagicMock()
+        mock_participantes.get.return_value = mock_participante
+        
+        mock_citas_qs = MagicMock()
+        mock_citas.filter.return_value = mock_citas_qs
+        
+        result = vw.get_user_calendar(mock_user)
+        
+        self.assertEqual(result, mock_citas_qs)
+
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_get_user_calendar_no_participante(self, mock_participantes):
+        """Debe retornar lista vacía si no existe participante"""
+        mock_user = MagicMock()
+        mock_participantes.get.side_effect = vw.Participantes.DoesNotExist
+        
+        result = vw.get_user_calendar(mock_user)
+        
+        self.assertEqual(result, [])
+
+
+# ==========================================================
+# TESTS DE PROFILE
+# ==========================================================
+
+class ProfileTests(SimpleTestCase):
+    """Pruebas de la vista profile"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.Notificaciones.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_profile_renders_with_context(
+        self, mock_render, mock_participantes, 
+        mock_preferencias, mock_notificaciones
+    ):
+        """Debe renderizar perfil con contexto completo"""
+        # Mock participante
+        mock_part = MagicMock()
+        mock_part.roles_id_rol.nombre_rol = "Estudiante"
+        mock_participantes.get.return_value = mock_part
+        
+        # Mock preferencias y actividades
+        mock_pref = MagicMock()
+        mock_actividad1 = MagicMock(nombre="Yoga")
+        mock_actividad2 = MagicMock(nombre="Fútbol")
+        mock_pref.actividades.all.return_value = [mock_actividad1, mock_actividad2]
+        mock_preferencias.get.return_value = mock_pref
+        
+        # Mock notificaciones
+        mock_notif_qs = MagicMock()
+        mock_notif_qs.order_by.return_value = mock_notif_qs
+        mock_notif_qs.filter.return_value.count.return_value = 3
+        mock_notificaciones.filter.return_value = mock_notif_qs
+        
+        request = self.factory.get('/profile/')
+        request.user = MagicMock()
+        
+        vw.profile(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "profile.html")
+        context = mock_render.call_args[0][2]
+        self.assertIn("participante", context)
+        self.assertIn("actividades", context)
+        self.assertIn("notificaciones", context)
+        self.assertEqual(context["notificaciones_no_leidas"], 3)
+
+    @patch('universitaryWellbeing.views.Notificaciones.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_profile_sin_preferencias(
+        self, mock_render, mock_participantes,
+        mock_preferencias, mock_notificaciones
+    ):
+        """Debe manejar caso sin preferencias"""
+        mock_part = MagicMock()
+        mock_part.roles_id_rol = None
+        mock_participantes.get.return_value = mock_part
+        
+        mock_preferencias.get.side_effect = vw.Preferencias.DoesNotExist
+        
+        mock_notif_qs = MagicMock()
+        mock_notif_qs.order_by.return_value = mock_notif_qs
+        mock_notif_qs.filter.return_value.count.return_value = 0
+        mock_notificaciones.filter.return_value = mock_notif_qs
+        
+        request = self.factory.get('/profile/')
+        request.user = MagicMock()
+        
+        vw.profile(request)
+        
+        context = mock_render.call_args[0][2]
+        self.assertEqual(context["actividades"], [])
+        self.assertIsNone(context["user_rol"])
+
+
+# ==========================================================
+# TESTS DE VER NOTIFICACIONES
+# ==========================================================
+
+class VerNotificacionesTests(SimpleTestCase):
+    """Pruebas de la vista ver_notificaciones"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.Notificaciones.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_ver_notificaciones_renders_list(self, mock_render, mock_notificaciones):
+        """Debe renderizar lista de notificaciones"""
+        mock_notif1 = MagicMock()
+        mock_notif1.titulo = "Nueva actividad"
+        mock_notif1.mensaje = "Se agregó Yoga"
+        
+        mock_notif2 = MagicMock()
+        mock_notif2.titulo = "Recordatorio"
+        mock_notif2.mensaje = "Clase mañana"
+        
+        mock_qs = MagicMock()
+        mock_qs.order_by.return_value = [mock_notif1, mock_notif2]
+        mock_notificaciones.filter.return_value = mock_qs
+        
+        request = self.factory.get('/notificaciones/')
+        request.user = MagicMock()
+        
+        vw.ver_notificaciones(request)
+        
+        mock_render.assert_called_once()
+        self.assertEqual(mock_render.call_args[0][1], "notificaciones/notificaciones.html")
+        context = mock_render.call_args[0][2]
+        self.assertIn("notificaciones", context)
+        self.assertEqual(len(context["notificaciones"]), 2)
+
+    @patch('universitaryWellbeing.views.Notificaciones.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_ver_notificaciones_sin_notificaciones(self, mock_render, mock_notificaciones):
+        """Debe manejar caso sin notificaciones"""
+        mock_qs = MagicMock()
+        mock_qs.order_by.return_value = []
+        mock_notificaciones.filter.return_value = mock_qs
+        
+        request = self.factory.get('/notificaciones/')
+        request.user = MagicMock()
+        
+        vw.ver_notificaciones(request)
+        
+        context = mock_render.call_args[0][2]
+        self.assertEqual(len(context["notificaciones"]), 0)
+
+
+# ==========================================================
+# TESTS ADICIONALES DE EDGE CASES
+# ==========================================================
+
+class EdgeCasesTests(SimpleTestCase):
+    """Pruebas de casos límite y edge cases"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch('universitaryWellbeing.views.HorariosParticipante.objects')
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    @patch('universitaryWellbeing.views.render')
+    def test_schedule_sin_eventos(self, mock_render, mock_get, mock_horarios):
+        """Debe manejar horario sin eventos"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        mock_get.return_value = mock_participante
+        
+        mock_horarios.filter.return_value = []
+        
+        request = self.factory.get('/schedule/')
+        request.user = MagicMock(id=1)
+        
+        vw.schedule(request)
+        
+        context = mock_render.call_args[0][2]
+        eventos_json = json.loads(context["eventos_json"])
+        self.assertEqual(len(eventos_json), 0)
+
+    @patch('universitaryWellbeing.views.HorariosParticipante.objects')
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    @patch('universitaryWellbeing.views.render')
+    def test_schedule_evento_con_cita(self, mock_render, mock_get, mock_horarios):
+        """Debe asignar color amarillo a citas"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        mock_get.return_value = mock_participante
+        
+        evento_mock = MagicMock()
+        evento_mock.id_horario = 1
+        evento_mock.titulo = "Cita médica"
+        evento_mock.fecha_inicio = dt.datetime(2025, 11, 10, 14, 0)
+        evento_mock.fecha_fin = dt.datetime(2025, 11, 10, 15, 0)
+        evento_mock.actividades_id_actividad = None
+        evento_mock.citas_id_cita = MagicMock()
+        evento_mock.partidos_id_partido = None
+        evento_mock.fuente_manual = 'N'
+        evento_mock.notas = None
+        
+        mock_horarios.filter.return_value = [evento_mock]
+        
+        request = self.factory.get('/schedule/')
+        request.user = MagicMock(id=1)
+        
+        vw.schedule(request)
+        
+        context = mock_render.call_args[0][2]
+        eventos_json = json.loads(context["eventos_json"])
+        self.assertEqual(eventos_json[0]["color"], "#E4EB60")
+        self.assertEqual(eventos_json[0]["extendedProps"]["tipo"], "cita")
+
+    @patch('universitaryWellbeing.views.HorariosParticipante.objects')
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    @patch('universitaryWellbeing.views.render')
+    def test_schedule_evento_con_partido(self, mock_render, mock_get, mock_horarios):
+        """Debe asignar color naranja a partidos"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        mock_get.return_value = mock_participante
+        
+        evento_mock = MagicMock()
+        evento_mock.id_horario = 1
+        evento_mock.titulo = "Partido de fútbol"
+        evento_mock.fecha_inicio = dt.datetime(2025, 11, 10, 16, 0)
+        evento_mock.fecha_fin = dt.datetime(2025, 11, 10, 18, 0)
+        evento_mock.actividades_id_actividad = None
+        evento_mock.citas_id_cita = None
+        evento_mock.partidos_id_partido = MagicMock()
+        evento_mock.fuente_manual = 'N'
+        evento_mock.notas = None
+        
+        mock_horarios.filter.return_value = [evento_mock]
+        
+        request = self.factory.get('/schedule/')
+        request.user = MagicMock(id=1)
+        
+        vw.schedule(request)
+        
+        context = mock_render.call_args[0][2]
+        eventos_json = json.loads(context["eventos_json"])
+        self.assertEqual(eventos_json[0]["color"], "#E9683B")
+        self.assertEqual(eventos_json[0]["extendedProps"]["tipo"], "partido")
+
+    @patch('universitaryWellbeing.views.HorariosActividad.objects')
+    @patch('universitaryWellbeing.views.HorariosBloque.objects')
+    @patch('universitaryWellbeing.views.Actividades.objects')
+    @patch('universitaryWellbeing.views.TiposActividad.objects')
+    @patch('universitaryWellbeing.views.render')
+    def test_calendario_unificado_sin_actividades(
+        self, mock_render, mock_tipos, mock_actividades,
+        mock_bloques, mock_horarios_act
+    ):
+        """Debe manejar caso sin actividades disponibles"""
+        mock_tipos.values.return_value.order_by.return_value = []
+        
+        mock_qs = MagicMock()
+        mock_qs.select_related.return_value.values.return_value = []
+        mock_actividades.all.return_value = mock_qs
+        
+        request = self.factory.get('/calendario/')
+        request.GET = {}
+        
+        vw.calendario_unificado(request)
+        
+        context = mock_render.call_args[0][2]
+        eventos_json = json.loads(context["eventos_json"])
+        self.assertEqual(len(eventos_json), 0)
+
+    @patch('universitaryWellbeing.views.get_object_or_404')
+    def test_eliminar_evento_exception_handling(self, mock_get):
+        """Debe manejar excepciones al eliminar evento"""
+        mock_participante = MagicMock()
+        mock_participante.id_participante = 1
+        
+        mock_evento = MagicMock()
+        mock_evento.fuente_manual = 'S'
+        mock_evento.delete.side_effect = Exception("Error de base de datos")
+        
+        mock_get.side_effect = [mock_participante, mock_evento]
+        
+        request = self.factory.post('/schedule/delete/1/')
+        request.user = MagicMock(id=1)
+        
+        response = vw.eliminar_evento(request, 1)
+        
+        self.assertEqual(response.status_code, 500)
+        data = json.loads(response.content)
+        self.assertFalse(data['success'])
+        self.assertIn("Error al eliminar", data['message'])

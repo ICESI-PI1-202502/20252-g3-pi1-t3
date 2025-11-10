@@ -1,3 +1,4 @@
+#project\tournaments\views.py
 import traceback
 from django.db.models import Q
 from django.views.decorators.csrf import csrf_exempt

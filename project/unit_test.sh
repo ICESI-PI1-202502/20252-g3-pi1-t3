@@ -35,6 +35,8 @@ coverage run -a manage.py test Analytics_Reports.test.test_analytics_reports --t
 # Management CADI
 coverage run -a manage.py test management_CADI.tests.test_views_management_cadi --timing --keepdb
 
+coverage run -a manage.py test management_CADI.tests.test_views_cadi_additional --timing --keepdb
+
 # Notificaciones
 coverage run -a manage.py test notificaciones.test.test_notificaciones --timing --keepdb
 
@@ -47,7 +49,13 @@ coverage run -a manage.py test social_projects.tests.test_views_psu --timing --k
 # Universitary Wellbeing
 coverage run -a manage.py test universitaryWellbeing.tests.test_views --timing --keepdb
 
+# Appointments (NUEVO)
+coverage run -a manage.py test appointments.tests.test_views --timing --keepdb
+coverage run -a manage.py test appointments.tests.test_views_basicos --timing --keepdb
 
+# torunaments (NUEVO)
+coverage run -a manage.py test tournaments.tests.test_views_basicos --timing --keepdb
+ 
 echo " Generando reporte de cobertura..."
 coverage report
 coverage html

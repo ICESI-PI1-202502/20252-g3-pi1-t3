@@ -1,3 +1,4 @@
+#project\social_projects\views.py
 from django.utils import timezone
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib import messages
