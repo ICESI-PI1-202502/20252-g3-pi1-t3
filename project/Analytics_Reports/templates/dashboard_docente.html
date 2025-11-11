@@ -7,11 +7,11 @@
 
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<!-- Pasar datos de Django a JavaScript -->
 <script>
     window.docenteData = {
         totalActividades: {{ total_mis_actividades }},
-        datosActividades: {{ datos_actividades_populares|safe }}
+        datosActividades: {{ datos_actividades_populares|safe }},
+        datosAsistenciaPorDia: {{ datos_asistencia_por_dia|safe }}
     };
 </script>
 <script src="{% static 'js/dashboard_docente.js' %}"></script>
@@ -31,7 +31,7 @@
 
     <!-- Métricas principales -->
     <div class="row mb-4">
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
                     <i class="bi bi-music-note-list" style="font-size: 2rem; color: #007bff;"></i>
@@ -40,7 +40,16 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check" style="font-size: 2rem; color: #17a2b8;"></i>
+                    <h3 class="mt-2">{{ sesiones_realizadas }}</h3>
+                    <p>Sesiones Realizadas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
                     <i class="bi bi-people-fill" style="font-size: 2rem; color: #28a745;"></i>
@@ -49,27 +58,27 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card text-center">
                 <div class="card-body">
                     <i class="bi bi-graph-up" style="font-size: 2rem; color: #ffc107;"></i>
                     <h3 class="mt-2">{{ promedio_asistencia }}</h3>
-                    <p>Promedio Asistencia</p>
+                    <p class="small">Promedio por Sesión</p>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Top estudiantes y Actividades populares -->
+    <!-- Top estudiantes -->
     <div class="row mb-4">
-        <div class="col-md-6">
+        <div class="col-md-{% if total_mis_actividades == 1 %}12{% else %}6{% endif %}">
             <div class="card">
                 <div class="card-header bg-primary text-white">
                     <i class="bi bi-trophy"></i> Estudiantes Más Activos
                 </div>
                 <div class="card-body">
                     {% if top_estudiantes %}
-                    <table class="table">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
                                 <th>Estudiante</th>
@@ -89,12 +98,6 @@
                                     <span class="badge bg-success">{{ est.total_asistencias }}</span>
                                 </td>
                             </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="2" class="text-center text-muted py-3">
-                                    No hay estudiantes con asistencias registradas aún.
-                                </td>
-                            </tr>
                             {% endfor %}
                         </tbody>
                     </table>
@@ -105,27 +108,83 @@
             </div>
         </div>
 
-        <!-- Actividades populares -->
+        <!-- Solo mostrar comparación si hay más de 1 actividad -->
+        {% if total_mis_actividades > 1 %}
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header bg-success text-white">
-                    <i class="bi bi-star"></i> 
-                    {% if total_mis_actividades == 1 %}
-                        Mi Actividad
-                    {% else %}
-                        Mis Actividades Más Populares
-                    {% endif %}
+                    <i class="bi bi-star"></i> Comparación de Actividades
                 </div>
                 <div class="card-body">
-                    {% if total_mis_actividades > 0 %}
-                        <canvas id="chartMisActividades"></canvas>
-                    {% else %}
-                        <p class="text-muted text-center py-3">No tienes actividades asignadas.</p>
-                    {% endif %}
+                    <canvas id="chartMisActividades"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Asistencia por día de la semana -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-calendar-week"></i> Asistencia Promedio por Día de la Semana
+                </div>
+                <div class="card-body">
+                    <canvas id="chartAsistenciaPorDia" height="80"></canvas>
+                    
+                    <div class="alert alert-info mt-3 mb-0">
+                        <strong>Interpretación de colores:</strong><br>
+                        <span class="legend-box legend-green"></span> <strong>Verde (≥15):</strong> Asistencia alta<br>
+                        <span class="legend-box legend-yellow"></span> <strong>Amarillo (10-14):</strong> Asistencia media<br>
+                        <span class="legend-box legend-red"></span> <strong>Rojo (<10):</strong> Asistencia baja - Considera cambiar horario
+                    </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <!-- Detalle por actividad y día -->
+    {% if asistencia_actividad_dia %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-table"></i> Detalle de Asistencia por Actividad y Día
+                </div>
+                <div class="card-body">
+                    {% for item in asistencia_actividad_dia %}
+                    <h5 class="mt-3">{{ item.actividad }}</h5>
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Día</th>
+                                <th class="text-center">Sesiones</th>
+                                <th class="text-center">Total Asistencias</th>
+                                <th class="text-center">Promedio por Sesión</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dia in item.dias %}
+                            <tr>
+                                <td><strong>{{ dia.dia }}</strong></td>
+                                <td class="text-center">{{ dia.sesiones }}</td>
+                                <td class="text-center">{{ dia.total }}</td>
+                                <td class="text-center">
+                                    <span class="badge {% if dia.promedio >= 15 %}bg-success{% elif dia.promedio >= 10 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ dia.promedio }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 
     <!-- Botones de acción -->
     <div class="row">
