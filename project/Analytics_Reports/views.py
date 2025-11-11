@@ -1897,9 +1897,12 @@ def menu_analisis(request):
 # Agregar estos imports al inicio del archivo views.py
 from django.db.models.functions import ExtractWeekDay, TruncMonth
 
+# AGREGAR AL INICIO DE views.py:
+from django.db.models.functions import ExtractWeekDay, TruncMonth
+
 @login_required
 def dashboard_docente(request):
-    """Dashboard exclusivo para profesores"""
+    """Dashboard exclusivo para profesores - VERSIÓN CORREGIDA"""
     
     try:
         participante = request.user.participantes_set.first()
@@ -1910,10 +1913,6 @@ def dashboard_docente(request):
         
         rol = participante.roles_id_rol.nombre_rol.lower()
         
-        print(f"DEBUG - Usuario: {request.user.username}")
-        print(f"DEBUG - Rol: {rol}")
-        print(f"DEBUG - ID Participante: {participante.id_participante}")
-        
     except Exception as e:
         messages.error(request, f'Error al obtener perfil: {str(e)}')
         return redirect('home')
@@ -1922,9 +1921,8 @@ def dashboard_docente(request):
         messages.warning(request, 'Esta sección es solo para profesores.')
         return redirect('Analytics_Reports:analytics_index')
     
-    # ========== OBTENER ACTIVIDADES DEL PROFESOR ==========
+    # ========== OBTENER ACTIVIDADES ==========
     mis_actividades = Actividades.objects.filter(responsable=participante)
-    print(f"DEBUG - Actividades como responsable: {mis_actividades.count()}")
     
     if not mis_actividades.exists():
         mis_participaciones_ids = Participaciones.objects.filter(
@@ -1934,22 +1932,14 @@ def dashboard_docente(request):
         mis_actividades = Actividades.objects.filter(
             id_actividad__in=mis_participaciones_ids
         )
-        print(f"DEBUG - Actividades por participaciones: {mis_actividades.count()}")
     
     if not mis_actividades.exists() and participante.facultad:
         mis_actividades = Actividades.objects.filter(
             Q(nombre__icontains=participante.facultad) |
             Q(descripcion__icontains=participante.facultad)
         )
-        print(f"DEBUG - Actividades por facultad: {mis_actividades.count()}")
-    
-    print(f"DEBUG - Total actividades encontradas: {mis_actividades.count()}")
     
     if not mis_actividades.exists():
-        total_participaciones = Participaciones.objects.filter(
-            participantes_id_participante=participante
-        ).count()
-        
         context = {
             'participante': participante,
             'mensaje_sin_actividades': True,
@@ -1961,21 +1951,14 @@ def dashboard_docente(request):
             'top_estudiantes': [],
             'actividades_populares': [],
             'datos_actividades_populares': '[]',
-            'datos_tipos_actividad': '[]',
-            'datos_evolucion_asistencia': '[]',
             'datos_asistencia_por_dia': '[]',
             'asistencia_actividad_dia': [],
             'nombre_docente': f"{participante.nombre} {participante.apellido}",
             'facultad': participante.facultad or 'Sin facultad',
-            'debug_info': {
-                'tiene_participaciones': total_participaciones > 0,
-                'total_participaciones': total_participaciones,
-                'sugerencia': 'Contacta al administrador para asignar tus actividades como responsable.'
-            }
         }
         return render(request, 'dashboard_docente.html', context)
     
-    # ========== MÉTRICAS GENERALES CORREGIDAS ==========
+    # ========== MÉTRICAS GENERALES - CORREGIDAS ==========
     total_mis_actividades = mis_actividades.count()
     
     participaciones_estudiantes = Participaciones.objects.filter(
@@ -1987,18 +1970,18 @@ def dashboard_docente(request):
         'participantes_id_participante'
     ).distinct().count()
     
-    # ✅ CORRECCIÓN: Contar sesiones reales (fechas únicas)
+    # ✅ CORRECCIÓN CRÍTICA: Sesiones = fechas únicas con asistencias
     sesiones_realizadas = Asistencias.objects.filter(
         participaciones_id_participacion__actividades_id_actividad__in=mis_actividades
     ).values('fecha').distinct().count()
     
-    # Solo asistencias "Presente"
+    # Total de asistencias "Presente"
     total_asistencias = Asistencias.objects.filter(
         participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
         estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
     ).count()
     
-    # ✅ PROMEDIO CORREGIDO: por sesión real
+    # ✅ PROMEDIO CORREGIDO: Total asistencias / Sesiones reales
     promedio_asistencia = round(
         total_asistencias / max(sesiones_realizadas, 1), 1
     )
@@ -2011,10 +1994,6 @@ def dashboard_docente(request):
             participaciones__actividades_id_actividad__in=mis_actividades
         )
         .annotate(
-            total_participaciones=Count(
-                'participaciones__id_participacion',
-                distinct=True
-            ),
             total_asistencias=Count(
                 'participaciones__asistencias__id_asistencia',
                 filter=Q(
@@ -2028,71 +2007,31 @@ def dashboard_docente(request):
             'id_participante',
             'nombre',
             'apellido',
-            'correo',
-            'total_participaciones',
             'total_asistencias'
         )
         .order_by('-total_asistencias')[:10]
     )
     
-    # ========== ACTIVIDADES POPULARES ==========
-    actividades_populares = mis_actividades.annotate(
-        total_estudiantes=Count(
-            'participaciones__participantes_id_participante',
-            filter=Q(participaciones__participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'),
-            distinct=True
-        ),
-        total_asistencias=Count(
-            'participaciones__asistencias',
-            filter=Q(participaciones__asistencias__estados_asistencia_id_estado_asistencia__nombre__icontains='presente')
-        )
-    ).order_by('-total_estudiantes')[:5]
+    # ========== ACTIVIDADES POPULARES (solo si hay más de 1) ==========
+    datos_actividades_populares = []
+    if total_mis_actividades > 1:
+        actividades_populares = mis_actividades.annotate(
+            total_estudiantes=Count(
+                'participaciones__participantes_id_participante',
+                filter=Q(participaciones__participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'),
+                distinct=True
+            )
+        ).order_by('-total_estudiantes')[:5]
+        
+        datos_actividades_populares = [
+            {
+                'label': act.nombre,
+                'value': act.total_estudiantes
+            }
+            for act in actividades_populares
+        ]
     
-    datos_actividades_populares = [
-        {
-            'label': act.nombre,
-            'value': act.total_estudiantes
-        }
-        for act in actividades_populares
-    ]
-    
-    # ========== TIPOS DE ACTIVIDAD ==========
-    tipos_actividad_stats = mis_actividades.values(
-        'tipos_actividad_id_tipo__nombre_tipo'
-    ).annotate(
-        cantidad=Count('id_actividad')
-    ).order_by('-cantidad')
-    
-    datos_tipos_actividad = [
-        {
-            'label': tipo['tipos_actividad_id_tipo__nombre_tipo'] or 'Sin tipo',
-            'value': tipo['cantidad']
-        }
-        for tipo in tipos_actividad_stats
-    ]
-    
-    # ========== EVOLUCIÓN MENSUAL ==========
-    fecha_limite = timezone.now().date() - timedelta(days=180)
-    
-    asistencias_por_mes = Asistencias.objects.filter(
-        participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
-        fecha__gte=fecha_limite,
-        estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
-    ).annotate(
-        mes=TruncMonth('fecha')
-    ).values('mes').annotate(
-        total=Count('id_asistencia')
-    ).order_by('mes')
-    
-    datos_evolucion_asistencia = [
-        {
-            'label': item['mes'].strftime('%Y-%m') if item['mes'] else 'N/A',
-            'value': item['total']
-        }
-        for item in asistencias_por_mes
-    ]
-    
-    # ========== NUEVO: ASISTENCIA POR DÍA DE LA SEMANA ==========
+    # ========== ASISTENCIA POR DÍA DE LA SEMANA ==========
     asistencias_por_dia = Asistencias.objects.filter(
         participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
         estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
@@ -2122,7 +2061,7 @@ def dashboard_docente(request):
             'sesiones': sesiones_dia
         })
     
-    # ========== NUEVO: DETALLE POR ACTIVIDAD Y DÍA ==========
+    # ========== DETALLE POR ACTIVIDAD Y DÍA ==========
     asistencia_actividad_dia = []
     
     for actividad in mis_actividades:
@@ -2151,9 +2090,13 @@ def dashboard_docente(request):
             })
         
         if dias_actividad:
+            # Ordenar por día de la semana
+            orden_dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+            dias_actividad.sort(key=lambda x: orden_dias.index(x['dia']) if x['dia'] in orden_dias else 999)
+            
             asistencia_actividad_dia.append({
                 'actividad': actividad.nombre,
-                'dias': sorted(dias_actividad, key=lambda x: list(dias_nombres.values()).index(x['dia']))
+                'dias': dias_actividad
             })
     
     # ========== CONTEXTO FINAL ==========
@@ -2165,10 +2108,7 @@ def dashboard_docente(request):
         'total_asistencias': total_asistencias,
         'sesiones_realizadas': sesiones_realizadas,
         'top_estudiantes': top_estudiantes,
-        'actividades_populares': actividades_populares,
         'datos_actividades_populares': json.dumps(datos_actividades_populares),
-        'datos_tipos_actividad': json.dumps(datos_tipos_actividad),
-        'datos_evolucion_asistencia': json.dumps(datos_evolucion_asistencia),
         'datos_asistencia_por_dia': json.dumps(datos_asistencia_por_dia),
         'asistencia_actividad_dia': asistencia_actividad_dia,
         'nombre_docente': f"{participante.nombre} {participante.apellido}",
