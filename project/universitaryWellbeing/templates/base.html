@@ -3,144 +3,145 @@
 <html lang="es">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Bienestar Universitario{% endblock %}</title>
+  <title>{% block title %}Bienestar Universitario{% endblock %}</title>
 
-    <link rel="icon" type="image/x-icon" href="{% static 'universitaryWellbeing/img/logo_icesi.png' %}">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+  <link rel="icon" type="image/x-icon" href="{% static 'universitaryWellbeing/img/logo_icesi.png' %}">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- styles -->
-    <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/home.css' %}">
-    <!-- Bootstrap -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    {% block extra_css %}{% endblock %}
+  <!-- styles -->
+  <link rel="stylesheet" href="{% static 'universitaryWellbeing/css/home.css' %}">
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  {% block extra_css %}
+  {% endblock %}
 
 </head>
 
 <body>
-    <!-- Header   -->
-    {% block header %}
-    <header>
-        <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
-            <div class="container-fluid">
+  <!-- Header   -->
+  {% block header %}
+  <header>
+    <nav class="navbar navbar-expand-lg custom-navbar fixed-top">
+      <div class="container-fluid">
 
-                {% block header_logo %}
-                <a class="navbar-brand" href="{% url 'home' %}">
-                    <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
-                    Bienestar Universitario
-                </a>
-                {% endblock %}
-
-                <div class="d-flex align-items-center ms-auto">
-                    <div class="collapse navbar-collapse" id="navbarNav"></div>
-
-                    {% block header_notifications %}
-                    <div class="navbar-option ms-3">
-                        <div class="notifications-dropdown">
-                        <button type="button" id="notificationsBtn" title="Notificaciones" class="btn btn-link p-0">
-                            <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
-                                {% if notificaciones_no_leidas > 0 %}
-                                    <span class="notifications-badge">{{ notificaciones_no_leidas }}</span>
-                                {% endif %}
-                        </button>
-
-                            
-                            <!-- Menú desplegable de notificaciones -->
-                            <div class="notifications-menu" id="notificationsMenu">
-                                <div class="notifications-header">
-                                    <h6><i class="bi bi-bell-fill me-2"></i>Notificaciones</h6>
-                                </div>
-                                
-                                <div class="notifications-list">
-                                    {% if notificaciones %}
-                                        {% for notif in notificaciones|slice:":10" %}
-                                        <div class="notification-item {% if not notif.leida %}unread{% endif %}" 
-                                             data-notif-id="{{ notif.id_notificacion }}">
-                                            <div class="notification-content">
-                                                <div class="notification-icon">
-                                                    <i class="bi bi-info-circle"></i>
-                                                </div>
-                                                <div class="notification-text">
-                                                    <div class="notification-message">
-                                                        {{ notif.mensaje|truncatewords:20 }}
-                                                    </div>
-                                                    <div class="notification-time">
-                                                    {% if notif.created_at %}
-                                                    hace {{ notif.created_at|timesince }}
-                                                    {% else %}
-                                                        {{ notif.fecha|date:"d/m/Y H:i" }}
-                                                    {% endif %}
-                                                    </div>
-                                                </div>
-                                                {% if not notif.leida %}
-                                                <div class="notification-unread-dot"></div>
-                                                {% endif %}
-                                            </div>
-                                        </div>
-                                        {% endfor %}
-                                    {% else %}
-                                        <div class="empty-notifications">
-                                            <i class="bi bi-bell-slash"></i>
-                                            <p class="mb-0">No tienes notificaciones</p>
-                                        </div>
-                                    {% endif %}
-                                </div>
-                                
-                                
-                                {% if notificaciones %}
-                                <div class="notifications-footer">
-                                    <a href="{% url 'notificaciones:ver_notificaciones' %}">
-                                        Ver todas las notificaciones
-                                    </a>
-                                </div>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
-                    {% endblock %}
-
-                    {% block header_avatar %}
-                    <div class="navbar-option ms-3">
-                        {% if user.is_authenticated %}
-                        <a href="{% url 'profile' %}" title="Perfil">
-                            {% include 'includes/user_avatar.html' %}
-                        </a>
-                        {% else %}
-                        <a href="{% url 'login' %}" class="btn btn-link text-light">Iniciar</a>
-                        {% endif %}
-                    </div>
-                    {% endblock %}
-
-                    {% block header_sidebar_btn %}
-                    <div class="navbar-option ms-3">
-                        <a href="#" id="menu-btn" title="Menú">
-                            <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
-                        </a>
-                    </div>
-                    {% endblock %}
-
-                </div>
-            </div>
-        </nav>
-    </header>
-    {% endblock %}
-
-    <!-- SUBHEADER -->
-    <nav class="sub-bar">
-        {% block subheaderBar %}
-        <br>
+        {% block header_logo %}
+        <a class="navbar-brand" href="{% url 'home' %}">
+          <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+          Bienestar Universitario
+        </a>
         {% endblock %}
+
+        <div class="d-flex align-items-center ms-auto">
+          <div class="collapse navbar-collapse" id="navbarNav"></div>
+
+          {% block header_notifications %}
+          <div class="navbar-option ms-3">
+            <div class="notifications-dropdown">
+              <button type="button" id="notificationsBtn" title="Notificaciones" class="btn btn-link p-0">
+                <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+                {% if notificaciones_no_leidas > 0 %}
+                <span class="notifications-badge">{{ notificaciones_no_leidas }}</span>
+                {% endif %}
+              </button>
+
+
+              <!-- Menú desplegable de notificaciones -->
+              <div class="notifications-menu" id="notificationsMenu">
+                <div class="notifications-header">
+                  <h6><i class="bi bi-bell-fill me-2"></i>Notificaciones</h6>
+                </div>
+
+                <div class="notifications-list">
+                  {% if notificaciones %}
+                  {% for notif in notificaciones|slice:":10" %}
+                  <div class="notification-item {% if not notif.leida %}unread{% endif %}"
+                    data-notif-id="{{ notif.id_notificacion }}">
+                    <div class="notification-content">
+                      <div class="notification-icon">
+                        <i class="bi bi-info-circle"></i>
+                      </div>
+                      <div class="notification-text">
+                        <div class="notification-message">
+                          {{ notif.mensaje|truncatewords:20 }}
+                        </div>
+                        <div class="notification-time">
+                          {% if notif.created_at %}
+                          hace {{ notif.created_at|timesince }}
+                          {% else %}
+                          {{ notif.fecha|date:"d/m/Y H:i" }}
+                          {% endif %}
+                        </div>
+                      </div>
+                      {% if not notif.leida %}
+                      <div class="notification-unread-dot"></div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                  {% else %}
+                  <div class="empty-notifications">
+                    <i class="bi bi-bell-slash"></i>
+                    <p class="mb-0">No tienes notificaciones</p>
+                  </div>
+                  {% endif %}
+                </div>
+
+
+                {% if notificaciones %}
+                <div class="notifications-footer">
+                  <a href="{% url 'notificaciones:ver_notificaciones' %}">
+                    Ver todas las notificaciones
+                  </a>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+          {% endblock %}
+
+          {% block header_avatar %}
+          <div class="navbar-option ms-3">
+            {% if user.is_authenticated %}
+            <a href="{% url 'profile' %}" title="Perfil">
+              {% include 'includes/user_avatar.html' %}
+            </a>
+            {% else %}
+            <a href="{% url 'login' %}" class="btn btn-link text-light">Iniciar</a>
+            {% endif %}
+          </div>
+          {% endblock %}
+
+          {% block header_sidebar_btn %}
+          <div class="navbar-option ms-3">
+            <a href="#" id="menu-btn" title="Menú">
+              <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
+            </a>
+          </div>
+          {% endblock %}
+
+        </div>
+      </div>
     </nav>
+  </header>
+  {% endblock %}
+
+  <!-- SUBHEADER -->
+  <nav class="sub-bar">
+    {% block subheaderBar %}
+    <br>
+    {% endblock %}
+  </nav>
 
 
-    <!-- templates/base.html – SIDEBAR LIMPIO -->
-<div id="sidebar" class="sidebar">
-  <a href="{% url 'home' %}">Inicio</a>
+  <!-- templates/base.html – SIDEBAR LIMPIO -->
+  <div id="sidebar" class="sidebar">
+    <a href="{% url 'home' %}">Inicio</a>
 
-  {% if request.user.is_superuser %}
+    {% if request.user.is_superuser %}
     {# === ADMINISTRADOR (SUPERUSER) === #}
     <a href="{% url 'cadi_admin' %}">Administrar oferta</a>
     <!-- <a href="#">Gestionar eventos y servicios</a> -->
@@ -152,7 +153,7 @@
     </a>
     <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
 
-  {% else %}
+    {% else %}
     {# === OPCIONES COMUNES (usuarios autenticados) === #}
     <a href="{% url 'searchActivities:search' %}">Buscar</a>
     <a href="{% url 'horario' %}">Horario</a>
@@ -164,88 +165,90 @@
 
     {# === OPCIONES ESPECÍFICAS POR ROL (variables opcionales en context) === #}
     {% if user.is_authenticated %}
-      {% if es_coordinador %}
-        <a href="{% url 'Analytics_Reports:analytics_index' %}">
-          <i class="bi bi-graph-up"></i> Analítica y Reportes
-        </a>
-        <a href="#">
-          <i class="bi bi-gear"></i> Gestionar mis actividades
-        </a>
-      {% elif es_profesor %}
-        <a href="{% url 'Analytics_Reports:dashboard_docente' %}">
-          <i class="bi bi-person-workspace"></i> Mi Dashboard
-        </a>
-        <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">
-          <i class="bi bi-clipboard-check"></i> Registrar Asistencia
-        </a>
-      {% elif es_psicologo %}
-        <a href="{% url 'appointments:pro_list' %}">
-          <i class="bi bi-calendar-heart"></i> Gestionar Citas
-        </a>
-        <a href="{% url 'Analytics_Reports:analytics_index' %}">
-          <i class="bi bi-graph-up"></i> Reportes
-        </a>
-      {% elif user_rol == 'Estudiante' %}
-        <a href="{% url 'Analytics_Reports:mi_historial' %}">
-          <i class="bi bi-clock-history"></i> Mi Historial y Progreso
-        </a>
-        <a href="{% url 'profile' %}">
-          <i class="bi bi-person-circle"></i> Mi Perfil
-        </a>
-      {% elif es_admin_bienestar %}
-        <a href="{% url 'Analytics_Reports:analytics_index' %}">
-          <i class="bi bi-graph-up"></i> Analítica y Reportes
-        </a>
-      {% endif %}
+    {% if es_coordinador %}
+    <a href="{% url 'Analytics_Reports:analytics_index' %}">
+      <i class="bi bi-graph-up"></i> Analítica y Reportes
+    </a>
+    <a href="#">
+      <i class="bi bi-gear"></i> Gestionar mis actividades
+    </a>
+    {% elif es_profesor %}
+    <a href="{% url 'Analytics_Reports:dashboard_docente' %}">
+      <i class="bi bi-person-workspace"></i> Mi Dashboard
+    </a>
+    <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">
+      <i class="bi bi-clipboard-check"></i> Registrar Asistencia
+    </a>
+    {% elif es_psicologo %}
+    <a href="{% url 'appointments:pro_list' %}">
+      <i class="bi bi-calendar-heart"></i> Gestionar Citas
+    </a>
+    <a href="{% url 'Analytics_Reports:analytics_index' %}">
+      <i class="bi bi-graph-up"></i> Reportes
+    </a>
+    {% elif user_rol == 'Estudiante' %}
+    <a href="{% url 'Analytics_Reports:mi_historial' %}">
+      <i class="bi bi-clock-history"></i> Mi Historial y Progreso
+    </a>
+    <a href="{% url 'profile' %}">
+      <i class="bi bi-person-circle"></i> Mi Perfil
+    </a>
+    {% elif es_admin_bienestar %}
+    <a href="{% url 'Analytics_Reports:analytics_index' %}">
+      <i class="bi bi-graph-up"></i> Analítica y Reportes
+    </a>
+    {% endif %}
     {% endif %}
 
     {# Citas: si NO es psicólogo, mostrar el acceso de estudiante #}
     {% if not es_psicologo %}
-      <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
+    <a href="{% url 'appointments:home' %}">Citas psicológicas</a>
     {% endif %}
 
     {# Extra professor: conservar acceso rápido si así lo usan #}
     {% if user_rol == "Profesor" %}
-      <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">Registrar asistencia</a>
+    <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}">Registrar asistencia</a>
     {% endif %}
-  {% endif %}
+    {% endif %}
 
-  <a href="{% url 'logout' %}">Cerrar sesión</a>
-</div>
+    <a href="{% url 'logout' %}">Cerrar sesión</a>
+  </div>
 
-    <!-- Fondo oscuro para cerrar -->
-    <div id="overlay" class="overlay"></div>
+  <!-- Fondo oscuro para cerrar -->
+  <div id="overlay" class="overlay"></div>
 
-    <main>
+  <main>
 
-        {# --- Flash messages (default global) --- #}
-        {% block flash_messages %}
-            {% if messages %}
-            <div class="container mt-3">
-                {% for message in messages %}
-                <div class="alert alert-{% if 'error' in message.tags %}danger{% elif 'success' in message.tags %}success{% elif 'warning' in message.tags %}warning{% elif 'info' in message.tags %}info{% else %}secondary{% endif %} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-                {% endfor %}
-            </div>
-            {% endif %}
-        {% endblock %}
-
-        {% block content %}
-        <!-- specify content -->
-        {% endblock %}
-    </main>
-
-    <!-- Footer  -->
-    {% include 'includes/footer.html' %}
-
-    {% block extra_js %}
-    <!-- JavaScript for better performance -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="{% static 'universitaryWellbeing/js/main.js' %}"></script>
-    <script src="{% static 'universitaryWellbeing/js/notifications.js' %}"></script>
+    {# --- Flash messages (default global) --- #}
+    {% block flash_messages %}
+    {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+      <div
+        class="alert alert-{% if 'error' in message.tags %}danger{% elif 'success' in message.tags %}success{% elif 'warning' in message.tags %}warning{% elif 'info' in message.tags %}info{% else %}secondary{% endif %} alert-dismissible fade show"
+        role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
     {% endblock %}
+
+    {% block content %}
+    <!-- specify content -->
+    {% endblock %}
+  </main>
+
+  <!-- Footer  -->
+  {% include 'includes/footer.html' %}
+
+  {% block extra_js %}
+  <!-- JavaScript for better performance -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="{% static 'universitaryWellbeing/js/main.js' %}"></script>
+  <script src="{% static 'universitaryWellbeing/js/notifications.js' %}"></script>
+  {% endblock %}
 
 </body>
 

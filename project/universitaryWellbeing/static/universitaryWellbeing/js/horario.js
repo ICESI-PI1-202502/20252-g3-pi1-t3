@@ -29,9 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // 4) Inicializar FullCalendar
   let showWeekends = true;
-  let initialView = window.innerWidth < 576 ? "timeGridDay" : "timeGridWeek";
   const calendar = new FullCalendar.Calendar(calendarEl, {
-    initialView: initialView,
+    initialView: 'timeGridWeek',
     locale: 'es',
     expandRows: true,
     stickyHeaderDates: true,
@@ -112,12 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   calendar.render();
-
-  window.addEventListener("resize", () => {
-    if (window.innerWidth < 576 && calendar.view.type !== "timeGridDay") {
-      calendar.changeView("timeGridDay");
-    }
-  });
 
   // --- Controles de navegación ---
   const btnPrev = document.getElementById('btn-prev');
