@@ -31,15 +31,21 @@
 <div class="container mt-4">
     <h2><i class="fas fa-chart-line"></i> Análisis del Comportamiento Estudiantil</h2>
     <p class="text-muted">
-         Registra y segmenta la participación por frecuencia, tipo y perfil | 
+         Registra y segmenta la participación por frecuencia, tipo y perfil |
          Estadísticas globales y rankings
     </p>
 
-    <!-- Buscador / Filtros -->
+    <!-- ######################################## -->
+    <!-- FORMULARIO ÚNICO (incluye ambos filtros) -->
+    <!-- ######################################## -->
     <form method="GET" action="{% url 'Analytics_Reports:analisis_comportamiento' %}" class="mb-3">
-        <div class="card">
+
+        <!-- ============================== -->
+        <!-- Filtros de Actividades (RF2.2) -->
+        <!-- ============================== -->
+        <div class="card mb-3">
             <div class="card-header bg-primary text-white">
-                <i class="fas fa-filter"></i> Filtros de Segmentación (RF2.2)
+                <i class="fas fa-filter"></i> Filtros de Segmentación por Actividades (RF2.2)
             </div>
             <div class="card-body">
                 <div class="row g-2">
@@ -54,8 +60,8 @@
                             {% endfor %}
                         </select>
                     </div>
-                    
-                    <!-- Filtros de perfil (RF2.2) -->
+
+                    <!-- Filtros de perfil -->
                     <div class="col-md-2">
                         <label class="form-label small">Rol</label>
                         <select name="rol" class="form-select">
@@ -101,7 +107,7 @@
                         </select>
                     </div>
                 </div>
-                
+
                 <div class="row g-2 mt-2">
                     <div class="col-md-2">
                         <button type="submit" class="btn btn-primary w-100">
@@ -115,12 +121,12 @@
                     </div>
                     <div class="col-md-2">
                         <a href="{% url 'Analytics_Reports:analisis_comportamiento' %}" class="btn btn-outline-secondary w-100">
-                            <i class="fas fa-redo"></i> Limpiar
+                            <i class="fas fa-redo"></i> Limpiar todo
                         </a>
                     </div>
                     <div class="col-md-2">
                         {% if has_filters %}
-                            <a href="?{% for key, value in request.GET.items %}{% if key != 'export' %}{{ key }}={{ value }}&{% endif %}{% endfor %}export=csv" 
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'export' %}{{ key }}={{ value|urlencode }}&{% endif %}{% endfor %}export=csv"
                                class="btn btn-success w-100">
                                 <i class="fas fa-download"></i> Exportar CSV
                             </a>
@@ -133,171 +139,233 @@
                 </div>
             </div>
         </div>
+
+        <!-- ============================== -->
+        <!-- NUEVO: Filtros de Torneos      -->
+        <!-- ============================== -->
+        <div class="card">
+            <div class="card-header bg-dark text-white">
+                <i class="fas fa-trophy"></i> Filtros por Torneos (Nombre / Disciplina / Estado)
+            </div>
+            <div class="card-body">
+                <div class="row g-2">
+                    <div class="col-md-4">
+                        <label class="form-label small">Nombre del torneo</label>
+                        <input type="text" name="torneo_nombre" class="form-control"
+                               value="{{ request.GET.torneo_nombre|default_if_none:'' }}"
+                               placeholder="Ej: Interfacultades">
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">Disciplina</label>
+                        <select name="torneo_disciplina" class="form-select">
+                            <option value="">Todas</option>
+                            {% for d in disciplinas_torneo %}
+                                <option value="{{ d.id_disciplina }}"
+                                  {% if request.GET.torneo_disciplina == d.id_disciplina|stringformat:"s" %}selected{% endif %}>
+                                  {{ d.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label small">Estado</label>
+                        <select name="torneo_estado" class="form-select">
+                            <option value="">Todos</option>
+                            {% for e in estados_torneo %}
+                                <option value="{{ e.id_estado_torneo }}"
+                                  {% if request.GET.torneo_estado == e.id_estado_torneo|stringformat:"s" %}selected{% endif %}>
+                                  {{ e.nombre }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+
+                <div class="row g-2 mt-2">
+                    <div class="col-md-3">
+                        <button type="submit" class="btn btn-dark w-100">
+                            <i class="fas fa-search"></i> Buscar (Torneos)
+                        </button>
+                    </div>
+                    <div class="col-md-3">
+                        <!-- Mostrar todos los torneos (conserva otros GET) -->
+                        <a href="?{% for k,v in request.GET.items %}{% if k != 'mostrar_todos_torneos' %}{{k}}={{v|urlencode}}&{% endif %}{% endfor %}mostrar_todos_torneos=1"
+                           class="btn btn-outline-dark w-100">
+                            <i class="fas fa-list"></i> Mostrar todos torneos
+                        </a>
+                    </div>
+                    <div class="col-md-6">
+                        <small class="text-muted d-block mt-2">
+                            Al aplicar filtros de torneos, la tabla de participantes se restringe a quienes
+                            <strong>pertenecen a equipos de los torneos seleccionados</strong>.
+                        </small>
+                    </div>
+                </div>
+
+                {% if torneos_has_filters %}
+                <div class="mt-3">
+                    <span class="badge bg-dark">
+                        Torneos coincidentes: {{ torneos_count|default:0 }}
+                    </span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
     </form>
 
-    <!-- Mensaje informativo cuando no hay filtros -->
-    {% if not has_filters %}
-    <div class="alert alert-info" role="alert">
-        <i class="fas fa-info-circle"></i> 
-        <strong>Sistema de Análisis de Comportamiento Estudiantil</strong>
-        <br>
-        <small>
-            <strong>RF2:</strong> Registra frecuencia, tipo y reincidencia de participación. Segmenta por rol, semestre, facultad y género.<br>
-            <strong>RF4:</strong> Muestra métricas globales, rankings y estadísticas de asistencia.
-        </small>
-    </div>
+    <!-- Mensajes estado filtros de Actividades -->
+    {% if not has_filters and not torneos_has_filters %}
+        <div class="alert alert-info mt-3" role="alert">
+            <i class="fas fa-info-circle"></i>
+            <strong>Sistema de Análisis de Comportamiento Estudiantil</strong><br>
+            <small>
+                <strong>RF2:</strong> Registra frecuencia, tipo y reincidencia de participación. Segmenta por rol, semestre, facultad y género.<br>
+                <strong>RF4:</strong> Muestra métricas globales, rankings y estadísticas de asistencia.<br>
+                <strong>Nuevo:</strong> Filtra por <em>Torneos</em> para visualizar solo los participantes
+                que están inscritos en equipos de los torneos filtrados.
+            </small>
+        </div>
     {% elif mostrar_todos %}
-    <div class="alert alert-success" role="alert">
-        <i class="fas fa-check-circle"></i> 
-        <strong>Mostrando todos los registros</strong>
-    </div>
+        <div class="alert alert-success mt-3" role="alert">
+            <i class="fas fa-check-circle"></i>
+            <strong>Mostrando todos los registros de actividades</strong>
+        </div>
     {% endif %}
 
-    <!-- DASHBOARDS Y GRÁFICOS -->
+    <!-- (Opcional) Mini listado de torneos encontrados -->
+    {% if torneos_has_filters and torneos_data %}
+        <h4 class="mb-2 mt-4"><i class="fas fa-list"></i> Torneos encontrados</h4>
+        <div class="card mb-3">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover table-sm mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>Nombre</th>
+                                <th>Disciplina</th>
+                                <th>Estado</th>
+                                <th>Inicio</th>
+                                <th>Fin</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for t in torneos_data %}
+                            <tr>
+                                <td>{{ t.id_torneo }}</td>
+                                <td>{{ t.nombre }}</td>
+                                <td>{{ t.disciplinas_id_disciplina__nombre }}</td>
+                                <td>{{ t.estados_torneo_id_estado_torneo__nombre }}</td>
+                                <td>{{ t.fecha_inicio }}</td>
+                                <td>{{ t.fecha_fin }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr><td colspan="6" class="text-center text-muted">Sin torneos</td></tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- ######################## -->
+    <!-- DASHBOARDS Y GRÁFICOS   -->
+    <!-- ######################## -->
     {% if data %}
-    
-    <!-- === MÉTRICAS GLOBALES RF4.1 === -->
+    <!-- Métricas Globales RF4.1 -->
     <h4 class="mb-3 mt-4"><i class="fas fa-chart-bar"></i> Métricas Globales</h4>
     <div class="row mb-4">
         <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>{{ total_participaciones }}</h3>
-                    <p>Total Participaciones</p>
-                </div>
-            </div>
+            <div class="card text-center"><div class="card-body">
+                <h3>{{ total_participaciones }}</h3><p>Total Participaciones</p>
+            </div></div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>{{ porcentaje_reincidencia }}%</h3>
-                    <p>Tasa de Reincidencia</p>
-                </div>
-            </div>
+            <div class="card text-center"><div class="card-body">
+                <h3>{{ porcentaje_reincidencia }}%</h3><p>Tasa de Reincidencia</p>
+            </div></div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>{{ promedio_participaciones }}</h3>
-                    <p>Promedio por Usuario</p>
-                </div>
-            </div>
+            <div class="card text-center"><div class="card-body">
+                <h3>{{ promedio_participaciones }}</h3><p>Promedio por Usuario</p>
+            </div></div>
         </div>
         <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h3>{{ total_nuevos }}</h3>
-                    <p>Nuevos Participantes</p>
-                </div>
-            </div>
+            <div class="card text-center"><div class="card-body">
+                <h3>{{ total_nuevos }}</h3><p>Nuevos Participantes</p>
+            </div></div>
         </div>
     </div>
 
-    <!-- Resumen estadístico RF2.2 -->
+    <!-- Resumen segmentación -->
     <h4 class="mb-3"><i class="fas fa-th"></i> Resumen de Segmentación</h4>
     <div class="row mb-4">
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h4>{{ data|length }}</h4>
-                    <p>Registros mostrados</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h4>{{ roles_unicos }}</h4>
-                    <p>Tipos de roles</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h4>{{ tipos_actividad_unicos }}</h4>
-                    <p>Tipos de actividades</p>
-                </div>
-            </div>
-        </div>
-        <div class="col-md-3">
-            <div class="card text-center">
-                <div class="card-body">
-                    <h4>{{ facultades_unicas }}</h4>
-                    <p>Facultades</p>
-                </div>
-            </div>
-        </div>
+        <div class="col-md-3"><div class="card text-center"><div class="card-body">
+            <h4>{{ data|length }}</h4><p>Registros mostrados</p>
+        </div></div></div>
+        <div class="col-md-3"><div class="card text-center"><div class="card-body">
+            <h4>{{ roles_unicos }}</h4><p>Tipos de roles</p>
+        </div></div></div>
+        <div class="col-md-3"><div class="card text-center"><div class="card-body">
+            <h4>{{ tipos_actividad_unicos }}</h4><p>Tipos de actividades</p>
+        </div></div></div>
+        <div class="col-md-3"><div class="card text-center"><div class="card-body">
+            <h4>{{ facultades_unicas }}</h4><p>Facultades</p>
+        </div></div></div>
     </div>
-         
-    <!-- GRÁFICOS -->
+
+    <!-- Gráficos -->
     <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Análisis de Comportamiento (RF2.1)</h4>
     <div class="row mb-4">
-        <!-- Gráfico: Distribución por frecuencia (RF2.1) -->
         <div class="col-md-6">
             <div class="dashboard-section">
                 <h5><i class="fas fa-chart-pie"></i> Distribución por Frecuencia</h5>
                 <small class="text-muted">Clasificación de usuarios según participación</small>
-                <div class="chart-container">
-                    <canvas id="chartFrecuencia"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="chartFrecuencia"></canvas></div>
             </div>
         </div>
-
-        <!-- Gráfico: Nuevos vs Reincidentes (RF2.1) -->
         <div class="col-md-6">
             <div class="dashboard-section">
                 <h5><i class="fas fa-user-friends"></i> Nuevos vs Reincidentes</h5>
                 <small class="text-muted">Fidelización de participantes</small>
-                <div class="chart-container">
-                    <canvas id="chartReincidencia"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="chartReincidencia"></canvas></div>
             </div>
         </div>
     </div>
 
     <div class="row mb-4">
-        <!-- Gráfico: Segmentación por Roles (RF2.2) -->
         <div class="col-md-6">
             <div class="dashboard-section">
                 <h5><i class="fas fa-users"></i> Segmentación por Roles</h5>
                 <small class="text-muted">Participación de la comunidad</small>
-                <div class="chart-container">
-                    <canvas id="chartRoles"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="chartRoles"></canvas></div>
             </div>
         </div>
-
-        <!-- Gráfico: Segmentación por Facultades (RF2.2) -->
         <div class="col-md-6">
             <div class="dashboard-section">
                 <h5><i class="fas fa-building"></i> Top Facultades</h5>
                 <small class="text-muted">Unidades académicas más activas</small>
-                <div class="chart-container">
-                    <canvas id="chartFacultades"></canvas>
-                </div>
+                <div class="chart-container"><canvas id="chartFacultades"></canvas></div>
             </div>
         </div>
     </div>
 
-    <!-- === RANKINGS RF4.2 === -->
+    <!-- Ranking por tipos de actividad (solo si no hay filtro específico de tipo) -->
     <h4 class="mb-3"><i class="fas fa-trophy"></i> Actividades Más Populares </h4>
     <div class="row mb-4">
         {% if not tipo_actividad_filtrado %}
-            <!-- Caso: Sin filtro de tipo de actividad, mostrar gráfico normal -->
             <div class="col-md-12">
                 <div class="dashboard-section">
                     <h5><i class="fas fa-tasks"></i> Distribución por Tipo de Actividad</h5>
                     <small class="text-muted">Preferencias de eventos de la comunidad</small>
-                    <div class="chart-container">
-                        <canvas id="chartTiposActividad"></canvas>
-                    </div>
+                    <div class="chart-container"><canvas id="chartTiposActividad"></canvas></div>
                 </div>
             </div>
         {% endif %}
     </div>
 
-    <!-- Tabla de resultados -->
+    <!-- Tabla de resultados (Participantes) -->
     <h4 class="mb-3"><i class="fas fa-table"></i> Detalle por Usuario</h4>
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -322,21 +390,16 @@
                         {% for item in data %}
                         <tr>
                             <td>
-                                <strong>{{ item.participantes_id_participante__nombre }}</strong>
-                                <br>
+                                <strong>{{ item.participantes_id_participante__nombre }}</strong><br>
                                 <small class="text-muted">{{ item.participantes_id_participante__correo }}</small>
                             </td>
-                            <td>
-                                <span class="badge bg-secondary">
-                                    {{ item.participantes_id_participante__semestre|default:"N/A" }}
-                                </span>
-                            </td>
+                            <td><span class="badge bg-secondary">
+                                {{ item.participantes_id_participante__semestre|default:"N/A" }}
+                            </span></td>
                             <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
-                            <td>
-                                <span class="badge bg-info">
-                                    {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
-                                </span>
-                            </td>
+                            <td><span class="badge bg-info">
+                                {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
+                            </span></td>
                             <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo|default:"Varias" }}</td>
                             <td class="text-center">
                                 <span class="badge bg-primary fs-6">{{ item.total }}</span>
@@ -354,8 +417,7 @@
                         {% empty %}
                         <tr>
                             <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
-                                <br>
+                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i><br>
                                 <strong>No se encontraron resultados</strong>
                              </td>
                         </tr>
@@ -366,7 +428,7 @@
         </div>
     </div>
 
-    <!-- Información adicional -->
+    <!-- Info adicional -->
     <div class="mt-4">
         <div class="alert alert-info">
             <h6><i class="fas fa-info-circle"></i> Criterios de Frecuencia (RF2.1):</h6>
@@ -384,16 +446,12 @@
 {% if data %}
 <script src="{% static 'js/analisis_charts.js' %}"></script>
 <script>
-    // Pasar datos de Django a JavaScript
-    const datosFrecuencia = {{ datos_grafico_frecuencia|safe }};
-    const datosRoles = {{ datos_grafico_roles|safe }};
-    const datosFacultades = {{ datos_grafico_facultades|safe }};
+    const datosFrecuencia   = {{ datos_grafico_frecuencia|safe }};
+    const datosRoles        = {{ datos_grafico_roles|safe }};
+    const datosFacultades   = {{ datos_grafico_facultades|safe }};
     const datosTiposActividad = {{ datos_grafico_tipos_actividad|safe }};
     const datosReincidencia = {{ datos_grafico_reincidencia|safe }};
-    
-    // Inicializar gráficos
     initCharts(datosFrecuencia, datosRoles, datosFacultades, datosTiposActividad, datosReincidencia);
 </script>
 {% endif %}
-
 {% endblock %}
