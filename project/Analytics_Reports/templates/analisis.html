@@ -24,6 +24,116 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin-bottom: 20px;
     }
+    
+    /* === ESTILOS PARA DESPLEGABLES === */
+    .actividades-toggle {
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        max-width: 250px;
+    }
+    
+    .actividades-toggle:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .actividades-toggle i {
+        transition: transform 0.2s;
+        font-size: 0.8rem;
+    }
+    
+    .actividades-toggle.expanded i {
+        transform: rotate(90deg);
+    }
+    
+    .actividades-preview {
+        font-weight: 500;
+        color: #495057;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .actividades-count {
+        background-color: #007bff;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    
+    .actividades-list {
+        display: none;
+        margin-top: 8px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 3px solid #007bff;
+    }
+    
+    .actividades-list.show {
+        display: block;
+        animation: slideDown 0.2s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .actividades-list ul {
+        margin: 0;
+        padding-left: 20px;
+        list-style: none;
+    }
+    
+    .actividades-list li {
+        padding: 4px 0;
+        color: #495057;
+    }
+    
+    .actividades-list li:before {
+        content: "→";
+        color: #007bff;
+        margin-right: 8px;
+        font-weight: bold;
+    }
+    
+    /* Tipos de actividad también compactos */
+    .tipos-badge {
+        display: inline-block;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.85rem;
+    }
+    
+    .tipos-badge:hover {
+        max-width: none;
+        white-space: normal;
+        cursor: help;
+    }
+    
+    /* Para móviles */
+    @media (max-width: 768px) {
+        .actividades-toggle {
+            max-width: 150px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -297,88 +407,115 @@
         {% endif %}
     </div>
 
-    <!-- Tabla de resultados -->
+    <!-- Tabla de resultados CON DESPLEGABLES -->
     <h4 class="mb-3"><i class="fas fa-table"></i> Detalle por Usuario</h4>
-<div class="card">
-    <div class="card-header d-flex justify-content-between align-items-center">
-        <h5 class="mb-0">Registros de Participación</h5>
-        <span class="badge bg-primary">{{ data|length }} registros</span>
-    </div>
-    <div class="card-body">
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Usuario</th>
-                        <th>Semestre</th>
-                        <th>Facultad</th>
-                        <th>Rol</th>
-                        <th>Actividades</th>
-                        <th>Tipos</th>
-                        <th class="text-center">Total</th>
-                        <th class="text-center">Frecuencia</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for item in data %}
-                    <tr>
-                        <td>
-                            <strong>{{ item.participantes_id_participante__nombre }}</strong>
-                            <br>
-                            <small class="text-muted">{{ item.participantes_id_participante__correo }}</small>
-                        </td>
-                        <td>
-                            <span class="badge bg-secondary">
-                                {{ item.participantes_id_participante__semestre|default:"N/A" }}
-                            </span>
-                        </td>
-                        <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
-                        <td>
-                            <span class="badge bg-info">
-                                {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
-                            </span>
-                        </td>
-                        <td>
-                            {% if item.actividades_lista %}
-                                <ul class="list-unstyled mb-0 small">
-                                    {% for actividad in item.actividades_lista %}
-                                        <li>• {{ actividad }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <small class="text-muted">Sin actividades</small>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <small class="text-muted">{{ item.tipos_actividad_texto }}</small>
-                        </td>
-                        <td class="text-center">
-                            <span class="badge bg-primary fs-6">{{ item.total }}</span>
-                        </td>
-                        <td class="text-center">
-                            {% if item.total >= 5 %}
-                                <span class="badge bg-success">Alta</span>
-                            {% elif item.total >= 2 %}
-                                <span class="badge bg-warning text-dark">Media</span>
-                            {% else %}
-                                <span class="badge bg-danger">Baja</span>
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="8" class="text-center text-muted py-4">
-                            <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
-                            <br>
-                            <strong>No se encontraron resultados</strong>
-                         </td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Registros de Participación</h5>
+            <span class="badge bg-primary">{{ data|length }} registros</span>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Semestre</th>
+                            <th>Facultad</th>
+                            <th>Rol</th>
+                            <th style="width: 280px;">Actividades</th>
+                            <th style="width: 200px;">Tipos</th>
+                            <th class="text-center">Total</th>
+                            <th class="text-center">Frecuencia</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in data %}
+                        <tr>
+                            <td>
+                                <strong>{{ item.participantes_id_participante__nombre }}</strong>
+                                <br>
+                                <small class="text-muted">{{ item.participantes_id_participante__correo }}</small>
+                            </td>
+                            <td>
+                                <span class="badge bg-secondary">
+                                    {{ item.participantes_id_participante__semestre|default:"N/A" }}
+                                </span>
+                            </td>
+                            <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
+                                </span>
+                            </td>
+                            
+                            <!-- === COLUMNA CON DESPLEGABLE === -->
+                            <td>
+                                {% if item.actividades_lista %}
+                                    {% if item.actividades_lista|length > 2 %}
+                                        <!-- Mostrar desplegable si hay 3+ actividades -->
+                                        <div class="actividades-toggle" onclick="toggleActividades(this)">
+                                            <i class="fas fa-chevron-right"></i>
+                                            <span class="actividades-preview">
+                                                {{ item.actividades_lista.0 }}
+                                                {% if item.actividades_lista|length > 1 %}...{% endif %}
+                                            </span>
+                                            <span class="actividades-count">{{ item.actividades_lista|length }}</span>
+                                        </div>
+                                        <div class="actividades-list">
+                                            <ul>
+                                                {% for actividad in item.actividades_lista %}
+                                                    <li>{{ actividad }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% else %}
+                                        <!-- Mostrar directamente si son 1-2 actividades -->
+                                        <ul class="list-unstyled mb-0 small">
+                                            {% for actividad in item.actividades_lista %}
+                                                <li>• {{ actividad }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% else %}
+                                    <small class="text-muted">Sin actividades</small>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- === COLUMNA TIPOS COMPACTA === -->
+                            <td>
+                                <span class="tipos-badge text-muted" title="{{ item.tipos_actividad_texto }}">
+                                    {{ item.tipos_actividad_texto }}
+                                </span>
+                            </td>
+                            
+                            <td class="text-center">
+                                <span class="badge bg-primary fs-6">{{ item.total }}</span>
+                            </td>
+                            <td class="text-center">
+                                {% if item.total >= 5 %}
+                                    <span class="badge bg-success">Alta</span>
+                                {% elif item.total >= 2 %}
+                                    <span class="badge bg-warning text-dark">Media</span>
+                                {% else %}
+                                    <span class="badge bg-danger">Baja</span>
+                                {% endif %}
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
+                                <br>
+                                <strong>No se encontraron resultados</strong>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
-</div>
 
     <!-- Información adicional -->
     <div class="mt-4">
@@ -407,6 +544,18 @@
     
     // Inicializar gráficos
     initCharts(datosFrecuencia, datosRoles, datosFacultades, datosTiposActividad, datosReincidencia);
+    
+    // === FUNCIÓN PARA TOGGLE DE ACTIVIDADES ===
+    function toggleActividades(element) {
+        const toggle = element;
+        const list = element.nextElementSibling;
+        
+        // Toggle clase expanded para rotar flecha
+        toggle.classList.toggle('expanded');
+        
+        // Toggle clase show para mostrar/ocultar lista
+        list.classList.toggle('show');
+    }
 </script>
 {% endif %}
 

@@ -3,6 +3,11 @@ from django.db import models
 from django.contrib.auth.models import User
 
 ##PORFAVOR CORRER LOS TEST CON python manage.py test management_CADI --keepdb
+
+# ==========================================
+# MODELOS BASE
+# ==========================================
+
 class Grupos(models.Model):
     id_grupo = models.BigAutoField(primary_key=True)
     nombre = models.CharField(max_length=255, unique=True)
@@ -10,7 +15,7 @@ class Grupos(models.Model):
     class Meta:
         managed = True
         db_table = "grupos"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
 
 class GruposActividad(models.Model):
@@ -18,19 +23,15 @@ class GruposActividad(models.Model):
     grupos_id_grupo = models.ForeignKey(Grupos, models.DO_NOTHING, db_column="grupos_id_grupo")
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=500, blank=True, null=True)
-    # La vista real no usa la imagen, pero el modelo productivo sí la trae en SELECT.
-    # Para evitar el error "column imagen does not exist", la ponemos aquí.
-    # En settings de test ya forzamos InMemoryStorage.
     imagen = models.ImageField(upload_to="dummy/", blank=True, null=True)
 
     class Meta:
         managed = True
         db_table = "grupos_actividad"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
 
 class TiposActividad(models.Model):
-    # En productivo es FloatField; mantenemos eso para que el ORM no se queje con asignaciones
     id_tipo = models.FloatField(primary_key=True)
     nombre_tipo = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
@@ -38,7 +39,8 @@ class TiposActividad(models.Model):
     class Meta:
         managed = True
         db_table = "tipos_actividad"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
+
 
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
@@ -60,20 +62,23 @@ class Actividades(models.Model):
     class Meta:
         managed = True
         db_table = "actividades"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
 
 class ActividadesGrupos(models.Model):
     id_actividad_grupo = models.BigAutoField(primary_key=True)
-    # Ojo con los nombres de columna: el view usa estos db_column en queries reales
     grupos_actividad = models.ForeignKey(GruposActividad, models.DO_NOTHING, db_column="grp_act_id")
     actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column="actividades_id_actividad")
 
     class Meta:
         managed = True
         db_table = "actividades_grupos"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
+
+# ==========================================
+# MODELOS DE HORARIOS
+# ==========================================
 
 class HorariosBloque(models.Model):
     id_horario_bloque = models.BigAutoField(primary_key=True)
@@ -88,7 +93,7 @@ class HorariosBloque(models.Model):
     class Meta:
         managed = True
         db_table = "horarios_bloque"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
 
 class HorariosActividad(models.Model):
@@ -102,7 +107,6 @@ class HorariosActividad(models.Model):
     )
     dia_semana = models.SmallIntegerField()
 
-    # Estos campos no los usa la vista que estamos testeando, pero no estorban:
     hora_inicio = models.TimeField(blank=True, null=True)
     hora_fin = models.TimeField(blank=True, null=True)
     profesor = models.CharField(max_length=150, blank=True, null=True)
@@ -111,12 +115,12 @@ class HorariosActividad(models.Model):
     class Meta:
         managed = True
         db_table = "horarios_actividad"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
 
-# --------------------------
-# Calificaciones y usuario
-# --------------------------
+# ==========================================
+# MODELOS DE USUARIOS Y ROLES
+# ==========================================
 
 class Roles(models.Model):
     id_rol = models.BigAutoField(primary_key=True)
@@ -125,31 +129,146 @@ class Roles(models.Model):
     class Meta:
         managed = True
         db_table = "roles"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
+
+
+class TiposParticipante(models.Model):
+    id_tipo_participante = models.BigAutoField(primary_key=True)
+    nombre_tipo = models.CharField(max_length=50)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "tipos_participante"
+        app_label = 'management_cadi_tests'
 
 
 class Participantes(models.Model):
     id_participante = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(max_length=100, blank=True, null=True)
-    apellido = models.CharField(max_length=100, blank=True, null=True)
+    nombre = models.CharField(max_length=100, blank=True, null=True, default='')
+    apellido = models.CharField(max_length=100, blank=True, null=True, default='')
     correo = models.CharField(max_length=150, unique=True)
+    
+    # Campos adicionales
+    semestre = models.BigIntegerField(blank=True, null=True, default=None)
+    estado_activo = models.CharField(max_length=1, blank=True, null=True, default=None)
+    facultad = models.CharField(max_length=80, blank=True, null=True, default=None)
+    programa = models.CharField(max_length=120, blank=True, null=True, default=None)
+    genero = models.CharField(max_length=20, blank=True, null=True, default=None)
 
     roles_id_rol = models.ForeignKey(Roles, models.DO_NOTHING, db_column="roles_id_rol")
 
-    # Evitar choques con universitaryWellbeing.Participantes.user
+    tipo_participante = models.ForeignKey(
+        TiposParticipante,
+        models.DO_NOTHING,
+        db_column="tipo_participante_id",
+        blank=True,
+        null=True,
+        default=None
+    )
+
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
         db_column='user',
-        related_name='+',       # sin reverse accessor
-        db_constraint=False     # no imponemos FK real en la DB de test
+        related_name='+',
+        db_constraint=False
     )
 
     class Meta:
         managed = True
         db_table = "participantes"
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'
 
+
+# ==========================================
+# MODELOS DE PARTICIPACIONES
+# ==========================================
+
+class RolesParticipacion(models.Model):
+    id_rol_participacion = models.BigAutoField(primary_key=True)
+    nombre_rol = models.CharField(max_length=50)
+
+    class Meta:
+        managed = True
+        db_table = "roles_participacion"
+        app_label = 'management_cadi_tests'
+
+
+class EstadosParticipacion(models.Model):
+    id_estado_participacion = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=50)
+
+    class Meta:
+        managed = True
+        db_table = "estados_participacion"
+        app_label = 'management_cadi_tests'
+
+
+class Participaciones(models.Model):
+    id_participacion = models.BigAutoField(primary_key=True)
+    participantes_id_participante = models.ForeignKey(
+        Participantes,
+        models.DO_NOTHING,
+        db_column="participantes_id_participante"
+    )
+    actividades_id_actividad = models.ForeignKey(
+        Actividades,
+        models.DO_NOTHING,
+        db_column="actividades_id_actividad"
+    )
+    fecha_inscripcion = models.DateTimeField(blank=True, null=True)
+    fecha_finalizacion = models.DateTimeField(blank=True, null=True)
+    
+    roles_participacion_id_rol_participacion = models.ForeignKey(
+        RolesParticipacion,
+        models.DO_NOTHING,
+        db_column="roles_participacion_id_rol_participacion",
+        blank=True,
+        null=True
+    )
+    estados_participacion_id_estado_participacion = models.ForeignKey(
+        EstadosParticipacion,
+        models.DO_NOTHING,
+        db_column="estados_participacion_id_estado_participacion",
+        blank=True,
+        null=True
+    )
+
+    class Meta:
+        managed = True
+        db_table = "participaciones"
+        app_label = 'management_cadi_tests'
+
+
+# ==========================================
+# MODELOS DE HORARIOS DE PARTICIPANTES
+# ==========================================
+
+class HorariosParticipante(models.Model):
+    id_horario_participante = models.BigAutoField(primary_key=True)
+    participantes_id_participante = models.ForeignKey(
+        Participantes,
+        models.DO_NOTHING,
+        db_column="participantes_id_participante"
+    )
+    actividades_id_actividad = models.ForeignKey(
+        Actividades,
+        models.DO_NOTHING,
+        db_column="actividades_id_actividad"
+    )
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+
+    class Meta:
+        managed = True
+        db_table = "horarios_participante"
+        app_label = 'management_cadi_tests'
+
+
+# ==========================================
+# MODELOS DE CALIFICACIONES
+# ==========================================
 
 class CalificacionesActividad(models.Model):
     id_calificacion = models.BigAutoField(primary_key=True)
@@ -159,11 +278,10 @@ class CalificacionesActividad(models.Model):
     participantes_id_participante = models.ForeignKey(
         Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
     )
-    # la vista hace Avg('estrellas'); default 0
     estrellas = models.SmallIntegerField(null=True, blank=True, default=0)
 
     class Meta:
         managed = True
         db_table = "calificaciones_actividad"
         unique_together = (("actividades_id_actividad", "participantes_id_participante"),)
-        app_label = 'tests_management_CADI'  # <-- agrega esto
+        app_label = 'management_cadi_tests'

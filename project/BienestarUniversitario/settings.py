@@ -1,3 +1,5 @@
+#project\BienestarUniversitario\settings.py
+
 """
 Django settings for BienestarUniversitario project.
 
@@ -15,6 +17,8 @@ import sys, os
 from django.conf.urls import handler404
 
 handler404 = "universitaryWellbeing.views.custom_404"
+
+ 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -263,7 +267,7 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
         INSTALLED_APPS += ["social_projects.tests.apps.SocialProjectsTestsConfig"]
     elif " tournaments" in args or args.endswith("tournaments"):
         INSTALLED_APPS += ["tournaments.tests.apps.TournamentsTestsConfig"]
-    elif " management_CADI" in args or args.endswith("management_CADI"):
+    elif "management_CADI" in args or args.endswith("management_CADI"):
         INSTALLED_APPS += ["management_CADI.tests.apps.ManagementCADITestsConfig"]
     elif " searchActivities" in args or args.endswith("searchActivities"):
         INSTALLED_APPS += ["searchActivities.tests.apps.SearchActivitiesTestsConfig"]
@@ -275,3 +279,6 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
     }
     STATIC_ROOT = BASE_DIR / ".test-static"
+
+
+ 
