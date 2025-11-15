@@ -526,7 +526,7 @@ def analisis_comportamiento(request):
             "participantes_id_participante__genero",
             "participantes_id_participante__roles_id_rol__nombre_rol",
             "participantes_id_participante",
-            "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+            #"actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
         ).annotate(
             total=Count("id_participacion"),
             primera_participacion=Min("fecha_inscripcion"),
@@ -537,6 +537,8 @@ def analisis_comportamiento(request):
         queryset = queryset.filter(
             participantes_id_participante__roles_id_rol__nombre_rol__in=ROLES_SISTEMA
         )
+
+
 
         # Aplicar filtros del usuario (SIN min_frecuencia)
         if tipo_actividad:
@@ -553,6 +555,38 @@ def analisis_comportamiento(request):
             queryset = queryset.filter(participantes_id_participante__semestre=semestre_filtro)
 
         data = list(queryset)
+
+        # ✅ SOLUCIÓN: Para cada participante, obtener sus actividades Y tipos
+        for item in data:
+            participante_id = item['participantes_id_participante']
+            
+            # Obtener todas las participaciones del participante
+            participaciones_usuario = Participaciones.objects.filter(
+                participantes_id_participante_id=participante_id
+            ).select_related('actividades_id_actividad__tipos_actividad_id_tipo')
+            
+            # Aplicar el mismo filtro de tipo_actividad si existe
+            if tipo_actividad:
+                participaciones_usuario = participaciones_usuario.filter(
+                    actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
+                )
+            
+            # Obtener nombres de actividades
+            actividades_info = []
+            tipos_set = set()
+            
+            for part in participaciones_usuario:
+                actividad = part.actividades_id_actividad
+                actividades_info.append(actividad.nombre)
+                
+                # Agregar tipo si existe
+                if actividad.tipos_actividad_id_tipo:
+                    tipos_set.add(actividad.tipos_actividad_id_tipo.nombre_tipo)
+            
+            # Agregar al item
+            item['actividades_lista'] = list(set(actividades_info))  # Únicos
+            item['actividades_texto'] = ', '.join(sorted(set(actividades_info))) if actividades_info else 'Ninguna'
+            item['tipos_actividad_texto'] = ', '.join(sorted(tipos_set)) if tipos_set else 'Sin tipo'
 
         # === ESTADÍSTICAS ÚNICAS (para cards de resumen) ===
         if data:
@@ -628,11 +662,16 @@ def analisis_comportamiento(request):
         ]
 
         # === GRÁFICO: Tipos de actividad - RF4.2 ===
+        # ✅ GRÁFICO: Tipos de actividad - CORREGIDO
         tipos_count = {}
+        
         for item in data:
-            tipo = item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Otro")
-            if tipo and tipo != "Otro":
-                tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
+                tipos_texto = item.get('tipos_actividad_texto', '')
+                if tipos_texto and tipos_texto != 'Sin tipo':
+                    # Dividir por comas si hay múltiples tipos
+                    tipos_lista = [t.strip() for t in tipos_texto.split(',')]
+                    for tipo in tipos_lista:
+                        tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
 
         datos_grafico_tipos_actividad = [
             {'label': tipo, 'value': count}

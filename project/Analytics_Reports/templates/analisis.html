@@ -39,7 +39,7 @@
     <form method="GET" action="{% url 'Analytics_Reports:analisis_comportamiento' %}" class="mb-3">
         <div class="card">
             <div class="card-header bg-primary text-white">
-                <i class="fas fa-filter"></i> Filtros de Segmentación (RF2.2)
+                <i class="fas fa-filter"></i> Filtros de Segmentación  
             </div>
             <div class="card-body">
                 <div class="row g-2">
@@ -142,8 +142,8 @@
         <strong>Sistema de Análisis de Comportamiento Estudiantil</strong>
         <br>
         <small>
-            <strong>RF2:</strong> Registra frecuencia, tipo y reincidencia de participación. Segmenta por rol, semestre, facultad y género.<br>
-            <strong>RF4:</strong> Muestra métricas globales, rankings y estadísticas de asistencia.
+             Registra frecuencia, tipo y reincidencia de participación. Segmenta por rol, semestre, facultad y género.<br>
+              Muestra métricas globales, rankings y estadísticas de asistencia.
         </small>
     </div>
     {% elif mostrar_todos %}
@@ -231,7 +231,7 @@
     </div>
          
     <!-- GRÁFICOS -->
-    <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Análisis de Comportamiento (RF2.1)</h4>
+    <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Análisis de Comportamiento  </h4>
     <div class="row mb-4">
         <!-- Gráfico: Distribución por frecuencia (RF2.1) -->
         <div class="col-md-6">
@@ -299,77 +299,91 @@
 
     <!-- Tabla de resultados -->
     <h4 class="mb-3"><i class="fas fa-table"></i> Detalle por Usuario</h4>
-    <div class="card">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h5 class="mb-0">Registros de Participación</h5>
-            <span class="badge bg-primary">{{ data|length }} registros</span>
-        </div>
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="table-dark">
-                        <tr>
-                            <th>Usuario</th>
-                            <th>Semestre</th>
-                            <th>Facultad</th>
-                            <th>Rol</th>
-                            <th>Tipo de actividad</th>
-                            <th class="text-center">Total</th>
-                            <th class="text-center">Frecuencia</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for item in data %}
-                        <tr>
-                            <td>
-                                <strong>{{ item.participantes_id_participante__nombre }}</strong>
-                                <br>
-                                <small class="text-muted">{{ item.participantes_id_participante__correo }}</small>
-                            </td>
-                            <td>
-                                <span class="badge bg-secondary">
-                                    {{ item.participantes_id_participante__semestre|default:"N/A" }}
-                                </span>
-                            </td>
-                            <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
-                            <td>
-                                <span class="badge bg-info">
-                                    {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
-                                </span>
-                            </td>
-                            <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo|default:"Varias" }}</td>
-                            <td class="text-center">
-                                <span class="badge bg-primary fs-6">{{ item.total }}</span>
-                            </td>
-                            <td class="text-center">
-                                {% if item.total >= 5 %}
-                                    <span class="badge bg-success">Alta</span>
-                                {% elif item.total >= 2 %}
-                                    <span class="badge bg-warning text-dark">Media</span>
-                                {% else %}
-                                    <span class="badge bg-danger">Baja</span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
-                                <br>
-                                <strong>No se encontraron resultados</strong>
-                             </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+<div class="card">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="mb-0">Registros de Participación</h5>
+        <span class="badge bg-primary">{{ data|length }} registros</span>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-striped table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Usuario</th>
+                        <th>Semestre</th>
+                        <th>Facultad</th>
+                        <th>Rol</th>
+                        <th>Actividades</th>
+                        <th>Tipos</th>
+                        <th class="text-center">Total</th>
+                        <th class="text-center">Frecuencia</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in data %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.participantes_id_participante__nombre }}</strong>
+                            <br>
+                            <small class="text-muted">{{ item.participantes_id_participante__correo }}</small>
+                        </td>
+                        <td>
+                            <span class="badge bg-secondary">
+                                {{ item.participantes_id_participante__semestre|default:"N/A" }}
+                            </span>
+                        </td>
+                        <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
+                        <td>
+                            <span class="badge bg-info">
+                                {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if item.actividades_lista %}
+                                <ul class="list-unstyled mb-0 small">
+                                    {% for actividad in item.actividades_lista %}
+                                        <li>• {{ actividad }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <small class="text-muted">Sin actividades</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small class="text-muted">{{ item.tipos_actividad_texto }}</small>
+                        </td>
+                        <td class="text-center">
+                            <span class="badge bg-primary fs-6">{{ item.total }}</span>
+                        </td>
+                        <td class="text-center">
+                            {% if item.total >= 5 %}
+                                <span class="badge bg-success">Alta</span>
+                            {% elif item.total >= 2 %}
+                                <span class="badge bg-warning text-dark">Media</span>
+                            {% else %}
+                                <span class="badge bg-danger">Baja</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
+                            <br>
+                            <strong>No se encontraron resultados</strong>
+                         </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
     <!-- Información adicional -->
     <div class="mt-4">
         <div class="alert alert-info">
-            <h6><i class="fas fa-info-circle"></i> Criterios de Frecuencia (RF2.1):</h6>
+            <h6><i class="fas fa-info-circle"></i> Criterios de Frecuencia:</h6>
             <ul class="mb-0">
                 <li><strong>Alta:</strong> 5 o más participaciones</li>
                 <li><strong>Media:</strong> 2-4 participaciones</li>
