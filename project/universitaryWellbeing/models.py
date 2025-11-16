@@ -821,6 +821,7 @@ class ConfiguracionNotificaciones(models.Model):
       
       
 class Noticias(models.Model):
+    id = models.BigAutoField(primary_key=True)
     titulo = models.CharField(max_length=200)
     enunciado = models.CharField(max_length=300)
     autor = models.CharField(max_length=100)

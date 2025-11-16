@@ -1,4 +1,5 @@
 import datetime as dt
+from django.http import Http404
 from django.utils import timezone
 from datetime import datetime, timedelta
 from django.contrib import messages
@@ -9,10 +10,11 @@ from django.utils.text import slugify
 from django.urls import reverse
 from collections import defaultdict
 from django.db.models import Avg
+from django.core.paginator import Paginator
 from django.contrib.auth.decorators import login_required
 from universitaryWellbeing.models import (
     ActividadesGrupos, Actividades, TiposActividad, GruposActividad, Grupos,
-    HorariosBloque, HorariosActividad, CalificacionesActividad, Participantes, Participaciones, HorariosParticipante
+    HorariosBloque, HorariosActividad, CalificacionesActividad, Participantes, Participaciones, HorariosParticipante,Noticias
 )
 
 def _draft_keys(grupo_actividad_id, actividad_id=None):
@@ -743,6 +745,94 @@ def create_Group_Activity(request, grupo_nombre, grupo_id):
         )
 
     return render(request, "form_gruposActivi.html", {"grupo": grupo})
+
+
+@login_required
+@superuser_required
+def create_news(request):
+    if request.method == "POST":
+        titulo = request.POST.get("titulo")
+        enunciado = request.POST.get("enunciado")
+        descripcion = request.POST.get("descripcion")
+        imagen_file = request.FILES.get("imagen")
+
+        # Creamos la noticia
+        noticia = Noticias.objects.create(
+            titulo=titulo,
+            enunciado=enunciado,
+            descripcion=descripcion,
+            imagen=imagen_file,
+        )
+
+        slug_real = slugify(noticia.titulo)
+
+        # Redirigimos a una página de detalle o listado
+        return redirect("management_cadi:detalle_noticia", slug=slug_real, id=noticia.id)
+
+    return render(request, "form_news.html")
+
+@login_required
+@superuser_required
+def edit_news(request, id):
+    noticia = get_object_or_404(Noticias, id=id)
+
+    if request.method == "POST":
+        noticia.titulo = request.POST.get("titulo")
+        noticia.enunciado = request.POST.get("enunciado")
+        noticia.autor = request.POST.get("autor")
+        noticia.descripcion = request.POST.get("descripcion")
+
+        imagen_file = request.FILES.get("imagen")
+        if imagen_file:
+            noticia.imagen = imagen_file
+
+        noticia.save()
+
+        slug_real = slugify(noticia.titulo)
+
+        return redirect("management_cadi:detalle_noticia", slug=slug_real, id=noticia.id)
+
+    return render(request, "edit_news.html", {"noticia": noticia})
+
+@login_required
+@superuser_required
+def delete_news(request, id):
+    noticia = get_object_or_404(Noticias, id=id)
+
+    if request.method == "POST":
+        noticia.delete()
+        return redirect("management_cadi:listar_noticias")
+
+    return render(request, "delete_confirm.html", {"noticia": noticia})
+
+def news_detail(request, slug, id):
+    noticia = get_object_or_404(Noticias, id=id)
+    return render(request, "detail_news.html", {"noticia": noticia})
+
+
+def list_news(request):
+    noticias = Noticias.objects.all()  # Puedes agregar filtros si es necesario
+    paginator = Paginator(noticias, 10)  # Muestra 10 noticias por página
+
+    page = request.GET.get("page")
+    noticias_pag = paginator.get_page(page)
+
+    return render(request, "list_news.html", {
+        "noticias": noticias_pag
+    })
+
+@login_required
+@superuser_required
+def manage_news(request):
+    if not request.user.is_superuser:
+        raise Http404("No tienes permiso para acceder a esta sección.")  # Solo superusuarios pueden gestionar noticias
+    
+    noticias = Noticias.objects.all()  # Obtener todas las noticias
+    paginator = Paginator(noticias, 10)
+    page = request.GET.get("page")
+    noticias_pag = paginator.get_page(page)
+
+    return render(request, 'manage_news.html', {'noticias': noticias_pag})
 
 @login_required
 @superuser_required
