@@ -30,10 +30,10 @@
             {% for noticia in noticias %}
             <tr>
                 <td>
-                  <!-- Link to the news detail page -->
-                  <a href="{% url 'management_cadi:detalle_noticia' slug=noticia.slug id=noticia.id %}">
-                    {{ noticia.titulo }}
-                  </a>
+                    <!-- Link to the news detail page -->
+                    <a href="{% url 'management_cadi:detalle_noticia' slug=noticia.slug id=noticia.id %}">
+                        {{ noticia.titulo }}
+                    </a>
                 </td>
                 <td>{{ noticia.autor }}</td>
                 <td>{{ noticia.fecha_publicacion }}</td>
@@ -47,6 +47,19 @@
             {% endfor %}
         </tbody>
     </table>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                {% for i in noticias_pag.paginator.page_range %}
+                <li class="page-item {% if noticias_pag.number == i %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
 </div>
 
 {% else %}
