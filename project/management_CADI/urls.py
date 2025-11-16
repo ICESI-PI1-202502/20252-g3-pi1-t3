@@ -30,4 +30,16 @@ urlpatterns = [
         views.scheduleDraft,
         name="schedule_draft_edit",
     ),
+
+    path(
+        "grupos/<slug:grupo_nombre>/<int:grupo_id>/<int:grupo_actividad_id>/add-slot/",
+        views.add_slot_to_schedule,
+        name="add_slot_to_schedule",
+    ),
+
+    path('noticias/gestionar/', views.manage_news, name='gestionar_noticias'),
+    path('noticias/crear/', views.create_news, name="crear_noticia"),
+    path('noticias/<int:id>/editar/', views.edit_news, name="editar_noticia"),
+    path('noticias/<int:id>/eliminar/', views.delete_news, name="eliminar_noticia"),
+    path('noticias/<slug:slug>/<int:id>/', views.news_detail, name="detalle_noticia"),
 ]

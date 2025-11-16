@@ -612,6 +612,7 @@ class TorneosEquipos(models.Model):
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
 
 class Noticias(models.Model):
+    id = models.BigAutoField(primary_key=True)
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField()
     imagen = models.ImageField(upload_to='noticias/')
