@@ -4,9 +4,7 @@ from django.conf.urls import handler404
 from dotenv import load_dotenv
 
 handler404 = "universitaryWellbeing.views.custom_404"
-
  
-
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 load_dotenv(BASE_DIR / ".env")
@@ -18,11 +16,16 @@ load_dotenv(BASE_DIR / ".env")
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ.get("SECRET_KEY")
 
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
 ALLOWED_HOSTS = ['mi-bienestar-universitario.onrender.com','127.0.0.1']
 
+CSRF_TRUSTED_ORIGINS = ['https://mi-bienestar-universitario.onrender.com']
+
+CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is only sent over HTTPS
+CSRF_COOKIE_SAMESITE = 'None'
 
 # Application definition
 

@@ -746,6 +746,14 @@ def create_Group_Activity(request, grupo_nombre, grupo_id):
 
     return render(request, "form_gruposActivi.html", {"grupo": grupo})
 
+from django.utils.text import slugify
+
+@login_required
+@superuser_required
+def news_detail(request, slug, id):
+    # Fetch the news item by id and slug
+    noticia = get_object_or_404(Noticias, id=id, slug=slug)
+    return render(request, "news_detail.html", {"noticia": noticia})
 
 @login_required
 @superuser_required
@@ -756,18 +764,18 @@ def create_news(request):
         descripcion = request.POST.get("descripcion")
         imagen_file = request.FILES.get("imagen")
 
-        # Creamos la noticia
+        # Creamos la noticia con slug fiel
+        slug_real = slugify(titulo)
         noticia = Noticias.objects.create(
             titulo=titulo,
             enunciado=enunciado,
             descripcion=descripcion,
             imagen=imagen_file,
+            slug=slug_real,  # assign slug here!
         )
 
-        slug_real = slugify(noticia.titulo)
-
-        # Redirigimos a una página de detalle o listado
-        return redirect("management_cadi:detalle_noticia", slug=slug_real, id=noticia.id)
+        # Redirigimos a una página de detalle o listado usando el valor guardado
+        return redirect("management_cadi:detalle_noticia", slug=noticia.slug, id=noticia.id)
 
     return render(request, "form_news.html")
 
@@ -781,16 +789,16 @@ def edit_news(request, id):
         noticia.enunciado = request.POST.get("enunciado")
         noticia.autor = request.POST.get("autor")
         noticia.descripcion = request.POST.get("descripcion")
-
+        noticia.autor = "Administración Bienestar Universitario"
         imagen_file = request.FILES.get("imagen")
         if imagen_file:
             noticia.imagen = imagen_file
 
+        noticia.slug = slugify(noticia.titulo)  # always update slug on title change
         noticia.save()
 
-        slug_real = slugify(noticia.titulo)
-
-        return redirect("management_cadi:detalle_noticia", slug=slug_real, id=noticia.id)
+        # Redirige correctamente usando el slug persistente de la noticia
+        return redirect("management_cadi:detalle_noticia", slug=noticia.slug, id=noticia.id)
 
     return render(request, "edit_news.html", {"noticia": noticia})
 
@@ -801,25 +809,9 @@ def delete_news(request, id):
 
     if request.method == "POST":
         noticia.delete()
-        return redirect("management_cadi:listar_noticias")
+        return redirect("management_cadi:gestionar_noticias")
 
     return render(request, "delete_confirm.html", {"noticia": noticia})
-
-def news_detail(request, slug, id):
-    noticia = get_object_or_404(Noticias, id=id)
-    return render(request, "detail_news.html", {"noticia": noticia})
-
-
-def list_news(request):
-    noticias = Noticias.objects.all()  # Puedes agregar filtros si es necesario
-    paginator = Paginator(noticias, 10)  # Muestra 10 noticias por página
-
-    page = request.GET.get("page")
-    noticias_pag = paginator.get_page(page)
-
-    return render(request, "list_news.html", {
-        "noticias": noticias_pag
-    })
 
 @login_required
 @superuser_required
