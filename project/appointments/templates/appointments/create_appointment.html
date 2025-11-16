@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Agendar cita psicológica{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'appointments/css/main.css' %}">
+{% endblock %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+  <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block content %}
+<main class="py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <section class="col-12 col-md-10 col-lg-8">
+        <div class="card shadow-sm border-0">
+          <div class="card-body p-4">
+
+            <h2 class="page-title text-center mb-1">Cita psicológica</h2>
+            <p class="text-center text-muted mb-4">Sesiones de 45 minutos · Bienestar (2.º piso)</p>
+
+            {# Mensajes de Django (éxito/errores) #}
+            {% if messages %}
+              <div class="mb-3">
+                {% for message in messages %}
+                  <div class="alert alert-{{ message.tags }} mb-2">{{ message }}</div>
+                {% endfor %}
+              </div>
+            {% endif %}
+
+            <form method="post" action="{% url 'appointments:create' %}" class="mx-auto" style="max-width: 560px;">
+              {% csrf_token %}
+
+              <div class="row g-3">
+
+                <!-- Profesional (participantes_id_participante2) -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Profesional *</label>
+                  <select name="profesional_id" class="form-select" required>
+                    <option value="" selected disabled>Selecciona psicólogo/a</option>
+                    {% for p in professionals %}
+                      <option value="{{ p.id }}">{{ p.nombre }}</option>
+                    {% endfor %}
+                  </select>
+                </div>
+
+                <!-- Fecha/hora de inicio (Citas.fecha) -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Fecha y hora *</label>
+                  <input type="datetime-local" name="fecha" class="form-control" required>
+                  <div class="form-text">Usaremos esta hora como inicio; la duración se gestionará con el slot.</div>
+                </div>
+
+                <!-- Motivo (texto libre corto) -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Motivo (opcional)</label>
+                  <input type="text" name="motivo" maxlength="200" class="form-control" placeholder="Ansiedad por parciales, estrés académico...">
+                </div>
+
+                <!-- Observaciones (texto largo) -->
+                <div class="col-12">
+                  <label class="form-label fw-semibold">Observaciones (opcional)</label>
+                  <textarea name="observaciones" maxlength="500" rows="4" class="form-control" placeholder="Información adicional que quieras compartir"></textarea>
+                </div>
+
+              </div>
+
+              <div class="d-flex justify-content-end mt-4">
+                <button class="btn btn-primary px-4" type="submit">Agendar</button>
+              </div>
+            </form>
+
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+{% endblock %}

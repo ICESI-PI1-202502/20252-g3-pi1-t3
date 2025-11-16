@@ -1,9 +1,11 @@
+#project\universitaryWellbeing\models.py
 from django.db import models
 from django.utils.text import slugify
 from django.contrib.auth.models import User,Group
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator
 import os
+from django_resized import ResizedImageField
 
 class Actividades(models.Model):
     id_actividad = models.BigAutoField(primary_key=True)
@@ -24,7 +26,6 @@ class Actividades(models.Model):
         blank=True, null=True
     )
 
-    #id_tipo = models.FloatField(blank=True, null=True)
     actividades_grupos_id_actividad_grupo = models.ForeignKey(
         'ActividadesGrupos',
         models.DO_NOTHING,
@@ -33,10 +34,33 @@ class Actividades(models.Model):
     )
 
     promedio_calificacion = models.FloatField(default=0, blank=True, null=True)
+    
+    # ✅ NUEVO CAMPO: Responsable de la actividad
+    responsable = models.ForeignKey(
+        'Participantes',
+        models.SET_NULL,  # Si se elimina el responsable, la actividad no se elimina
+        db_column='responsable',
+        blank=True,
+        null=True,
+        related_name='actividades_responsable',  # Para evitar conflictos con otras relaciones
+        limit_choices_to={
+            'roles_id_rol__nombre_rol__in': ['Coordinador', 'Administrador', 'Docente']
+        },
+        help_text='Profesor o coordinador responsable de la actividad'
+    )
 
     class Meta:
         managed = False
         db_table = 'actividades'
+    
+    def __str__(self):
+        return self.nombre
+    
+    def obtener_responsable_nombre(self):
+        """Método helper para obtener el nombre completo del responsable"""
+        if self.responsable:
+            return f"{self.responsable.nombre} {self.responsable.apellido}"
+        return "Sin asignar"
 
 
 # Estos son nuevos modelos para la solucón del problema
@@ -449,12 +473,35 @@ class Notificaciones(models.Model):
         db_column='tipos_notificacion_id_tipo_notificacion'
     )
     leida = models.BooleanField(default=False)
-    
-    #  NUEVO: Fecha de creación real de la notificación
     created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    
+    # ✅ NUEVOS CAMPOS (coinciden con el SQL)
+    actividad_relacionada = models.ForeignKey(
+        'Actividades',
+        models.DO_NOTHING,
+        db_column='actividad_relacionada',
+        null=True,
+        blank=True,
+        help_text="Actividad específica relacionada"
+    )
+    
+    contexto_hito = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        help_text="Ej: 'hito_10', 'inasistencia_7dias'"
+    )
+    
+    hash_unicidad = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+        db_index=True,
+        help_text="Hash único para evitar duplicados"
+    )
 
     class Meta:
-        managed = False  #  CAMBIO: Dejar en False para no tocar otras tablas
+        managed = False
         db_table = 'notificaciones'
     
     def __str__(self):
@@ -474,6 +521,37 @@ class Participaciones(models.Model):
         db_table = 'participaciones'
         unique_together = (('participantes_id_participante', 'actividades_id_actividad'),)
 
+class TiposParticipante(models.Model):
+    id_tipo_participante = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=50, unique=True)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
+    
+    # Campos útiles para tu contexto universitario
+    requiere_validacion = models.BooleanField(
+        default=False,
+        help_text='Requiere aprobación de admin (ej: Docentes)'
+    )
+    puede_crear_actividades = models.BooleanField(
+        default=False,
+        help_text='Puede crear actividades (ej: Coordinadores, Docentes)'
+    )
+    activo = models.BooleanField(
+        default=True,
+        help_text='Tipo disponible para selección'
+    )
+    orden = models.IntegerField(
+        default=0,
+        help_text='Orden de aparición en formularios'
+    )
+    
+    class Meta:
+        managed = False
+        db_table = 'tipos_participante'
+        ordering = ['orden', 'nombre']
+    
+    def __str__(self):
+        return self.nombre
+    
 class Participantes(models.Model):
 
     id_participante = models.BigAutoField(primary_key=True)
@@ -487,6 +565,14 @@ class Participantes(models.Model):
     programa = models.CharField(max_length=120, blank=True, null=True)
     genero = models.CharField(max_length=20, blank=True, null=True)
     user = models.ForeignKey(User, db_column='user', to_field='id', on_delete=models.CASCADE)
+    tipo_participante = models.ForeignKey(
+        'TiposParticipante',
+        models.DO_NOTHING,
+        db_column='tipo_participante_id',
+        blank=True,
+        null=True,
+        verbose_name='Tipo de Usuario'
+    )
     
     class Meta:
         managed = False
@@ -540,16 +626,26 @@ class ProyectosSociales(models.Model):
         db_table = 'proyectos_sociales'
 
 class Roles(models.Model):
-
     id_rol = models.BigAutoField(primary_key=True)
     nombre_rol = models.CharField(max_length=50)
-    grupo_d = models.OneToOneField(Group, on_delete=models.DO_NOTHING, db_column='group_id', null=True, blank=True)
+    grupo_d = models.OneToOneField(
+        Group, 
+        on_delete=models.SET_NULL,  # Cambiado de DO_NOTHING
+        db_column='group_id', 
+        null=True, 
+        blank=True
+    )
 
     def save(self, *args, **kwargs):
-    # Si no tiene grupo asociado, crear uno nuevo con el mismo nombre que el rol
-        if not self.group:
-            group, created = Group.objects.get_or_create(name=self.nombre_rol)
-            self.group = group
+        # Auto-crear grupo si el rol requiere permisos
+        ROLES_CON_PERMISOS = ['coordinador', 'profesor', 'psicologo', 'admin_bienestar', 'super_admin']
+        
+        if self.nombre_rol.lower() in ROLES_CON_PERMISOS and not self.grupo_d:
+            # Crear grupo con nombre capitalizado
+            nombre_grupo = self.nombre_rol.replace('_', ' ').title()
+            grupo, created = Group.objects.get_or_create(name=nombre_grupo)
+            self.grupo_d = grupo
+        
         super().save(*args, **kwargs)
 
     class Meta:
@@ -611,10 +707,132 @@ class TorneosEquipos(models.Model):
         db_table = 'torneos_equipos'
         unique_together = (('torneos_id_torneo', 'equipos_id_equipo'),)
 
+
+
+class ConfiguracionNotificaciones(models.Model):
+    """Configuración completa del sistema de notificaciones"""
+    
+    # ============ RECONOCIMIENTOS ============
+    hitos_reconocimiento = models.CharField(
+        max_length=100,
+        default='10,20,30,40,50',
+        help_text='Hitos separados por comas (ej: 10,20,30)'
+    )
+    reconocimientos_activos = models.BooleanField(
+        default=True,
+        help_text='¿Enviar reconocimientos automáticos?'
+    )
+    
+    # ============ INASISTENCIAS ============
+    dias_sin_asistir_alerta = models.IntegerField(
+        default=7,
+        help_text='Días sin asistir para generar alerta'
+    )
+    dias_repetir_alerta_inasistencia = models.IntegerField(
+        default=7,
+        help_text='Cada cuántos días repetir alerta (0 = no repetir)'
+    )
+    alertas_inasistencia_activas = models.BooleanField(
+        default=True,
+        help_text='¿Enviar alertas de inasistencia?'
+    )
+    asistencias_minimas_para_alertar = models.IntegerField(
+        default=1,
+        help_text='Debe haber asistido antes para alertar'
+    )
+    
+    # ============ ENCUESTAS ============
+    dias_despues_cierre_encuesta = models.IntegerField(
+        default=7,
+        help_text='Días después del cierre para enviar encuesta'
+    )
+    asistencias_minimas_encuesta = models.IntegerField(
+        default=3,
+        help_text='Asistencias mínimas para enviar encuesta'
+    )
+    encuestas_activas = models.BooleanField(
+        default=True,
+        help_text='¿Enviar encuestas automáticas?'
+    )
+    
+    # ============ CITAS ============
+    recordatorio_cita_dias_antes = models.IntegerField(
+        default=1,
+        help_text='Días antes de la cita para recordatorio'
+    )
+    recordatorio_cita_horas_antes = models.IntegerField(
+        default=2,
+        help_text='Horas antes de la cita para recordatorio'
+    )
+    recordatorios_citas_activos = models.BooleanField(
+        default=True,
+        help_text='¿Enviar recordatorios de citas?'
+    )
+    
+    # ============ EVENTOS (Torneos/Proyectos) ============
+    recordatorio_evento_dias_antes = models.IntegerField(
+        default=3,
+        help_text='Días antes del evento'
+    )
+    recordatorio_evento_dia_antes = models.BooleanField(
+        default=True,
+        help_text='¿Recordatorio el día anterior?'
+    )
+    recordatorios_eventos_activos = models.BooleanField(
+        default=True,
+        help_text='¿Enviar recordatorios de eventos?'
+    )
+    
+    # ============ CAMPOS EXISTENTES (mantener) ============
+    umbral_riesgo_critico = models.IntegerField(default=2)
+    umbral_baja_asistencia = models.IntegerField(default=5)
+    dias_inactividad = models.IntegerField(default=14)
+    dias_riesgo_critico = models.IntegerField(default=21)
+    asistencias_reconocimiento = models.IntegerField(default=10)
+    margen_proximo_reconocimiento = models.IntegerField(default=2)
+    asistencias_destacado = models.IntegerField(default=15)
+    envio_automatico = models.BooleanField(default=True)
+    frecuencia_envio = models.CharField(max_length=20, default='semanal')
+    emails_staff = models.TextField(default='luis.gluis.g.io.com@gmail.com')
+    
+    ultima_modificacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        managed = False
+        db_table = 'configuracion_notificaciones'
+        verbose_name = 'Configuración de Notificaciones'
+        verbose_name_plural = 'Configuración de Notificaciones'
+    
+    def save(self, *args, **kwargs):
+        self.pk = 1  # Singleton
+        super().save(*args, **kwargs)
+    
+    @classmethod
+    def obtener_config(cls):
+        config, _ = cls.objects.get_or_create(pk=1)
+        return config
+    
+    def obtener_hitos(self):
+        """Retorna lista de hitos como enteros"""
+        return [int(h.strip()) for h in self.hitos_reconocimiento.split(',')]
+    
+    def obtener_emails_staff(self):
+        return [email.strip() for email in self.emails_staff.split(',') if email.strip()]
+      
+      
 class Noticias(models.Model):
     titulo = models.CharField(max_length=200)
+    enunciado = models.CharField(max_length=300)
+    autor = models.CharField(max_length=100)
     descripcion = models.TextField()
-    imagen = models.ImageField(upload_to='noticias/')
+    imagen = ResizedImageField(
+        size=[800, 450],           # Tamaño máximo [ancho, alto]
+        crop=None,                 # None = No cortar, mantener proporción
+        quality=85,                # Calidad JPEG (0-100)
+        keep_meta=False,           # Eliminar metadatos EXIF
+        force_format='JPEG',       # Convertir a JPEG
+        upload_to='noticias/'
+    )
     fecha_publicacion = models.DateField(auto_now_add=True)
 
     def __str__(self):

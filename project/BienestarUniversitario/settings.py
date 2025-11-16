@@ -1,3 +1,5 @@
+#project\BienestarUniversitario\settings.py
+
 """
 Django settings for BienestarUniversitario project.
 
@@ -15,6 +17,8 @@ import sys, os
 from django.conf.urls import handler404
 
 handler404 = "universitaryWellbeing.views.custom_404"
+
+ 
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -41,6 +45,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',
     'universitaryWellbeing',
     'Analytics_Reports',   
     'management_CADI',
@@ -48,12 +53,11 @@ INSTALLED_APPS = [
     'tournaments',
     'social_projects',
     'notificaciones',
-
-    
- 
+    'appointments', 
 
 ]
 
+SITE_ID = 1
  
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -64,6 +68,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'universitaryWellbeing.middleware.AsignarGrupoMiddleware',
 ]
 
 ROOT_URLCONF = 'BienestarUniversitario.urls'
@@ -78,8 +83,9 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'universitaryWellbeing.context_processors.user_role',  
                 'universitaryWellbeing.context_processors.notificaciones_context',
+                'universitaryWellbeing.context_processors.user_rol',  # ← Sin 'e' al final
+
             ],
         },
     },
@@ -130,6 +136,7 @@ LANGUAGE_CODE = 'en-us'
 
  #  Zona horaria de Colombia
 TIME_ZONE = 'America/Bogota'
+USE_TZ = True
 
 # Habilitar internacionalización
 USE_I18N = True
@@ -187,22 +194,19 @@ if any(cmd in sys.argv for cmd in ["test", "pytest"]):
     # Desactiva migraciones del app real que está en conflicto
     MIGRATION_MODULES = {"universitaryWellbeing": None}
 
-
-
-
-
-
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-EMAIL_HOST_USER = 'luis.gluis.g.io.com@gmail.com'
-EMAIL_HOST_PASSWORD = 'jbrg abzk beox eipo'
-DEFAULT_FROM_EMAIL = 'luis.gluis.g.io.com@gmail.com'
+EMAIL_HOST_USER = 'jhonjhonshon4@gmail.com'
+EMAIL_HOST_PASSWORD = 'aeoa zaaf gykq uetb'
+DEFAULT_FROM_EMAIL = 'BU App <jhonjhonshon4@gmail.com>'
 
+# Mejor práctica: usar variables de entorno
+# EMAIL_HOST_USER = os.environ.get('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = os.environ.get('EMAIL_PASSWORD')
 
-
+PASSWORD_RESET_TIMEOUT = 3600  # 1 hora (en segundos)
 
 # Celery y Redis
 CELERY_BROKER_URL = os.getenv("CELERY_BROKER_URL", "redis://redis:6379/0")
@@ -212,23 +216,47 @@ CELERY_RESULT_BACKEND = os.getenv("CELERY_RESULT_BACKEND", "redis://redis:6379/0
 CELERY_TIMEZONE = 'America/Bogota'
 CELERY_ENABLE_UTC = True
 
-from celery.schedules import crontab
-
-# Tareas periódicas
-CELERY_BEAT_SCHEDULE = {
-    'generar-notificaciones-diarias': {
-        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
-        'schedule': crontab(minute='*/1'),  # cada 1 minutos
-    },
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'LOCATION': 'unique-snowflake',
+    }
 }
 
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    # Notificaciones existentes (cada 1 minuto)
+    'generar-notificaciones-diarias': {
+        'task': 'notificaciones.tasks.generar_notificaciones_horarios_task',
+        'schedule': crontab(minute='*/1'),
+    },
+    
+     #  AGREGAR SOLO: Reconocimientos (RF8.1 - Premios)
+    'verificar-reconocimientos-alcanzados': {
+        'task': 'Analytics_Reports.tasks.verificar_y_otorgar_reconocimientos',
+        'schedule': crontab(minute='*/1'),  # Diario 8 PM
+    },
+    
+    #  AGREGAR: Inasistencias (RF8.1 - Inasistencias)
+    'verificar-inasistencias-inscritos': {
+        'task': 'Analytics_Reports.tasks.verificar_inasistencias_inscritos',
+        'schedule': crontab(minute='*/1'),  # Diario 10 PM
+    },
+    
+    #  AGREGAR: Encuestas (RF8.2)
+    'enviar-encuestas-retroalimentacion': {
+        'task': 'Analytics_Reports.tasks.enviar_encuestas_retroalimentacion',
+        'schedule': crontab(minute='*/1'),  # Diario 6 PM
+    },
+}
 
 
 
 import sys
 
 if any(cmd in sys.argv for cmd in ("test", "pytest")):
-    MIGRATION_MODULES = {"universitaryWellbeing": None}
+    MIGRATION_MODULES = {"universitaryWellbeing": None, "appointments.tests": None}
 
     args = " ".join(sys.argv)
 
@@ -239,10 +267,12 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
         INSTALLED_APPS += ["social_projects.tests.apps.SocialProjectsTestsConfig"]
     elif " tournaments" in args or args.endswith("tournaments"):
         INSTALLED_APPS += ["tournaments.tests.apps.TournamentsTestsConfig"]
-    elif " management_CADI" in args or args.endswith("management_CADI"):
+    elif "management_CADI" in args or args.endswith("management_CADI"):
         INSTALLED_APPS += ["management_CADI.tests.apps.ManagementCADITestsConfig"]
     elif " searchActivities" in args or args.endswith("searchActivities"):
         INSTALLED_APPS += ["searchActivities.tests.apps.SearchActivitiesTestsConfig"]
+    elif " appointments" in args or args.endswith("appointments"):
+        INSTALLED_APPS += ["appointments.tests.apps.AppointmentsTestsConfig"]
 
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
@@ -251,4 +281,4 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
     STATIC_ROOT = BASE_DIR / ".test-static"
 
 
-
+ 

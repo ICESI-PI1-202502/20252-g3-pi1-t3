@@ -9,7 +9,8 @@ from .models import (
     Preferencias, PreferenciasActividades, ProyectosSociales,
     RolesParticipacion, TiposActividad, TiposNotificacion, TorneosEquipos,Noticias
 )
-
+from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
+from django.contrib.auth.models import User
 # -----------------------
 # ADMIN PERSONALIZADOS
 # -----------------------
@@ -37,20 +38,52 @@ class RolesAdmin(admin.ModelAdmin):
     list_display = ('id_rol', 'nombre_rol', 'grupo_d')
     search_fields = ('nombre_rol',)
 
+
+# -----------------------
+# ADMIN DE USUARIOS
+# -----------------------
+
+class UsuarioAdmin(BaseUserAdmin):
+    # Solo agregar la columna personalizada, NO modificar fieldsets
+    list_display = ['username', 'email', 'first_name', 'last_name', 'get_grupos', 'is_staff']
+    
+    def get_grupos(self, obj):
+        grupos = obj.groups.all()
+        return ", ".join([g.name for g in grupos]) if grupos else "Sin roles"
+    get_grupos.short_description = 'Roles Especiales' # type: ignore
+
+# Desregistrar el User por defecto y registrar el personalizado
+admin.site.unregister(User)
+admin.site.register(User, UsuarioAdmin)
+
+
 @admin.register(Noticias)
 class NoticiaAdmin(admin.ModelAdmin):
-    list_display = ('titulo', 'fecha_publicacion')
+    list_display = ('titulo', 'autor', 'fecha_publicacion')
     search_fields = ('titulo',)
+    readonly_fields = ('fecha_publicacion',)
+    exclude = ('autor',)  # Ocultar campo autor del formulario
+    
+    def save_model(self, request, obj, form, change):
+        """Asignar automáticamente 'Administración Bienestar Universitario' como autor"""
+        obj.autor = "Administración Bienestar Universitario"
+        super().save_model(request, obj, form, change)
+
 # -----------------------
 # READ-ONLY MODELS
 # -----------------------
 
 class ReadOnlyAdmin(admin.ModelAdmin):
-    def has_add_permission(self, request): return False
-    def has_change_permission(self, request, obj=None): return False
-    def has_delete_permission(self, request, obj=None): return False
+    def has_add_permission(self, request): 
+        return False
+    def has_change_permission(self, request, obj=None): 
+        return False
+    def has_delete_permission(self, request, obj=None): 
+        return False
 
+# CRÍTICO: Excluir modelos que ya tienen admin personalizado
 readonly_models = [
+    # Equipos, Torneos, Participantes, Roles <- YA ESTÁN REGISTRADOS ARRIBA
     Disciplinas, Actividades, ActividadesGrupos, AgendaPsicologos,
     Asistencias, CalificacionesActividad, Citas,
     EquiposParticipantes, EstadosAsistencia, EstadosCita,

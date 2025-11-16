@@ -1,0 +1,77 @@
+/* static/css/dashboard_docente.css */
+
+/* Cards de métricas */
+.card {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+/* Tablas */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
+}
+
+/* Badges de asistencia */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Interpretación de colores */
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Tablas de detalle */
+.table-sm th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+}
+
+/* Gráficos */
+canvas {
+    max-height: 400px;
+}
+
+/* Información contextual */
+.alert-info {
+    border-left: 4px solid #17a2b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body h3 {
+        font-size: 1.5rem;
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Leyenda de interpretación */
+.legend-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.legend-green { background-color: #28a745; }
+.legend-yellow { background-color: #ffc107; }
+.legend-red { background-color: #dc3545; }
