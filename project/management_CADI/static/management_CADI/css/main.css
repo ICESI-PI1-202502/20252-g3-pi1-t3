@@ -119,3 +119,41 @@ td .btn {
 .greenBotton_White:hover {
   background-color: #218838;
 }
+
+/* --- Ajustes Responsive para móviles --- */
+@media (max-width: 600px) {
+
+  .table-container {
+    padding: 0 5px;
+  }
+
+  table {
+    table-layout: auto !important;   /* Permite que el contenido fluya mejor */
+    border-spacing: 5px !important;  /* Reduce el espacio entre celdas */
+    width: 100% !important;
+  }
+
+  th, td {
+    padding: 8px !important;         /* Reduce padding */
+    font-size: 12px !important;
+    white-space: normal !important;  /* Evita que se estire hacia los lados */
+    text-align: left !important;
+    word-break: break-word !important;
+  }
+
+ /* --- BOTONES EN MÓVIL --- */
+  td .btn {
+    display: block !important;   /* Uno debajo del otro */
+    width: 100% !important;      /* Ocupa toda la celda */
+    margin: 5px 0 !important;    /* Espacio entre botones */
+    padding: 10px !important;    /* Botón cómodo para móvil */
+    font-size: 14px !important;
+    text-align: center !important;
+  }
+
+  /* Para evitar que se salgan del contenedor */
+  td {
+    max-width: 100% !important;
+  }
+
+}
