@@ -1,0 +1,205 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/dashboard_docente.css' %}">
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    window.docenteData = {
+        totalActividades: {{ total_mis_actividades }},
+        datosActividades: {{ datos_actividades_populares|safe }},
+        datosAsistenciaPorDia: {{ datos_asistencia_por_dia|safe }}
+    };
+</script>
+<script src="{% static 'js/dashboard_docente.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2>
+                <i class="bi bi-person-workspace"></i> 
+                Dashboard de {{ nombre_docente }}
+            </h2>
+            <p class="text-muted">{{ facultad }}</p>
+        </div>
+    </div>
+
+    <!-- Métricas principales -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-music-note-list" style="font-size: 2rem; color: #007bff;"></i>
+                    <h3 class="mt-2">{{ total_mis_actividades }}</h3>
+                    <p>{% if total_mis_actividades == 1 %}Mi Actividad{% else %}Mis Actividades{% endif %}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check" style="font-size: 2rem; color: #17a2b8;"></i>
+                    <h3 class="mt-2">{{ sesiones_realizadas }}</h3>
+                    <p>Sesiones Realizadas</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-people-fill" style="font-size: 2rem; color: #28a745;"></i>
+                    <h3 class="mt-2">{{ total_asistentes }}</h3>
+                    <p>Total Estudiantes</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <i class="bi bi-graph-up" style="font-size: 2rem; color: #ffc107;"></i>
+                    <h3 class="mt-2">{{ promedio_asistencia }}</h3>
+                    <p class="small">Promedio por Sesión</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top estudiantes -->
+    <div class="row mb-4">
+        <div class="col-md-{% if total_mis_actividades == 1 %}12{% else %}6{% endif %}">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <i class="bi bi-trophy"></i> Estudiantes Más Activos
+                </div>
+                <div class="card-body">
+                    {% if top_estudiantes %}
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Estudiante</th>
+                                <th class="text-center">Asistencias</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for est in top_estudiantes %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'Analytics_Reports:historial_participante' est.id_participante %}" 
+                                       class="text-decoration-none">
+                                        <strong>{{ est.nombre }} {{ est.apellido }}</strong>
+                                    </a>
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge bg-success">{{ est.total_asistencias }}</span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% else %}
+                    <p class="text-muted text-center py-3">No hay estudiantes registrados aún.</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Solo mostrar comparación si hay más de 1 actividad -->
+        {% if total_mis_actividades > 1 %}
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <i class="bi bi-star"></i> Comparación de Actividades
+                </div>
+                <div class="card-body">
+                    <canvas id="chartMisActividades"></canvas>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Asistencia por día de la semana -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-info text-white">
+                    <i class="bi bi-calendar-week"></i> Asistencia Promedio por Día de la Semana
+                </div>
+                <div class="card-body">
+                    <canvas id="chartAsistenciaPorDia" height="80"></canvas>
+                    
+                    <div class="alert alert-info mt-3 mb-0">
+                        <strong>Interpretación de colores:</strong><br>
+                        <span class="legend-box legend-green"></span> <strong>Verde (≥15):</strong> Asistencia alta<br>
+                        <span class="legend-box legend-yellow"></span> <strong>Amarillo (10-14):</strong> Asistencia media<br>
+                        <span class="legend-box legend-red"></span> <strong>Rojo (<10):</strong> Asistencia baja - Considera cambiar horario
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detalle por actividad y día -->
+    {% if asistencia_actividad_dia %}
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-secondary text-white">
+                    <i class="bi bi-table"></i> Detalle de Asistencia por Actividad y Día
+                </div>
+                <div class="card-body">
+                    {% for item in asistencia_actividad_dia %}
+                    <h5 class="mt-3">{{ item.actividad }}</h5>
+                    <table class="table table-sm table-hover">
+                        <thead>
+                            <tr>
+                                <th>Día</th>
+                                <th class="text-center">Sesiones</th>
+                                <th class="text-center">Total Asistencias</th>
+                                <th class="text-center">Promedio por Sesión</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for dia in item.dias %}
+                            <tr>
+                                <td><strong>{{ dia.dia }}</strong></td>
+                                <td class="text-center">{{ dia.sesiones }}</td>
+                                <td class="text-center">{{ dia.total }}</td>
+                                <td class="text-center">
+                                    <span class="badge {% if dia.promedio >= 15 %}bg-success{% elif dia.promedio >= 10 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ dia.promedio }}
+                                    </span>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Botones de acción -->
+    <div class="row">
+        <div class="col-12">
+            <a href="{% url 'Analytics_Reports:registrar_asistencia_manual' %}" 
+               class="btn btn-primary">
+                <i class="bi bi-clipboard-check"></i> Registrar Asistencia
+            </a>
+            {% if total_mis_actividades > 1 %}
+            <a href="{% url 'Analytics_Reports:comparar_mis_grupos' %}" 
+               class="btn btn-info">
+                <i class="bi bi-bar-chart"></i> Comparar Mis Grupos
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

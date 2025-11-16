@@ -2,63 +2,71 @@
    BASIC RESET
    ============================== */
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    min-height: 100vh;              /* takes up the entire screen */
-    display: flex;                  /* enable flexbox */
-    flex-direction: column;         /* stack header, main and footer */
-    font-family: 'Plus Jakarta Sans', sans-serif;
-    color: #000;
+  min-height: 100vh;
+  /* takes up the entire screen */
+  display: flex;
+  /* enable flexbox */
+  flex-direction: column;
+  /* stack header, main and footer */
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #000;
 }
 
 /* ==============================
    MAIN HEADER (NAVBAR)
    ============================== */
 .custom-navbar {
-    background-color: #FFFF; /*  change this color as you like */
-    padding: 0.5rem 1rem;
+  background-color: #FFFF;
+  /*  change this color as you like */
+  padding: 0.5rem 1rem;
 }
 
 .custom-navbar .navbar-brand {
-    font-size: 1rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color:#000; /* text color */
+  font-size: 1rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: #000;
+  /* text color */
 }
 
 .custom-navbar .navbar-brand img {
-    height: 60px;
-    width: auto;
-    margin-right: 8px;
-    transition: transform 0.3s ease;
+  height: 60px;
+  width: auto;
+  margin-right: 8px;
+  transition: transform 0.3s ease;
 }
 
 .custom-navbar .navbar-brand:hover img {
-    transform: scale(1.05);
+  transform: scale(1.05);
 }
 
 .custom-navbar .nav-link {
-    font-size: 1rem;
-    padding: 0.5rem 1rem;
-    color: #000 !important; /* link text color */
-    transition: color 0.3s ease, background-color 0.3s ease;
+  font-size: 1rem;
+  padding: 0.5rem 1rem;
+  color: #000 !important;
+  /* link text color */
+  transition: color 0.3s ease, background-color 0.3s ease;
 }
 
 .custom-navbar .nav-link:hover {
-    color: #ffd700 !important; /* golden hover */
-    background-color: rgba(255, 255, 255, 0.1);
-    border-radius: 5px;
+  color: #ffd700 !important;
+  /* golden hover */
+  background-color: rgba(255, 255, 255, 0.1);
+  border-radius: 5px;
 }
- 
+
 /* campana en navbar */
 .navbar-option img {
-  height: 28px;        /* ajusta tamaño */
+  height: 28px;
+  /* ajusta tamaño */
   width: auto;
   display: block;
   cursor: pointer;
@@ -70,8 +78,8 @@ body {
   transform: scale(1.08);
 }
 
-/*regla CSS en el icono del perfiñ*/
-.user-avatar { 
+/*regla CSS en el icono del perfil*/
+.user-avatar {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -92,11 +100,11 @@ body {
   transform: scale(1.05);
 }
 
-/* opcional: badge de notificaciones (pequeño círculo rojo) */
 .navbar-option .notif-badge {
   position: relative;
   display: inline-block;
-  margin-left: -18px; /* mueve el badge sobre la campana */
+  margin-left: -18px;
+  /* mueve el badge sobre la campana */
   margin-top: -18px;
   background: #dc3545;
   color: #fff;
@@ -110,24 +118,28 @@ body {
    SUBHEADER (secondary bar)
    ============================== */
 .sub-bar {
-    background-color: #5454E9; /*  blue */
-    padding: 8px 16px;
-    position: fixed;
-    top: 86px; /* actual navbar height */
-    width: 100%;
-    z-index: 1030;
+  background-color: #5454E9;
+  /*  blue */
+  padding: 8px 16px;
+  position: fixed;
+  top: 86px;
+  /* actual navbar height */
+  width: 100%;
+  z-index: 1030;
 }
 
 .sub-bar a {
-    color: white; /*  white text on blue background */
-    text-decoration: none;
-    font-size: 1rem;
-    font-weight: bold;
-    transition: color 0.2s ease;
+  color: white;
+  /*  white text on blue background */
+  text-decoration: none;
+  font-size: 1rem;
+  font-weight: bold;
+  transition: color 0.2s ease;
 }
 
 .sub-bar a:hover {
-    color: #dcdcdc; /* light gray on hover */
+  color: #dcdcdc;
+  /* light gray on hover */
 }
 
 
@@ -135,88 +147,115 @@ body {
    MAIN CONTENT
    ============================== */
 main {
-    flex: 1 0 auto;
-    padding: 20px;
+  flex: 1 0 auto;
+  padding: 20px;
 
-    /* space to avoid overlapping navbar + sub-bar */
-    margin-top: calc(86px + 40px); /* navbar (86px) + sub-bar (~40px) */
+  /* space to avoid overlapping navbar + sub-bar */
+  margin-top: calc(86px + 40px);
+  /* navbar (86px) + sub-bar (~40px) */
 }
 
 .container {
-    max-width: 1200px;
-    margin: 0 auto;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 /* lists */
 ul {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 0;
 }
 
 ul li {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 ul li a {
-    text-decoration: none;
-    color: #007bff;
-    font-size: 1.2rem;
-    transition: color 0.3s ease;
+  text-decoration: none;
+  color: #007bff;
+  font-size: 1.2rem;
+  transition: color 0.3s ease;
 }
 
 ul li a:hover {
-    color: #0056b3;
-    text-decoration: underline;
+  color: #0056b3;
+  text-decoration: underline;
 }
 
 /* tables */
 .table {
-    width: 100%;
-    margin-top: 20px;
+  width: 100%;
+  margin-top: 20px;
 }
 
-.table th, .table td {
-    text-align: center;
+.table th,
+.table td {
+  text-align: center;
 }
 
 /* ==============================
    FOOTER
    ============================== */
 .footer {
-    background-color: #5454e9;
-    color: white;
-    text-align: center;
-    padding: 1rem;
-    flex-shrink: 0;
+  background-color: #5454e9;
+  color: white;
+  text-align: center;
+  padding: 1rem;
+  flex-shrink: 0;
 }
 
 /* ==============================
    UTILITIES
    ============================== */
 .flex-center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .flex-center-column {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
 }
 
 /* ==============================
    HIDE old home styles
    ============================== */
-.home, .universidad-icesi-calle-container, .calendario, .noticias, .actividades,
-.blanco, .blanco-icon, .blanco-icon2, .blanco-icon3, .blanco-icon4, .blanco-icon5,
-.judo, .ajedrez, .natacin, .arquero-de-ftbol, .image-34-icon, .hola-pablo-bienvenido,
-.modulo-1-rf3-14-item, .bienestar-universitario, .menu-icon, .pp-wrapper, .pp,
-.modulo-1-rf3-14-inner, .calendar, .row, .header-cell, .cell, .inner, .cell28,
-.modulo-1-rf3-14-child, .image-32-icon{
-    display: none;
+.home,
+.universidad-icesi-calle-container,
+.calendario,
+.noticias,
+.actividades,
+.blanco,
+.blanco-icon,
+.blanco-icon2,
+.blanco-icon3,
+.blanco-icon4,
+.blanco-icon5,
+.judo,
+.ajedrez,
+.natacin,
+.arquero-de-ftbol,
+.image-34-icon,
+.hola-pablo-bienvenido,
+.modulo-1-rf3-14-item,
+.bienestar-universitario,
+.menu-icon,
+.pp-wrapper,
+.pp,
+.modulo-1-rf3-14-inner,
+.calendar,
+.row,
+.header-cell,
+.cell,
+.inner,
+.cell28,
+.modulo-1-rf3-14-child,
+.image-32-icon {
+  display: none;
 }
 
 
@@ -225,7 +264,8 @@ ul li a:hover {
 .sidebar {
   position: fixed;
   top: 0;
-  right: -280px; /* hide */
+  right: -280px;
+  /* hide */
   width: 280px;
   height: 100%;
   background-color: #5454E9;
@@ -234,9 +274,11 @@ ul li a:hover {
   transition: right 0.3s ease;
   z-index: 2000;
 }
+
 .sidebar.open {
   right: 0;
 }
+
 .sidebar a {
   display: block;
   padding: 12px;
@@ -247,6 +289,7 @@ ul li a:hover {
   border-radius: 8px;
   font-weight: 600;
 }
+
 .sidebar a:hover {
   background: #ff844f;
 }
@@ -258,12 +301,13 @@ ul li a:hover {
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.4);
+  background: rgba(0, 0, 0, 0.4);
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.3s ease;
   z-index: 1500;
 }
+
 .overlay.show {
   opacity: 1;
   visibility: visible;
@@ -278,17 +322,19 @@ ul li a:hover {
   text-decoration: none;
   display: flex;
   align-items: center;
-  gap: 6px;   /* separación entre flecha y texto */
+  gap: 6px;
+  /* separación entre flecha y texto */
 }
 
 .back-link:hover {
-  color: #dcdcdc; /* mismo hover que tu subheader */
+  color: #dcdcdc;
+  /* mismo hover que tu subheader */
 }
 
 
 .yellowBotton_Black {
   background-color: #E4EB60;
-  color: #000;              
+  color: #000;
   font-weight: bold;
   padding: 12px 20px;
   border: none;
@@ -299,7 +345,7 @@ ul li a:hover {
 
 .whiteBotton {
   background-color: #ffffff;
-  color: #000;              
+  color: #000;
   font-weight: bold;
   padding: 12px 20px;
   border: none;
@@ -310,7 +356,7 @@ ul li a:hover {
 
 .blueBotton {
   background-color: #5454e9;
-  color: #ffffff;              
+  color: #ffffff;
   font-weight: bold;
   padding: 12px 20px;
   border: none;
@@ -321,7 +367,7 @@ ul li a:hover {
 
 .greenBotton_Black {
   background-color: #4DB979;
-  color: #000;              
+  color: #000;
   font-weight: bold;
   padding: 12px 20px;
   border: none;
@@ -332,7 +378,7 @@ ul li a:hover {
 
 .greenBotton_White {
   background-color: #4DB979;
-  color: #fff;              
+  color: #fff;
   font-weight: bold;
   padding: 12px 20px;
   border: none;
@@ -355,7 +401,8 @@ ul li a:hover {
 
 /* Hover States */
 .yellowBotton_Black:hover {
-  background-color: #d9df55; /* un poco más oscuro */
+  background-color: #d9df55;
+  /* un poco más oscuro */
   transform: scale(1.05);
 }
 
@@ -365,265 +412,75 @@ ul li a:hover {
 }
 
 .blueBotton:hover {
-  background-color: #2424d3; 
+  background-color: #2424d3;
   transform: scale(1.05);
 }
 
 .greenBotton_Black:hover {
-  background-color: #3fa468; /* más oscuro */
+  background-color: #3fa468;
+  /* más oscuro */
   transform: scale(1.05);
 }
 
 .greenBotton_White:hover {
-  background-color: #3fa468; /* más oscuro */
+  background-color: #3fa468;
+  /* más oscuro */
   transform: scale(1.05);
 }
 
 .deleteButton:hover {
-  background-color: #D94B4B; /* Rojo más oscuro en hover */
+  background-color: #D94B4B;
+  /* Rojo más oscuro en hover */
   transform: scale(1.05);
 }
 
 
 /*---------------Para el tipo de fuente--------------------*/
 
-html, body, h1, h2, h3, h4, h5, h6, p, a, button, input, textarea, select, table, th, td {
+html,
+body,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+a,
+button,
+input,
+textarea,
+select,
+table,
+th,
+td {
   font-family: 'Plus Jakarta Sans', sans-serif !important;
 }
 
 /*---------------Para el tipo de fuente--------------------*/
 
-.user-avatar { 
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  width:36px;
-  height:36px;
-  border-radius:8px; 
-  background-color:#0b2ea6;
-  color:#fff;
-  font-weight:700;
-  font-size:14px;
-  line-height:1;
-  text-transform:uppercase;
+.user-avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background-color: #0b2ea6;
+  color: #fff;
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 1;
+  text-transform: uppercase;
   cursor: pointer;
 }
-
-
-
-
-
-
-
-
-/* 
-Esto son los estilos de las notificaciones
-*/
-
-
-
-
-
- /* Estilos para el dropdown de notificaciones */
-        .notifications-dropdown {
-            position: relative;
-            display: inline-block;
-        }
-
-        .notifications-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: #dc3545;
-            color: white;
-            border-radius: 50%;
-            padding: 2px 6px;
-            font-size: 10px;
-            font-weight: bold;
-            min-width: 18px;
-            text-align: center;
-        }
-
-        .notifications-menu {
-            position: absolute;
-            top: 45px;
-            right: 0;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            width: 380px;
-            max-height: 500px;
-            overflow: hidden;
-            display: none;
-            z-index: 1050;
-        }
-
-        .notifications-menu.show {
-            display: block;
-            animation: slideDown 0.2s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .notifications-header {
-            padding: 15px 20px;
-            border-bottom: 1px solid #e9ecef;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: #f8f9fa;
-            border-radius: 8px 8px 0 0;
-        }
-
-        .notifications-header h6 {
-            margin: 0;
-            font-weight: 600;
-            color: #333;
-        }
-
-        .notifications-list {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-
-        .notification-item {
-            padding: 12px 20px;
-            border-bottom: 1px solid #f1f3f5;
-            transition: background 0.2s;
-            cursor: pointer;
-        }
-
-        .notification-item:last-child {
-            border-bottom: none;
-        }
-
-        .notification-item:hover {
-            background: #f8f9fa;
-        }
-
-        .notification-item.unread {
-            background: #e3f2fd;
-        }
-
-        .notification-item.unread:hover {
-            background: #d1e7f7;
-        }
-
-        .notification-content {
-            display: flex;
-            gap: 12px;
-        }
-
-        .notification-icon {
-            flex-shrink: 0;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #007bff;
-            color: white;
-        }
-
-        .notification-text {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .notification-message {
-            font-size: 14px;
-            color: #333;
-            margin-bottom: 4px;
-            line-height: 1.4;
-        }
-
-        .notification-time {
-            font-size: 12px;
-            color: #6c757d;
-        }
-
-        .notification-unread-dot {
-            width: 8px;
-            height: 8px;
-            background: #007bff;
-            border-radius: 50%;
-            margin-top: 6px;
-            flex-shrink: 0;
-        }
-
-        .notifications-footer {
-            padding: 12px 20px;
-            text-align: center;
-            border-top: 1px solid #e9ecef;
-            background: #f8f9fa;
-            border-radius: 0 0 8px 8px;
-        }
-
-        .notifications-footer a {
-            color: #007bff;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .notifications-footer a:hover {
-            text-decoration: underline;
-        }
-
-        .empty-notifications {
-            padding: 40px 20px;
-            text-align: center;
-            color: #6c757d;
-        }
-
-        .empty-notifications i {
-            font-size: 48px;
-            color: #dee2e6;
-            margin-bottom: 10px;
-        }
-
-        /* Scrollbar personalizada */
-        .notifications-list::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .notifications-list::-webkit-scrollbar-track {
-            background: #f1f1f1;
-        }
-
-        .notifications-list::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 3px;
-        }
-
-        .notifications-list::-webkit-scrollbar-thumb:hover {
-            background: #555;
-        }
-
-        /* Responsivo */
-        @media (max-width: 768px) {
-            .notifications-menu {
-                width: 320px;
-                right: -10px;
-            }
-        }
 
 /* ---------- SLIDER DE NOTICIAS CORREGIDO ---------- */
 .noticia-slider {
   position: relative;
   width: 80%;
   max-width: 720px;
-  margin: 1rem auto 0 auto;
+  margin: 1rem auto 3rem auto;
   overflow: visible;
   border-radius: 16px;
   background: transparent;
@@ -632,29 +489,48 @@ Esto son los estilos de las notificaciones
 
 /* Cada noticia (slide) */
 .noticia-slide {
-  position: absolute;
-  top: 0;
-  left: 0;
+  display: none;
+  /* CAMBIO CLAVE: display none por defecto */
   width: 100%;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.8s ease-in-out, visibility 0s linear 0.8s;
+  transition: opacity 0.6s ease-in-out;
+  overflow: hidden;
+  border-radius: 16px;
 }
 
 .noticia-slide.active {
-  opacity: 1;
-  visibility: visible;
+  display: block;
+  animation: fadeIn 0.6s ease-in-out forwards;
+  /* CAMBIO CLAVE: display block cuando activo */
+}
+
+/* Animación de fade in */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+/* Contenedor de imagen */
+.noticia-img {
   position: relative;
-  z-index: 2;
+  width: 100%;
+  height: 400px;
+  overflow: hidden;
+  background-color: #f0f0f0;
 }
 
 /* Imagen */
 .noticia-slide img {
   width: 100%;
-  height: auto;
+  height: 100%;
   display: block;
   border-radius: 16px 16px 0 0;
   object-fit: cover;
+  object-position: center;
 }
 
 /* Bloque azul */
@@ -671,6 +547,23 @@ Esto son los estilos de las notificaciones
 .noticia-content h5,
 .noticia-content p {
   color: #fff !important;
+  margin-bottom: 0.5rem;
+}
+
+.noticia-content h5 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+}
+
+.noticia-content p {
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin-bottom: 1rem;
+}
+
+.noticia-content .btn {
+  margin-top: 0.5rem;
 }
 
 /* Barra de progreso */
@@ -678,18 +571,17 @@ Esto son los estilos de las notificaciones
   position: absolute;
   bottom: 0;
   left: 0;
-  right: 0;
-  height: 4px;
   width: 0%;
+  height: 4px;
   background: linear-gradient(90deg, #60a5fa, #8b5cf6);
-  transition: width 4s linear;
-  border-radius: 0 0 16px 16px;
+  transition: width 6.5s linear;
+  border-radius: 0;
 }
 
-/* Botones de navegación - CENTRADOS DINÁMICAMENTE */
+/* Botones de navegación */
 .btn-nav {
   position: absolute;
-  /* top será controlado por JavaScript */
+  top: 200%;
   transform: translateY(-50%);
   background: rgba(255, 255, 255, 0.95);
   border: none;
@@ -705,11 +597,13 @@ Esto son los estilos de las notificaciones
 }
 
 .btn-nav.prev {
-  left: 15px;
+  left: -20px;
+  /* FUERA del slider */
 }
 
 .btn-nav.next {
-  right: 15px;
+  right: -20px;
+  /* FUERA del slider */
 }
 
 .btn-nav:hover {
@@ -724,16 +618,16 @@ Esto son los estilos de las notificaciones
   .noticia-slider {
     width: 95%;
   }
-  
+
   .btn-nav {
     font-size: 1.6rem;
     padding: 0.4rem 0.65rem;
   }
-  
+
   .btn-nav.prev {
     left: 10px;
   }
-  
+
   .btn-nav.next {
     right: 10px;
   }
@@ -753,4 +647,571 @@ Esto son los estilos de las notificaciones
 #noticiaModal .modal-body {
   font-size: 0.95rem;
   line-height: 1.5;
+}
+
+/* universitaryWellbeing/static/universitaryWellbeing/css/news.css */
+
+.descripcion-texto {
+  white-space: pre-wrap;
+  /* Preserva saltos de línea */
+  word-wrap: break-word;
+  /* Rompe palabras largas */
+  line-height: 1.6;
+  /* Espaciado entre líneas */
+  text-align: justify;
+  /* Justificar texto */
+}
+
+.descripcion-texto p {
+  margin-bottom: 1rem;
+}
+
+/* Estilos para listas en descripción */
+.descripcion-texto ol,
+.descripcion-texto ul {
+  margin-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+.descripcion-texto li {
+  margin-bottom: 0.5rem;
+}
+
+
+/* 
+Esto son los estilos de las notificaciones
+*/
+
+
+/* Estilos para el dropdown de notificaciones */
+.notifications-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.notifications-badge {
+  position: absolute;
+  top: -5px;
+  right: -5px;
+  background-color: #dc3545;
+  color: white;
+  border-radius: 50%;
+  padding: 2px 6px;
+  font-size: 10px;
+  font-weight: bold;
+  min-width: 18px;
+  text-align: center;
+}
+
+.notifications-menu {
+  position: absolute;
+  top: 45px;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  width: 380px;
+  max-height: 500px;
+  overflow: hidden;
+  display: none;
+  z-index: 1050;
+}
+
+.notifications-menu.show {
+  display: block;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notifications-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #e9ecef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8f9fa;
+  border-radius: 8px 8px 0 0;
+}
+
+.notifications-header h6 {
+  margin: 0;
+  font-weight: 600;
+  color: #333;
+}
+
+.notifications-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.notification-item {
+  padding: 12px 20px;
+  border-bottom: 1px solid #f1f3f5;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+
+.notification-item:last-child {
+  border-bottom: none;
+}
+
+.notification-item:hover {
+  background: #f8f9fa;
+}
+
+.notification-item.unread {
+  background: #e3f2fd;
+}
+
+.notification-item.unread:hover {
+  background: #d1e7f7;
+}
+
+.notification-content {
+  display: flex;
+  gap: 12px;
+}
+
+.notification-icon {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #007bff;
+  color: white;
+}
+
+.notification-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.notification-message {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 4px;
+  line-height: 1.4;
+}
+
+.notification-time {
+  font-size: 12px;
+  color: #6c757d;
+}
+
+.notification-unread-dot {
+  width: 8px;
+  height: 8px;
+  background: #007bff;
+  border-radius: 50%;
+  margin-top: 6px;
+  flex-shrink: 0;
+}
+
+.notifications-footer {
+  padding: 12px 20px;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+  background: #f8f9fa;
+  border-radius: 0 0 8px 8px;
+}
+
+.notifications-footer a {
+  color: #007bff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.notifications-footer a:hover {
+  text-decoration: underline;
+}
+
+.empty-notifications {
+  padding: 40px 20px;
+  text-align: center;
+  color: #6c757d;
+}
+
+.empty-notifications i {
+  font-size: 48px;
+  color: #dee2e6;
+  margin-bottom: 10px;
+}
+
+/* Scrollbar personalizada */
+.notifications-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.notifications-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.notifications-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 3px;
+}
+
+.notifications-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.notifications-dropdown {
+  position: relative;
+  z-index: 4000;
+}
+
+.notifications-menu {
+  position: fixed !important;
+  top: 70px; 
+  left: auto;
+  right: 20px;
+  z-index: 5000 !important;
+}
+
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .notifications-menu {
+    position: fixed;          
+    top: 70px;                
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90vw;              /* Ocupa casi toda la pantalla */
+    max-height: 70vh;         /* Evita que sea demasiado alto */
+    border-radius: 12px;
+    position: fixed !important;
+    z-index: 5000 !important;
+  }
+}
+
+
+.accordion-body {
+  padding: 1rem;
+}
+
+#horario-mini table {
+  font-size: 0.9rem;
+}
+
+#horario-mini .table th {
+  background: #f8f9fa;
+}
+
+.sticky-top {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+
+
+/* Mini Calendario Widget */
+.mini-calendar-widget {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  border-radius: 12px;
+  padding: 1.5rem;
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.mini-calendar-header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.calendar-date-display {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.day-name {
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  opacity: 0.9;
+}
+
+.day-number {
+  font-size: 3rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.month-year {
+  font-size: 1rem;
+  font-weight: 400;
+  opacity: 0.9;
+}
+
+.today-events {
+  background: white;
+  border-radius: 8px;
+  padding: 1rem;
+  color: #333;
+  min-height: 200px;
+}
+
+.today-events h6 {
+  color: #667eea;
+  font-weight: 600;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.event-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.event-item {
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.event-item:last-child {
+  border-bottom: none;
+}
+
+.event-time {
+  color: #667eea;
+  font-size: 0.875rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.event-title {
+  font-weight: 500;
+  color: #333;
+  font-size: 0.95rem;
+}
+
+.event-notes {
+  font-size: 0.8rem;
+  padding-left: 1.25rem;
+}
+
+/* Botón Ver Completo */
+.mini-calendar-widget .btn-primary {
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid white;
+  color: white;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.mini-calendar-widget .btn-primary:hover {
+  background: white;
+  color: #667eea;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .day-number {
+    font-size: 2.5rem;
+  }
+
+  .mini-calendar-widget {
+    padding: 1rem;
+  }
+}
+
+/* ==============================
+   NAVBAR OPTIONS WRAPPER
+   ============================== */
+.navbar-options {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+/* ==============================
+   SUBHEADER MOBILE OPTIONS
+   ============================== */
+.sub-bar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 100;
+}
+
+.sub-bar-content {
+  flex: 1;
+}
+
+.sub-bar-mobile-options {
+  display: none;
+  gap: 12px;
+  align-items: center;
+}
+
+/* Iconos blancos para mobile en sub-bar */
+.sub-bar-mobile-options .navbar-option img {
+  height: 24px;
+  filter: brightness(0) invert(1);
+}
+
+.sub-bar-mobile-options .user-avatar {
+  width: 32px;
+  height: 32px;
+  font-size: 12px;
+}
+
+.sub-bar-mobile-options .btn-link {
+  padding: 0;
+}
+
+/* ==============================
+   RESPONSIVE - MOBILE
+   ============================== */
+@media (max-width: 768px) {
+
+  /* Ocultar opciones del navbar principal en móvil */
+  .navbar-options {
+    display: none !important;
+  }
+
+  /* Mostrar opciones en el subheader en móvil */
+  .sub-bar-mobile-options {
+    display: flex !important;
+  }
+
+  /* Ajustar logo y texto en móvil */
+  .custom-navbar .navbar-brand img {
+    height: 45px;
+  }
+
+  .custom-navbar .navbar-brand {
+    font-size: 0.85rem;
+  }
+
+  /* Ajustar espaciado del main */
+  main {
+    margin-top: calc(70px + 44px);
+  }
+
+  .sub-bar {
+    top: 70px;
+    padding: 10px 16px;
+  }
+
+  /* Ajustar menú de notificaciones en móvil */
+  .sub-bar-mobile-options .notifications-menu {
+    top: 42px;
+    right: -10px;
+    width: 300px;
+  }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .custom-navbar .navbar-brand {
+    font-size: 0.75rem;
+  }
+
+  .custom-navbar .navbar-brand img {
+    height: 40px;
+  }
+
+  .sub-bar-mobile-options {
+    gap: 8px;
+  }
+
+  .sub-bar-mobile-options .navbar-option img {
+    height: 22px;
+  }
+
+  .sub-bar-mobile-options .notifications-menu {
+    width: 280px;
+    right: 0;
+  }
+}
+
+/* ==============================
+   FIX: ELIMINAR SEPARACIÓN ENTRE HEADERS EN MÓVIL
+   ============================== */
+@media (max-width: 768px) {
+
+  /* Reducir padding del navbar principal */
+  .custom-navbar {
+    padding: 0.3rem 0.8rem;
+  }
+
+  /* Eliminar margen inferior del navbar */
+  .navbar.fixed-top {
+    margin-bottom: 0;
+  }
+
+  /* Pegar el sub-bar justo debajo del navbar */
+  .sub-bar {
+    top: 58px;
+    /* Altura ajustada del navbar en móvil */
+    padding: 8px 12px;
+  }
+
+  /* Ajustar el margen del main */
+  main {
+    margin-top: calc(58px + 40px);
+    /* navbar + sub-bar sin gaps */
+  }
+
+  /* Reducir altura del logo */
+  .custom-navbar .navbar-brand img {
+    height: 42px;
+  }
+
+  .custom-navbar .navbar-brand {
+    font-size: 0.8rem;
+    gap: 4px;
+  }
+}
+
+/* Para pantallas muy pequeñas */
+@media (max-width: 480px) {
+  .custom-navbar {
+    padding: 0.25rem 0.6rem;
+  }
+
+  .sub-bar {
+    top: 52px;
+    padding: 6px 10px;
+  }
+
+  main {
+    margin-top: calc(52px + 36px);
+  }
+
+  .custom-navbar .navbar-brand img {
+    height: 38px;
+  }
+
+  .custom-navbar .navbar-brand {
+    font-size: 0.75rem;
+  }
 }

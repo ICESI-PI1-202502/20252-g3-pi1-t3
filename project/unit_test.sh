@@ -46,6 +46,7 @@ coverage run -a manage.py test social_projects.tests.test_views_psu --timing --k
 
 # Universitary Wellbeing
 coverage run -a manage.py test universitaryWellbeing.tests.test_views --timing --keepdb
+coverage run -a manage.py test universitaryWellbeing.tests.test_calendario_horario --timing --keepdb
 
 
 echo " Generando reporte de cobertura..."

@@ -6,26 +6,81 @@
       {% block header_logo %}
       <a class="navbar-brand" href="{% url 'home' %}">
         <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
-        Bienestar Universitario
+        <span class="brand-text">Bienestar Universitario</span>
       </a>
       {% endblock %}
 
-      <!-- ADDED: wrapper que contiene nav-collapse + campana -->
-      <div class="d-flex align-items-center ms-auto">
+      <!-- Contenedor de iconos de navegación -->
+      <div class="navbar-icons-wrapper">
         <div class="collapse navbar-collapse" id="navbarNav"></div>
 
         <!-- notificaciones -->
         {% block header_notifications %}
-        <div class="navbar-option ms-3">
-          <a href="#" title="Notificaciones">
-            <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
-          </a>
+        <div class="navbar-option">
+          <div class="notifications-dropdown">
+            <button type="button" id="notificationsBtn" title="Notificaciones" class="btn btn-link p-0">
+              <img src="{% static 'universitaryWellbeing/img/notification.png' %}" alt="Notificaciones" />
+              {% if notificaciones_no_leidas > 0 %}
+                <span class="notifications-badge">{{ notificaciones_no_leidas }}</span>
+              {% endif %}
+            </button>
+
+            <!-- Menú desplegable de notificaciones -->
+            <div class="notifications-menu" id="notificationsMenu">
+              <div class="notifications-header">
+                <h6><i class="bi bi-bell-fill me-2"></i>Notificaciones</h6>
+              </div>
+              
+              <div class="notifications-list">
+                {% if notificaciones %}
+                  {% for notif in notificaciones|slice:":10" %}
+                  <div class="notification-item {% if not notif.leida %}unread{% endif %}" 
+                       data-notif-id="{{ notif.id_notificacion }}">
+                    <div class="notification-content">
+                      <div class="notification-icon">
+                        <i class="bi bi-info-circle"></i>
+                      </div>
+                      <div class="notification-text">
+                        <div class="notification-message">
+                          {{ notif.mensaje|truncatewords:20 }}
+                        </div>
+                        <div class="notification-time">
+                          {% if notif.created_at %}
+                            hace {{ notif.created_at|timesince }}
+                          {% else %}
+                            {{ notif.fecha|date:"d/m/Y H:i" }}
+                          {% endif %}
+                        </div>
+                      </div>
+                      {% if not notif.leida %}
+                      <div class="notification-unread-dot"></div>
+                      {% endif %}
+                    </div>
+                  </div>
+                  {% endfor %}
+                {% else %}
+                  <div class="empty-notifications">
+                    <i class="bi bi-bell-slash"></i>
+                    <p class="mb-0">No tienes notificaciones</p>
+                  </div>
+                {% endif %}
+              </div>
+              
+              {% if notificaciones %}
+              <div class="notifications-footer">
+                <a href="{% url 'notificaciones:ver_notificaciones' %}">
+                  Ver todas las notificaciones
+                </a>
+              </div>
+              {% endif %}
+            </div>
+          </div>
         </div>
         {% endblock %}
 
         <!-- avatar -->
         {% block header_avatar %}
-        <div class="navbar-option ms-3">
+        <div class="navbar-option">
           {% if user.is_authenticated %}
           <a href="{% url 'profile' %}" title="Perfil">
             {% include 'includes/user_avatar.html' %}
@@ -38,14 +93,13 @@
 
         <!-- boton menú lateral -->
         {% block header_sidebar_btn %}
-        <div class="navbar-option ms-3">
+        <div class="navbar-option">
           <a href="#" id="menu-btn" title="Menú">
             <img src="{% static 'universitaryWellbeing/img/Menu.png' %}" alt="Menú" />
           </a>
         </div>
         {% endblock %}
       </div>
-      <!-- /ADDED -->
     </div>
   </nav>
 </header>

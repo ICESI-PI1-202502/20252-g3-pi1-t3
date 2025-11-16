@@ -12,14 +12,11 @@ document.addEventListener("DOMContentLoaded", function () {
     function centerButtons() {
         const activeSlide = document.querySelector(".noticia-slide.active");
         if (activeSlide && slider) {
-            // Obtener altura total del slider
             const sliderHeight = activeSlide.offsetHeight;
             const centerPosition = sliderHeight / 2;
             
             nextBtn.style.top = `${centerPosition}px`;
             prevBtn.style.top = `${centerPosition}px`;
-            
-            console.log('Slider height:', sliderHeight, 'Center:', centerPosition);
         }
     }
 
@@ -45,7 +42,6 @@ document.addEventListener("DOMContentLoaded", function () {
             bar.style.width = "100%";
         }, 100);
 
-        // Centrar botones después de que el slide esté visible
         setTimeout(centerButtons, 100);
     }
 
@@ -75,11 +71,9 @@ document.addEventListener("DOMContentLoaded", function () {
         showSlide(currentIndex);
         startAuto();
         
-        // Recentrar al cargar imágenes y redimensionar
         window.addEventListener('load', centerButtons);
         window.addEventListener('resize', centerButtons);
         
-        // Recentrar cuando todas las imágenes carguen
         slides.forEach(slide => {
             const img = slide.querySelector('img');
             if (img) {
@@ -93,6 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
 document.addEventListener("DOMContentLoaded", function () {
     const modal = new bootstrap.Modal(document.getElementById('noticiaModal'));
     const modalTitulo = document.getElementById('modalTitulo');
+    const modalEnunciado = document.getElementById('modalEnunciado');
     const modalDescripcion = document.getElementById('modalDescripcion');
     const modalImagen = document.getElementById('modalImagen');
     const modalFecha = document.getElementById('modalFecha');
@@ -101,11 +96,19 @@ document.addEventListener("DOMContentLoaded", function () {
     document.querySelectorAll('.ver-mas').forEach(btn => {
         btn.addEventListener('click', (e) => {
             const slide = e.target.closest('.noticia-slide');
+            
+            // Rellenar modal con datos
             modalTitulo.textContent = slide.dataset.titulo;
-            modalDescripcion.textContent = slide.dataset.descripcion;
+            modalEnunciado.textContent = slide.dataset.enunciado;
+            let descripcion = slide.dataset.descripcion || '';
+            descripcion = descripcion.split('\n\n').map(p => `<p>${p.replace(/\n/g, '<br>')}</p>`).join('');
+            modalDescripcion.innerHTML = descripcion;
             modalImagen.src = slide.dataset.imagen;
-            modalFecha.textContent = `📅 Publicado el ${slide.dataset.fecha}`;
-            modalAutor.textContent = `✍️ Autor: ${slide.dataset.autor}`;
+            
+            // Formatear fecha y autor
+            modalFecha.querySelector('span').textContent = slide.dataset.fecha;
+            modalAutor.querySelector('span').textContent = slide.dataset.autor;
+            
             modal.show();
         });
     });

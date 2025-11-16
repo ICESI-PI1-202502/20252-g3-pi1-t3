@@ -1,3 +1,4 @@
+# 20252-g3-pi1-t3\project\universitaryWellbeing\urls.py
 from django.urls import path, include
 from django.contrib.auth import views as auth_views
 from . import views
@@ -15,10 +16,12 @@ urlpatterns = [
     path("analytics-reports/", include("Analytics_Reports.urls", namespace="Analytics_Reports")),
     path("tournaments/", include("tournaments.urls")),
     path("psu/", include("social_projects.urls")),
+    path("appointments/", include("appointments.urls")),
     path("horario/", views.schedule, name="horario"),
+    path("horario/eliminar/<int:evento_id>/", views.delete_event, name="eliminar_evento"),  
     path("notificaciones/", include("notificaciones.urls", namespace="notificaciones")),
-    path("news/", include("news.urls", namespace="news")),
-
+    path("completar-perfil/", views.completar_perfil, name="completar_perfil"),
+    path("calendario-unificado/", views.unified_calendar, name="calendario_unificado"),
 
     path('password_reset/', auth_views.PasswordResetView.as_view(template_name='auth/password_reset.html'), name='password_reset'),
     path('password_reset/done/', auth_views.PasswordResetDoneView.as_view(template_name='auth/password_reset_done.html'), name='password_reset_done'),
