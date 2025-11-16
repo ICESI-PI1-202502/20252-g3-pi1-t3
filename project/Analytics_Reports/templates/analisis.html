@@ -24,6 +24,116 @@
         box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         margin-bottom: 20px;
     }
+    
+    /* === ESTILOS PARA DESPLEGABLES === */
+    .actividades-toggle {
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+        max-width: 250px;
+    }
+    
+    .actividades-toggle:hover {
+        background-color: #f8f9fa;
+    }
+    
+    .actividades-toggle i {
+        transition: transform 0.2s;
+        font-size: 0.8rem;
+    }
+    
+    .actividades-toggle.expanded i {
+        transform: rotate(90deg);
+    }
+    
+    .actividades-preview {
+        font-weight: 500;
+        color: #495057;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    
+    .actividades-count {
+        background-color: #007bff;
+        color: white;
+        padding: 2px 6px;
+        border-radius: 10px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-left: 5px;
+    }
+    
+    .actividades-list {
+        display: none;
+        margin-top: 8px;
+        padding: 10px;
+        background-color: #f8f9fa;
+        border-radius: 4px;
+        border-left: 3px solid #007bff;
+    }
+    
+    .actividades-list.show {
+        display: block;
+        animation: slideDown 0.2s ease-out;
+    }
+    
+    @keyframes slideDown {
+        from {
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+    
+    .actividades-list ul {
+        margin: 0;
+        padding-left: 20px;
+        list-style: none;
+    }
+    
+    .actividades-list li {
+        padding: 4px 0;
+        color: #495057;
+    }
+    
+    .actividades-list li:before {
+        content: "→";
+        color: #007bff;
+        margin-right: 8px;
+        font-weight: bold;
+    }
+    
+    /* Tipos de actividad también compactos */
+    .tipos-badge {
+        display: inline-block;
+        max-width: 180px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        font-size: 0.85rem;
+    }
+    
+    .tipos-badge:hover {
+        max-width: none;
+        white-space: normal;
+        cursor: help;
+    }
+    
+    /* Para móviles */
+    @media (max-width: 768px) {
+        .actividades-toggle {
+            max-width: 150px;
+        }
+    }
 </style>
 {% endblock %}
 
@@ -45,7 +155,7 @@
         <!-- ============================== -->
         <div class="card mb-3">
             <div class="card-header bg-primary text-white">
-                <i class="fas fa-filter"></i> Filtros de Segmentación por Actividades (RF2.2)
+                <i class="fas fa-filter"></i> Filtros de Segmentación  
             </div>
             <div class="card-body">
                 <div class="row g-2">
@@ -140,46 +250,23 @@
             </div>
         </div>
 
-        <!-- ============================== -->
-        <!-- NUEVO: Filtros de Torneos      -->
-        <!-- ============================== -->
-        <div class="card">
-            <div class="card-header bg-dark text-white">
-                <i class="fas fa-trophy"></i> Filtros por Torneos (Nombre / Disciplina / Estado)
-            </div>
-            <div class="card-body">
-                <div class="row g-2">
-                    <div class="col-md-4">
-                        <label class="form-label small">Nombre del torneo</label>
-                        <input type="text" name="torneo_nombre" class="form-control"
-                               value="{{ request.GET.torneo_nombre|default_if_none:'' }}"
-                               placeholder="Ej: Interfacultades">
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small">Disciplina</label>
-                        <select name="torneo_disciplina" class="form-select">
-                            <option value="">Todas</option>
-                            {% for d in disciplinas_torneo %}
-                                <option value="{{ d.id_disciplina }}"
-                                  {% if request.GET.torneo_disciplina == d.id_disciplina|stringformat:"s" %}selected{% endif %}>
-                                  {{ d.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                    <div class="col-md-4">
-                        <label class="form-label small">Estado</label>
-                        <select name="torneo_estado" class="form-select">
-                            <option value="">Todos</option>
-                            {% for e in estados_torneo %}
-                                <option value="{{ e.id_estado_torneo }}"
-                                  {% if request.GET.torneo_estado == e.id_estado_torneo|stringformat:"s" %}selected{% endif %}>
-                                  {{ e.nombre }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
-                </div>
+    <!-- Mensaje informativo cuando no hay filtros -->
+    {% if not has_filters %}
+    <div class="alert alert-info" role="alert">
+        <i class="fas fa-info-circle"></i> 
+        <strong>Sistema de Análisis de Comportamiento Estudiantil</strong>
+        <br>
+        <small>
+             Registra frecuencia, tipo y reincidencia de participación. Segmenta por rol, semestre, facultad y género.<br>
+              Muestra métricas globales, rankings y estadísticas de asistencia.
+        </small>
+    </div>
+    {% elif mostrar_todos %}
+    <div class="alert alert-success" role="alert">
+        <i class="fas fa-check-circle"></i> 
+        <strong>Mostrando todos los registros</strong>
+    </div>
+    {% endif %}
 
                 <div class="row g-2 mt-2">
                     <div class="col-md-3">
@@ -297,26 +384,9 @@
             </div></div>
         </div>
     </div>
-
-    <!-- Resumen segmentación -->
-    <h4 class="mb-3"><i class="fas fa-th"></i> Resumen de Segmentación</h4>
-    <div class="row mb-4">
-        <div class="col-md-3"><div class="card text-center"><div class="card-body">
-            <h4>{{ data|length }}</h4><p>Registros mostrados</p>
-        </div></div></div>
-        <div class="col-md-3"><div class="card text-center"><div class="card-body">
-            <h4>{{ roles_unicos }}</h4><p>Tipos de roles</p>
-        </div></div></div>
-        <div class="col-md-3"><div class="card text-center"><div class="card-body">
-            <h4>{{ tipos_actividad_unicos }}</h4><p>Tipos de actividades</p>
-        </div></div></div>
-        <div class="col-md-3"><div class="card text-center"><div class="card-body">
-            <h4>{{ facultades_unicas }}</h4><p>Facultades</p>
-        </div></div></div>
-    </div>
-
-    <!-- Gráficos -->
-    <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Análisis de Comportamiento (RF2.1)</h4>
+         
+    <!-- GRÁFICOS -->
+    <h4 class="mb-3"><i class="fas fa-chart-pie"></i> Análisis de Comportamiento  </h4>
     <div class="row mb-4">
         <div class="col-md-6">
             <div class="dashboard-section">
@@ -365,7 +435,7 @@
         {% endif %}
     </div>
 
-    <!-- Tabla de resultados (Participantes) -->
+    <!-- Tabla de resultados CON DESPLEGABLES -->
     <h4 class="mb-3"><i class="fas fa-table"></i> Detalle por Usuario</h4>
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
@@ -381,7 +451,8 @@
                             <th>Semestre</th>
                             <th>Facultad</th>
                             <th>Rol</th>
-                            <th>Tipo de actividad</th>
+                            <th style="width: 280px;">Actividades</th>
+                            <th style="width: 200px;">Tipos</th>
                             <th class="text-center">Total</th>
                             <th class="text-center">Frecuencia</th>
                         </tr>
@@ -397,10 +468,52 @@
                                 {{ item.participantes_id_participante__semestre|default:"N/A" }}
                             </span></td>
                             <td>{{ item.participantes_id_participante__facultad|default:"Sin especificar" }}</td>
-                            <td><span class="badge bg-info">
-                                {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
-                            </span></td>
-                            <td>{{ item.actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo|default:"Varias" }}</td>
+                            <td>
+                                <span class="badge bg-info">
+                                    {{ item.participantes_id_participante__roles_id_rol__nombre_rol|default:"Sin rol" }}
+                                </span>
+                            </td>
+                            
+                            <!-- === COLUMNA CON DESPLEGABLE === -->
+                            <td>
+                                {% if item.actividades_lista %}
+                                    {% if item.actividades_lista|length > 2 %}
+                                        <!-- Mostrar desplegable si hay 3+ actividades -->
+                                        <div class="actividades-toggle" onclick="toggleActividades(this)">
+                                            <i class="fas fa-chevron-right"></i>
+                                            <span class="actividades-preview">
+                                                {{ item.actividades_lista.0 }}
+                                                {% if item.actividades_lista|length > 1 %}...{% endif %}
+                                            </span>
+                                            <span class="actividades-count">{{ item.actividades_lista|length }}</span>
+                                        </div>
+                                        <div class="actividades-list">
+                                            <ul>
+                                                {% for actividad in item.actividades_lista %}
+                                                    <li>{{ actividad }}</li>
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% else %}
+                                        <!-- Mostrar directamente si son 1-2 actividades -->
+                                        <ul class="list-unstyled mb-0 small">
+                                            {% for actividad in item.actividades_lista %}
+                                                <li>• {{ actividad }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    {% endif %}
+                                {% else %}
+                                    <small class="text-muted">Sin actividades</small>
+                                {% endif %}
+                            </td>
+                            
+                            <!-- === COLUMNA TIPOS COMPACTA === -->
+                            <td>
+                                <span class="tipos-badge text-muted" title="{{ item.tipos_actividad_texto }}">
+                                    {{ item.tipos_actividad_texto }}
+                                </span>
+                            </td>
+                            
                             <td class="text-center">
                                 <span class="badge bg-primary fs-6">{{ item.total }}</span>
                             </td>
@@ -416,10 +529,11 @@
                         </tr>
                         {% empty %}
                         <tr>
-                            <td colspan="7" class="text-center text-muted py-4">
-                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i><br>
+                            <td colspan="8" class="text-center text-muted py-4">
+                                <i class="fas fa-search mb-3" style="font-size: 2rem;"></i>
+                                <br>
                                 <strong>No se encontraron resultados</strong>
-                             </td>
+                            </td>
                         </tr>
                         {% endfor %}
                     </tbody>
@@ -431,7 +545,7 @@
     <!-- Info adicional -->
     <div class="mt-4">
         <div class="alert alert-info">
-            <h6><i class="fas fa-info-circle"></i> Criterios de Frecuencia (RF2.1):</h6>
+            <h6><i class="fas fa-info-circle"></i> Criterios de Frecuencia:</h6>
             <ul class="mb-0">
                 <li><strong>Alta:</strong> 5 o más participaciones</li>
                 <li><strong>Media:</strong> 2-4 participaciones</li>
@@ -452,6 +566,18 @@
     const datosTiposActividad = {{ datos_grafico_tipos_actividad|safe }};
     const datosReincidencia = {{ datos_grafico_reincidencia|safe }};
     initCharts(datosFrecuencia, datosRoles, datosFacultades, datosTiposActividad, datosReincidencia);
+    
+    // === FUNCIÓN PARA TOGGLE DE ACTIVIDADES ===
+    function toggleActividades(element) {
+        const toggle = element;
+        const list = element.nextElementSibling;
+        
+        // Toggle clase expanded para rotar flecha
+        toggle.classList.toggle('expanded');
+        
+        // Toggle clase show para mostrar/ocultar lista
+        list.classList.toggle('show');
+    }
 </script>
 {% endif %}
 {% endblock %}

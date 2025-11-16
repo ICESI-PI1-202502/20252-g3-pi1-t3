@@ -23,6 +23,12 @@ from universitaryWellbeing.models import (
     RolesParticipacion,EstadosParticipacion, Torneos, Disciplinas, EstadosTorneo, TorneosEquipos, EquiposParticipantes
 )
 
+# Agregar estos imports al inicio de views.py si no están presentes
+from django.db.models import (
+    Count, Avg, Q, F, Case, When, IntegerField, Max, 
+    ExpressionWrapper, FloatField  # ← AÑADIR FloatField
+)
+
 LOG_DIR = os.path.join("Analytics_Reports", "logs", "emails")
 LOG_EMAILS_FILE = os.path.join(LOG_DIR, "log_emails.txt")
 
@@ -573,37 +579,30 @@ def analisis_comportamiento(request):
     # BLOQUE ACTUAL: ACTIVIDADES / PARTICIPACIONES
     # ============================================
     if has_filters or export:
-        queryset = (
-            Participaciones.objects.values(
-                "participantes_id_participante__nombre",
-                "participantes_id_participante__correo",
-                "participantes_id_participante__semestre",
-                "participantes_id_participante__facultad",
-                "participantes_id_participante__genero",
-                "participantes_id_participante__roles_id_rol__nombre_rol",
-                "participantes_id_participante",
-                "actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
-            )
-            .annotate(
-                total=Count("id_participacion"),
-                primera_participacion=Min("fecha_inscripcion"),
-                ultima_participacion=Max("fecha_inscripcion"),
-            )
-            .order_by("-total")
-        )
+        # Base: participaciones por usuario
+        queryset = Participaciones.objects.values(
+            "participantes_id_participante__nombre",
+            "participantes_id_participante__correo",
+            "participantes_id_participante__semestre",
+            "participantes_id_participante__facultad",
+            "participantes_id_participante__genero",
+            "participantes_id_participante__roles_id_rol__nombre_rol",
+            "participantes_id_participante",
+            #"actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo",
+        ).annotate(
+            total=Count("id_participacion"),
+            primera_participacion=Min("fecha_inscripcion"),
+            ultima_participacion=Max("fecha_inscripcion")
+        ).order_by("-total")
 
-        # Solo roles del sistema
+        # === FILTRAR SOLO ROLES DEL SISTEMA ===
         queryset = queryset.filter(
             participantes_id_participante__roles_id_rol__nombre_rol__in=ROLES_SISTEMA
         )
 
-        # >>> NUEVO: si hay filtros de torneos, restringir por los participantes hallados
-        if participante_ids_from_torneos is not None:
-            queryset = queryset.filter(
-                participantes_id_participante__in=participante_ids_from_torneos
-            )
 
-        # Filtros de ACTIVIDADES / perfil
+
+        # Aplicar filtros del usuario (SIN min_frecuencia)
         if tipo_actividad:
             queryset = queryset.filter(
                 actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
@@ -626,6 +625,38 @@ def analisis_comportamiento(request):
             )
 
         data = list(queryset)
+
+        # ✅ SOLUCIÓN: Para cada participante, obtener sus actividades Y tipos
+        for item in data:
+            participante_id = item['participantes_id_participante']
+            
+            # Obtener todas las participaciones del participante
+            participaciones_usuario = Participaciones.objects.filter(
+                participantes_id_participante_id=participante_id
+            ).select_related('actividades_id_actividad__tipos_actividad_id_tipo')
+            
+            # Aplicar el mismo filtro de tipo_actividad si existe
+            if tipo_actividad:
+                participaciones_usuario = participaciones_usuario.filter(
+                    actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
+                )
+            
+            # Obtener nombres de actividades
+            actividades_info = []
+            tipos_set = set()
+            
+            for part in participaciones_usuario:
+                actividad = part.actividades_id_actividad
+                actividades_info.append(actividad.nombre)
+                
+                # Agregar tipo si existe
+                if actividad.tipos_actividad_id_tipo:
+                    tipos_set.add(actividad.tipos_actividad_id_tipo.nombre_tipo)
+            
+            # Agregar al item
+            item['actividades_lista'] = list(set(actividades_info))  # Únicos
+            item['actividades_texto'] = ', '.join(sorted(set(actividades_info))) if actividades_info else 'Ninguna'
+            item['tipos_actividad_texto'] = ', '.join(sorted(tipos_set)) if tipos_set else 'Sin tipo'
 
         # === ESTADÍSTICAS ÚNICAS (para cards de resumen) ===
         if data:
@@ -706,12 +737,18 @@ def analisis_comportamiento(request):
             for fac, count in sorted(fac_count.items(), key=lambda x: x[1], reverse=True)[:10]
         ]
 
-        # === GRÁFICO: Tipos de actividad
+        # === GRÁFICO: Tipos de actividad - RF4.2 ===
+        # ✅ GRÁFICO: Tipos de actividad - CORREGIDO
         tipos_count = {}
-        for item in (data or []):
-            tipo = item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo", "Otro")
-            if tipo and tipo != "Otro":
-                tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
+        
+        for item in data:
+                tipos_texto = item.get('tipos_actividad_texto', '')
+                if tipos_texto and tipos_texto != 'Sin tipo':
+                    # Dividir por comas si hay múltiples tipos
+                    tipos_lista = [t.strip() for t in tipos_texto.split(',')]
+                    for tipo in tipos_lista:
+                        tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
+
         datos_grafico_tipos_actividad = [
             {"label": tipo, "value": count}
             for tipo, count in sorted(tipos_count.items(), key=lambda x: x[1], reverse=True)
@@ -1985,10 +2022,15 @@ def menu_analisis(request):
 
 
 
+# Agregar estos imports al inicio del archivo views.py
+from django.db.models.functions import ExtractWeekDay, TruncMonth
+
+# AGREGAR AL INICIO DE views.py:
+from django.db.models.functions import ExtractWeekDay, TruncMonth
 
 @login_required
 def dashboard_docente(request):
-    """Dashboard exclusivo para profesores"""
+    """Dashboard exclusivo para profesores - VERSIÓN CORREGIDA"""
     
     try:
         participante = request.user.participantes_set.first()
@@ -1999,27 +2041,17 @@ def dashboard_docente(request):
         
         rol = participante.roles_id_rol.nombre_rol.lower()
         
-        # ✅ DEBUG
-        print(f"DEBUG - Usuario: {request.user.username}")
-        print(f"DEBUG - Rol: {rol}")
-        print(f"DEBUG - ID Participante: {participante.id_participante}")
-        
     except Exception as e:
         messages.error(request, f'Error al obtener perfil: {str(e)}')
         return redirect('home')
     
-    # Verificar que sea profesor/docente
     if rol not in ['profesor', 'docente']:
         messages.warning(request, 'Esta sección es solo para profesores.')
         return redirect('Analytics_Reports:analytics_index')
     
-    # ========== ESTRATEGIA MEJORADA: 3 MÉTODOS ==========
-    
-    # MÉTODO 1: Por campo responsable
+    # ========== OBTENER ACTIVIDADES ==========
     mis_actividades = Actividades.objects.filter(responsable=participante)
-    print(f"DEBUG - Actividades como responsable: {mis_actividades.count()}")
     
-    # MÉTODO 2: Por participaciones (CUALQUIER rol, no solo instructor)
     if not mis_actividades.exists():
         mis_participaciones_ids = Participaciones.objects.filter(
             participantes_id_participante=participante
@@ -2028,31 +2060,14 @@ def dashboard_docente(request):
         mis_actividades = Actividades.objects.filter(
             id_actividad__in=mis_participaciones_ids
         )
-        print(f"DEBUG - Actividades por participaciones: {mis_actividades.count()}")
     
-    # MÉTODO 3: Si el profesor tiene grupo asignado (ej: Artes Musicales)
     if not mis_actividades.exists() and participante.facultad:
-        # Buscar actividades que mencionen su facultad en el nombre o descripción
         mis_actividades = Actividades.objects.filter(
             Q(nombre__icontains=participante.facultad) |
             Q(descripcion__icontains=participante.facultad)
         )
-        print(f"DEBUG - Actividades por facultad: {mis_actividades.count()}")
     
-    # ✅ DEBUG FINAL
-    print(f"DEBUG - Total actividades encontradas: {mis_actividades.count()}")
-    if mis_actividades.exists():
-        print("DEBUG - Actividades encontradas:")
-        for act in mis_actividades:
-            print(f"  - {act.nombre} (ID: {act.id_actividad})")
-    
-    # Si aún no tiene actividades, mostrar mensaje
     if not mis_actividades.exists():
-        # Verificar si tiene participaciones pero sin actividades visibles
-        total_participaciones = Participaciones.objects.filter(
-            participantes_id_participante=participante
-        ).count()
-        
         context = {
             'participante': participante,
             'mensaje_sin_actividades': True,
@@ -2060,51 +2075,46 @@ def dashboard_docente(request):
             'total_asistentes': 0,
             'promedio_asistencia': 0,
             'total_asistencias': 0,
+            'sesiones_realizadas': 0,
             'top_estudiantes': [],
             'actividades_populares': [],
             'datos_actividades_populares': '[]',
-            'datos_tipos_actividad': '[]',
-            'datos_evolucion_asistencia': '[]',
+            'datos_asistencia_por_dia': '[]',
+            'asistencia_actividad_dia': [],
             'nombre_docente': f"{participante.nombre} {participante.apellido}",
             'facultad': participante.facultad or 'Sin facultad',
-            # ✅ NUEVO: Info de debug para el usuario
-            'debug_info': {
-                'tiene_participaciones': total_participaciones > 0,
-                'total_participaciones': total_participaciones,
-                'sugerencia': 'Contacta al administrador para asignar tus actividades como responsable.'
-            }
         }
         return render(request, 'dashboard_docente.html', context)
     
-    # ========== MÉTRICAS GENERALES ==========
+    # ========== MÉTRICAS GENERALES - CORREGIDAS ==========
     total_mis_actividades = mis_actividades.count()
     
-    # Participaciones de ESTUDIANTES en mis actividades (excluir mi propia participación)
     participaciones_estudiantes = Participaciones.objects.filter(
         actividades_id_actividad__in=mis_actividades,
         participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'
     )
     
-    # Total de estudiantes únicos
     total_asistentes = participaciones_estudiantes.values(
         'participantes_id_participante'
     ).distinct().count()
     
-    # Asistencias totales en mis actividades
+    # ✅ CORRECCIÓN CRÍTICA: Sesiones = fechas únicas con asistencias
+    sesiones_realizadas = Asistencias.objects.filter(
+        participaciones_id_participacion__actividades_id_actividad__in=mis_actividades
+    ).values('fecha').distinct().count()
+    
+    # Total de asistencias "Presente"
     total_asistencias = Asistencias.objects.filter(
         participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
         estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
     ).count()
     
-    # Promedio de asistencia por actividad
+    # ✅ PROMEDIO CORREGIDO: Total asistencias / Sesiones reales
     promedio_asistencia = round(
-        total_asistencias / max(total_mis_actividades, 1), 1
+        total_asistencias / max(sesiones_realizadas, 1), 1
     )
     
-    # ========== TOP ESTUDIANTES MÁS ACTIVOS ==========
-    from django.db.models import Count, Q, Sum
-
-    # OPCIÓN 1: Query más directa (RECOMENDADA)
+    # ========== TOP ESTUDIANTES ==========
     top_estudiantes = (
         Participantes.objects
         .filter(
@@ -2112,10 +2122,6 @@ def dashboard_docente(request):
             participaciones__actividades_id_actividad__in=mis_actividades
         )
         .annotate(
-            total_participaciones=Count(
-                'participaciones__id_participacion',
-                distinct=True
-            ),
             total_asistencias=Count(
                 'participaciones__asistencias__id_asistencia',
                 filter=Q(
@@ -2124,91 +2130,115 @@ def dashboard_docente(request):
                 distinct=True
             )
         )
-        .filter(total_asistencias__gt=0)  # ✅ Solo estudiantes con al menos 1 asistencia
+        .filter(total_asistencias__gt=0)
         .values(
             'id_participante',
             'nombre',
             'apellido',
-            'correo',
-            'total_participaciones',
             'total_asistencias'
         )
         .order_by('-total_asistencias')[:10]
-        )
+    )
     
-    # ========== ACTIVIDADES MÁS POPULARES ==========
-    actividades_populares = mis_actividades.annotate(
-        total_estudiantes=Count(
-            'participaciones__participantes_id_participante',
-            filter=Q(participaciones__participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'),
-            distinct=True
-        ),
-        total_asistencias=Count(
-            'participaciones__asistencias',
-            filter=Q(participaciones__asistencias__estados_asistencia_id_estado_asistencia__nombre__icontains='presente')
-        )
-    ).order_by('-total_estudiantes')[:5]
+    # ========== ACTIVIDADES POPULARES (solo si hay más de 1) ==========
+    datos_actividades_populares = []
+    if total_mis_actividades > 1:
+        actividades_populares = mis_actividades.annotate(
+            total_estudiantes=Count(
+                'participaciones__participantes_id_participante',
+                filter=Q(participaciones__participantes_id_participante__roles_id_rol__nombre_rol='Estudiante'),
+                distinct=True
+            )
+        ).order_by('-total_estudiantes')[:5]
+        
+        datos_actividades_populares = [
+            {
+                'label': act.nombre,
+                'value': act.total_estudiantes
+            }
+            for act in actividades_populares
+        ]
     
-    # Preparar datos para gráfico
-    datos_actividades_populares = [
-        {
-            'label': act.nombre,
-            'value': act.total_estudiantes
-        }
-        for act in actividades_populares
-    ]
-    
-    # ========== DISTRIBUCIÓN POR TIPO DE ACTIVIDAD ==========
-    tipos_actividad_stats = mis_actividades.values(
-        'tipos_actividad_id_tipo__nombre_tipo'
-    ).annotate(
-        cantidad=Count('id_actividad')
-    ).order_by('-cantidad')
-    
-    datos_tipos_actividad = [
-        {
-            'label': tipo['tipos_actividad_id_tipo__nombre_tipo'] or 'Sin tipo',
-            'value': tipo['cantidad']
-        }
-        for tipo in tipos_actividad_stats
-    ]
-    
-    # ========== ASISTENCIA POR MES (últimos 6 meses) ==========
-    from datetime import timedelta
-    from django.db.models.functions import TruncMonth
-    
-    fecha_limite = timezone.now().date() - timedelta(days=180)
-    
-    # ✅ Compatible con PostgreSQL y MySQL
-    asistencias_por_mes = Asistencias.objects.filter(
+    # ========== ASISTENCIA POR DÍA DE LA SEMANA ==========
+    asistencias_por_dia = Asistencias.objects.filter(
         participaciones_id_participacion__actividades_id_actividad__in=mis_actividades,
-        fecha__gte=fecha_limite,
         estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
     ).annotate(
-        mes=TruncMonth('fecha')
-    ).values('mes').annotate(
-        total=Count('id_asistencia')
-    ).order_by('mes')
+        dia_semana=ExtractWeekDay('fecha')
+    ).values('dia_semana').annotate(
+        total=Count('id_asistencia'),
+        sesiones=Count('fecha', distinct=True)
+    ).order_by('dia_semana')
     
-    datos_evolucion_asistencia = [
-        {
-            'label': item['mes'].strftime('%Y-%m') if item['mes'] else 'N/A',
-            'value': item['total']
-        }
-        for item in asistencias_por_mes
-    ]
+    dias_nombres = {
+        1: 'Domingo', 2: 'Lunes', 3: 'Martes', 4: 'Miércoles',
+        5: 'Jueves', 6: 'Viernes', 7: 'Sábado'
+    }
     
+    datos_asistencia_por_dia = []
+    for item in asistencias_por_dia:
+        dia_num = item['dia_semana']
+        total_asistencias_dia = item['total']
+        sesiones_dia = item['sesiones']
+        promedio_dia = round(total_asistencias_dia / max(sesiones_dia, 1), 1)
+        
+        datos_asistencia_por_dia.append({
+            'label': dias_nombres.get(dia_num, 'N/A'),
+            'value': promedio_dia,
+            'total_asistencias': total_asistencias_dia,
+            'sesiones': sesiones_dia
+        })
+    
+    # ========== DETALLE POR ACTIVIDAD Y DÍA ==========
+    asistencia_actividad_dia = []
+    
+    for actividad in mis_actividades:
+        asistencias_act = Asistencias.objects.filter(
+            participaciones_id_participacion__actividades_id_actividad=actividad,
+            estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+        ).annotate(
+            dia_semana=ExtractWeekDay('fecha')
+        ).values('dia_semana').annotate(
+            total=Count('id_asistencia'),
+            sesiones=Count('fecha', distinct=True)
+        )
+        
+        dias_actividad = []
+        for item in asistencias_act:
+            dia_num = item['dia_semana']
+            total_asist = item['total']
+            sesiones = item['sesiones']
+            promedio = round(total_asist / max(sesiones, 1), 1)
+            
+            dias_actividad.append({
+                'dia': dias_nombres.get(dia_num, 'N/A'),
+                'promedio': promedio,
+                'sesiones': sesiones,
+                'total': total_asist
+            })
+        
+        if dias_actividad:
+            # Ordenar por día de la semana
+            orden_dias = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']
+            dias_actividad.sort(key=lambda x: orden_dias.index(x['dia']) if x['dia'] in orden_dias else 999)
+            
+            asistencia_actividad_dia.append({
+                'actividad': actividad.nombre,
+                'dias': dias_actividad
+            })
+    
+    # ========== CONTEXTO FINAL ==========
     context = {
         'participante': participante,
         'total_mis_actividades': total_mis_actividades,
         'total_asistentes': total_asistentes,
         'promedio_asistencia': promedio_asistencia,
         'total_asistencias': total_asistencias,
+        'sesiones_realizadas': sesiones_realizadas,
         'top_estudiantes': top_estudiantes,
-        'actividades_populares': actividades_populares,
         'datos_actividades_populares': json.dumps(datos_actividades_populares),
-        'datos_tipos_actividad': json.dumps(datos_tipos_actividad),
-        'datos_evolucion_asistencia': json.dumps(datos_evolucion_asistencia),
+        'datos_asistencia_por_dia': json.dumps(datos_asistencia_por_dia),
+        'asistencia_actividad_dia': asistencia_actividad_dia,
         'nombre_docente': f"{participante.nombre} {participante.apellido}",
         'facultad': participante.facultad or 'Sin facultad',
         'mensaje_sin_actividades': False
@@ -2223,149 +2253,61 @@ from django.shortcuts import render, redirect
 from django.db.models import Count, Q
 from datetime import datetime
 # Reemplaza tu función mi_historial_estudiante actual con esta:
-
 @login_required
 def mi_historial_estudiante(request):
-    """Dashboard simple para estudiantes: Historial + Progreso hacia camiseta"""
+    # Obtener el participante del usuario logueado
+    participante = get_object_or_404(Participantes, user=request.user)
     
-    try:
-        participante = request.user.participantes_set.first()
-        
-        if not participante:
-            messages.error(request, 'No se encontró tu perfil de participante.')
-            return redirect('home')
-        
-        rol = participante.roles_id_rol.nombre_rol
-    except Exception as e:
-        messages.error(request, f'Error al obtener perfil: {str(e)}')
-        return redirect('home')
-    
-    if rol != 'Estudiante':
-        messages.warning(request, 'Esta sección es solo para estudiantes.')
-        return redirect('Analytics_Reports:analytics_index')
-    
-    # ========== OBTENER PARTICIPACIONES ==========
-    mis_participaciones = Participaciones.objects.filter(
-        participantes_id_participante=participante
-    ).select_related('actividades_id_actividad')
-    
-    # ========== OBTENER ASISTENCIAS ==========
+    # ✅ CORRECCIÓN: Contar asistencias desde la tabla Asistencias
+    # Filtramos por estado "Presente" y participante actual
     asistencias = Asistencias.objects.filter(
-        participaciones_id_participacion__participantes_id_participante=participante
+        participaciones_id_participacion__participantes_id_participante=participante,
+        estados_asistencia_id_estado_asistencia__nombre='Presente'
     ).select_related(
         'participaciones_id_participacion__actividades_id_actividad',
         'estados_asistencia_id_estado_asistencia'
     ).order_by('-fecha')
     
-    # ========== FILTROS ==========
-    actividad_filtro = request.GET.get('actividad', '')
-    fecha_inicio = request.GET.get('fecha_inicio', '')
-    fecha_fin = request.GET.get('fecha_fin', '')
-    estado_filtro = request.GET.get('estado', '')
-    
-    if actividad_filtro:
-        asistencias = asistencias.filter(
-            participaciones_id_participacion__actividades_id_actividad__id_actividad=actividad_filtro
-        )
-    if fecha_inicio:
-        asistencias = asistencias.filter(fecha__gte=fecha_inicio)
-    if fecha_fin:
-        asistencias = asistencias.filter(fecha__lte=fecha_fin)
-    if estado_filtro:
-        asistencias = asistencias.filter(
-            estados_asistencia_id_estado_asistencia__id_estado_asistencia=estado_filtro
-        )
-    
-    # ========== ESTADÍSTICAS ==========
-    total_asistencias = asistencias.count()
-    
-    stats_estados = asistencias.values(
-        'estados_asistencia_id_estado_asistencia__nombre'
-    ).annotate(cantidad=Count('id_asistencia'))
-    
+    # Estadísticas generales
     stats = {
-        'presente': 0,
-        'ausente': 0,
-        'justificado': 0,
-        'tardanza': 0
+        'presente': asistencias.count(),  # ✅ Ahora cuenta correctamente
     }
     
-    for stat in stats_estados:
-        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre'].lower()
-        stats[estado_nombre] = stat['cantidad']
+    # ✅ Progreso hacia la camiseta (10 asistencias)
+    META_CAMISETA = 10
+    progreso_camiseta = {
+        'total_presentes': stats['presente'],
+        'meta': META_CAMISETA,
+        'falta': max(0, META_CAMISETA - stats['presente']),
+        'porcentaje': min(100, (stats['presente'] / META_CAMISETA * 100)),
+        'alcanzado': stats['presente'] >= META_CAMISETA
+    }
     
-    porcentaje_asistencia = round((stats['presente'] / total_asistencias) * 100, 2) if total_asistencias > 0 else 0
-    
-    # ========== ESTADÍSTICAS POR ACTIVIDAD ==========
-    stats_actividades = asistencias.values(
-        'participaciones_id_participacion__actividades_id_actividad__nombre',
-        'estados_asistencia_id_estado_asistencia__nombre'
-    ).annotate(cantidad=Count('id_asistencia'))
-    
-    actividades_stats = {}
-    for stat in stats_actividades:
-        actividad_nombre = stat['participaciones_id_participacion__actividades_id_actividad__nombre']
-        estado_nombre = stat['estados_asistencia_id_estado_asistencia__nombre']
-        
-        if actividad_nombre not in actividades_stats:
-            actividades_stats[actividad_nombre] = {
-                'nombre': actividad_nombre,
-                'presente': 0,
-                'ausente': 0,
-                'justificado': 0,
-                'tardanza': 0,
-                'total': 0
-            }
-        
-        actividades_stats[actividad_nombre][estado_nombre.lower()] = stat['cantidad']
-        actividades_stats[actividad_nombre]['total'] += stat['cantidad']
-    
-    for actividad in actividades_stats.values():
-        if actividad['total'] > 0:
-            actividad['porcentaje'] = round((actividad['presente'] / actividad['total']) * 100, 2)
-        else:
-            actividad['porcentaje'] = 0
-    
-    # ========================================
-    # ✅ PROGRESO HACIA CAMISETA (SOLO META PRINCIPAL)
-    # ========================================
-    config = ConfiguracionNotificaciones.obtener_config()
-    meta_camiseta = config.asistencias_reconocimiento  # Ej: 10
-    
-    # Total de asistencias "Presente" (sin filtros, cuenta todas)
-    total_presentes = Asistencias.objects.filter(
+    # ✅ Estadísticas por actividad
+    actividades_stats = Asistencias.objects.filter(
         participaciones_id_participacion__participantes_id_participante=participante,
         estados_asistencia_id_estado_asistencia__nombre='Presente'
-    ).count()
+    ).values(
+        'participaciones_id_participacion__actividades_id_actividad__nombre'
+    ).annotate(
+        presente=Count('id_asistencia')
+    ).order_by('-presente')
     
-    # Calcular progreso simple
-    falta_para_camiseta = max(0, meta_camiseta - total_presentes)
-    porcentaje_camiseta = min(100, (total_presentes / meta_camiseta) * 100) if meta_camiseta > 0 else 0
-    ya_gano_camiseta = total_presentes >= meta_camiseta
+    # Renombrar clave para usar en template
+    actividades_stats = [
+        {
+            'nombre': act['participaciones_id_participacion__actividades_id_actividad__nombre'],
+            'presente': act['presente']
+        }
+        for act in actividades_stats
+    ]
     
-    progreso_camiseta = {
-        'total_presentes': total_presentes,
-        'meta': meta_camiseta,
-        'falta': falta_para_camiseta,
-        'porcentaje': round(porcentaje_camiseta, 1),
-        'alcanzado': ya_gano_camiseta
-    }
-    
-    # ========== CONTEXTO ==========
     context = {
         'participante': participante,
         'asistencias': asistencias,
-        'participaciones': mis_participaciones,
-        'total_asistencias': total_asistencias,
         'stats': stats,
-        'porcentaje_asistencia': porcentaje_asistencia,
-        'actividades_stats': actividades_stats.values(),
-        'estados_asistencia': EstadosAsistencia.objects.all(),
-        'actividad_filtro': actividad_filtro,
-        'fecha_inicio': fecha_inicio,
-        'fecha_fin': fecha_fin,
-        'estado_filtro': estado_filtro,
-        'progreso_camiseta': progreso_camiseta,  # ✅ SIMPLE
+        'progreso_camiseta': progreso_camiseta,
+        'actividades_stats': actividades_stats,
     }
     
     return render(request, 'mi_historial_estudiante.html', context)
