@@ -1,78 +1,77 @@
-/* Dashboard Docente Styles */
+/* static/css/dashboard_docente.css */
 
+/* Cards de métricas */
 .card {
-    border: none;
-    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
-    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: transform 0.2s;
 }
 
 .card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-}
-
-.card-body h3 {
-    font-size: 2.5rem;
-    font-weight: bold;
-    color: #333;
-    margin: 0;
-}
-
-.card-body p {
-    margin-bottom: 0;
-    color: #6c757d;
-    font-size: 0.95rem;
-}
-
-.table {
-    margin-bottom: 0;
-}
-
-.table thead th {
-    border-top: none;
-    font-weight: 600;
-    text-transform: uppercase;
-    font-size: 0.85rem;
-    letter-spacing: 0.5px;
-    color: #495057;
-}
-
-.table tbody tr {
-    transition: background-color 0.2s;
-}
-
-.table tbody tr:hover {
-    background-color: #f8f9fa;
-}
-
-.badge {
-    padding: 0.4em 0.8em;
-    font-size: 0.9rem;
-}
-
-.btn {
-    padding: 0.6rem 1.2rem;
-    font-weight: 500;
-    margin-right: 0.5rem;
-    transition: all 0.3s ease;
-}
-
-.btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
 }
 
-.text-muted {
-    font-size: 0.95rem;
+/* Tablas */
+.table-hover tbody tr:hover {
+    background-color: rgba(0, 123, 255, 0.05);
 }
 
-/* Card Headers */
-.card-header {
+/* Badges de asistencia */
+.badge {
+    font-size: 0.9rem;
+    padding: 0.4rem 0.6rem;
+}
+
+/* Interpretación de colores */
+.badge.bg-success {
+    background-color: #28a745 !important;
+}
+
+.badge.bg-warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+}
+
+.badge.bg-danger {
+    background-color: #dc3545 !important;
+}
+
+/* Tablas de detalle */
+.table-sm th {
+    background-color: #f8f9fa;
     font-weight: 600;
-    font-size: 1rem;
-    border-bottom: none;
 }
 
-.card-header i {
-    margin-right: 0.3rem;
+/* Gráficos */
+canvas {
+    max-height: 400px;
 }
+
+/* Información contextual */
+.alert-info {
+    border-left: 4px solid #17a2b8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .card-body h3 {
+        font-size: 1.5rem;
+    }
+    
+    .table {
+        font-size: 0.9rem;
+    }
+}
+
+/* Leyenda de interpretación */
+.legend-box {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+}
+
+.legend-green { background-color: #28a745; }
+.legend-yellow { background-color: #ffc107; }
+.legend-red { background-color: #dc3545; }

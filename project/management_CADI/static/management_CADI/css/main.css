@@ -46,3 +46,76 @@
   border: 1px solid #999; 
   cursor: not-allowed; 
 }
+/* Centrar el contenedor de la tabla */
+.table-container {
+  width: 100%;
+  display: flex !important;
+  justify-content: center !important;
+  margin: 20px 0;
+  overflow-x: auto !important;  /* Para evitar que la tabla se desborde horizontalmente en pantallas pequeñas */
+}
+
+/* Estilo para la tabla */
+table {
+  width: 100%;               /* Hace que la tabla ocupe todo el ancho del contenedor */
+  border-collapse: separate !important; /* Asegura que haya espacio entre las celdas */
+  border-spacing: 15px !important;       /* Espaciado entre las celdas */
+  margin: 0 auto;            /* Centra la tabla */
+  table-layout: fixed !important;       /* Garantiza que la tabla tenga un ancho fijo */
+}
+
+/* Estilos para las celdas de la tabla (th, td) */
+th, td {
+  padding: 20px;              /* Espaciado interno de las celdas */
+  text-align: center !important;         /* Centrar el contenido de las celdas */
+  font-size: 14px;            /* Tamaño de la fuente */
+  word-wrap: break-word !important;      /* Permite que las palabras largas se ajusten */
+}
+
+/* Espaciado entre los botones en la misma celda */
+td .btn {
+  margin-right: 10px;         /* Espacio entre los botones de "Editar" y "Eliminar" */
+  padding: 8px 20px;          /* Aumentar el tamaño de los botones */
+  font-size: 14px;
+  border-radius: 5px;
+}
+
+/* Estilo para el botón de eliminar */
+.btn-danger {
+  background-color: #dc3545;
+  color: white;
+  border: none;
+}
+
+/* Estilo para el botón de editar */
+.btn-primary {
+  background-color: #007bff;
+  color: white;
+  border: none;
+}
+
+/* Hover effect para los botones */
+.btn:hover {
+  opacity: 0.8;
+}
+
+.center-btn-container {
+  display: flex;
+  justify-content: center;  /* Centra el contenido horizontalmente */
+  align-items: center;      /* Centra el contenido verticalmente */
+  margin-top: 20px;         /* Espacio superior para separarlo de los elementos anteriores */
+}
+
+/* Estilo para el botón "Crear Nueva Noticia" */
+.greenBotton_White {
+  background-color: #28a745;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.greenBotton_White:hover {
+  background-color: #218838;
+}
