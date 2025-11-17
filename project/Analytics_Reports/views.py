@@ -1,3 +1,4 @@
+#project\Analytics_Reports\views.py
 from django.db.models import Count, Avg, Q, F, Case, When, IntegerField,Max, ExpressionWrapper
 from django.core.mail import send_mail
 from django.conf import settings
@@ -504,7 +505,8 @@ def analisis_comportamiento(request):
     datos_grafico_facultades = []
     datos_grafico_tipos_actividad = []
     datos_grafico_reincidencia = []
-
+    datos_grafico_dias_semana = [] 
+    
     data = None
     facultades_unicas = 0
     roles_unicos = 0
@@ -684,6 +686,62 @@ def analisis_comportamiento(request):
             {'label': 'Reincidentes', 'value': reincidentes}
         ]
 
+
+        # === NUEVO: DÍAS DE LA SEMANA ===
+        asistencias_query = Asistencias.objects.filter(
+            participaciones_id_participacion__participantes_id_participante__in=participantes_unicos,
+            estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+        )
+        
+        # Aplicar los mismos filtros
+        if tipo_actividad:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
+            )
+        if rol_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__roles_id_rol__id_rol=rol_filtro
+            )
+        if facultad_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__facultad=facultad_filtro
+            )
+        if genero_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__genero=genero_filtro
+            )
+        if semestre_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__semestre=semestre_filtro
+            )
+        
+        # Agrupar por día de la semana
+        asistencias_por_dia = asistencias_query.annotate(
+            dia_semana=ExtractWeekDay('fecha')
+        ).values('dia_semana').annotate(
+            total=Count('id_asistencia')
+        ).order_by('dia_semana')
+        
+        # Mapeo de números a nombres
+        dias_nombres = {
+            1: 'Domingo', 2: 'Lunes', 3: 'Martes', 4: 'Miércoles',
+            5: 'Jueves', 6: 'Viernes', 7: 'Sábado'
+        }
+        
+        # Inicializar todos los días con 0
+        dias_data = {dia: 0 for dia in range(1, 8)}
+        
+        # Llenar con datos reales
+        for item in asistencias_por_dia:
+            dias_data[item['dia_semana']] = item['total']
+        
+        # Ordenar Lunes-Domingo
+        orden_dias = [2, 3, 4, 5, 6, 7, 1]
+        datos_grafico_dias_semana = [
+            {'label': dias_nombres[dia], 'value': dias_data[dia]}
+            for dia in orden_dias
+        ]
+
         # === EXPORTAR CSV ===
         if export == "csv":
             response = HttpResponse(content_type="text/csv; charset=utf-8")
@@ -766,6 +824,7 @@ def analisis_comportamiento(request):
     "datos_grafico_facultades": json.dumps(datos_grafico_facultades),
     "datos_grafico_tipos_actividad": json.dumps(datos_grafico_tipos_actividad),
     "datos_grafico_reincidencia": json.dumps(datos_grafico_reincidencia),
+    "datos_grafico_dias_semana": json.dumps(datos_grafico_dias_semana),  # NUEVO
  })
 
 def participantes_list(request):

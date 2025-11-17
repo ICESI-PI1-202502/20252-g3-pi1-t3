@@ -217,7 +217,7 @@ class TestShowActivities(TransactionTestCase):
         
         # ✅ Crear tipo de participante
         self.tipo_participante = TiposParticipante.objects.create(
-            nombre ="Estudiante Regular"
+            nombre_tipo="Estudiante Regular"
         )
         
         rol = Roles.objects.create(nombre_rol="Estudiante")
