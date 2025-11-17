@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block title %}{{ noticia.titulo }}{% endblock %}
+
+{% block content %}
+  <div class="container mt-5">
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <h1>{{ noticia.titulo }}</h1>
+        <h4>{{ noticia.enunciado }}</h4>
+        <p><strong>Autor:</strong> {{ noticia.autor }}</p>
+        <p><strong>Fecha de Publicación:</strong> {{ noticia.fecha_publicacion }}</p>
+
+        {% if noticia.imagen %}
+          <img src="{{ noticia.imagen.url }}" alt="{{ noticia.titulo }}" class="img-fluid mb-4">
+        {% endif %}
+
+        <div class="content-text mt-3">
+          <p>{{ noticia.descripcion }}</p>
+        </div>
+
+        <a href="{% url 'management_cadi:gestionar_noticias' %}" class="btn btn-primary">Volver al listado</a>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block subheaderBar %}
+<a href="javascript:history.back()" class="back-link">
+    <i class="bi bi-arrow-left"></i> Regresar
+</a>
+{% endblock %}
+
+{% block title %}Gestionar Noticias{% endblock %}
+
+{% block extra_css %}
+{{ block.super }}
+<link rel="stylesheet" href="{% static 'management_CADI/css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+{% if noticias %}
+<div class="table-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>Fecha de Publicación</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for noticia in noticias %}
+            <tr>
+                <td>
+                    <!-- Link to the news detail page -->
+                    <a href="{% url 'management_cadi:detalle_noticia' slug=noticia.slug id=noticia.id %}">
+                        {{ noticia.titulo }}
+                    </a>
+                </td>
+                <td>{{ noticia.autor }}</td>
+                <td>{{ noticia.fecha_publicacion }}</td>
+                <td>
+                    <a href="{% url 'management_cadi:editar_noticia' id=noticia.id %}"
+                        class="btn btn-primary">Editar</a>
+                    <button class="btn btn-danger" data-bs-toggle="modal"
+                        data-bs-target="#deleteModal{{ noticia.id }}">Eliminar</button>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center">
+        <nav>
+            <ul class="pagination">
+                {% for i in noticias_pag.paginator.page_range %}
+                <li class="page-item {% if noticias_pag.number == i %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                </li>
+                {% endfor %}
+            </ul>
+        </nav>
+    </div>
+</div>
+
+{% else %}
+<p>No hay noticias disponibles.</p>
+{% endif %}
+
+<div class="center-btn-container">
+    <a href="{% url 'management_cadi:crear_noticia' %}" class="greenBotton_White">Crear Nueva Noticia</a>
+</div>
+<!-- Modal para eliminar noticias -->
+{% for noticia in noticias %}
+<div class="modal fade" id="deleteModal{{ noticia.id }}" tabindex="-1"
+    aria-labelledby="deleteModalLabel{{ noticia.id }}" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel{{ noticia.id }}">Confirmar eliminación</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                ¿Estás seguro de que deseas eliminar la noticia "{{ noticia.titulo }}"?
+            </div>
+            <div class="modal-footer">
+                <!-- Formulario de eliminación dentro del modal -->
+                <form action="{% url 'management_cadi:eliminar_noticia' id=noticia.id %}" method="POST">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger">Sí, eliminar</button>
+                </form>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+
+{% endblock %}

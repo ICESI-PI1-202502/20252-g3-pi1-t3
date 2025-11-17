@@ -1,0 +1,39 @@
+{% extends "form_base.html" %}
+{% load static %}
+
+{% block title %}Publicar nueva Noticia{% endblock %}
+
+{% block form_title %}Añadir una nueva Noticia{% endblock %}
+
+{% block form_fields %}
+  <div class="row text-center mb-4">
+    <div class="col-md-6">
+      <h6>Título de la Noticia</h6>
+      <input type="text" name="titulo" class="form-control text-center" maxlength="50" required>
+    </div>
+
+    <div class="col-md-6">
+      <h6>Enunciado de la Noticia</h6>
+      <input type="text" name="enunciado" class="form-control text-center" maxlength="500" required>
+    </div>
+
+    <div class="col-md-6">
+      <h6>Descripción</h6>
+      <textarea name="descripcion" class="form-control text-center" rows="1" maxlength="500" required></textarea>
+    </div>
+  </div>
+
+  <div class="col-md-6 text-center">
+    <h6>Imagen</h6>
+    <input type="file" id="imagen" name="imagen" accept="image/*" hidden onchange="previewImage(event)">
+    <label for="imagen" class="upload-box">
+      <img id="preview" 
+           src="{% static 'management_CADI/images/create/galery.png' %}" 
+           alt="Subir imagen" 
+           class="upload-icon"
+           style="max-height:200px; object-fit:cover;">
+    </label>
+  </div>
+
+  <script src="{% static 'management_CADI/js/preview.js' %}"></script>
+{% endblock %}
