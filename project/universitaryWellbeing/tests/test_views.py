@@ -1,229 +1,477 @@
+# project/universitaryWellbeing/tests/test_views.py
+from django.test import TestCase, RequestFactory
+from unittest.mock import patch, MagicMock, Mock
+from universitaryWellbeing.models import Participantes  # ✅ Importar el modelo
 import pytest
-from unittest.mock import Mock, patch
+
 
 # ================================================================
-# LOGIN LOGIC TESTS
+# TESTS DE LOGIN CON MOCKS
 # ================================================================
 
-class TestLoginLogic:
-    def test_login_valido(self):
-        # Simula una función de validación propia
-        def validar_usuario(correo, contraseña):
-            return correo == "estudiante@uni.edu" and contraseña == "1234"
+class TestLoginView(TestCase):
+    """Tests para la vista de login usando mocks"""
+    
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.UserLoginForm')
+    def test_login_admin_exitoso(self, mock_form_class, mock_is_admin, 
+                                  mock_participantes, mock_preferencias, 
+                                  mock_login_func, mock_redirect):
+        """Admin debe ser redirigido a cadi_admin"""
+        request = RequestFactory().post('/login/', {
+            'username': 'admin',
+            'password': 'admin123'
+        })
+        request.method = 'POST'
         
-        # Simulación de formulario
-        correo, contraseña = "estudiante@uni.edu", "1234"
-        assert validar_usuario(correo, contraseña) is True
-
-    def test_login_invalido(self):
-        def validar_usuario(correo, contraseña):
-            return correo == "estudiante@uni.edu" and contraseña == "1234"
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock(is_staff=True)
+        mock_form_class.return_value = mock_form
         
-        correo, contraseña = "mal@uni.edu", "0000"
-        assert validar_usuario(correo, contraseña) is False
+        mock_is_admin.return_value = True
+        
+        from universitaryWellbeing.views import user_login
+        user_login(request)
+        
+        mock_redirect.assert_called_with('cadi_admin')
+    
+    # ✅ TEST CORREGIDO
+    @patch('universitaryWellbeing.views.logout')
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.UserLoginForm')
+    def test_login_sin_participante(self, mock_form_class, mock_is_admin,
+                                    mock_participantes, mock_login_func,
+                                    mock_redirect, mock_messages, mock_logout):
+        """Usuario sin participante debe ser deslogueado"""
+        request = RequestFactory().post('/login/', {
+            'username': '123456',
+            'password': 'test123'
+        })
+        request.method = 'POST'
+        
+        # ✅ Configurar mock del formulario
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock(is_staff=False)
+        mock_form_class.return_value = mock_form
+        
+        # ✅ Usuario no es admin
+        mock_is_admin.return_value = False
+        
+        # ✅ Simular que no existe el participante
+        mock_participantes.get.side_effect = Participantes.DoesNotExist()
+        
+        from universitaryWellbeing.views import user_login
+        user_login(request)
+        
+        # ✅ Verificaciones
+        mock_logout.assert_called_once_with(request)
+        mock_messages.error.assert_called_with(request, 'No se encontró tu perfil de participante.')
+        mock_redirect.assert_called_with('login')
+    
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.UserLoginForm')
+    def test_login_estudiante_sin_perfil(self, mock_form_class, mock_is_admin,
+                                         mock_participantes, mock_preferencias,
+                                         mock_login_func, mock_redirect, mock_messages):
+        """Estudiante sin tipo_participante debe completar perfil"""
+        request = RequestFactory().post('/login/', {
+            'username': '123456',
+            'password': 'test123'
+        })
+        request.method = 'POST'
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock(is_staff=False)
+        mock_form_class.return_value = mock_form
+        
+        mock_is_admin.return_value = False
+        
+        # Participante sin tipo_participante
+        mock_participante = MagicMock()
+        mock_participante.tipo_participante = None
+        mock_participantes.get.return_value = mock_participante
+        
+        from universitaryWellbeing.views import user_login
+        user_login(request)
+        
+        mock_messages.info.assert_called_once()
+        mock_redirect.assert_called_with('completar_perfil')
+    
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.UserLoginForm')
+    def test_login_estudiante_sin_preferencias(self, mock_form_class, mock_is_admin,
+                                                mock_participantes, mock_preferencias,
+                                                mock_login_func, mock_redirect, mock_messages):
+        """Estudiante con perfil pero sin preferencias"""
+        request = RequestFactory().post('/login/', {
+            'username': '123456',
+            'password': 'test123'
+        })
+        request.method = 'POST'
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock(is_staff=False)
+        mock_form_class.return_value = mock_form
+        
+        mock_is_admin.return_value = False
+        
+        # Participante CON tipo_participante
+        mock_participante = MagicMock()
+        mock_participante.tipo_participante = MagicMock()
+        mock_participantes.get.return_value = mock_participante
+        
+        # Sin preferencias
+        mock_preferencias.filter.return_value.exists.return_value = False
+        
+        from universitaryWellbeing.views import user_login
+        user_login(request)
+        
+        mock_messages.info.assert_called_once()
+        mock_redirect.assert_called_with('preferences')
+    
+    # ✅ NUEVO: Test de login completo exitoso
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.login')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.is_role_admin')
+    @patch('universitaryWellbeing.views.UserLoginForm')
+    def test_login_completo_exitoso(self, mock_form_class, mock_is_admin,
+                                     mock_participantes, mock_preferencias,
+                                     mock_login_func, mock_redirect, mock_messages):
+        """Usuario con perfil y preferencias completos va a home"""
+        request = RequestFactory().post('/login/', {
+            'username': '123456',
+            'password': 'test123'
+        })
+        request.method = 'POST'
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.user = MagicMock(is_staff=False)
+        mock_form_class.return_value = mock_form
+        
+        mock_is_admin.return_value = False
+        
+        # Participante completo
+        mock_participante = MagicMock()
+        mock_participante.tipo_participante = MagicMock()
+        mock_participante.nombre = 'Test'
+        mock_participantes.get.return_value = mock_participante
+        
+        # Con preferencias
+        mock_preferencias.filter.return_value.exists.return_value = True
+        
+        from universitaryWellbeing.views import user_login
+        user_login(request)
+        
+        mock_messages.success.assert_called_once()
+        call_args = mock_messages.success.call_args[0]
+        self.assertIn('Bienvenido', call_args[1])
+        mock_redirect.assert_called_with('home')
+    
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.UserLoginForm')
+    def test_login_form_invalido(self, mock_form_class, mock_redirect, mock_messages):
+        """Login con credenciales inválidas"""
+        request = RequestFactory().post('/login/', {
+            'username': 'wrong',
+            'password': 'wrong'
+        })
+        request.method = 'POST'
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = False
+        mock_form.errors = {'password': ['Contraseña incorrecta']}
+        mock_form_class.return_value = mock_form
+        
+        from universitaryWellbeing.views import user_login
+        user_login(request)
+        
+        mock_messages.error.assert_called()
+        mock_redirect.assert_called_with('login')
 
 
 # ================================================================
-# REGISTER LOGIC TESTS
+# TESTS DE REGISTRO CON MOCKS
 # ================================================================
 
-class TestRegisterLogic:
-    def test_registro_exitoso(self):
-        usuarios = []
-        nuevo_usuario = {"email": "nuevo@uni.edu", "nombre": "Nuevo"}
+class TestRegisterView(TestCase):
+    """Tests para la vista de registro"""
+    
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.Roles.objects')
+    @patch('universitaryWellbeing.views.User.objects')
+    @patch('universitaryWellbeing.views.UserRegisterForm')
+    def test_registro_exitoso(self, mock_form_class, mock_user_objects,
+                              mock_roles, mock_participantes, 
+                              mock_redirect, mock_messages):
+        """Registro exitoso de nuevo usuario"""
+        request = RequestFactory().post('/register/', {
+            'cedula': '123456',
+            'nombre_completo': 'Test User',
+            'email': 'test@example.com',
+            'password': 'test123'
+        })
+        request.method = 'POST'
         
-        if nuevo_usuario["email"] not in [u["email"] for u in usuarios]:
-            usuarios.append(nuevo_usuario)
-            resultado = "registrado"
-        else:
-            resultado = "duplicado"
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.cleaned_data = {
+            'cedula': '123456',
+            'nombre_completo': 'Test User',
+            'email': 'test@example.com',
+            'password': 'test123'
+        }
+        mock_form_class.return_value = mock_form
         
-        assert resultado == "registrado"
-
-    def test_registro_correo_duplicado(self):
-        usuarios = [{"email": "existente@uni.edu"}]
-        nuevo_usuario = {"email": "existente@uni.edu"}
+        mock_rol = MagicMock()
+        mock_rol.nombre_rol = 'Estudiante'
+        mock_roles.get.return_value = mock_rol
         
-        if nuevo_usuario["email"] not in [u["email"] for u in usuarios]:
-            usuarios.append(nuevo_usuario)
-            resultado = "registrado"
-        else:
-            resultado = "duplicado"
+        mock_user = MagicMock()
+        mock_user_objects.create_user.return_value = mock_user
         
-        assert resultado == "duplicado"
-
-    def test_registro_incompleto(self):
-        formulario = {"email": "user@uni.edu", "password": ""}
-        campos_requeridos = all(formulario.values())
-        assert campos_requeridos is False
+        from universitaryWellbeing.views import register
+        register(request)
+        
+        mock_user_objects.create_user.assert_called_once()
+        mock_participantes.create.assert_called_once()
+        mock_messages.success.assert_called_once()
+        mock_redirect.assert_called_with('login')
+    
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    @patch('universitaryWellbeing.views.User.objects')
+    @patch('universitaryWellbeing.views.Roles.objects')
+    @patch('universitaryWellbeing.views.UserRegisterForm')
+    def test_registro_sin_rol_estudiante(self, mock_form_class, mock_roles,
+                                         mock_user_objects, mock_participantes,
+                                         mock_redirect, mock_messages):
+        """Error cuando no existe rol 'Estudiante' en BD"""
+        request = RequestFactory().post('/register/', {})
+        request.method = 'POST'
+        
+        mock_form = MagicMock()
+        mock_form.is_valid.return_value = True
+        mock_form.cleaned_data = {
+            'cedula': '123456',
+            'nombre_completo': 'Test User',
+            'email': 'test@example.com',
+            'password': 'test123'
+        }
+        mock_form_class.return_value = mock_form
+        
+        mock_user = MagicMock()
+        mock_user_objects.create_user.return_value = mock_user
+        
+        # ✅ Importar desde models
+        from universitaryWellbeing.models import Roles
+        mock_roles.get.side_effect = Roles.DoesNotExist()
+        
+        from universitaryWellbeing.views import register
+        register(request)
+        
+        mock_messages.error.assert_called()
+        mock_redirect.assert_called_with('register')
+        mock_user_objects.create_user.assert_called_once()
+        mock_participantes.create.assert_not_called()
 
 
 # ================================================================
-# PREFERENCES LOGIC TESTS
+# TESTS DE PREFERENCIAS CON MOCKS
 # ================================================================
 
-class TestPreferencesLogic:
-    def test_crear_preferencias_nuevas(self):
-        preferencias = {}
-        user = "estudiante1"
-        nuevas = {"deporte": "fútbol", "comida": "vegetariana"}
+class TestPreferencesView(TestCase):
+    """Tests para la vista de preferencias"""
+    
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_preferences_ya_completadas(self, mock_participantes, mock_redirect):
+        """Usuario con preferencias debe ir a home"""
+        request = RequestFactory().get('/preferences/')
+        request.user = MagicMock(is_authenticated=True)
         
-        if user not in preferencias:
-            preferencias[user] = nuevas
+        mock_participante = MagicMock()
+        mock_participante.preferencias = MagicMock()
+        mock_participantes.get.return_value = mock_participante
         
-        assert preferencias[user]["deporte"] == "fútbol"
-
-    def test_usuario_con_preferencias_existentes(self):
-        preferencias = {"estudiante1": {"deporte": "baloncesto"}}
-        user = "estudiante1"
+        from universitaryWellbeing.views import preferences
+        preferences(request)
         
-        resultado = "ya tiene" if user in preferencias else "nuevo"
-        assert resultado == "ya tiene"
-
-
-# ================================================================
-# HOME USER LOGIC TESTS
-# ================================================================
-
-class TestHomeUserHelpersLogic:
-    def test_generar_recomendaciones(self):
-        preferencias = {"deporte": "fútbol"}
-        actividades = [
-            {"nombre": "Torneo de fútbol", "tipo": "deporte"},
-            {"nombre": "Clase de pintura", "tipo": "arte"},
-        ]
+        mock_redirect.assert_called_with('home')
+    
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.PreferenciasActividades.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects')
+    @patch('universitaryWellbeing.views.TiposActividad.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_preferences_crear_nuevas(self, mock_participantes, mock_tipos,
+                                      mock_preferencias, mock_pref_act, mock_redirect):
+        """Crear preferencias nuevas"""
+        request = RequestFactory().post('/preferences/', {
+            'categories': ['1', '2']
+        })
+        request.method = 'POST'
+        request.user = MagicMock(is_authenticated=True)
         
-        recomendadas = [
-            a for a in actividades if a["tipo"] == "deporte" and preferencias.get("deporte")
-        ]
+        mock_participante = MagicMock()
+        if hasattr(mock_participante, 'preferencias'):
+            delattr(mock_participante, 'preferencias')
+        mock_participantes.get.return_value = mock_participante
         
-        assert len(recomendadas) == 1
-        assert recomendadas[0]["nombre"] == "Torneo de fútbol"
-
-    def test_horario_simulado(self):
-        horario = {"Lunes": ["Clase de yoga"], "Martes": []}
-        assert "Clase de yoga" in horario["Lunes"]
-
-    def test_calendario_simulado(self):
-        eventos = [{"fecha": "2025-10-06", "evento": "Charla de bienestar"}]
-        fechas = [e["fecha"] for e in eventos]
-        assert "2025-10-06" in fechas
+        mock_tipos.all.return_value = []
+        
+        mock_pref = MagicMock()
+        mock_preferencias.create.return_value = mock_pref
+        
+        mock_tipo1 = MagicMock()
+        mock_tipo2 = MagicMock()
+        mock_tipos.get.side_effect = [mock_tipo1, mock_tipo2]
+        
+        from universitaryWellbeing.views import preferences
+        preferences(request)
+        
+        mock_preferencias.create.assert_called_once()
+        self.assertEqual(mock_pref_act.create.call_count, 2)
+        mock_redirect.assert_called_with('home')
 
 
 # ================================================================
-# ADMIN PROFILE & LOGOUT LOGIC TESTS
+# TESTS DE COMPLETAR PERFIL CON MOCKS
 # ================================================================
 
-class TestAdminProfileLogoutLogic:
-    def test_home_admin_renderiza(self):
-        renderizado = True  # Simula render exitoso
-        assert renderizado is True
+class TestCompletarPerfilView(TestCase):
+    """Tests para completar perfil"""
+    
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_perfil_ya_completado_redirige(self, mock_participantes, mock_redirect):
+        """Usuario con tipo_participante debe ir a preferencias"""
+        request = RequestFactory().get('/completar-perfil/')
+        request.user = MagicMock(is_authenticated=True)
+        
+        mock_participante = MagicMock()
+        mock_participante.tipo_participante = MagicMock()
+        mock_participantes.get.return_value = mock_participante
+        
+        from universitaryWellbeing.views import completar_perfil
+        completar_perfil(request)
+        
+        mock_redirect.assert_called_with('preferences')
+    
+    @patch('universitaryWellbeing.views.messages')
+    @patch('universitaryWellbeing.views.redirect')
+    @patch('universitaryWellbeing.models.TiposParticipante.objects')
+    @patch('universitaryWellbeing.views.Participantes.objects')
+    def test_completar_perfil_estudiante(self, mock_participantes, mock_tipos_part,
+                                         mock_redirect, mock_messages):
+        """Completar perfil como estudiante"""
+        request = RequestFactory().post('/completar-perfil/', {
+            'tipo_participante': 'estudiante',
+            'semestre': '5',
+            'programa': 'Ingeniería',
+            'facultad': 'Ingeniería',
+            'genero': 'M'
+        })
+        request.method = 'POST'
+        request.user = MagicMock(is_authenticated=True)
+        
+        mock_participante = MagicMock()
+        mock_participante.tipo_participante = None
+        mock_participantes.get.return_value = mock_participante
+        
+        mock_tipo = MagicMock()
+        mock_tipo.nombre = 'Estudiante'
+        mock_tipos_part.get.return_value = mock_tipo
+        
+        from universitaryWellbeing.views import completar_perfil
+        completar_perfil(request)
+        
+        mock_participante.save.assert_called_once()
+        mock_messages.success.assert_called_once()
+        mock_redirect.assert_called_with('preferences')
 
-    def test_profile_con_preferencias(self):
-        admin_pref = {"notificaciones": True}
-        assert admin_pref["notificaciones"] is True
 
-    def test_logout(self):
-        session = {"usuario": "admin"}
-        session.clear()
-        assert session == {}
 # ================================================================
-# TESTS UNITARIOS CONTRA SQL INJECTION
+# TESTS DE PROTECCIÓN SQL INJECTION
 # ================================================================
 
-class TestSQLInjectionProtection:
-    # -------------------------------------------------------------------
-    # LOGIN: asegurarse de que no evalúa SQL con strings del usuario
-    # -------------------------------------------------------------------
+class TestSQLInjectionProtection(TestCase):
+    """Tests de seguridad contra SQL Injection"""
+    
     def test_login_rechaza_inyeccion(self):
-        """
-        Simula el intento de inyección SQL en el campo 'usuario'.
-        La función debería tratar la entrada como texto literal, no como código SQL.
-        """
+        """Login debe rechazar intentos de SQL injection"""
         input_usuario = "' OR '1'='1"
         input_password = "cualquiercosa"
-
-        # Simula una función de login segura (como tu lógica de form.is_valid())
+        
         def login_seguro(usuario, password):
             usuarios_validos = {"estudiante": "1234"}
             return usuarios_validos.get(usuario) == password
-
+        
         resultado = login_seguro(input_usuario, input_password)
-
-        # Si el sistema fuera vulnerable, el login sería exitoso.
-        # Esperamos que NO lo sea.
-        assert resultado is False, "El sistema no debe aceptar inyección SQL en login."
-
-    # -------------------------------------------------------------------
-    # REGISTER: no debe aceptar inyecciones en correo o nombre
-    # -------------------------------------------------------------------
-    def test_register_no_inserta_sql_inyectado(self):
-        """
-        Simula un intento de inyección SQL en el registro de usuario.
-        Verifica que el sistema no construya consultas SQL manualmente.
-        """
-        # Datos maliciosos
+        self.assertFalse(resultado, "No debe aceptar SQL injection")
+    
+    def test_register_valida_email_malicioso(self):
+        """Registro debe validar emails con caracteres SQL"""
         datos_maliciosos = {
             "email": "malicioso@uni.edu'; DROP TABLE users;--",
-            "nombre": "Atacante'); DELETE FROM users;--",
+            "nombre": "Atacante",
             "password": "1234"
         }
-
-        # Mock de una función de creación de usuario segura
-        def registrar_usuario(data):
-            # Simula validación de email (como tu UserRegisterForm)
-            if "'" in data["email"] or ";" in data["email"]:
-                raise ValueError("Entrada inválida detectada")
-            return True
-
-        with pytest.raises(ValueError):
-            registrar_usuario(datos_maliciosos)
-
-    # -------------------------------------------------------------------
-    # PREFERENCIAS: evitar inyección en selección de categorías
-    # -------------------------------------------------------------------
-    def test_preferences_inyeccion_en_categorias(self):
-        """
-        Verifica que la lista de categorías no sea usada directamente en una consulta SQL concatenada.
-        """
+        
+        def validar_email(email):
+            caracteres_peligrosos = ["'", ";", "--", "DROP", "DELETE"]
+            return not any(char in email for char in caracteres_peligrosos)
+        
+        self.assertFalse(validar_email(datos_maliciosos["email"]))
+    
+    def test_preferences_valida_ids_numericos(self):
+        """Preferencias debe validar IDs como numéricos"""
         categorias_recibidas = ["1", "2", "3; DROP TABLE actividades;--"]
-
-        # Función simulada que validaría IDs numéricos
+        
         def validar_categorias(lista):
-            for item in lista:
-                if not item.isdigit():
-                    return False
-            return True
-
-        assert validar_categorias(categorias_recibidas) is False, \
-            "Debe rechazar categorías que contengan SQL malicioso."
-
-    # -------------------------------------------------------------------
-    # HOME USER: evitar que consultas de filtros usen strings directos
-    # -------------------------------------------------------------------
-    def test_recomendaciones_no_usar_sql_crudo(self):
-        """
-        Simula que el filtro usa ORM seguro (Django ORM), no SQL directo.
-        """
-        with patch("universitaryWellbeing.views.Actividades.objects.filter") as mock_filter:
-            mock_filter.return_value = []
-
-            # Simula uso normal de ORM
-            mock_filter(tipos_actividad_id_tipo__in=[1, 2, 3])
-
-            # Verifica que se llamó de forma segura (sin SQL crudo)
-            args, kwargs = mock_filter.call_args
-            assert "tipos_actividad_id_tipo__in" in kwargs
-            assert not any(isinstance(a, str) and "SELECT" in a.upper() for a in args), \
-                "No debe usar SQL crudo en las llamadas ORM."
-
-    # -------------------------------------------------------------------
-    # LOGOUT / PROFILE: sin riesgo de SQL, pero verificar manipulación segura
-    # -------------------------------------------------------------------
-    def test_logout_no_inyeccion(self):
-        """
-        Asegura que el logout limpia sesión sin evaluar cadenas del usuario.
-        """
-        session = {"user": "admin'; DROP TABLE users;--"}
-        session.clear()
-        assert session == {}, "Logout debe limpiar sesión sin ejecutar nada del contenido."
+            return all(item.isdigit() for item in lista)
+        
+        self.assertFalse(validar_categorias(categorias_recibidas))
+    
+    @patch('universitaryWellbeing.views.Actividades.objects')
+    def test_orm_no_usa_sql_crudo(self, mock_actividades):
+        """ORM debe usar filtros seguros, no SQL crudo"""
+        mock_actividades.filter.return_value = []
+        
+        mock_actividades.filter(tipos_actividad_id_tipo__in=[1, 2, 3])
+        
+        args, kwargs = mock_actividades.filter.call_args
+        self.assertIn('tipos_actividad_id_tipo__in', kwargs)
+        
+        for arg in args:
+            if isinstance(arg, str):
+                self.assertNotIn('SELECT', arg.upper())

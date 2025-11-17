@@ -8,41 +8,19 @@ PGDATABASE="postgres"
 
 export PGPASSWORD
 
-# Función para eliminar test_postgres usando Python
+# Función para eliminar test_postgres
 drop_test_db() {
-    echo "🗑️ Terminando conexiones y eliminando test_postgres..."
-    python - <<EOF
-import psycopg2
-import sys
-
-try:
-    conn = psycopg2.connect(
-        host="$PGHOST",
-        user="$PGUSER",
-        password="$PGPASSWORD",
-        database="$PGDATABASE",
-        sslmode="require"
-    )
-    conn.autocommit = True
-    cursor = conn.cursor()
-    
-    # Terminar conexiones activas
-    cursor.execute("""
+    echo "🗑️ Terminando conexiones..."
+    psql "host=$PGHOST user=$PGUSER dbname=$PGDATABASE sslmode=require" -c "
         SELECT pg_terminate_backend(pid)
         FROM pg_stat_activity
-        WHERE datname = 'test_postgres' AND pid <> pg_backend_pid();
-    """)
-    
-    # Eliminar la base de datos
-    cursor.execute("DROP DATABASE IF EXISTS test_postgres WITH (FORCE);")
-    
-    cursor.close()
-    conn.close()
-    print("✅ Base test_postgres eliminada exitosamente")
-except Exception as e:
-    print(f"⚠️ Error al eliminar test_postgres: {e}")
-    sys.exit(0)  # No fallar el script completo
-EOF
+        WHERE datname = 'test_postgres';
+    "
+
+    echo "💥 Eliminando base test_postgres..."
+    psql "host=$PGHOST user=$PGUSER dbname=$PGDATABASE sslmode=require" -c "
+        DROP DATABASE IF EXISTS test_postgres WITH (FORCE);
+    "
 }
 
 # Ejecutar tests con keepdb
@@ -60,7 +38,7 @@ run_test_fresh() {
     echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
     drop_test_db  # <--- ELIMINA test_postgres ANTES
-    coverage run -a manage.py test "$1" --timing --keepdb
+    coverage run -a manage.py test "$1" --timing
 }
 
 coverage erase
@@ -68,6 +46,7 @@ coverage erase
 echo "🧪 Ejecutando suites..."
 
 # Suites sin problemas
+
 run_test_keepdb "Analytics_Reports.tests"
 run_test_keepdb "notificaciones.test.test_notificaciones"
 run_test_keepdb "social_projects.tests.test_views_psu"

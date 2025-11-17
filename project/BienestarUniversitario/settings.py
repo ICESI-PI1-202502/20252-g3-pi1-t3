@@ -37,7 +37,7 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
-
+#project\BienestarUniversitario\settings.py
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -46,8 +46,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.sites',
-    'universitaryWellbeing',
-    'Analytics_Reports',   
+    'universitaryWellbeing.apps.UniversitarywellbeingConfig',
+    'Analytics_Reports',  
     'management_CADI',
     'searchActivities',
     'tournaments',
@@ -59,6 +59,7 @@ INSTALLED_APPS = [
 
 SITE_ID = 1
  
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     "whitenoise.middleware.WhiteNoiseMiddleware",
@@ -192,7 +193,7 @@ MEDIA_ROOT = BASE_DIR / "media"
 if any(cmd in sys.argv for cmd in ["test", "pytest"]):
     INSTALLED_APPS += ["tournaments.tests"]
     # Desactiva migraciones del app real que está en conflicto
-    MIGRATION_MODULES = {"universitaryWellbeing": None}
+    #MIGRATION_MODULES = {"universitaryWellbeing": None}
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
@@ -252,16 +253,22 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 
-
-import sys
-
 if any(cmd in sys.argv for cmd in ("test", "pytest")):
-    MIGRATION_MODULES = {"universitaryWellbeing": None, "appointments.tests": None}
+    # Solo desactivar migraciones de tus apps, nunca de Django
+    MIGRATION_MODULES = {
+        "universitaryWellbeing": None,
+        "appointments": None,
+        "social_projects": None,
+        "tournaments": None,
+        "management_CADI": None,
+        "searchActivities": None,
+        "Analytics_Reports": None,
+    }
+
+    # Limpiar tests previos
+    INSTALLED_APPS = [app for app in INSTALLED_APPS if ".tests" not in app]
 
     args = " ".join(sys.argv)
-
-    # Limpia cualquier *.tests previo por si algo quedó colado
-    INSTALLED_APPS = [app for app in INSTALLED_APPS if ".tests" not in app]
 
     if " social_projects" in args or args.endswith("social_projects"):
         INSTALLED_APPS += ["social_projects.tests.apps.SocialProjectsTestsConfig"]
@@ -273,12 +280,31 @@ if any(cmd in sys.argv for cmd in ("test", "pytest")):
         INSTALLED_APPS += ["searchActivities.tests.apps.SearchActivitiesTestsConfig"]
     elif " appointments" in args or args.endswith("appointments"):
         INSTALLED_APPS += ["appointments.tests.apps.AppointmentsTestsConfig"]
+    elif "Analytics_Reports" in args or args.endswith("Analytics_Reports"):
+        INSTALLED_APPS += ["Analytics_Reports.tests.apps.AnalyticsReportsTestsConfig"]
 
     STORAGES = {
         "default": {"BACKEND": "django.core.files.storage.InMemoryStorage"},
         "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
     }
     STATIC_ROOT = BASE_DIR / ".test-static"
+
+
+# Configuración para tests
+import sys
+
+if 'test' in sys.argv:
+    # Deshabilitar migraciones de apps con managed=False
+    MIGRATION_MODULES = {
+        'universitaryWellbeing': None,
+        'notificaciones': None,
+        'appointments': None,
+        'management_CADI': None,
+        'searchActivities': None,
+        'tournaments': None,
+        'social_projects': None,
+    }
+
 
 
  
