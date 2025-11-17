@@ -588,7 +588,7 @@ def completar_perfil(request):
             # ✅ Mapeo de valores del formulario a nombres en tipos_participante
             mapeo_tipos = {
                 'estudiante': 'Estudiante',
-                'trabajador': 'Docente',  # O el nombre que tengas en la BD
+                'trabajador': 'Trabajador',  # O el nombre que tengas en la BD
                 'egresado': 'Egresado',
                 'invitado': 'Otro'  # O el nombre que tengas en la BD
             }
