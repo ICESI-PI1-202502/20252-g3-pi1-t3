@@ -2,7 +2,7 @@ Feature: Horario - Visualización del horario personal (draft)
 
   Scenario: Ver el botón "Semana" en la vista de Horario
     Given I am on the login page
-    When I login with username "23871289" and password "Pablito_200"
+    When I login with username "488192423" and password "Daniel_2005"
     And I open the sidebar menu
     And I go to the schedule page from the menu
     Then I should see the "Semana" button

@@ -19,6 +19,7 @@ from django.urls import reverse_lazy
 from django.utils import timezone
 from datetime import datetime, date
 from collections import defaultdict
+import pytz
 
 # ========== LOGIN ==========
 def user_login(request):
@@ -341,7 +342,7 @@ def unified_calendar(request):
         )
     )
 
-    # Días por bloque (una consulta)
+    
     bloque_ids = [b["id_horario_bloque"] for b in bloques] or []
     dias = list(
         HorariosActividad.objects
@@ -353,7 +354,7 @@ def unified_calendar(request):
     for d in dias:
         dias_por_bloque[d["horario_bloque_id"]].append(d["dia_semana"])
 
-    # Construcción de eventos (todo en memoria, sin más consultas)
+    
     eventos = []
     for b in bloques:
         act_id = b["actividades_id_actividad"]
@@ -368,7 +369,7 @@ def unified_calendar(request):
             fc_dow = _django_weekday_to_fc_dow(django_wd)
             eventos.append({
                 "title": act["nombre"],
-                "daysOfWeek": [fc_dow],          # 0..6
+                "daysOfWeek": [fc_dow],   
                 "startTime": start_time,
                 "endTime": end_time,
                 "display": "block",
@@ -391,67 +392,54 @@ def unified_calendar(request):
     return render(request, "calendario_unificado.html", ctx)
 
 
-def obtener_eventos_del_dia(participante, fecha):
+def obtener_actividades_generales_del_dia(fecha):
     """
-    Obtiene todos los eventos (únicos y recurrentes) para una fecha específica
+    Obtiene las actividades generales disponibles para un día específico
     """
     dia_semana = fecha.weekday()
     eventos = []
     
-    print(f"Buscando eventos para: {fecha} - {fecha.strftime('%A')} (día {dia_semana})")
+    # Convertir weekday de Python a formato de tu BD
+    dia_semana_bd = (dia_semana + 2) % 7
+    if dia_semana_bd == 0:
+        dia_semana_bd = 7
     
-    # 1. Eventos únicos de la fecha
-    eventos_unicos = HorariosParticipante.objects.filter(
-        participantes_id_participante=participante,
-        fecha_inicio__date=fecha
-    )
+    print(f"Buscando actividades generales para: {fecha.strftime('%A')} (día {dia_semana}, BD: {dia_semana_bd})")
     
-    print(f"Eventos únicos encontrados: {eventos_unicos.count()}")
+    horarios_del_dia = HorariosActividad.objects.filter(
+        dia_semana=dia_semana_bd,
+        horario_bloque__isnull=False,
+        horario_bloque__actividades_id_actividad__isnull=False,
+        horario_bloque__hora_inicio__isnull=False,
+        horario_bloque__hora_fin__isnull=False
+    ).select_related('horario_bloque__actividades_id_actividad')
     
-    for ev in eventos_unicos:
-        eventos.append({
-            'titulo': ev.titulo,
-            'fecha_inicio': ev.fecha_inicio,
-            'fecha_fin': ev.fecha_fin,
-            'notas': ev.notas or '',
-            'tipo': 'único',
-            'id': ev.id_horario
-        })
+    print(f"Horarios válidos encontrados: {horarios_del_dia.count()}")
     
-    # 2. Eventos recurrentes que caen en este día de la semana
-    eventos_recurrentes = HorariosParticipante.objects.filter(
-        participantes_id_participante=participante,
-        fuente_manual='S',
-        actividades_id_actividad__isnull=False
-    )
-    
-    print(f"Eventos recurrentes totales: {eventos_recurrentes.count()}")
-    
-    for ev in eventos_recurrentes:
-        # Obtener el día de la semana del evento original
-        dia_evento = ev.fecha_inicio.weekday()
-        print(f"   - {ev.titulo}: día {dia_evento} ({['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][dia_evento]}) | Buscando: {dia_semana} ({['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][dia_semana]})")
+    for horario_dia in horarios_del_dia:
+        bloque = horario_dia.horario_bloque
+        actividad = bloque.actividades_id_actividad # type: ignore
         
-        if dia_evento == dia_semana:
-            # Usar timezone.localtime para asegurar zona horaria correcta
-            hora_inicio = ev.fecha_inicio.time()
-            hora_fin = ev.fecha_fin.time()
-            
+        try:
             eventos.append({
-                'titulo': ev.titulo,
-                'fecha_inicio': datetime.combine(fecha, hora_inicio),
-                'fecha_fin': datetime.combine(fecha, hora_fin),
-                'notas': ev.notas or '',
-                'tipo': 'recurrente',
-                'id': ev.id_horario
+                'titulo': actividad.nombre,
+                'fecha_inicio': datetime.combine(fecha, bloque.hora_inicio), # type: ignore
+                'fecha_fin': datetime.combine(fecha, bloque.hora_fin), # type: ignore
+                'notas': f"Profesor: {bloque.profesor or 'N/A'} - Lugar: {bloque.lugar or 'N/A'}", # type: ignore
+                'tipo': 'actividad_general',
+                'id': bloque.id_horario_bloque # type: ignore
             })
-            print(f"      MATCH! Agregado.")
+            print(f"   {actividad.nombre} - {bloque.hora_inicio}-{bloque.hora_fin}") # type: ignore
+        except Exception as e:
+            print(f"  Error procesando actividad: {e}")
+            continue
     
-    # Ordenar por hora
     eventos.sort(key=lambda x: x['fecha_inicio'].time())
-    print(f"Total eventos a mostrar: {len(eventos)}")
+    print(f"Total actividades generales: {len(eventos)}\n")
     
-    return eventos
+    return eventos[:5]
+
+
 
 
 @login_required
@@ -462,37 +450,29 @@ def home_user(request):
     user = request.user
     participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
     
-    # Datos para el home
-    actividades = Actividades.objects.values("nombre")[:10]
-    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
-    actividades_recomendadas = get_recommendations_for_user(user)
-    
+    tz = pytz.timezone('America/Bogota')
     ahora = timezone.localtime(timezone.now())
     hoy = ahora.date()
-    # Datos para el home
+    
     actividades = Actividades.objects.values("nombre")[:10]
     noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
     
-    # EVENTOS DE HOY para el mini calendario
-    eventos_hoy = obtener_eventos_del_dia(participante, hoy)[:5]  # Máximo 5 eventos
-    
-    # Horario general (próximos 10 eventos)
+    # HORARIO PERSONAL (Mi Horario)
     horario = HorariosParticipante.objects.filter(
         participantes_id_participante=participante,
-        fecha_inicio__gte=timezone.now()
+        fecha_inicio__gte=ahora
     ).order_by('fecha_inicio')[:10]
     
-    # Calendario actividades (próximas 5)
+    # CALENDARIO DE ACTIVIDADES GENERALES (Calendario BU)
+    eventos_hoy = obtener_actividades_generales_del_dia(hoy)
+    
     calendario = Actividades.objects.all()[:5]
     
-     # Intentamos obtener el rol del participante
-    #participante = Participantes.objects.filter(usuario=user).select_related('roles_id_rol').first()
-    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
     user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
 
     context = {
-        "today": hoy,  # Para mostrar la fecha
-        "eventos_hoy": eventos_hoy,  # Eventos del día
+        "today": hoy,
+        "eventos_hoy": eventos_hoy,
         "horario": horario,
         "calendario": calendario,
         "actividades": actividades,
@@ -626,7 +606,7 @@ def completar_perfil(request):
             tipo_participante = TiposParticipante.objects.get(nombre__iexact=nombre_tipo_bd)
             
             # ✅ Asignar tipo_participante (NO cambiar el rol - roles_id_rol se mantiene como 'Invitado')
-            participante.tipo_participante = tipo_participante
+            participante.tipo_participante = tipo_participante # type: ignore
             
             # Procesar campos según el tipo
             if tipo_nombre == 'estudiante':
@@ -688,8 +668,8 @@ def completar_perfil(request):
             # Redirigir a preferencias
             return redirect('preferences')
             
-        except TiposParticipante.DoesNotExist:
-            messages.error(request, f'No se encontró el tipo "{nombre_tipo_bd}" en la base de datos.')
+        except TiposParticipante.DoesNotExist: # type: ignore
+            messages.error(request, f'No se encontró el tipo "{nombre_tipo_bd}" en la base de datos.') # type: ignore
         except ValueError as e:
             messages.error(request, 'Error en los datos ingresados. Verifica la información.')
         except Exception as e:
@@ -774,3 +754,5 @@ class CustomPasswordResetConfirmView(auth_views.PasswordResetConfirmView):
             print(f"Error enviando email de notificación: {e}")
         
         return response
+
+

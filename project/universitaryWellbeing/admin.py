@@ -50,16 +50,12 @@ class UsuarioAdmin(BaseUserAdmin):
     def get_grupos(self, obj):
         grupos = obj.groups.all()
         return ", ".join([g.name for g in grupos]) if grupos else "Sin roles"
-    get_grupos.short_description = 'Roles Especiales'
+    get_grupos.short_description = 'Roles Especiales' # type: ignore
 
 # Desregistrar el User por defecto y registrar el personalizado
 admin.site.unregister(User)
 admin.site.register(User, UsuarioAdmin)
 
-# -----------------------
-# READ-ONLY MODELS
-# -----------------------
-# universitaryWellbeing/admin.py
 
 @admin.register(Noticias)
 class NoticiaAdmin(admin.ModelAdmin):

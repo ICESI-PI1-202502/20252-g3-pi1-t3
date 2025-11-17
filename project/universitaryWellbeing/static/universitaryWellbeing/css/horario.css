@@ -710,3 +710,71 @@
   font-size: 0.9rem;
   color: #555;
 }
+
+/* =========================================================
+   OPTIMIZACIONES RESPONSIVE PARA PANTALLAS PEQUEÑAS
+   ========================================================= */
+
+/* Ajustar botones para ser más "touch-friendly" */
+@media (max-width: 576px) {
+  .btn {
+    padding: 10px 16px;
+    border-radius: 12px;
+  }
+
+  .btn-group {
+    width: 100%;
+  }
+
+  .btn-group .btn {
+    flex: 1;
+    text-align: center;
+  }
+}
+
+/* Evitar que la vista semana se rompa: scroll horizontal suave */
+@media (max-width: 768px) {
+  #calendar .fc-view-harness {
+    overflow-x: auto !important;
+    overflow-y: hidden !important;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .fc-timegrid-body {
+    min-width: 600px; /* Mantener columnas legibles */
+  }
+
+  .fc-col-header {
+    min-width: 600px;
+  }
+}
+
+/* Mejorar legibilidad de eventos en móvil */
+@media (max-width: 576px) {
+  .fc-daygrid-event {
+    font-size: 0.75rem !important;
+    padding: 3px 6px !important;
+  }
+
+  .fc-timegrid-event .fc-event-title {
+    font-size: 0.8rem !important;
+  }
+
+  .fc-timegrid-event {
+    padding: 4px 6px !important;
+    border-radius: 8px;
+  }
+}
+
+/* Leyenda compacta en móvil */
+@media (max-width: 576px) {
+  .legend {
+    justify-content: center;
+    gap: 10px;
+  }
+  .legend-item {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.8rem;
+  }
+}

@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     if (notifBtn && notifMenu) {
         notifBtn.addEventListener("click", function(e) {
-            e.preventDefault(); // 👈 evita recargar la página
+            e.preventDefault(); // 
             notifMenu.classList.toggle("active");
         });
     }

@@ -13,7 +13,7 @@
 
 Para Proyecto Integrador I
 
-**Link al Documento de Especificación de Requerimientos (SRS)**: 
+**Link al Documento de Especificación de Requerimientos (SRS)**: https://icesiedu-my.sharepoint.com/:w:/g/personal/1113624957_u_icesi_edu_co/Edv_ZqgUnkxGvBlIEvQAAZoBO_xaEtfUBIBTFP68Dv6FRw?e=Iq2hMu 
 
 ## ¿Qué es?
 
@@ -39,7 +39,7 @@ Una plataforma web diseñada para mejorar la experiencia universitaria de los es
 
 ## ¿Cómo Acceder?
 
-Visita nuestra plataforma en: [URL_del_sitio]
+Visita nuestra plataforma en: [https://mi-bienestar-universitario.onrender.com]
 
 ### Para Entrar:
 1. Ingresa con tu cédula y contraseña
