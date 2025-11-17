@@ -3,7 +3,7 @@
 ## Desarrollado por:
  
 - David Chicué Romero A00405613
-  * Correo: 1113624957@u.icesi.edu.co
+  * Correo: 1110287840@u.icesi.edu.co
 - Daniel Martínez Alvarado A00404992
   * Correo: 1105365296@u.icesi.edu.co
 - Luis Gabriel Lopéz Sanchéz A00405100

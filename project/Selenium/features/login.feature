@@ -17,5 +17,5 @@ Feature: Login functionality
 
   Scenario: CF-A5 - Login como administrador
     Given I am on the login page
-    When I login with username "1113624957" and password "00"
+    When I login with username "1110287840" and password "123"
     Then I should see the admin panel

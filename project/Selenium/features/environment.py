@@ -9,7 +9,7 @@ def before_scenario(context, scenario):
     opts = Options()
     opts.add_argument("--start-maximized")
     # opcional, acelera cargas pesadas:
-    # opts.set_capability("pageLoadStrategy", "eager")
+    opts.set_capability("pageLoadStrategy", "eager")
     context.driver = webdriver.Chrome(options=opts)
     context.driver.set_page_load_timeout(25)
     context.driver.implicitly_wait(0)  # usa esperas explícitas en las pages

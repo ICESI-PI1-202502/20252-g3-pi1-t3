@@ -2,7 +2,7 @@ Feature: CADI - Creación de actividad grupal por administrador
 
   Scenario: Crear actividad "Fut Sala" en Deportes de Conjunto
     Given I am on the login page
-    When I login with username "1113624957" and password "00"
+    When I login with username "1110287840" and password "123"
     And I open CADI management from the home card
     And I open the CADI category "Deportes de Conjunto"
     And I click "Agregar actividad" in the CADI list
