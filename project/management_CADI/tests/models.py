@@ -1,7 +1,9 @@
 # management_CADI/tests/models.py
 from django.db import models
 from django.contrib.auth.models import User, Group
- 
+from django_resized import ResizedImageField
+from django.utils.text import slugify
+
 ##PORFAVOR CORRER LOS TEST CON python manage.py test management_CADI --keepdb
 
 # ==========================================
@@ -468,4 +470,45 @@ class CalificacionesActividad(models.Model):
         managed = True
         db_table = "calificaciones_actividad"
         unique_together = (("actividades_id_actividad", "participantes_id_participante"),)
+        app_label = 'management_cadi_tests'
+
+class Noticias(models.Model):
+    id = models.BigAutoField(primary_key=True, db_column='id')
+    titulo = models.CharField(max_length=200, db_column='titulo')
+    enunciado = models.CharField(max_length=300, db_column='enunciado', default='No description available')
+    autor = models.CharField(max_length=100, default='Administración Bienestar Universitario')
+    descripcion = models.TextField(db_column='descripcion')
+    imagen = ResizedImageField(
+        size=[800, 450],           # Tamaño máximo [ancho, alto]
+        crop=None,                 # None = No cortar, mantener proporción
+        quality=85,                # Calidad JPEG (0-100)
+        keep_meta=False,           # Eliminar metadatos EXIF
+        force_format='JPEG',       # Convertir a JPEG
+        upload_to='noticias/'
+    )
+    fecha_publicacion = models.DateField(auto_now_add=True)
+    slug = models.SlugField(max_length=200, unique=True, blank=True)
+
+    def save(self, *args, **kwargs):
+
+        from django.conf import settings
+
+    # Evitar procesamiento de imagen SOLO en tests
+        if settings.TESTING:
+            if self.imagen and not hasattr(self.imagen, 'file'):
+                self.imagen = None
+
+    # Slug autogenerado si no existe
+        if not self.slug:
+            self.slug = slugify(self.titulo)
+
+        super().save(*args, **kwargs)
+
+
+    def __str__(self):
+        return self.titulo
+    class Meta:
+        managed = False
+        db_table = "noticias"
+        ordering = ['-fecha_publicacion']
         app_label = 'management_cadi_tests'
