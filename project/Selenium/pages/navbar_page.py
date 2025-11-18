@@ -10,7 +10,8 @@ class NavBar(BasePage):
     LINK_SEARCH = (By.CSS_SELECTOR, '#sidebar a[href="/search/"]')
     LINK_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/horario/"]') 
     LINK_ANALYTICS = (By.CSS_SELECTOR, '#sidebar a[href="/analytics-reports/"]')
-    LINK_PSU         = (By.CSS_SELECTOR, '#sidebar a[href="/psu/proyectos/"]')
+    # Use a more flexible selector to match variants (admin or query params)
+    LINK_PSU         = (By.CSS_SELECTOR, '#sidebar a[href*="/psu/proyectos"]')
     LINK_UNIFIED_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/calendario-unificado/"]')
 
 
@@ -72,12 +73,25 @@ class NavBar(BasePage):
             link.click()
         except Exception:
             self.driver.execute_script("arguments[0].click();", link)
+        # 3) Intentar detectar navegación por URL; si el click no redirige, navegar al href como fallback
+        try:
+            WebDriverWait(self.driver, 8).until(EC.url_contains("/psu/proyectos"))
+        except Exception:
+            try:
+                href = link.get_attribute("href")
+                if href:
+                    try:
+                        self.driver.get(href)
+                    except Exception:
+                        pass
+            except Exception:
+                pass
 
-        # 3) Esperar a que cargue algo propio de la página de PSU
+        # 4) Esperar a que cargue algo propio de la página de PSU (search input o create link)
         WebDriverWait(self.driver, 15).until(
             EC.presence_of_element_located((
                 By.CSS_SELECTOR,
-                'input[name="q"], a[href="/psu/proyectos/crear/"]'
+                'input[name="q"], a[href*="/psu/proyectos/crear"]'
             ))
         )
 
