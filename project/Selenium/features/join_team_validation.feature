@@ -2,7 +2,7 @@ Feature: Join team form validation
 
   Scenario: Error al unirse sin seleccionar equipo
     Given I am on the login page
-    When I login with username "488192423" and password "Daniel_2005"
+    When I login with username "1112343789" and password "contraseña"
     And I go to tournaments from the menu
     And I open tournament details for "Torneo Interno de Tenis de Mesa"
     And I open the join team form
