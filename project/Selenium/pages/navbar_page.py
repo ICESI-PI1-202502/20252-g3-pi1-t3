@@ -54,8 +54,13 @@ class NavBar(BasePage):
 
     def go_to_psu_projects(self):                        
         self.open_menu()
-        try: self.click(self.LINK_PSU)
-        except Exception: self.click_js(self.LINK_PSU, timeout=5)
+        try:
+            self.click(self.LINK_PSU)
+        except Exception:
+            self.click_js(self.LINK_PSU, timeout=5)
+        WebDriverWait(self.driver, 15).until(
+            EC.url_contains("/psu/proyectos/")
+        )
 
     def go_to_unified_schedule(self):
         self.open_menu()

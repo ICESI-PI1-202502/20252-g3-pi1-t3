@@ -2,7 +2,7 @@ Feature: CADI - Creación exitosa de actividad por administrador
 
   Scenario: Crear actividad "Ajedrez (Profesional)" en Deportes Individuales
     Given I am on the login page
-    When I login with username "1113624957" and password "00"
+    When I login with username "5544" and password "5544"
     And I open CADI management from the home card
     And I open the CADI category "Deportes Individuales"
     And I click "Agregar actividad" in the CADI list

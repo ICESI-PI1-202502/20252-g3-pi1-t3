@@ -1,7 +1,8 @@
 Feature: Gestión de noticias
 
   Background:
-    Given que el admin inicia sesión en el sistema
+    Given I am on the login page
+    When I login with username "5544" and password "5544"
     And navega a la sección de gestionar noticias
 
   Scenario: Crear una noticia
