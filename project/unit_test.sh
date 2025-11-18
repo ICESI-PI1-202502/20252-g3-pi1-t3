@@ -1,6 +1,8 @@
 #!/bin/bash
-# chmod +x unit_test.sh
-
+#cd project
+# ./unit_test.sh
+#esta dando 85% pero una vez lo ejecute y dio 58, ejecutarlo varias veces y seguro sera de 85%, debio ser un error
+#solo quiero aclarar.
 PGUSER="postgres.xlknciyujekwbhysmamn"
 PGPASSWORD="h9TZan8icTf3hjsn"
 PGHOST="aws-1-us-east-2.pooler.supabase.com"

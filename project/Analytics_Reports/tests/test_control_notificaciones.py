@@ -1,5 +1,344 @@
 #project\Analytics_Reports\tests\test_control_notificaciones.py
 
+"""
+Tests unitarios completos para Analytics_Reports/tasks.py - ControlNotificacionesContextual
+
+COBERTURA REAL DE TESTS:
+========================
+
+PROPÓSITO DEL SISTEMA:
+=====================
+ControlNotificacionesContextual previene notificaciones duplicadas mediante:
+1. Generación de hash único por combinación (participante, tipo, actividad, contexto)
+2. Verificación de existencia con ventana temporal opcional
+3. Registro atómico con validación de duplicados
+
+ARQUITECTURA DEL SISTEMA:
+=========================
+
+Hash de Unicidad (MD5):
+- Formato: MD5("{participante_id}_{tipo_notif}_{actividad_id}_{contexto}")
+- Valores especiales: actividad_id=None → "global", contexto=None → "general"
+- Longitud: 32 caracteres hexadecimales
+- Propósito: identificador único e idempotente para cada tipo de notificación
+
+Ventana Temporal:
+- Parámetro opcional: ventana_horas
+- Función: permite duplicados después de X horas
+- Ejemplo: inasistencia cada 24h, reconocimiento una sola vez (sin ventana)
+
+TESTS IMPLEMENTADOS:
+===================
+
+1. GENERACIÓN DE HASH (GenerarHashUnicidadTests - 8 tests):
+   =========================================================
+   
+   test_genera_hash_md5_valido:
+   - Valida longitud: 32 caracteres
+   - Valida formato: hexadecimal (0-9, a-f)
+   - Valida tipo: string
+   
+   test_mismo_input_genera_mismo_hash:
+   - Idempotencia: mismo input → siempre mismo output
+   - Crítico para prevención de duplicados
+   
+   test_diferente_participante_genera_diferente_hash:
+   - Hash(participante=123) ≠ Hash(participante=456)
+   - Aislamiento por usuario
+   
+   test_diferente_tipo_genera_diferente_hash:
+   - Hash(tipo="Reconocimiento") ≠ Hash(tipo="Inasistencia")
+   - Permite múltiples tipos de notificación al mismo usuario
+   
+   test_diferente_actividad_genera_diferente_hash:
+   - Hash(actividad=45) ≠ Hash(actividad=99)
+   - Notificaciones por actividad independientes
+   
+   test_diferente_contexto_genera_diferente_hash:
+   - Hash(contexto="hito_10") ≠ Hash(contexto="hito_20")
+   - Permite múltiples hitos/contextos
+   
+   test_actividad_none_usa_global:
+   - actividad_id=None → usa "global" en string pre-hash
+   - Verifica: hash == MD5("123_Reconocimiento_global_general")
+   
+   test_contexto_none_usa_general:
+   - contexto=None → usa "general" en string pre-hash
+   - Verifica: hash == MD5("123_Reconocimiento_45_general")
+
+2. VERIFICACIÓN DE EXISTENCIA (YaExisteNotificacionTests - 6 tests):
+   ===================================================================
+   
+   test_retorna_false_cuando_no_existe:
+   - Mock: Notificaciones.objects.filter().exists() → False
+   - Valida: ya_existe_notificacion() → False
+   
+   test_retorna_true_cuando_existe:
+   - Mock: exists() → True
+   - Valida: ya_existe_notificacion() → True
+   
+   test_filtra_por_hash_correcto:
+   - Verifica: filter(hash_unicidad=hash_calculado)
+   - Valida: hash generado == hash esperado
+   
+   test_aplica_ventana_temporal_cuando_especificada:
+   - Parámetro: ventana_horas=24
+   - Verifica: filter(created_at__gte=hace_24_horas)
+   - Tolerancia: ±1 segundo (evita flakiness por microsegundos)
+   
+   test_sin_actividad_usa_none_en_hash:
+   - actividad=None → hash usa "global"
+   - Verifica: hash correcto sin actividad
+
+3. REGISTRO DE NOTIFICACIONES (RegistrarNotificacionTests - 5 tests):
+   ====================================================================
+   
+   test_crea_notificacion_cuando_no_existe:
+   - Mock: ya_existe=False → crea nueva
+   - Valida: Notificaciones.objects.create() llamado
+   - Retorna: instancia creada
+   
+   test_retorna_none_cuando_ya_existe:
+   - Mock: ya_existe=True
+   - Valida: create() NO llamado
+   - Retorna: None (no duplica)
+   
+   test_guarda_todos_los_campos_correctamente:
+   - Verifica campos guardados:
+     * participantes_id_participante
+     * tipos_notificacion_id_tipo_notificacion
+     * mensaje
+     * fecha (con ventana de tolerancia ±microsegundos)
+     * leida=False (default)
+     * actividad_relacionada
+     * contexto_hito
+     * hash_unicidad
+   
+   test_hash_unicidad_es_correcto:
+   - Valida: hash guardado == hash calculado
+   - Previene: inconsistencias entre verificación y registro
+
+4. EDGE CASES (EdgeCasesTests - 6 tests):
+   =======================================
+   
+   test_hash_con_caracteres_especiales_en_contexto:
+   - Contexto: "días_7-crítico!"
+   - Valida: hash válido (32 chars, no crashea)
+   
+   test_hash_con_ids_muy_grandes:
+   - IDs: 999999999, 888888888
+   - Valida: no overflow, hash válido
+   
+   test_ventana_temporal_cero_horas:
+   - ventana_horas=0
+   - Valida: no crashea, funciona correctamente
+   
+   test_mensaje_muy_largo:
+   - Mensaje: 1000 caracteres ("A" * 1000)
+   - Valida: se guarda correctamente
+   
+   test_diferentes_ordenes_mismos_parametros:
+   - Llamada 1: posicional (123, "Test", 45, "ctx")
+   - Llamada 2: keyword (participante_id=123, ...)
+   - Valida: hash1 == hash2 (consistencia)
+
+5. INTEGRACIÓN (IntegracionControlTests - 2 tests):
+   =================================================
+   
+   test_flujo_completo_primera_notificacion:
+   - Paso 1: ya_existe() → False
+   - Paso 2: registrar() → crea notificación
+   - Paso 3: ya_existe() → True
+   - Valida: flujo completo funciona correctamente
+   
+   test_previene_duplicados_en_registro:
+   - Llamada 1: registrar() → crea (resultado != None)
+   - Llamada 2: registrar() → no crea (resultado == None)
+   - Valida: create() llamado solo 1 vez (no 2)
+
+LÓGICA DE NEGOCIO CRÍTICA:
+===========================
+
+GENERACIÓN DE HASH:
+```python
+def generar_hash_unicidad(participante_id, tipo_notif, actividad_id=None, contexto=None):
+    actividad_str = str(actividad_id) if actividad_id else "global"
+    contexto_str = contexto if contexto else "general"
+    
+    clave = f"{participante_id}_{tipo_notif}_{actividad_str}_{contexto_str}"
+    return hashlib.md5(clave.encode()).hexdigest()
+```
+
+VERIFICACIÓN CON VENTANA TEMPORAL:
+```python
+def ya_existe_notificacion(participante, tipo_notif, actividad=None, 
+                           contexto=None, ventana_horas=None):
+    hash_unicidad = generar_hash_unicidad(...)
+    
+    filtros = {'hash_unicidad': hash_unicidad}
+    
+    if ventana_horas is not None:
+        limite_tiempo = timezone.now() - timedelta(hours=ventana_horas)
+        filtros['created_at__gte'] = limite_tiempo
+    
+    return Notificaciones.objects.filter(**filtros).exists()
+```
+
+REGISTRO ATÓMICO:
+```python
+def registrar_notificacion(participante, tipo_notif, mensaje, 
+                           actividad=None, contexto=None):
+    # 1. Verificar duplicado
+    if ya_existe_notificacion(participante, tipo_notif, actividad, contexto):
+        return None  # No duplicar
+    
+    # 2. Crear notificación
+    tipo_obj = TiposNotificacion.objects.get(nombre=tipo_notif)
+    hash_unicidad = generar_hash_unicidad(...)
+    
+    notif = Notificaciones.objects.create(
+        participantes_id_participante=participante,
+        tipos_notificacion_id_tipo_notificacion=tipo_obj,
+        mensaje=mensaje,
+        fecha=timezone.now(),
+        leida=False,
+        actividad_relacionada=actividad,
+        contexto_hito=contexto,
+        hash_unicidad=hash_unicidad
+    )
+    
+    return notif
+```
+
+CASOS DE USO REALES:
+====================
+
+1. RECONOCIMIENTO (sin ventana temporal):
+   - Usuario completa 10 asistencias en Yoga
+   - Hash: MD5("123_Reconocimiento_45_hito_10")
+   - Primera vez: crea notificación
+   - Intento duplicado: retorna None (ya existe)
+
+2. INASISTENCIA (con ventana de 24h):
+   - Usuario falta 3 veces seguidas
+   - Hash: MD5("123_Inasistencia_45_inasistencia_critica")
+   - ventana_horas=24
+   - Permite nueva notificación después de 24h
+
+3. ACTIVACIÓN GENERAL (sin actividad):
+   - Usuario inactivo por 30 días
+   - Hash: MD5("123_Inactividad_global_general")
+   - actividad_id=None → usa "global"
+   - contexto=None → usa "general"
+
+PREVENCIÓN DE DUPLICADOS:
+=========================
+
+ESTRATEGIA DE DOBLE VERIFICACIÓN:
+1. ya_existe_notificacion() verifica con hash
+2. registrar_notificacion() vuelve a verificar antes de crear
+3. Race condition protegida por unique constraint en BD (hash_unicidad)
+
+CAMPOS DEL HASH:
+- participante_id: aislamiento por usuario
+- tipo_notif: múltiples tipos permitidos
+- actividad_id: independencia por actividad
+- contexto: permite múltiples hitos/estados
+
+VENTANA TEMPORAL:
+- None: solo una vez en la vida
+- 24: permite repetir cada 24 horas
+- 168 (7 días): notificaciones semanales
+
+METODOLOGÍA DE TESTING:
+=======================
+- 100% mocks: NO se usa base de datos real
+- SimpleTestCase: tests unitarios puros sin DB
+- Aislamiento completo con @patch
+- Validación de campos individuales
+- Tests de idempotencia y consistencia
+- Edge cases exhaustivos
+
+CORRECCIONES APLICADAS:
+=======================
+1. ✅ Eliminado campo 'descripcion' de TiposNotificacion.objects.create()
+   - Solo usa 'nombre' que existe en modelo real
+   
+2. ✅ Tolerancia en comparación de fechas
+   - No compara microsegundos exactos
+   - Usa ventana de ±1 segundo para evitar flakiness
+
+3. ✅ Tests con side_effect para simular múltiples llamadas
+   - [False, False, True] en test de flujo completo
+   - [False, True] en test de prevención de duplicados
+
+LO QUE SE PRUEBA REALMENTE:
+===========================
+✅ Generación de hash MD5 correcto e idempotente
+✅ Diferenciación por participante, tipo, actividad, contexto
+✅ Manejo de valores None (global, general)
+✅ Verificación con/sin ventana temporal
+✅ Registro atómico con prevención de duplicados
+✅ Guardado de todos los campos correctamente
+✅ Edge cases: caracteres especiales, IDs grandes, mensajes largos
+✅ Flujo completo: verificar → crear → verificar
+✅ Prevención de race conditions en registro
+
+LO QUE NO SE PRUEBA:
+====================
+❌ Unique constraint real en base de datos
+❌ Race conditions con múltiples procesos concurrentes
+❌ Performance con millones de notificaciones
+❌ Integración con Celery tasks real
+❌ Envío real de emails/notificaciones push
+
+CASOS ESPECIALES IMPORTANTES:
+==============================
+
+1. VALORES ESPECIALES:
+   - actividad_id=None → "global" en hash
+   - contexto=None → "general" en hash
+   - Consistencia: siempre mismos valores para None
+
+2. VENTANA TEMPORAL:
+   - None: solo una vez (default)
+   - 0: verifica solo en el mismo instante (caso edge)
+   - >0: permite repetición después de X horas
+
+3. HASH IDEMPOTENTE:
+   - Mismo input → siempre mismo output
+   - Crítico para prevención de duplicados
+   - MD5 es suficiente (no necesita ser criptográficamente seguro)
+
+4. REGISTRO ATÓMICO:
+   - Verifica ANTES de crear
+   - Race condition protegida por unique constraint en BD
+   - Retorna None si duplicado (no lanza excepción)
+
+EJEMPLO DE FLUJO REAL:
+=======================
+
+Usuario "Ana" completa 10 asistencias en "Yoga":
+
+1. Sistema detecta hito (10 asistencias)
+2. Llama: registrar_notificacion(ana, "Reconocimiento", "¡10 asistencias!", yoga, "hito_10")
+3. Hash generado: MD5("123_Reconocimiento_45_hito_10") → "a1b2c3d4..."
+4. Verifica: ya_existe_notificacion() → False
+5. Busca tipo: TiposNotificacion.objects.get(nombre="Reconocimiento")
+6. Crea: Notificaciones.objects.create(
+     participante=ana,
+     tipo=reconocimiento,
+     mensaje="¡10 asistencias!",
+     hash_unicidad="a1b2c3d4..."
+   )
+7. Retorna: instancia creada
+
+Si se vuelve a llamar (bug o duplicado):
+1-4. Mismos pasos
+4. Verifica: ya_existe_notificacion() → True
+5. Retorna: None (no crea duplicado)
+"""
+
 from django.test import SimpleTestCase  # ✅ SOLO SimpleTestCase
 from unittest.mock import patch, MagicMock
 from django.utils import timezone
