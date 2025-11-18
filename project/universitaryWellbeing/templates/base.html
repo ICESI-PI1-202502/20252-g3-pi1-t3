@@ -201,7 +201,7 @@
     <a href="{% url 'profile' %}">
       <i class="bi bi-person-circle"></i> Mi Perfil
     </a>
-    {% elif es_admin_bienestar %}
+    {% elif es_admin_bienestar or request.user.is_superuser %}
     <a href="{% url 'Analytics_Reports:analytics_index' %}">
       <i class="bi bi-graph-up"></i> Analítica y Reportes
     </a>

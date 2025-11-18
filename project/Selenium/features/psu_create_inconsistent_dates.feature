@@ -2,7 +2,7 @@ Feature: PSU - Creación de proyecto social con fechas inconsistentes
 
   Scenario: Intentar crear proyecto con fecha de inicio posterior a la fecha fin
     Given I am on the login page
-    When I login with username "5544" and password "5544"
+    When I login with username "1110287840" and password "123"
     And I open the sidebar menu
     And I go to PSU projects (admin) from the menu
     And I open the PSU create project form

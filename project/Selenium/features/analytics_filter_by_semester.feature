@@ -2,7 +2,7 @@ Feature: Analítica - Filtro por semestre
 
   Scenario: Filtrar semestre 2 y agrupar por Facultad en Comparaciones
     Given I am on the login page
-    When I login with username "5544" and password "5544"
+    When I login with username "1110287840" and password "123"
     And I open the sidebar menu
     And I go to analytics & reports from the menu
     And I open the comparisons & statistics page
