@@ -47,8 +47,8 @@ class HelpersTestCase(SimpleTestCase):
         from management_CADI.views import hhmm_to_dt
         result = hhmm_to_dt("15:30")
         self.assertIsNotNone(result)
-        self.assertEqual(result.hour, 15)
-        self.assertEqual(result.minute, 30)
+        self.assertEqual(result.hour, 15) # type: ignore
+        self.assertEqual(result.minute, 30) # type: ignore
 
     def test_hhmm_to_dt_invalid(self):
         from management_CADI.views import hhmm_to_dt
@@ -59,9 +59,9 @@ class HelpersTestCase(SimpleTestCase):
         from management_CADI.views import date_input_to_dt
         result = date_input_to_dt("2025-10-13")
         self.assertIsNotNone(result)
-        self.assertEqual(result.year, 2025)
-        self.assertEqual(result.month, 10)
-        self.assertEqual(result.day, 13)
+        self.assertEqual(result.year, 2025) # type: ignore
+        self.assertEqual(result.month, 10) # type: ignore
+        self.assertEqual(result.day, 13) # type: ignore
 
     def test_date_input_to_dt_invalid(self):
         from management_CADI.views import date_input_to_dt

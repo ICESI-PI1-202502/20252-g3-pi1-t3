@@ -2,6 +2,9 @@ from pathlib import Path
 import sys, os
 from django.conf.urls import handler404
 from dotenv import load_dotenv
+import sys
+
+TESTING = any(cmd in sys.argv for cmd in ("test", "pytest"))
 
 handler404 = "universitaryWellbeing.views.custom_404"
  
@@ -244,9 +247,7 @@ CELERY_BEAT_SCHEDULE = {
 
 
 
-import sys
-
-if any(cmd in sys.argv for cmd in ("test", "pytest")):
+if TESTING:
     MIGRATION_MODULES = {"universitaryWellbeing": None, "appointments.tests": None}
 
     args = " ".join(sys.argv)

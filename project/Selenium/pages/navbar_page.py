@@ -12,7 +12,6 @@ class NavBar(BasePage):
     LINK_ANALYTICS = (By.CSS_SELECTOR, '#sidebar a[href="/analytics-reports/"]')
     LINK_PSU         = (By.CSS_SELECTOR, '#sidebar a[href="/psu/proyectos/"]')
     LINK_UNIFIED_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/calendario-unificado/"]')
-    LINK_SCHEDULE = (By.CSS_SELECTOR, '#sidebar a[href="/horario/"]')
 
 
     def open_menu(self):
@@ -45,13 +44,6 @@ class NavBar(BasePage):
             self.click(self.LINK_SEARCH)
         except Exception:
             self.click_js(self.LINK_SEARCH, timeout=5)
-
-    def go_to_schedule(self):  
-        self.open_menu()
-        try:
-            self.click(self.LINK_SCHEDULE)
-        except Exception:
-            self.click_js(self.LINK_SCHEDULE, timeout=5)
 
     def go_to_analytics_reports(self):
         self.open_menu()
