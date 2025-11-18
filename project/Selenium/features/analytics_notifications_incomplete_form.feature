@@ -2,7 +2,7 @@ Feature: Analítica - Envío de formulario incompleto de configuración de notif
 
   Scenario: Guardar con umbral y días en 0 debe disparar validación nativa (min=1)
     Given I am on the login page
-    When I login with username "1113624957" and password "00"
+    When I login with username "5544" and password "5544"
     And I open the sidebar menu
     And I go to analytics & reports from the menu
     And I go to recommendations from analytics menu

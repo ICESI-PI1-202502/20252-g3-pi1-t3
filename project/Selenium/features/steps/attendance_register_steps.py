@@ -6,7 +6,7 @@ from pages.register_attendance_page import RegisterAttendancePage
 
 @when("I go to attendance management from the analytics menu")
 def step_go_attendance_mgmt(context):
-    NavBar(context.driver).open_menu()
+    # go_to_analytics_reports ya abre el menú por dentro
     NavBar(context.driver).go_to_analytics_reports()
     AnalyticsMenuPage(context.driver).go_to_attendance_mgmt()
 

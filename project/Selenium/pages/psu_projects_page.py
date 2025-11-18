@@ -8,6 +8,7 @@ class PSUProjectsPage(BasePage):
     INPUT_Q        = (By.CSS_SELECTOR, 'input[name="q"]')
     BTN_SEARCH     = (By.CSS_SELECTOR, 'button[type="submit"].btn.btn-primary, .btn.btn-primary[type="submit"]')
     RESULT_TITLES  = (By.CSS_SELECTOR, 'article.card-item h3.title')
+    BTN_CREATE     = (By.CSS_SELECTOR, 'a[href="/psu/proyectos/crear/"]')
 
     def search(self, text: str):
         self.type(self.INPUT_Q, text)
