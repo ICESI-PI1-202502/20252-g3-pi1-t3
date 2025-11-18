@@ -21,12 +21,341 @@ from datetime import date, time
 from collections import defaultdict
 
 
+"""
+Tests unitarios completos para universitaryWellbeing/views.py
+
+COBERTURA REAL DE TESTS:
+========================
+
+1. HELPERS Y UTILIDADES (HelpersTestCase):
+   =========================================
+   - is_role_admin: verificación de permisos admin
+     * Usuario en grupo "admin" → True
+     * Superuser → True
+     * Usuario regular → False
+   - _django_weekday_to_fc_dow: conversión días de semana
+     * Django (1=Domingo, 7=Sábado) ↔ FullCalendar (0=Domingo, 6=Sábado)
+
+2. LOGIN - FLUJOS COMPLETOS (TestLoginView):
+   ==========================================
+   
+   GET:
+   - Renderiza formulario de login (login.html)
+   
+   POST - FLUJOS POR TIPO DE USUARIO:
+   - Admin: is_role_admin=True → redirección a 'cadi_admin'
+   - Usuario sin participante: logout forzado + error
+   - Usuario sin tipo_participante: redirección a 'completar_perfil'
+   - Usuario sin preferencias: redirección a 'preferences'
+   - Usuario completo: redirección a 'home' + mensaje bienvenida
+   
+   ERRORES:
+   - Formulario inválido: mensaje de error + redirección a login
+
+3. SEGURIDAD - SQL INJECTION (TestSQLInjectionProtection):
+   ========================================================
+   - Login: rechaza "' OR '1'='1" y similares
+   - Registro: valida emails con caracteres SQL ('; DROP TABLE)
+   - Preferencias: valida IDs numéricos (rechaza "3; DROP TABLE")
+   - ORM: verifica uso de filter() seguro vs SQL crudo
+   - Búsquedas: rechaza comandos (DELETE, DROP, UNION, --, ;)
+
+4. PASSWORD RESET - RATE LIMITING (PasswordResetTests):
+   =====================================================
+   - Permite hasta 3 intentos por hora por IP
+   - Intento 4+: retorna 403 Forbidden
+   - Obtención de IP:
+     * Con proxy: HTTP_X_FORWARDED_FOR (primera IP)
+     * Sin proxy: REMOTE_ADDR
+   - Cache: incrementa contador con TTL de 1 hora
+
+5. PASSWORD RESET CONFIRM (PasswordResetConfirmTests):
+   ====================================================
+   - Envía email de notificación tras cambio exitoso
+   - Contenido: "Tu contraseña ha sido cambiada"
+   - Si falla SMTP: continúa flujo sin interrumpir
+
+6. OBTENER ACTIVIDADES DEL DÍA (ObtenerActividadesDelDiaTests):
+   ==============================================================
+   - obtener_actividades_generales_del_dia(fecha):
+     * Filtra HorariosActividad por día de semana
+     * Ordena por hora_inicio (10h → 14h → 16h)
+     * Límite: máximo 5 actividades
+     * Formato retornado: {titulo, tipo, hora_inicio, hora_fin, profesor, lugar}
+
+7. EDGE CASES Y CASOS LÍMITE (EdgeCasesTests):
+   ============================================
+   - Completar perfil con tipo_participante vacío: error sin llamar a DB
+   - Domingo (weekday=6): conversión correcta Django → FullCalendar
+   - Evento no encontrado: manejo de Http404
+
+8. VALIDACIÓN DE DATOS (ValidationTests):
+   =======================================
+   - Email: formato RFC válido (validate_email de Django)
+     * Válidos: user@example.com, user+tag@example.co.uk
+     * Inválidos: notanemail, @example.com, user@
+   - Cédula: solo dígitos (isdigit())
+   - Semestre: rango [1-12]
+
+9. INTEGRACIÓN - FLUJOS COMPLETOS (IntegrationTests):
+   ===================================================
+   - Primer login: Login → sin tipo_participante → completar_perfil
+   - Segundo login: Login → con perfil, sin preferencias → preferences
+   - Login admin: validación is_role_admin → cadi_admin
+
+10. LOGOUT (LogoutTests):
+    =====================
+    - Llama logout(request) de Django
+    - Mensaje de éxito
+    - Redirección a 'login'
+
+11. REGISTRO (TestRegisterView):
+    ============================
+    
+    GET:
+    - Renderiza formulario (auth/register.html)
+    
+    POST - EXITOSO:
+    - Crea User con username=cédula
+    - Separa nombre completo: "Juan Carlos Pérez" → first_name="Juan", last_name="Carlos Pérez"
+    - Crea Participantes vinculado con rol "Estudiante"
+    - Mensaje de éxito + redirección a 'login'
+    
+    ERRORES:
+    - Rol "Estudiante" no existe en BD: error + no crea Participantes
+    - Formulario inválido: mensaje de error
+
+12. PREFERENCIAS (TestPreferencesView):
+    ====================================
+    
+    GET:
+    - Usuario con preferencias: redirección a 'home'
+    - Usuario sin preferencias: renderiza categorías (list_preferences.html)
+    
+    POST:
+    - Crea Preferencias para participante
+    - Crea PreferenciasActividades por cada tipo seleccionado
+    - Redirección a 'home'
+
+13. COMPLETAR PERFIL (TestCompletarPerfilView):
+    ============================================
+    
+    GET:
+    - Usuario con tipo_participante: redirección a 'preferences'
+    - Usuario sin tipo_participante: renderiza formulario
+    
+    POST:
+    - Estudiante: guarda semestre, programa, facultad, género
+    - Trabajador: guarda facultad, género (sin semestre/programa)
+    - Actualiza tipo_participante
+    - Mensaje de éxito + redirección a 'preferences'
+
+14. SCHEDULE/HORARIO - SERIALIZACIÓN A FULLCALENDAR (ScheduleTests):
+    ==================================================================
+    
+    RENDERIZADO BÁSICO:
+    - Obtiene HorariosParticipante del usuario
+    - Serializa a JSON para FullCalendar
+    - Template: Horario.html
+    
+    TIPOS DE EVENTOS:
+    - Actividades: color por defecto
+    - Citas: color amarillo (#E4EB60)
+    - Partidos: color naranja (#E9683B)
+    
+    EVENTOS RECURRENTES:
+    - fuente_manual='S' + actividad → genera daysOfWeek
+    - es_recurrente=True en extendedProps
+    
+    SIN EVENTOS:
+    - eventos_json = [] (array vacío)
+
+15. ELIMINAR EVENTO (EliminarEventoTests):
+    =======================================
+    - Solo eventos manuales (fuente_manual='S'): permite eliminar
+    - Eventos automáticos (fuente_manual='N'): retorna 403 Forbidden
+    - Excepción en delete(): retorna 500 con mensaje de error
+    - Respuesta: JsonResponse con {success: true/false, message: "..."}
+
+16. CALENDARIO UNIFICADO (CalendarioUnificadoTests):
+    =================================================
+    - Lista todas las actividades disponibles
+    - Agrupa por actividad → bloques → días
+    - Filtro por tipo: aplica tipos_actividad_id_tipo
+    - Sin actividades: eventos_json = []
+    - Template: calendario_unificado.html
+
+17. HOME USER (HomeUserTests):
+    ===========================
+    - Superuser: retorna 404 (pageNotFound-404.html)
+    - Usuario regular:
+      * Obtiene rol del participante
+      * Actividades del día (obtener_actividades_generales_del_dia)
+      * Horarios del usuario
+      * Noticias recientes
+      * Template: home_user.html
+
+18. HOME ADMIN (HomeAdminTests):
+    =============================
+    - Renderiza home_admin.html
+    - Sin validaciones adicionales
+
+19. FUNCIONES AUXILIARES (HelperFunctionsTests):
+    ==============================================
+    
+    get_recommendations_for_user(user):
+    - Obtiene Participantes → Preferencias → PreferenciasActividades
+    - Filtra Actividades por tipos preferidos
+    - Sin participante/preferencias: retorna []
+    
+    get_user_schedule(user):
+    - Obtiene HorariosParticipante del usuario
+    - Sin participante: retorna []
+    
+    get_user_calendar(user):
+    - Obtiene Citas del usuario
+    - Sin participante: retorna []
+
+20. PROFILE (ProfileTests):
+    ========================
+    - Obtiene Participantes + Preferencias + Notificaciones
+    - Contexto:
+      * participante: objeto Participantes
+      * actividades: lista de actividades preferidas
+      * notificaciones: últimas notificaciones
+      * notificaciones_no_leidas: contador
+      * user_rol: nombre del rol (si existe)
+    - Sin preferencias: actividades=[], user_rol=None
+
+21. NOTIFICACIONES (test_ver_notificaciones_sin_notificaciones):
+    =============================================================
+    - Maneja caso sin notificaciones: contexto con array vacío
+
+LÓGICA DE NEGOCIO CRÍTICA:
+===========================
+
+FLUJO DE ONBOARDING:
+```
+Login → ¿tiene tipo_participante? → NO → completar_perfil
+                ↓ SÍ
+        ¿tiene preferencias? → NO → preferences
+                ↓ SÍ
+              home
+```
+
+CONVERSIÓN DE DÍAS DE SEMANA:
+```python
+# Django: 1=Domingo, 2=Lunes, ..., 7=Sábado
+# FullCalendar: 0=Domingo, 1=Lunes, ..., 6=Sábado
+def _django_weekday_to_fc_dow(django_day):
+    return 0 if django_day == 1 else django_day - 1
+```
+
+RATE LIMITING (PASSWORD RESET):
+```python
+cache_key = f"password_reset_{ip}"
+attempts = cache.get(cache_key, 0)
+if attempts >= 3:
+    return HttpResponseForbidden()
+cache.set(cache_key, attempts + 1, timeout=3600)
+```
+
+DETECCIÓN DE EVENTOS RECURRENTES:
+```python
+if evento.fuente_manual == 'S' and evento.actividades_id_actividad:
+    evento_json['daysOfWeek'] = [weekday]
+    evento_json['extendedProps']['es_recurrente'] = True
+```
+
+SERIALIZACIÓN PARA FULLCALENDAR:
+```python
+evento_json = {
+    'id': evento.id_horario,
+    'title': evento.titulo,
+    'start': fecha_inicio.isoformat(),
+    'end': fecha_fin.isoformat(),
+    'color': color_por_tipo,
+    'extendedProps': {
+        'tipo': 'actividad' | 'cita' | 'partido',
+        'es_recurrente': True/False,
+        'fuente_manual': 'S'/'N'
+    }
+}
+```
+
+COLORES POR TIPO:
+- Actividades: color por defecto (sin especificar)
+- Citas: #E4EB60 (amarillo)
+- Partidos: #E9683B (naranja)
+
+METODOLOGÍA DE TESTING:
+=======================
+- 100% mocks: NO se usa base de datos real
+- Aislamiento con @patch de todos los modelos
+- Tests de integración: flujos completos multi-vista
+- Tests de seguridad: SQL injection, rate limiting
+- Edge cases: datos vacíos, conversiones de fechas, errores de BD
+
+LO QUE SE PRUEBA REALMENTE:
+===========================
+✅ Flujos de onboarding (login → completar perfil → preferencias → home)
+✅ Sistema de autenticación y autorización (admin vs usuario regular)
+✅ Seguridad: SQL injection, rate limiting (3 intentos/hora)
+✅ Serialización de eventos a FullCalendar (recurrentes, colores por tipo)
+✅ Conversión de días de semana (Django ↔ FullCalendar)
+✅ Validación de datos (emails, cédulas, semestres)
+✅ Gestión de horarios (agregar, eliminar, eventos manuales vs automáticos)
+✅ Funciones auxiliares (recomendaciones, schedule, calendar)
+✅ Manejo de errores (sin participante, sin preferencias, BD errors)
+
+LO QUE NO SE PRUEBA:
+====================
+❌ Queries reales a PostgreSQL/MySQL
+❌ Renderizado HTML de templates
+❌ Integración con FullCalendar.js (frontend)
+❌ Envío real de emails SMTP
+❌ Cache real (Redis/Memcached)
+❌ Timezone real del servidor
+
+CASOS ESPECIALES IMPORTANTES:
+==============================
+
+1. SEPARACIÓN DE NOMBRE COMPLETO:
+   "Juan Carlos Pérez González" → first_name="Juan", last_name="Carlos Pérez González"
+   (split() toma primer elemento como nombre, resto como apellido)
+
+2. RATE LIMITING POR IP:
+   - Usa cache con TTL de 1 hora
+   - Key: f"password_reset_{ip}"
+   - Limite: 3 intentos/hora
+   - Obtiene IP real con proxy: HTTP_X_FORWARDED_FOR.split(',')[0]
+
+3. EVENTOS RECURRENTES:
+   - Solo eventos manuales (fuente_manual='S') + actividad
+   - Genera daysOfWeek para FullCalendar
+   - Permite que se repitan semanalmente
+
+4. CONVERSIÓN DE DÍAS:
+   - Django usa 1-7 (Domingo=1)
+   - FullCalendar usa 0-6 (Domingo=0)
+   - Python weekday() usa 0-6 (Lunes=0)
+   - Requiere conversión cuidadosa en ambas direcciones
+
+5. OBTENER ACTIVIDADES DEL DÍA:
+   - Filtra por día de semana de la fecha
+   - Ordena por hora_inicio
+   - Limita a 5 resultados
+   - Usado en home_user para mostrar actividades destacadas
+"""
+
 # ==========================================================
 # TESTS DE HELPERS Y UTILIDADES
 # ==========================================================
 # ==========================================================
 # CORRECCIÓN 1: HelpersTestCase - Eliminar @patch de Group
 # ==========================================================
+
+
 
 class HelpersTestCase(SimpleTestCase):
     """Pruebas de funciones auxiliares"""

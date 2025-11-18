@@ -1,3 +1,127 @@
+"""
+Tests unitarios completos para universitaryWellbeing/views.py
+
+COBERTURA REAL DE TESTS:
+========================
+
+1. HELPERS Y UTILIDADES (HelpersTestCase):
+   - Validación de roles admin (superuser y grupo)
+   - Conversión de días de semana Django ↔ FullCalendar
+
+2. LOGIN (TestLoginView):
+   - Renderizado de formulario (GET)
+   - Login exitoso de admin → redirección a cadi_admin
+   - Login sin participante → logout forzado
+   - Login sin tipo_participante → redirección a completar_perfil
+   - Login sin preferencias → redirección a preferences
+   - Login completo → redirección a home
+   - Formulario inválido → manejo de errores
+
+3. SEGURIDAD SQL INJECTION (TestSQLInjectionProtection):
+   - Rechazo de inyecciones SQL en login (' OR '1'='1)
+   - Validación de emails maliciosos (DROP TABLE, etc.)
+   - Validación de IDs numéricos en preferencias
+   - Verificación de uso de ORM (no SQL crudo)
+   - Rechazo de comandos SQL en búsquedas
+
+4. PASSWORD RESET (PasswordResetTests):
+   - Rate limiting: permite hasta 3 intentos/hora
+   - Rate limiting: bloquea después de 3 intentos (403)
+   - Obtención de IP con proxy (X-Forwarded-For)
+   - Obtención de IP directa (REMOTE_ADDR)
+
+5. PASSWORD RESET CONFIRM (PasswordResetConfirmTests):
+   - Envío de email de notificación tras cambio exitoso
+   - Flujo no se interrumpe si falla envío de email
+
+6. OBTENER ACTIVIDADES DEL DÍA (ObtenerActividadesDelDiaTests):
+   - Obtención de actividades para un día específico (lunes)
+   - Ordenamiento por hora de inicio (10h → 14h → 16h)
+   - Límite de 5 actividades máximo
+
+7. EDGE CASES (EdgeCasesTests):
+   - Completar perfil con tipo_participante vacío
+   - Conversión correcta de domingo (día 6)
+   - Manejo de evento no encontrado (Http404)
+
+8. VALIDACIÓN DE DATOS (ValidationTests):
+   - Formato de email válido/inválido
+   - Cédula numérica vs alfanumérica
+   - Rango de semestre (1-12)
+
+9. INTEGRACIÓN - FLUJOS COMPLETOS (IntegrationTests):
+   - Flujo primer login → completar perfil
+   - Flujo segundo login → preferencias
+   - Login admin → cadi_admin
+
+10. LOGOUT (LogoutTests):
+    - Cierre de sesión y limpieza
+
+11. REGISTRO (TestRegisterView):
+    - Renderizado de formulario (GET)
+    - Registro exitoso → creación User + Participante
+    - Separación de nombre completo (Juan Carlos → Juan | Carlos)
+    - Error cuando no existe rol 'Estudiante'
+    - Formulario inválido
+
+12. PREFERENCIAS (TestPreferencesView):
+    - Usuario con preferencias → redirección a home
+    - GET renderiza categorías disponibles
+    - POST crea nuevas preferencias y asocia tipos de actividad
+
+13. COMPLETAR PERFIL (TestCompletarPerfilView):
+    - Usuario con perfil completo → redirección
+    - Completar perfil como estudiante (semestre, programa, facultad)
+    - Completar perfil como trabajador (solo facultad)
+
+14. SCHEDULE/HORARIO (ScheduleTests):
+    - Renderizado de eventos del participante
+    - Evento recurrente (manual) con daysOfWeek
+    - Colores por tipo: citas (amarillo), partidos (naranja), actividades
+    - Manejo de horario sin eventos
+
+15. ELIMINAR EVENTO (EliminarEventoTests):
+    - Eliminar evento manual → success
+    - No eliminar evento automático → 403 Forbidden
+    - Manejo de excepciones → 500
+
+16. CALENDARIO UNIFICADO (CalendarioUnificadoTests):
+    - Renderizado con todas las actividades
+    - Filtro por tipo de actividad
+    - Manejo de sin actividades disponibles
+
+17. HOME USER (HomeUserTests):
+    - Superuser recibe 404
+    - Renderizado con contexto completo (rol, actividades, horarios)
+
+18. HOME ADMIN (HomeAdminTests):
+    - Renderizado básico de home admin
+
+19. FUNCIONES AUXILIARES (HelperFunctionsTests):
+    - get_recommendations_for_user: recomendaciones según preferencias
+    - get_recommendations_for_user: sin participante/preferencias
+    - get_user_schedule: horarios del participante
+    - get_user_schedule: sin participante
+    - get_user_calendar: citas del participante
+    - get_user_calendar: sin participante
+
+20. PROFILE (ProfileTests):
+    - Renderizado con participante, actividades, notificaciones
+    - Manejo de perfil sin preferencias
+
+21. NOTIFICACIONES (test_ver_notificaciones_sin_notificaciones):
+    - Manejo de caso sin notificaciones
+
+METODOLOGÍA DE TESTING:
+=======================
+- Uso extensivo de @patch para aislar dependencias
+- Mocks de QuerySets de Django
+- Pruebas de flujos completos (integración)
+- Pruebas de seguridad (SQL Injection, rate limiting)
+- Validación de datos de entrada
+- Manejo de excepciones y casos límite
+"""
+
 from collections import defaultdict
 from functools import reduce
 import operator
