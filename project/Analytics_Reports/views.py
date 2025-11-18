@@ -21,7 +21,7 @@ import os
 from universitaryWellbeing.models import (
     Participaciones, Asistencias, Actividades, Notificaciones, HistorialParticipaciones,
     Participantes, TiposActividad, Roles, Citas, ProyectosSociales, Equipos,EstadosAsistencia, ConfiguracionNotificaciones,
-    RolesParticipacion,EstadosParticipacion 
+    RolesParticipacion,EstadosParticipacion, Torneos, Disciplinas, EstadosTorneo, TorneosEquipos, EquiposParticipantes
 )
 
 # Agregar estos imports al inicio de views.py si no están presentes
@@ -487,19 +487,32 @@ ROLES_SISTEMA = ['Estudiante', 'Trabajador', 'Egresado', 'Invitado']
 
 def analisis_comportamiento(request):
     # === FILTROS (sin min_frecuencia) ===
-    tipo_actividad = request.GET.get("tipo_actividad")
-    export = request.GET.get("export")
-    mostrar_todos = request.GET.get("mostrar_todos")
-    rol_filtro = request.GET.get("rol")
-    facultad_filtro = request.GET.get("facultad")
-    genero_filtro = request.GET.get("genero")
-    semestre_filtro = request.GET.get("semestre")
+    tipo_actividad   = request.GET.get("tipo_actividad")
+    export           = request.GET.get("export")
+    mostrar_todos    = request.GET.get("mostrar_todos")
+    rol_filtro       = request.GET.get("rol")
+    facultad_filtro  = request.GET.get("facultad")
+    genero_filtro    = request.GET.get("genero")
+    semestre_filtro  = request.GET.get("semestre")
 
-    # has_filters SIN min_frecuencia
-    has_filters = bool(tipo_actividad or mostrar_todos or
-                      rol_filtro or facultad_filtro or genero_filtro or semestre_filtro)
+    # === NUEVOS FILTROS – TORNEOS ===
+    torneo_nombre_q     = request.GET.get("torneo_nombre")       # texto libre
+    torneo_disciplina_q = request.GET.get("torneo_disciplina")   # id_disciplina
+    torneo_estado_q     = request.GET.get("torneo_estado")       # id_estado_torneo
+    mostrar_todos_torneos = request.GET.get("mostrar_todos_torneos")
 
-    # Datos para gráficos
+    # has_filters para ACTIVIDADES + (ahora) TORNEOS
+    has_filters_actividades = bool(
+        tipo_actividad or mostrar_todos or
+        rol_filtro or facultad_filtro or genero_filtro or semestre_filtro
+    )
+    torneos_has_filters = bool(
+        mostrar_todos_torneos or torneo_nombre_q or torneo_disciplina_q or torneo_estado_q
+    )
+    # Para activar el bloque de cálculo aunque solo haya filtros de torneos:
+    has_filters = has_filters_actividades or torneos_has_filters
+
+    # Datos para gráficos (Actividades)
     datos_grafico_frecuencia = []
     datos_grafico_roles = []
     datos_grafico_facultades = []
@@ -511,13 +524,62 @@ def analisis_comportamiento(request):
     facultades_unicas = 0
     roles_unicos = 0
     tipos_actividad_unicos = 0
-    
-    # === NUEVAS MÉTRICAS RF4.1 ===
+
+    # === MÉTRICAS RF4.1 (Actividades) ===
     total_participaciones = 0
     promedio_participaciones = 0
     porcentaje_reincidencia = 0
     total_nuevos = 0
 
+    # ============================================
+    # NUEVO: Resolver filtros de TORNEOS -> participantes
+    # ============================================
+    torneos_data = None
+    torneos_count = 0
+    participante_ids_from_torneos = None  # None: no aplicar; []: aplica y vacía
+
+    if torneos_has_filters:
+        torneos_qs = (
+            Torneos.objects
+            .select_related("disciplinas_id_disciplina", "estados_torneo_id_estado_torneo")
+            .order_by("-fecha_inicio")
+        )
+        if torneo_nombre_q:
+            torneos_qs = torneos_qs.filter(nombre__icontains=torneo_nombre_q.strip())
+        if torneo_disciplina_q:
+            torneos_qs = torneos_qs.filter(disciplinas_id_disciplina__id_disciplina=torneo_disciplina_q)
+        if torneo_estado_q:
+            torneos_qs = torneos_qs.filter(estados_torneo_id_estado_torneo__id_estado_torneo=torneo_estado_q)
+
+        # Para mostrar listado en la UI
+        torneos_data = list(
+            torneos_qs.values(
+                "id_torneo", "nombre",
+                "disciplinas_id_disciplina__nombre",
+                "estados_torneo_id_estado_torneo__nombre",
+                "fecha_inicio", "fecha_fin",
+            )
+        )
+        torneos_count = len(torneos_data)
+
+        # Encadenar: torneos -> equipos -> participantes
+        torneo_ids = list(torneos_qs.values_list("id_torneo", flat=True))
+        equipo_ids = list(
+            TorneosEquipos.objects
+            .filter(torneos_id_torneo_id__in=torneo_ids)
+            .values_list("equipos_id_equipo_id", flat=True)
+            .distinct()
+        )
+        participante_ids_from_torneos = list(
+            EquiposParticipantes.objects
+            .filter(equipos_id_equipo_id__in=equipo_ids)
+            .values_list("participantes_id_participante_id", flat=True)
+            .distinct()
+        )
+
+    # ============================================
+    # BLOQUE ACTUAL: ACTIVIDADES / PARTICIPACIONES
+    # ============================================
     if has_filters or export:
         # Base: participaciones por usuario
         queryset = Participaciones.objects.values(
@@ -548,13 +610,21 @@ def analisis_comportamiento(request):
                 actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
             )
         if rol_filtro:
-            queryset = queryset.filter(participantes_id_participante__roles_id_rol__id_rol=rol_filtro)
+            queryset = queryset.filter(
+                participantes_id_participante__roles_id_rol__id_rol=rol_filtro
+            )
         if facultad_filtro:
-            queryset = queryset.filter(participantes_id_participante__facultad=facultad_filtro)
+            queryset = queryset.filter(
+                participantes_id_participante__facultad=facultad_filtro
+            )
         if genero_filtro:
-            queryset = queryset.filter(participantes_id_participante__genero=genero_filtro)
+            queryset = queryset.filter(
+                participantes_id_participante__genero=genero_filtro
+            )
         if semestre_filtro:
-            queryset = queryset.filter(participantes_id_participante__semestre=semestre_filtro)
+            queryset = queryset.filter(
+                participantes_id_participante__semestre=semestre_filtro
+            )
 
         data = list(queryset)
 
@@ -592,74 +662,80 @@ def analisis_comportamiento(request):
 
         # === ESTADÍSTICAS ÚNICAS (para cards de resumen) ===
         if data:
-            facultades_unicas = len(set(item.get("participantes_id_participante__facultad") 
-                                        for item in data 
-                                        if item.get("participantes_id_participante__facultad")))
-            
-            roles_unicos = len(set(item.get("participantes_id_participante__roles_id_rol__nombre_rol") 
-                                   for item in data 
-                                   if item.get("participantes_id_participante__roles_id_rol__nombre_rol")))
-            
-            tipos_actividad_unicos = len(set(item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo") 
-                                              for item in data 
-                                              if item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo")))
-            
-            # === MÉTRICAS RF4.1 ===
-            total_participaciones = sum(item['total'] for item in data)
-            participantes_unicos_count = len(set(item['participantes_id_participante'] for item in data))
-            promedio_participaciones = round(total_participaciones / participantes_unicos_count, 1) if participantes_unicos_count > 0 else 0
+            facultades_unicas = len({
+                item.get("participantes_id_participante__facultad")
+                for item in data
+                if item.get("participantes_id_participante__facultad")
+            })
+            roles_unicos = len({
+                item.get("participantes_id_participante__roles_id_rol__nombre_rol")
+                for item in data
+                if item.get("participantes_id_participante__roles_id_rol__nombre_rol")
+            })
+            tipos_actividad_unicos = len({
+                item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo")
+                for item in data
+                if item.get("actividades_id_actividad__tipos_actividad_id_tipo__nombre_tipo")
+            })
 
-        # === REINCIDENCIA: nuevos vs reincidentes (RF4.1) ===
-        participantes_unicos = {item['participantes_id_participante'] for item in data}
+            total_participaciones = sum(item["total"] for item in data)
+            participantes_unicos_count = len({
+                item["participantes_id_participante"] for item in data
+            })
+            promedio_participaciones = (
+                round(total_participaciones / participantes_unicos_count, 1)
+                if participantes_unicos_count > 0 else 0
+            )
+
+        # === REINCIDENCIA: nuevos vs reincidentes
+        participantes_unicos = {item["participantes_id_participante"] for item in (data or [])}
         nuevos = reincidentes = 0
-
         for p_id in participantes_unicos:
             count = Participaciones.objects.filter(participantes_id_participante_id=p_id).count()
             if count > 1:
                 reincidentes += 1
             else:
                 nuevos += 1
-        
         total_nuevos = nuevos
-        porcentaje_reincidencia = round((reincidentes / len(participantes_unicos) * 100), 1) if participantes_unicos else 0
+        porcentaje_reincidencia = (
+            round((reincidentes / len(participantes_unicos) * 100), 1)
+            if participantes_unicos else 0
+        )
 
-        # === GRÁFICO: Frecuencia de participación ===
-        freq = {'Alta': 0, 'Media': 0, 'Baja': 0}
-        for item in data:
-            t = item['total']
+        # === GRÁFICO: Frecuencia de participación
+        freq = {"Alta": 0, "Media": 0, "Baja": 0}
+        for item in (data or []):
+            t = item["total"]
             if t >= 5:
-                freq['Alta'] += 1
+                freq["Alta"] += 1
             elif t >= 2:
-                freq['Media'] += 1
+                freq["Media"] += 1
             else:
-                freq['Baja'] += 1
-
+                freq["Baja"] += 1
         datos_grafico_frecuencia = [
-            {'label': 'Alta (5+)', 'value': freq['Alta']},
-            {'label': 'Media (2–4)', 'value': freq['Media']},
-            {'label': 'Baja (1)', 'value': freq['Baja']}
+            {"label": "Alta (5+)", "value": freq["Alta"]},
+            {"label": "Media (2–4)", "value": freq["Media"]},
+            {"label": "Baja (1)",   "value": freq["Baja"]},
         ]
 
-        # === GRÁFICO: Roles (solo sistema) ===
+        # === GRÁFICO: Roles
         roles_count = {}
-        for item in data:
+        for item in (data or []):
             rol = item.get("participantes_id_participante__roles_id_rol__nombre_rol", "Sin rol")
             roles_count[rol] = roles_count.get(rol, 0) + 1
-
         datos_grafico_roles = [
-            {'label': rol.title(), 'value': count}
+            {"label": rol.title(), "value": count}
             for rol, count in sorted(roles_count.items(), key=lambda x: x[1], reverse=True)
         ]
 
-        # === GRÁFICO: Facultades (top 10) - RF4.2 ===
+        # === GRÁFICO: Facultades (top 10)
         fac_count = {}
-        for item in data:
+        for item in (data or []):
             fac = item.get("participantes_id_participante__facultad", "No especificada")
             if fac and fac != "No especificada":
                 fac_count[fac] = fac_count.get(fac, 0) + 1
-
         datos_grafico_facultades = [
-            {'label': fac, 'value': count}
+            {"label": fac, "value": count}
             for fac, count in sorted(fac_count.items(), key=lambda x: x[1], reverse=True)[:10]
         ]
 
@@ -676,14 +752,14 @@ def analisis_comportamiento(request):
                         tipos_count[tipo] = tipos_count.get(tipo, 0) + 1
 
         datos_grafico_tipos_actividad = [
-            {'label': tipo, 'value': count}
+            {"label": tipo, "value": count}
             for tipo, count in sorted(tipos_count.items(), key=lambda x: x[1], reverse=True)
         ]
 
-        # === GRÁFICO: Reincidencia ===
+        # === GRÁFICO: Reincidencia
         datos_grafico_reincidencia = [
-            {'label': 'Nuevos', 'value': nuevos},
-            {'label': 'Reincidentes', 'value': reincidentes}
+            {"label": "Nuevos",       "value": nuevos},
+            {"label": "Reincidentes", "value": reincidentes},
         ]
 
 
@@ -745,18 +821,16 @@ def analisis_comportamiento(request):
         # === EXPORTAR CSV ===
         if export == "csv":
             response = HttpResponse(content_type="text/csv; charset=utf-8")
-            response['Content-Disposition'] = 'attachment; filename="estadisticas_participacion.csv"'
-            response.write('\ufeff')  # BOM para Excel
-
+            response["Content-Disposition"] = 'attachment; filename="estadisticas_participacion.csv"'
+            response.write("\ufeff")  # BOM para Excel
             writer = csv.writer(response)
             writer.writerow([
                 "Nombre", "Correo", "Semestre", "Facultad", "Género",
                 "Rol", "Tipo Actividad", "Participaciones", "Frecuencia",
-                "Primera vez", "Última vez"
+                "Primera vez", "Última vez",
             ])
-
-            for item in data:
-                total = item['total']
+            for item in (data or []):
+                total = item["total"]
                 freq_label = "Alta" if total >= 5 else "Media" if total >= 2 else "Baja"
                 writer.writerow([
                     item.get("participantes_id_participante__nombre", "Anónimo"),
@@ -769,33 +843,37 @@ def analisis_comportamiento(request):
                     total,
                     freq_label,
                     item.get("primera_participacion", "N/A"),
-                    item.get("ultima_participacion", "N/A")
+                    item.get("ultima_participacion", "N/A"),
                 ])
             return response
 
     # === Opciones de filtros (solo roles del sistema) ===
     tipos_actividad = TiposActividad.objects.all().order_by("nombre_tipo")
     roles = Roles.objects.filter(nombre_rol__in=ROLES_SISTEMA).order_by("nombre_rol")
-    facultades = (Participantes.objects
-                  .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
-                  .exclude(facultad__isnull=True)
-                  .exclude(facultad='')
-                  .values_list('facultad', flat=True).distinct().order_by('facultad'))
-    generos = (Participantes.objects
-               .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
-               .exclude(genero__isnull=True)
-               .exclude(genero='')
-               .values_list('genero', flat=True).distinct())
-    semestres = (Participantes.objects
-                 .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
-                 .exclude(semestre__isnull=True)
-                 .values_list('semestre', flat=True).distinct().order_by('semestre'))
+    facultades = (
+        Participantes.objects
+        .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
+        .exclude(facultad__isnull=True)
+        .exclude(facultad="")
+        .values_list("facultad", flat=True).distinct().order_by("facultad")
+    )
+    generos = (
+        Participantes.objects
+        .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
+        .exclude(genero__isnull=True)
+        .exclude(genero="")
+        .values_list("genero", flat=True).distinct()
+    )
+    semestres = (
+        Participantes.objects
+        .filter(roles_id_rol__nombre_rol__in=ROLES_SISTEMA)
+        .exclude(semestre__isnull=True)
+        .values_list("semestre", flat=True).distinct().order_by("semestre")
+    )
 
-    
-    # Al final de la vista, antes del return render:
-    # === Agregar al final de la vista, antes del return render ===
-
-#  
+    # === Opciones de filtros – TORNEOS ===
+    disciplinas_torneo = Disciplinas.objects.all().order_by("nombre")
+    estados_torneo     = EstadosTorneo.objects.all().order_by("nombre")
 
     return render(request, "analisis.html", {
     "data": data,
