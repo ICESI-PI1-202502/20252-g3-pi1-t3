@@ -1,6 +1,6 @@
 # management_CADI/tests/models.py
 from django.db import models
-from django.contrib.auth.models import User
+from django.contrib.auth.models import User, Group
 from django_resized import ResizedImageField
 from django.utils.text import slugify
 
@@ -19,6 +19,36 @@ class Grupos(models.Model):
         db_table = "grupos"
         app_label = 'management_cadi_tests'
 
+class Disciplinas(models.Model):
+    id_disciplina = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(unique=True, max_length=80)
+    class Meta:
+        managed = True
+        db_table = 'disciplinas'
+
+class EstadosTorneo(models.Model):
+
+    id_estado_torneo = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(unique=True, max_length=30)
+    class Meta:
+        managed = True
+        db_table = 'estados_torneo'
+
+class Torneos(models.Model):
+    id_torneo = models.BigAutoField(db_column="id_torneo", primary_key=True) 
+    nombre = models.CharField(max_length=150)
+    disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina')
+    fecha_inicio = models.DateTimeField()
+    fecha_fin    = models.DateTimeField()
+    estados_torneo_id_estado_torneo = models.ForeignKey(EstadosTorneo,models.DO_NOTHING,db_column='estados_torneo_id_estado_torneo'
+)
+    reglas_elegibilidad = models.CharField(max_length=1000, blank=True, null=True)
+    aforo_equipos = models.BigIntegerField(null=True, blank=True)
+    limite_inscripcion = models.DateTimeField(blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = 'torneos'
 
 class GruposActividad(models.Model):
     id_grupo_actividad = models.BigAutoField(primary_key=True, db_column="id_grupo_actividad")
@@ -127,6 +157,12 @@ class HorariosActividad(models.Model):
 class Roles(models.Model):
     id_rol = models.BigAutoField(primary_key=True)
     nombre_rol = models.CharField(max_length=50)
+    
+    #  AGREGAR: Campo group_id para compatibilidad con appointments
+    group = models.ForeignKey(
+        Group, models.DO_NOTHING, db_column="group_id",
+        null=True, blank=True, related_name="+", db_constraint=False
+    )
 
     class Meta:
         managed = True
@@ -136,13 +172,35 @@ class Roles(models.Model):
 
 class TiposParticipante(models.Model):
     id_tipo_participante = models.BigAutoField(primary_key=True)
-    nombre_tipo = models.CharField(max_length=50)
+    nombre = models.CharField(max_length=50, unique=True)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
-
+    
+    # Campos útiles para tu contexto universitario
+    requiere_validacion = models.BooleanField(
+        default=False,
+        help_text='Requiere aprobación de admin (ej: Docentes)'
+    )
+    puede_crear_actividades = models.BooleanField(
+        default=False,
+        help_text='Puede crear actividades (ej: Coordinadores, Docentes)'
+    )
+    activo = models.BooleanField(
+        default=True,
+        help_text='Tipo disponible para selección'
+    )
+    orden = models.IntegerField(
+        default=0,
+        help_text='Orden de aparición en formularios'
+    )
+    
     class Meta:
         managed = True
-        db_table = "tipos_participante"
-        app_label = 'management_cadi_tests'
+        db_table = 'tipos_participante'
+        ordering = ['orden', 'nombre']
+    
+    def __str__(self):
+        return self.nombre
+    
 
 
 class Participantes(models.Model):
@@ -247,24 +305,150 @@ class Participaciones(models.Model):
 # MODELOS DE HORARIOS DE PARTICIPANTES
 # ==========================================
 
-class HorariosParticipante(models.Model):
-    id_horario_participante = models.BigAutoField(primary_key=True)
+
+class AgendaPsicologos(models.Model):
+    id_agenda_slot = models.BigAutoField(primary_key=True)
     participantes_id_participante = models.ForeignKey(
-        Participantes,
-        models.DO_NOTHING,
-        db_column="participantes_id_participante"
-    )
-    actividades_id_actividad = models.ForeignKey(
-        Actividades,
-        models.DO_NOTHING,
-        db_column="actividades_id_actividad"
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
     )
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
-
+    estado_slot = models.CharField(max_length=20)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    
     class Meta:
         managed = True
-        db_table = "horarios_participante"
+        db_table = "agenda_psicologos"
+        app_label = 'management_cadi_tests'
+
+class Citas(models.Model):
+    id_cita = models.BigAutoField(primary_key=True)
+    fecha = models.DateTimeField()
+    motivo = models.CharField(max_length=200, blank=True, null=True)
+    observaciones = models.CharField(max_length=500, blank=True, null=True)
+
+    estados_cita_id_estado_cita = models.OneToOneField(
+        "EstadosCita", models.DO_NOTHING,
+        db_column="estados_cita_id_estado_cita", null=True, blank=True
+    )
+
+    participantes_id_participante = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante", related_name="+"
+    )
+    participantes_id_participante2 = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante2", related_name="+"
+    )
+    agenda_psicologos_id_agenda_slot = models.ForeignKey(
+        AgendaPsicologos, models.DO_NOTHING,
+        db_column="agenda_psicologos_id_agenda_slot", null=True, blank=True
+    )
+    motivos_cita_id_motivo = models.OneToOneField(
+        "MotivosCita", models.DO_NOTHING,
+        db_column="motivos_cita_id_motivo", null=True, blank=True
+    )
+    
+    class Meta:
+        managed = True
+        db_table = "citas"
+        app_label = 'management_cadi_tests'
+
+
+class EstadosCita(models.Model):
+    id_estado_cita = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=30)
+    citas_id_cita = models.OneToOneField(
+        Citas, models.DO_NOTHING, db_column="citas_id_cita", related_name="+"
+    )
+    
+    class Meta:
+        managed = True
+        db_table = "estados_cita"
+        app_label = 'management_cadi_tests'
+
+
+class MotivosCita(models.Model):
+    id_motivo = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=80, unique=True)
+    citas_id_cita = models.OneToOneField(
+        Citas, models.DO_NOTHING, db_column="citas_id_cita", null=True, blank=True, related_name="+"
+    )
+    
+    class Meta:
+        managed = True
+        db_table = "motivos_cita"
+        app_label = 'management_cadi_tests'
+
+
+class HistorialCitas(models.Model):
+    id_historial = models.BigAutoField(primary_key=True)
+    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column="citas_id_cita")
+    participantes_id_participante = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
+    )
+    fecha = models.DateTimeField()
+    nota = models.CharField(max_length=2000)
+    
+    class Meta:
+        managed = True
+        db_table = "historial_citas"
+        app_label = 'management_cadi_tests'
+ 
+        
+class Equipos(models.Model):
+    id_equipo = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=100)
+    fecha_creacion = models.DateTimeField()
+    cantidad_personas = models.BigIntegerField(blank=True, null=True)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    disciplinas_id_disciplina = models.ForeignKey(Disciplinas, models.DO_NOTHING, db_column='disciplinas_id_disciplina', blank=True, null=True)
+    capacidad_min = models.IntegerField(blank=True, null=True)
+    capacidad_max = models.IntegerField(blank=True, null=True)
+    class Meta:
+        managed = True
+        db_table = 'equipos'
+
+class EquiposParticipantes(models.Model):
+    id = models.BigAutoField(primary_key=True) 
+    equipos_id_equipo = models.ForeignKey('Equipos', models.DO_NOTHING, db_column='equipos_id_equipo')
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    id_participante1 = models.BigIntegerField()  
+    class Meta:
+        managed = True
+        db_table = 'equipos_participantes'
+
+class Partidos(models.Model):
+
+    id_partido = models.BigAutoField(primary_key=True)
+    torneos_id_torneo = models.ForeignKey('Torneos', models.DO_NOTHING, db_column='torneos_id_torneo')
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField(blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+    equipos_id_equipo = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo')
+    equipos_id_equipo2 = models.ForeignKey(Equipos, models.DO_NOTHING, db_column='equipos_id_equipo2', related_name='partidos_equipos_id_equipo2_set')
+    marcador_a = models.IntegerField(blank=True, null=True)
+    marcador_b = models.IntegerField(blank=True, null=True)
+    estado = models.CharField(max_length=20)
+    class Meta:
+        managed = True
+        db_table = 'partidos'
+
+class HorariosParticipante(models.Model):
+
+    id_horario = models.BigAutoField(primary_key=True)
+    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
+    titulo = models.CharField(max_length=150)
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+    fuente_manual = models.CharField(max_length=1)
+    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad', blank=True, null=True)
+    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column='citas_id_cita', blank=True, null=True)
+    partidos_id_partido = models.ForeignKey('Partidos', models.DO_NOTHING, db_column='partidos_id_partido', blank=True, null=True)
+    notas = models.CharField(max_length=500, blank=True, null=True)
+    # A unique constraint could not be introspected.
+    class Meta:
+        managed = True
+        db_table = 'horarios_participante'
+        unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
         app_label = 'management_cadi_tests'
 
 

@@ -588,7 +588,7 @@ def completar_perfil(request):
             # ✅ Mapeo de valores del formulario a nombres en tipos_participante
             mapeo_tipos = {
                 'estudiante': 'Estudiante',
-                'trabajador': 'Docente',  # O el nombre que tengas en la BD
+                'trabajador': 'Trabajador',  # O el nombre que tengas en la BD
                 'egresado': 'Egresado',
                 'invitado': 'Otro'  # O el nombre que tengas en la BD
             }
@@ -605,7 +605,7 @@ def completar_perfil(request):
             from .models import TiposParticipante
             tipo_participante = TiposParticipante.objects.get(nombre__iexact=nombre_tipo_bd)
             
-            # ✅ Asignar tipo_participante (NO cambiar el rol - roles_id_rol se mantiene como 'Invitado')
+            # ✅ Asignar tipo_participante  
             participante.tipo_participante = tipo_participante # type: ignore
             
             # Procesar campos según el tipo

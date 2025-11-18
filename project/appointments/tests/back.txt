@@ -1,13 +1,8 @@
-# project\appointments\tests\models.py
+# management_CADI/tests/models.py
 from django.db import models
 from django.contrib.auth.models import User, Group
  
-##PORFAVOR CORRER LOS TEST CON python manage.py test appointments --keepdb
-
-# ==========================================
-# CONFIGURACIÓN GLOBAL
-# ==========================================
-APP_LABEL = 'tests_appointments'
+##PORFAVOR CORRER LOS TEST CON python manage.py test management_CADI --keepdb
 
 # ==========================================
 # MODELOS BASE
@@ -20,22 +15,7 @@ class Grupos(models.Model):
     class Meta:
         managed = True
         db_table = "grupos"
-        app_label = APP_LABEL
-
-
-class Roles(models.Model):
-    id_rol = models.BigAutoField(primary_key=True)
-    nombre_rol = models.CharField(max_length=50)
-    
-    group = models.ForeignKey(
-        Group, models.DO_NOTHING, db_column="group_id",
-        null=True, blank=True, related_name="+", db_constraint=False
-    )
-
-    class Meta:
-        managed = True
-        db_table = "roles"
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
 
 
 class GruposActividad(models.Model):
@@ -48,40 +28,198 @@ class GruposActividad(models.Model):
     class Meta:
         managed = True
         db_table = "grupos_actividad"
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
+
+
+# --- CITA + ESTADO (OneToOne), MOTIVO, HISTORIAL ---
+
+class Citas(models.Model):
+    id_cita = models.BigAutoField(primary_key=True)
+    fecha = models.DateTimeField()
+    motivo = models.CharField(max_length=200, blank=True, null=True)
+    observaciones = models.CharField(max_length=500, blank=True, null=True)
+
+    # En producción es OneToOne NO NULL. En tests lo dejamos NULL para romper el ciclo.
+    estados_cita_id_estado_cita = models.OneToOneField(
+        "EstadosCita", models.DO_NOTHING,
+        db_column="estados_cita_id_estado_cita", null=True, blank=True
+    )
+
+    participantes_id_participante = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante", related_name="+"
+    )
+    participantes_id_participante2 = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante2", related_name="+"
+    )
+    agenda_psicologos_id_agenda_slot = models.ForeignKey(
+        AgendaPsicologos, models.DO_NOTHING,
+        db_column="agenda_psicologos_id_agenda_slot", null=True, blank=True
+    )
+    # Igual que arriba: mantener estructura pero sin forzar ciclo
+    motivos_cita_id_motivo = models.OneToOneField(
+        "MotivosCita", models.DO_NOTHING,
+        db_column="motivos_cita_id_motivo", null=True, blank=True
+    )
+    class Meta:
+        managed = True
+        db_table = "citas"
+        app_label = "tests_appointments"
+
+
+class EstadosCita(models.Model):
+    id_estado_cita = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=30)
+    # En prod es OneToOne hacia Citas. Lo dejamos igual.
+    citas_id_cita = models.OneToOneField(
+        Citas, models.DO_NOTHING, db_column="citas_id_cita", related_name="+"
+    )
+    class Meta:
+        managed = True
+        db_table = "estados_cita"
+        app_label = "tests_appointments"
+
+
+class MotivosCita(models.Model):
+    id_motivo = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=80, unique=True)
+    citas_id_cita = models.OneToOneField(
+        Citas, models.DO_NOTHING, db_column="citas_id_cita", null=True, blank=True, related_name="+"
+    )
+    class Meta:
+        managed = True
+        db_table = "motivos_cita"
+        app_label = "tests_appointments"
+
+
+class HistorialCitas(models.Model):
+    id_historial = models.BigAutoField(primary_key=True)
+    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column="citas_id_cita")
+    participantes_id_participante = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
+    )
+    fecha = models.DateTimeField()
+    nota = models.CharField(max_length=2000)
+    class Meta:
+        managed = True
+        db_table = "historial_citas"
+        app_label = "tests_appointments"
+        
+class TiposActividad(models.Model):
+    id_tipo = models.FloatField(primary_key=True)
+    nombre_tipo = models.CharField(max_length=100)
+    descripcion = models.CharField(max_length=255, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "tipos_actividad"
+        app_label = 'management_cadi_tests'
+
+
+class Actividades(models.Model):
+    id_actividad = models.BigAutoField(primary_key=True)
+    nombre = models.CharField(max_length=150)
+    descripcion = models.CharField(max_length=500, blank=True, null=True)
+
+    requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
+    modalidad = models.CharField(max_length=1, blank=True, null=True)
+    aforo = models.FloatField(blank=True, null=True)
+
+    fecha_apertura_ins = models.DateTimeField(blank=True, null=True)
+    fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
+
+    tipos_actividad_id_tipo = models.ForeignKey(
+        TiposActividad, models.DO_NOTHING, db_column="tipos_actividad_id_tipo",
+        blank=True, null=True
+    )
+
+    class Meta:
+        managed = True
+        db_table = "actividades"
+        app_label = 'management_cadi_tests'
+
+
+class ActividadesGrupos(models.Model):
+    id_actividad_grupo = models.BigAutoField(primary_key=True)
+    grupos_actividad = models.ForeignKey(GruposActividad, models.DO_NOTHING, db_column="grp_act_id")
+    actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column="actividades_id_actividad")
+
+    class Meta:
+        managed = True
+        db_table = "actividades_grupos"
+        app_label = 'management_cadi_tests'
+
+
+# ==========================================
+# MODELOS DE HORARIOS
+# ==========================================
+
+class HorariosBloque(models.Model):
+    id_horario_bloque = models.BigAutoField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(
+        Actividades, models.DO_NOTHING, db_column="actividades_id_actividad"
+    )
+    hora_inicio = models.TimeField()
+    hora_fin = models.TimeField()
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "horarios_bloque"
+        app_label = 'management_cadi_tests'
+
+
+class HorariosActividad(models.Model):
+    id_horario = models.BigAutoField(primary_key=True)
+    actividades_id_actividad = models.ForeignKey(
+        Actividades, models.DO_NOTHING, db_column="actividades_id_actividad"
+    )
+    horario_bloque = models.ForeignKey(
+        HorariosBloque, models.DO_NOTHING, db_column="horario_bloque_id",
+        null=True, blank=True
+    )
+    dia_semana = models.SmallIntegerField()
+
+    hora_inicio = models.TimeField(blank=True, null=True)
+    hora_fin = models.TimeField(blank=True, null=True)
+    profesor = models.CharField(max_length=150, blank=True, null=True)
+    lugar = models.CharField(max_length=150, blank=True, null=True)
+
+    class Meta:
+        managed = True
+        db_table = "horarios_actividad"
+        app_label = 'management_cadi_tests'
+
+
+# ==========================================
+# MODELOS DE USUARIOS Y ROLES
+# ==========================================
+
+class Roles(models.Model):
+    id_rol = models.BigAutoField(primary_key=True)
+    nombre_rol = models.CharField(max_length=50)
+    
+    #  AGREGAR: Campo group_id para compatibilidad con appointments
+    group = models.ForeignKey(
+        Group, models.DO_NOTHING, db_column="group_id",
+        null=True, blank=True, related_name="+", db_constraint=False
+    )
+
+    class Meta:
+        managed = True
+        db_table = "roles"
+        app_label = 'management_cadi_tests'
 
 
 class TiposParticipante(models.Model):
     id_tipo_participante = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(max_length=50, unique=True)
+    nombre_tipo = models.CharField(max_length=50)
     descripcion = models.CharField(max_length=255, blank=True, null=True)
-    
-    # Campos útiles para tu contexto universitario
-    requiere_validacion = models.BooleanField(
-        default=False,
-        help_text='Requiere aprobación de admin (ej: Docentes)'
-    )
-    puede_crear_actividades = models.BooleanField(
-        default=False,
-        help_text='Puede crear actividades (ej: Coordinadores, Docentes)'
-    )
-    activo = models.BooleanField(
-        default=True,
-        help_text='Tipo disponible para selección'
-    )
-    orden = models.IntegerField(
-        default=0,
-        help_text='Orden de aparición en formularios'
-    )
-    
+
     class Meta:
         managed = True
-        db_table = 'tipos_participante'
-        ordering = ['orden', 'nombre']
-    
-    def __str__(self):
-        return self.nombre
-    
+        db_table = "tipos_participante"
+        app_label = 'management_cadi_tests'
 
 
 class Participantes(models.Model):
@@ -90,6 +228,7 @@ class Participantes(models.Model):
     apellido = models.CharField(max_length=100, blank=True, null=True, default='')
     correo = models.CharField(max_length=150, unique=True)
     
+    # Campos adicionales
     semestre = models.BigIntegerField(blank=True, null=True, default=None)
     estado_activo = models.CharField(max_length=1, blank=True, null=True, default=None)
     facultad = models.CharField(max_length=80, blank=True, null=True, default=None)
@@ -118,191 +257,7 @@ class Participantes(models.Model):
     class Meta:
         managed = True
         db_table = "participantes"
-        app_label = APP_LABEL
-
-
-# ==========================================
-# MODELOS DE AGENDA Y CITAS
-# ==========================================
-
-class AgendaPsicologos(models.Model):
-    id_agenda_slot = models.BigAutoField(primary_key=True)
-    participantes_id_participante = models.ForeignKey(
-        Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
-    )
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField()
-    estado_slot = models.CharField(max_length=20)
-    lugar = models.CharField(max_length=150, blank=True, null=True)
-    
-    class Meta:
-        managed = True
-        db_table = "agenda_psicologos"
-        app_label = APP_LABEL
-
-
-class Citas(models.Model):
-    id_cita = models.BigAutoField(primary_key=True)
-    fecha = models.DateTimeField()
-    motivo = models.CharField(max_length=200, blank=True, null=True)
-    observaciones = models.CharField(max_length=500, blank=True, null=True)
-
-    estados_cita_id_estado_cita = models.OneToOneField(
-        "EstadosCita", models.DO_NOTHING,
-        db_column="estados_cita_id_estado_cita", null=True, blank=True
-    )
-
-    participantes_id_participante = models.ForeignKey(
-        Participantes, models.DO_NOTHING, db_column="participantes_id_participante", related_name="+"
-    )
-    participantes_id_participante2 = models.ForeignKey(
-        Participantes, models.DO_NOTHING, db_column="participantes_id_participante2", related_name="+"
-    )
-    agenda_psicologos_id_agenda_slot = models.ForeignKey(
-        AgendaPsicologos, models.DO_NOTHING,
-        db_column="agenda_psicologos_id_agenda_slot", null=True, blank=True
-    )
-    motivos_cita_id_motivo = models.OneToOneField(
-        "MotivosCita", models.DO_NOTHING,
-        db_column="motivos_cita_id_motivo", null=True, blank=True
-    )
-    
-    class Meta:
-        managed = True
-        db_table = "citas"
-        app_label = APP_LABEL
-
-
-class EstadosCita(models.Model):
-    id_estado_cita = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(max_length=30)
-    citas_id_cita = models.OneToOneField(
-        Citas, models.DO_NOTHING, db_column="citas_id_cita", related_name="+"
-    )
-    
-    class Meta:
-        managed = True
-        db_table = "estados_cita"
-        app_label = APP_LABEL
-
-
-class MotivosCita(models.Model):
-    id_motivo = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(max_length=80, unique=True)
-    citas_id_cita = models.OneToOneField(
-        Citas, models.DO_NOTHING, db_column="citas_id_cita", null=True, blank=True, related_name="+"
-    )
-    
-    class Meta:
-        managed = True
-        db_table = "motivos_cita"
-        app_label = APP_LABEL
-
-
-class HistorialCitas(models.Model):
-    id_historial = models.BigAutoField(primary_key=True)
-    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column="citas_id_cita")
-    participantes_id_participante = models.ForeignKey(
-        Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
-    )
-    fecha = models.DateTimeField()
-    nota = models.CharField(max_length=2000)
-    
-    class Meta:
-        managed = True
-        db_table = "historial_citas"
-        app_label = APP_LABEL
-
-
-# ==========================================
-# MODELOS DE ACTIVIDADES
-# ==========================================
-
-class TiposActividad(models.Model):
-    id_tipo = models.FloatField(primary_key=True)
-    nombre_tipo = models.CharField(max_length=100)
-    descripcion = models.CharField(max_length=255, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "tipos_actividad"
-        app_label = APP_LABEL
-
-
-class Actividades(models.Model):
-    id_actividad = models.BigAutoField(primary_key=True)
-    nombre = models.CharField(max_length=150)
-    descripcion = models.CharField(max_length=500, blank=True, null=True)
-
-    requiere_inscripcion = models.CharField(max_length=1, blank=True, null=True)
-    modalidad = models.CharField(max_length=1, blank=True, null=True)
-    aforo = models.FloatField(blank=True, null=True)
-
-    fecha_apertura_ins = models.DateTimeField(blank=True, null=True)
-    fecha_cierre_ins = models.DateTimeField(blank=True, null=True)
-
-    tipos_actividad_id_tipo = models.ForeignKey(
-        TiposActividad, models.DO_NOTHING, db_column="tipos_actividad_id_tipo",
-        blank=True, null=True
-    )
-
-    class Meta:
-        managed = True
-        db_table = "actividades"
-        app_label = APP_LABEL
-
-
-class ActividadesGrupos(models.Model):
-    id_actividad_grupo = models.BigAutoField(primary_key=True)
-    grupos_actividad = models.ForeignKey(GruposActividad, models.DO_NOTHING, db_column="grp_act_id")
-    actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column="actividades_id_actividad")
-
-    class Meta:
-        managed = True
-        db_table = "actividades_grupos"
-        app_label = APP_LABEL
-
-
-# ==========================================
-# MODELOS DE HORARIOS
-# ==========================================
-
-class HorariosBloque(models.Model):
-    id_horario_bloque = models.BigAutoField(primary_key=True)
-    actividades_id_actividad = models.ForeignKey(
-        Actividades, models.DO_NOTHING, db_column="actividades_id_actividad"
-    )
-    hora_inicio = models.TimeField()
-    hora_fin = models.TimeField()
-    profesor = models.CharField(max_length=150, blank=True, null=True)
-    lugar = models.CharField(max_length=150, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "horarios_bloque"
-        app_label = APP_LABEL
-
-
-class HorariosActividad(models.Model):
-    id_horario = models.BigAutoField(primary_key=True)
-    actividades_id_actividad = models.ForeignKey(
-        Actividades, models.DO_NOTHING, db_column="actividades_id_actividad"
-    )
-    horario_bloque = models.ForeignKey(
-        HorariosBloque, models.DO_NOTHING, db_column="horario_bloque_id",
-        null=True, blank=True
-    )
-    dia_semana = models.SmallIntegerField()
-
-    hora_inicio = models.TimeField(blank=True, null=True)
-    hora_fin = models.TimeField(blank=True, null=True)
-    profesor = models.CharField(max_length=150, blank=True, null=True)
-    lugar = models.CharField(max_length=150, blank=True, null=True)
-
-    class Meta:
-        managed = True
-        db_table = "horarios_actividad"
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
 
 
 # ==========================================
@@ -316,7 +271,7 @@ class RolesParticipacion(models.Model):
     class Meta:
         managed = True
         db_table = "roles_participacion"
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
 
 
 class EstadosParticipacion(models.Model):
@@ -326,7 +281,7 @@ class EstadosParticipacion(models.Model):
     class Meta:
         managed = True
         db_table = "estados_participacion"
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
 
 
 class Participaciones(models.Model):
@@ -362,50 +317,54 @@ class Participaciones(models.Model):
     class Meta:
         managed = True
         db_table = "participaciones"
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
 
 
-# ==========================================
-# ✅ MODELO CORREGIDO: HorariosParticipante
-# Ahora coincide con el modelo de producción
-# ==========================================
+# --- AGENDA DEL PROFESIONAL ---
 
-
-class HorariosParticipante(models.Model):
-
-    id_horario = models.BigAutoField(primary_key=True)
-    participantes_id_participante = models.ForeignKey('Participantes', models.DO_NOTHING, db_column='participantes_id_participante')
-    titulo = models.CharField(max_length=150)
+class AgendaPsicologos(models.Model):
+    id_agenda_slot = models.BigAutoField(primary_key=True)
+    participantes_id_participante = models.ForeignKey(
+        Participantes, models.DO_NOTHING, db_column="participantes_id_participante"
+    )
     fecha_inicio = models.DateTimeField()
     fecha_fin = models.DateTimeField()
-    fuente_manual = models.CharField(max_length=1)
-    actividades_id_actividad = models.ForeignKey(Actividades, models.DO_NOTHING, db_column='actividades_id_actividad', blank=True, null=True)
-    citas_id_cita = models.ForeignKey(Citas, models.DO_NOTHING, db_column='citas_id_cita', blank=True, null=True)
-    partidos_id_partido = models.ForeignKey('Partidos', models.DO_NOTHING, db_column='partidos_id_partido', blank=True, null=True)
-    notas = models.CharField(max_length=500, blank=True, null=True)
-    # A unique constraint could not be introspected.
+    estado_slot = models.CharField(max_length=20)
+    # Producción puede no tenerlo, pero las views lo leen si existe:
+    lugar = models.CharField(max_length=150, blank=True, null=True)
     class Meta:
         managed = True
-        db_table = 'horarios_participante'
-        unique_together = (('participantes_id_participante', 'fecha_inicio', 'fecha_fin'),)
-        app_label = APP_LABEL
+        db_table = "agenda_psicologos"
+        app_label = "tests_appointments"
+
+# ==========================================
+# MODELOS DE HORARIOS DE PARTICIPANTES
+# ==========================================
+
+class HorariosParticipante(models.Model):
+    id_horario_participante = models.BigAutoField(primary_key=True)
+    participantes_id_participante = models.ForeignKey(
+        Participantes,
+        models.DO_NOTHING,
+        db_column="participantes_id_participante"
+    )
+    actividades_id_actividad = models.ForeignKey(
+        Actividades,
+        models.DO_NOTHING,
+        db_column="actividades_id_actividad"
+    )
+    fecha_inicio = models.DateTimeField()
+    fecha_fin = models.DateTimeField()
+
+    class Meta:
+        managed = True
+        db_table = "horarios_participante"
+        app_label = 'management_cadi_tests'
+
+
 # ==========================================
 # MODELOS DE CALIFICACIONES
 # ==========================================
-
-class Partidos(models.Model):
-    """Modelo para partidos deportivos (necesario para HorariosParticipante)"""
-    id_partido = models.BigAutoField(primary_key=True)
-    fecha_inicio = models.DateTimeField()
-    fecha_fin = models.DateTimeField(blank=True, null=True)
-    lugar = models.CharField(max_length=150, blank=True, null=True)
-    estado = models.CharField(max_length=20)
-    
-    class Meta:
-        managed = True
-        db_table = "partidos"
-        app_label = APP_LABEL
-
 
 class CalificacionesActividad(models.Model):
     id_calificacion = models.BigAutoField(primary_key=True)
@@ -421,4 +380,4 @@ class CalificacionesActividad(models.Model):
         managed = True
         db_table = "calificaciones_actividad"
         unique_together = (("actividades_id_actividad", "participantes_id_participante"),)
-        app_label = APP_LABEL
+        app_label = 'management_cadi_tests'
