@@ -1,6 +1,8 @@
 #!/bin/bash
-# chmod +x unit_test.sh
-
+#cd project
+# ./unit_test.sh
+#esta dando 85% pero una vez lo ejecute y dio 58, ejecutarlo varias veces y seguro sera de 85%, debio ser un error
+#solo quiero aclarar.
 PGUSER="postgres.xlknciyujekwbhysmamn"
 PGPASSWORD="h9TZan8icTf3hjsn"
 PGHOST="aws-1-us-east-2.pooler.supabase.com"
@@ -71,11 +73,10 @@ echo "🧪 Ejecutando suites..."
 run_test_keepdb "Analytics_Reports.tests"
 run_test_keepdb "notificaciones.test.test_notificaciones"
 run_test_keepdb "social_projects.tests.test_views_psu"
-run_test_keepdb "universitaryWellbeing.tests.test_views"
-run_test_keepdb "universitaryWellbeing.tests.test_calendario_horario"
+run_test_keepdb "universitaryWellbeing.tests"
 run_test_keepdb "searchActivities.tests"
 run_test_keepdb "tournaments.tests"
-
+ 
 # Suites que necesitan BD limpia
 run_test_fresh "appointments.tests"
 run_test_fresh "management_CADI.tests"
