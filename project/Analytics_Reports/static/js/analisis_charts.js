@@ -17,6 +17,113 @@ function initCharts(datosFrecuencia, datosRoles, datosFacultades, datosTiposActi
     createRolesChart(datosRoles);
     createFacultadesChart(datosFacultades);
     createTiposActividadChart(datosTiposActividad);
+
+    // === NUEVO: GRÁFICO DE DÍAS DE LA SEMANA ===
+    if (datosDiasSemana && datosDiasSemana.length > 0) {
+        const ctxDias = document.getElementById('chartDiasSemana');
+        if (ctxDias) {
+            // Colores según el día (días laborales azul, fin de semana verde)
+            const coloresDias = [
+                'rgba(54, 162, 235, 0.7)',  // Lunes
+                'rgba(54, 162, 235, 0.7)',  // Martes
+                'rgba(54, 162, 235, 0.7)',  // Miércoles
+                'rgba(54, 162, 235, 0.7)',  // Jueves
+                'rgba(54, 162, 235, 0.7)',  // Viernes
+                'rgba(75, 192, 192, 0.7)',  // Sábado
+                'rgba(255, 159, 64, 0.7)'   // Domingo
+            ];
+            
+            const coloresBorde = [
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(54, 162, 235, 1)',
+                'rgba(75, 192, 192, 1)',
+                'rgba(255, 159, 64, 1)'
+            ];
+            
+            new Chart(ctxDias, {
+                type: 'bar',
+                data: {
+                    labels: datosDiasSemana.map(d => d.label),
+                    datasets: [{
+                        label: 'Asistencias',
+                        data: datosDiasSemana.map(d => d.value),
+                        backgroundColor: coloresDias,
+                        borderColor: coloresBorde,
+                        borderWidth: 2,
+                        borderRadius: 5,
+                        barThickness: 'flex',
+                        maxBarThickness: 60
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const total = datosDiasSemana.reduce((sum, d) => sum + d.value, 0);
+                                    const porcentaje = total > 0 ? ((context.parsed.y / total) * 100).toFixed(1) : 0;
+                                    return [
+                                        `Asistencias: ${context.parsed.y}`,
+                                        `Porcentaje: ${porcentaje}%`
+                                    ];
+                                }
+                            },
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            padding: 12,
+                            titleFont: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            bodyFont: {
+                                size: 13
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                precision: 0,
+                                font: {
+                                    size: 12
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 12,
+                                    weight: 'bold'
+                                }
+                            },
+                            grid: {
+                                display: false
+                            }
+                        }
+                    },
+                    animation: {
+                        duration: 1000,
+                        easing: 'easeInOutQuart'
+                    }
+                }
+            });
+        }
+    }
+    
 }
 
 /**

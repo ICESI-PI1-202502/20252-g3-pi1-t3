@@ -2,12 +2,12 @@ Feature: Login functionality
 
   Scenario: CF-A1.1 - Login exitoso
     Given I am on the login page
-    When I login with username "123" and password "123"
+    When I login with username "1112343789" and password "contraseña"
     Then I should see the user calendar
 
   Scenario: CF-A1.2 - Contraseña incorrecta
     Given I am on the login page
-    When I login with username "123" and password "456"
+    When I login with username "1112343789" and password "456"
     Then I should see an incorrect password message
 
   Scenario: CF-A1.3 - Usuario no registrado
@@ -17,5 +17,5 @@ Feature: Login functionality
 
   Scenario: CF-A5 - Login como administrador
     Given I am on the login page
-    When I login with username "1113624957" and password "00"
+    When I login with username "5544" and password "5544"
     Then I should see the admin panel

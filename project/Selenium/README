@@ -1,15 +1,16 @@
-Para correr cualquier test porfavor usar 
-
-behave features/{nombredel archivo .feature a probar}.feature
-
-ejemplo:
-behave features/cadi_personal_schedule_psych_appointment.feature
-
 NOTA:
 La gran mayoria de test relacionados con crear cosas, solo se pueden hacer una vez, puesto a que sicreas
 turas con el mismo nombre, el sistema no las deja crear. Por lo tanto, he puesto en los features nombre y
-datos validos para que se puedan realizar todos los test con total facilidad, algo a tomar en cuenta
+datos validos para que se puedan realizar todos los test con total facilidad.
 
-porfavor ejecutar cadi_personal_schedule_view_event.feature antes de cadi_personal_schedule_delete_event.feature
-no preguntes porfavor. :D
-
+paso 1:
+haber secargado el requirements.txt que esta en la raiz del proyecto
+pip install -r requirements.txt
+paso 2:
+El settings.py que se encuentra en project/BienestarUniversitario/settings.py reemplazarlo temporalmente
+por el que se encuentra en el txt project/Selenium/setting.txt (esto es para que se pueda ejecutar el server local sin problema)
+paso 3:
+En una terminal pararse en la rama del proyecto (cd project) y correr python manage.py runserver
+paso 4:
+En otra terminal pararse en cd project/selenium y correr todos los test con:
+behave 

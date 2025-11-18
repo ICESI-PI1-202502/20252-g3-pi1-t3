@@ -1,4 +1,5 @@
-from django.db.models import Count, Avg, Q, F, Case, When, IntegerField,Max, ExpressionWrapper, Min, Max
+#project\Analytics_Reports\views.py
+from django.db.models import Count, Avg, Q, F, Case, When, IntegerField,Max, ExpressionWrapper
 from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
@@ -517,7 +518,8 @@ def analisis_comportamiento(request):
     datos_grafico_facultades = []
     datos_grafico_tipos_actividad = []
     datos_grafico_reincidencia = []
-
+    datos_grafico_dias_semana = [] 
+    
     data = None
     facultades_unicas = 0
     roles_unicos = 0
@@ -760,7 +762,63 @@ def analisis_comportamiento(request):
             {"label": "Reincidentes", "value": reincidentes},
         ]
 
-        # === EXPORTAR CSV (del dataset de participantes mostrado) ===
+
+        # === NUEVO: DÍAS DE LA SEMANA ===
+        asistencias_query = Asistencias.objects.filter(
+            participaciones_id_participacion__participantes_id_participante__in=participantes_unicos,
+            estados_asistencia_id_estado_asistencia__nombre__icontains='presente'
+        )
+        
+        # Aplicar los mismos filtros
+        if tipo_actividad:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__actividades_id_actividad__tipos_actividad_id_tipo__id_tipo=tipo_actividad
+            )
+        if rol_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__roles_id_rol__id_rol=rol_filtro
+            )
+        if facultad_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__facultad=facultad_filtro
+            )
+        if genero_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__genero=genero_filtro
+            )
+        if semestre_filtro:
+            asistencias_query = asistencias_query.filter(
+                participaciones_id_participacion__participantes_id_participante__semestre=semestre_filtro
+            )
+        
+        # Agrupar por día de la semana
+        asistencias_por_dia = asistencias_query.annotate(
+            dia_semana=ExtractWeekDay('fecha')
+        ).values('dia_semana').annotate(
+            total=Count('id_asistencia')
+        ).order_by('dia_semana')
+        
+        # Mapeo de números a nombres
+        dias_nombres = {
+            1: 'Domingo', 2: 'Lunes', 3: 'Martes', 4: 'Miércoles',
+            5: 'Jueves', 6: 'Viernes', 7: 'Sábado'
+        }
+        
+        # Inicializar todos los días con 0
+        dias_data = {dia: 0 for dia in range(1, 8)}
+        
+        # Llenar con datos reales
+        for item in asistencias_por_dia:
+            dias_data[item['dia_semana']] = item['total']
+        
+        # Ordenar Lunes-Domingo
+        orden_dias = [2, 3, 4, 5, 6, 7, 1]
+        datos_grafico_dias_semana = [
+            {'label': dias_nombres[dia], 'value': dias_data[dia]}
+            for dia in orden_dias
+        ]
+
+        # === EXPORTAR CSV ===
         if export == "csv":
             response = HttpResponse(content_type="text/csv; charset=utf-8")
             response["Content-Disposition"] = 'attachment; filename="estadisticas_participacion.csv"'
@@ -818,44 +876,34 @@ def analisis_comportamiento(request):
     estados_torneo     = EstadosTorneo.objects.all().order_by("nombre")
 
     return render(request, "analisis.html", {
-        # Actividades
-        "data": data,
-        "tipos_actividad": tipos_actividad,
-        "roles": roles,
-        "facultades": facultades,
-        "generos": generos,
-        "semestres": semestres,
-        "has_filters": has_filters,          # ahora considera también torneos
-        "mostrar_todos": mostrar_todos,
-        "facultades_unicas": facultades_unicas,
-        "roles_unicos": roles_unicos,
-        "tipos_actividad_unicos": tipos_actividad_unicos,
-        "total_participaciones": total_participaciones,
-        "promedio_participaciones": promedio_participaciones,
-        "porcentaje_reincidencia": porcentaje_reincidencia,
-        "total_nuevos": total_nuevos,
-        "tipo_actividad_filtrado": tipo_actividad,
-        "tipo_actividad_nombre": (
-            TiposActividad.objects.filter(id_tipo=tipo_actividad)
-            .values_list("nombre_tipo", flat=True).first()
-            if tipo_actividad else None
-        ),
-        "datos_grafico_frecuencia": json.dumps(datos_grafico_frecuencia),
-        "datos_grafico_roles": json.dumps(datos_grafico_roles),
-        "datos_grafico_facultades": json.dumps(datos_grafico_facultades),
-        "datos_grafico_tipos_actividad": json.dumps(datos_grafico_tipos_actividad),
-        "datos_grafico_reincidencia": json.dumps(datos_grafico_reincidencia),
-
-        # Torneos (para la UI)
-        "torneos_has_filters": torneos_has_filters,
-        "torneos_data": torneos_data,
-        "torneos_count": torneos_count,
-        "torneo_nombre_q": torneo_nombre_q,
-        "torneo_disciplina_q": torneo_disciplina_q,
-        "torneo_estado_q": torneo_estado_q,
-        "disciplinas_torneo": disciplinas_torneo,
-        "estados_torneo": estados_torneo,
-    })
+    "data": data,
+    "tipos_actividad": tipos_actividad,
+    "roles": roles,
+    "facultades": facultades,
+    "generos": generos,
+    "semestres": semestres,
+    "has_filters": has_filters,
+    "mostrar_todos": mostrar_todos,
+    # Estadísticas únicas
+    "facultades_unicas": facultades_unicas,
+    "roles_unicos": roles_unicos,
+    "tipos_actividad_unicos": tipos_actividad_unicos,
+    # === MÉTRICAS RF4.1 ===
+    "total_participaciones": total_participaciones,
+    "promedio_participaciones": promedio_participaciones,
+    "porcentaje_reincidencia": porcentaje_reincidencia,
+    "total_nuevos": total_nuevos,
+    # === NUEVO: Detectar filtro de tipo actividad ===
+    "tipo_actividad_filtrado": tipo_actividad,  # ← AGREGAR ESTA LÍNEA
+    "tipo_actividad_nombre": TiposActividad.objects.get(id_tipo=tipo_actividad).nombre_tipo if tipo_actividad else None,  # ← AGREGAR ESTA LÍNEA
+    # Gráficos
+    "datos_grafico_frecuencia": json.dumps(datos_grafico_frecuencia),
+    "datos_grafico_roles": json.dumps(datos_grafico_roles),
+    "datos_grafico_facultades": json.dumps(datos_grafico_facultades),
+    "datos_grafico_tipos_actividad": json.dumps(datos_grafico_tipos_actividad),
+    "datos_grafico_reincidencia": json.dumps(datos_grafico_reincidencia),
+    "datos_grafico_dias_semana": json.dumps(datos_grafico_dias_semana),  # NUEVO
+ })
 
 def participantes_list(request):
     participantes = Participantes.objects.all().order_by("nombre")
