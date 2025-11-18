@@ -29,10 +29,17 @@
       <div class="container-fluid">
 
         {% block header_logo %}
-        <a class="navbar-brand" href="{% url 'home' %}">
-          <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
-          Bienestar Universitario
-        </a>
+        {% if request.user.is_superuser %}
+          <a class="navbar-brand" href="{% url 'cadi_admin' %}">
+            <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+            Bienestar Universitario
+          </a>
+        {% else %}
+          <a class="navbar-brand" href="{% url 'home' %}">
+            <img src="{% static 'universitaryWellbeing/img/logo_icesi.png' %}" alt="Logo Icesi">
+            Bienestar Universitario
+          </a>
+        {%endif%}
         {% endblock %}
 
         <div class="d-flex align-items-center ms-auto">
@@ -139,11 +146,10 @@
 
   <!-- templates/base.html – SIDEBAR LIMPIO -->
   <div id="sidebar" class="sidebar">
-    <a href="{% url 'home' %}">Inicio</a>
 
     {% if request.user.is_superuser %}
     {# === ADMINISTRADOR (SUPERUSER) === #}
-    <a href="{% url 'cadi_admin' %}">Administrar oferta</a>
+    <a href="{% url 'cadi_admin' %}">Inicio</a>
     <!-- <a href="#">Gestionar eventos y servicios</a> -->
     <a href="{% url 'tournaments:list' %}">Gestionar torneos</a>
     <a href="{% url 'admin:index' %}">Panel de Administrador</a>
@@ -156,6 +162,7 @@
 
     {% else %}
     {# === OPCIONES COMUNES (usuarios autenticados) === #}
+    <a href="{% url 'home' %}">Inicio</a>
     <a href="{% url 'searchActivities:search' %}">Buscar</a>
     <a href="{% url 'horario' %}">Horario</a>
     <a href="{% url 'calendario_unificado' %}">Horario unificado BU</a>
