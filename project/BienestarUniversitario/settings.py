@@ -32,12 +32,18 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-305vk1@f0*ixg2=&d9t+928^nbwv2q=1c$1n=033wjxk&+pso&'
+SECRET_KEY = os.environ.get("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['mi-bienestar-universitario.onrender.com','127.0.0.1']
+
+CSRF_TRUSTED_ORIGINS = ['https://mi-bienestar-universitario.onrender.com']
+
+CSRF_COOKIE_SECURE = True  # Ensures CSRF cookie is only sent over HTTPS
+CSRF_COOKIE_SAMESITE = 'None'  # This is necessary for cross-site requests
+
 
 
 # Application definition
@@ -105,11 +111,10 @@ WSGI_APPLICATION = 'BienestarUniversitario.wsgi.application'
 DATABASES = {
    'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'postgres',
-        'USER': 'postgres.xlknciyujekwbhysmamn',
-        'PASSWORD': 'h9TZan8icTf3hjsn',
-        'HOST': 'aws-1-us-east-2.pooler.supabase.com',
-        'PORT': '5432',
+        'NAME': os.environ.get("NAME"),
+        'USER': os.environ.get("USER"),
+        'PASSWORD': os.environ.get("PASSWORD"),
+        'HOST': os.environ.get("HOST"),
         'CONN_MAX_AGE': 0,
         'OPTIONS': {'sslmode': 'require'},
    }
