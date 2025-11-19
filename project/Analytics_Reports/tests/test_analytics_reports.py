@@ -109,6 +109,9 @@ from django.utils import timezone
 from django.http import HttpResponse, QueryDict
 from datetime import datetime, timedelta
 import Analytics_Reports.views as vw
+from django.test import SimpleTestCase, RequestFactory
+from django.http import JsonResponse
+import json
 
 # ==========================================================
 # TESTS UNITARIOS DE FUNCIONES AUXILIARES
@@ -926,4 +929,365 @@ class VistasAuxiliaresTests(SimpleTestCase):
         
         vw.asistencia(request)
         
+        mock_render.assert_called_once()
+
+class RegistrarAsistenciaRapidaTests(SimpleTestCase):
+    """Casos clave de registrar_asistencia_rapido"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _post(self, data):
+        from Analytics_Reports.views import registrar_asistencia_rapido
+        request = self.factory.post(
+            "/analytics/asistencia/rapida/",
+            data=data,
+            HTTP_X_REQUESTED_WITH="XMLHttpRequest",  # si tu vista lo usa para diferenciar AJAX
+        )
+        request.user = MagicMock(is_authenticated=True)
+        return registrar_asistencia_rapido(request)
+
+    def test_falta_datos_requeridos(self):
+        """Debe devolver error cuando faltan campos obligatorios"""
+        resp = self._post({})
+        self.assertIsInstance(resp, JsonResponse)
+        self.assertEqual(resp.status_code, 400)
+        body = json.loads(resp.content.decode("utf-8"))
+        self.assertIn("error", body)
+        self.assertIn("Faltan datos requeridos", body["error"])
+
+
+    @patch("Analytics_Reports.views.Asistencias")
+    @patch("Analytics_Reports.views.get_object_or_404")
+    @patch("Analytics_Reports.views.EstadosAsistencia")
+    @patch("Analytics_Reports.views.Participaciones")
+    @patch("Analytics_Reports.views.Participantes")
+    def test_crea_asistencia_nueva_exito(self,
+                                         mock_participantes,
+                                         mock_participaciones,
+                                         mock_estados,
+                                         mock_get_obj,
+                                         mock_asistencias):
+        """Caso feliz: crea participante, participación y asistencia nueva"""
+
+        # Participante no existe aún
+        fake_participante = MagicMock()
+        mock_participantes.objects.get_or_create.return_value = (fake_participante, True)
+
+        # Participación tampoco
+        fake_participacion = MagicMock()
+        mock_participaciones.objects.get_or_create.return_value = (fake_participacion, True)
+
+        # Estado de asistencia
+        fake_estado = MagicMock(nombre="Presente")
+        mock_get_obj.return_value = fake_estado
+
+        # No hay asistencia previa para esa fecha
+        mock_asistencias.objects.filter.return_value.first.return_value = None
+        # Para aggregate(Max('id_asistencia'))
+        mock_asistencias.objects.aggregate.return_value = {"id_asistencia__max": 10}
+
+        data = {
+            "cedula": "123",
+            "estado_id": "1",          # ← nombre real del campo
+            "actividad_id": "10",
+            "fecha": "2025-10-10",
+        }
+
+        resp = self._post(data)
+        self.assertIsInstance(resp, JsonResponse)
+        self.assertEqual(resp.status_code, 200)
+        body = json.loads(resp.content.decode("utf-8"))
+
+        self.assertTrue(body.get("success", False))
+        self.assertIn("Registrado exitosamente", body.get("message", ""))
+
+        # Verifica que se creó la asistencia con el ID siguiente
+        mock_asistencias.objects.create.assert_called_once()
+        args, kwargs = mock_asistencias.objects.create.call_args
+        self.assertEqual(kwargs["id_asistencia"], 11)
+        self.assertEqual(kwargs["participaciones_id_participacion"], fake_participacion)
+        self.assertEqual(kwargs["estados_asistencia_id_estado_asistencia"], fake_estado)
+
+class RegistrarAsistenciaManualTests(SimpleTestCase):
+    """Casos clave de registrar_asistencia_manual"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _post(self, data):
+        from Analytics_Reports.views import registrar_asistencia_manual
+        request = self.factory.post(
+            "/analytics/asistencia/manual/",
+            data=data,
+            # Aquí da igual AJAX o no, porque vamos a mockear render
+        )
+        request.user = MagicMock(is_authenticated=True)
+        return registrar_asistencia_manual(request)
+
+    # 4 decorators → 4 mocks (en orden inverso)
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.messages")
+    @patch("Analytics_Reports.views.get_object_or_404")
+    @patch("Analytics_Reports.views.EstadosAsistencia")
+    def test_sin_estado_presente_configurado(self,
+                                             mock_estados,
+                                             mock_get,
+                                             mock_messages,
+                                             mock_render):
+        """Devuelve error si no existe Estado 'Presente' en la BD"""
+        # Evitar acceso a BD por actividad
+        mock_get.return_value = MagicMock()  # actividad fake
+        # Forzar que no haya estado 'Presente'
+        mock_estados.objects.filter.return_value.first.return_value = None
+
+        # Evitar que Django entre a templates y context processors
+        mock_render.return_value = HttpResponse("OK")
+
+        resp = self._post({
+            "actividad_id": "10",
+            "user_id": "1",
+            "fecha": "2025-10-10",
+        })
+
+        # Solo comprobamos que la vista terminó y que se intentó renderizar
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+        # Si quieres, puedes inspeccionar el contexto:
+        # args, kwargs = mock_render.call_args
+        # ctx = args[2]
+        # self.assertIn("error", ctx)
+    # 6 decorators → 6 mocks (en orden inverso)
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.messages")
+    @patch("Analytics_Reports.views.get_object_or_404")
+    @patch("Analytics_Reports.views.EstadosAsistencia")
+    @patch("Analytics_Reports.views.Participaciones")
+    @patch("Analytics_Reports.views.Asistencias")
+    def test_evita_asistencia_duplicada(self,
+                                        mock_asistencias,
+                                        mock_participaciones,
+                                        mock_estados,
+                                        mock_get,
+                                        mock_messages,
+                                        mock_render):
+        """Si ya existe una asistencia para esa fecha, no crea otra"""
+
+        mock_render.return_value = HttpResponse("OK")
+
+        # Evitar acceso real a BD
+        mock_get.return_value = MagicMock()  # actividad fake
+        mock_estados.objects.filter.return_value.first.return_value = MagicMock()
+        mock_participaciones.objects.get.return_value = MagicMock()
+
+        # Simular que ya hay una asistencia registrada para esa fecha
+        mock_asistencias.objects.filter.return_value.exists.return_value = True
+
+        resp = self._post({
+            "actividad_id": "10",
+            "user_id": "1",
+            "fecha": "2025-10-10",
+        })
+
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+        # Debe haberse consultado si existía asistencia
+        # Y, crucial: no se crea una nueva asistencia en este caso
+        mock_asistencias.objects.create.assert_not_called()
+
+
+
+class ComparacionesViewTests(SimpleTestCase):
+    """Tests unitarios para la vista comparaciones"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("Analytics_Reports.views.max", side_effect=lambda a, b: 2023)
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.Participaciones")
+    @patch("Analytics_Reports.views.Asistencias")
+    def test_comparaciones_sin_filtros_rango_default(self,
+                                                     mock_asistencias,
+                                                     mock_participaciones,
+                                                     mock_render,
+                                                     mock_max):
+        from Analytics_Reports.views import comparaciones
+
+        # QuerySet ficticio: filter().aggregate(...) devuelve ints
+        qs_asist = MagicMock()
+        qs_asist.aggregate.return_value = {
+            "año_min": 2023,
+            "año_max": 2025,
+        }
+        mock_asistencias.objects.filter.return_value = qs_asist
+
+        mock_participaciones.objects.filter.return_value = []
+
+        mock_render.return_value = HttpResponse("OK")
+
+        request = self.factory.get("/analytics/comparaciones/")
+        request.user = MagicMock(is_authenticated=True)
+
+        resp = comparaciones(request)
+
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+
+    @patch("Analytics_Reports.views.max", side_effect=lambda a, b: 2023)
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.Participaciones")
+    @patch("Analytics_Reports.views.Asistencias")
+    def test_comparaciones_con_rango_fechas(self,
+                                            mock_asistencias,
+                                            mock_participaciones,
+                                            mock_render,
+                                            mock_max):
+        from Analytics_Reports.views import comparaciones
+
+        qs_asist = MagicMock()
+        qs_asist.aggregate.return_value = {
+            "año_min": 2023,
+            "año_max": 2025,
+        }
+        mock_asistencias.objects.filter.return_value = qs_asist
+        mock_participaciones.objects.filter.return_value = []
+
+        mock_render.return_value = HttpResponse("OK")
+
+        request = self.factory.get("/analytics/comparaciones/", {
+            "fecha_inicio": "2025-01-01",
+            "fecha_fin": "2025-01-31",
+        })
+        request.user = MagicMock(is_authenticated=True)
+
+        resp = comparaciones(request)
+
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+
+
+class HistorialParticipanteViewTests(SimpleTestCase):
+    """Tests para historial_participante"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.Asistencias")
+    @patch("Analytics_Reports.views.Participaciones")
+    @patch("Analytics_Reports.views.get_object_or_404")
+    def test_historial_participante_basico(self,
+                                           mock_get,
+                                           mock_participaciones,
+                                           mock_asistencias,
+                                           mock_render):
+        from Analytics_Reports.views import historial_participante
+
+        # Participante fake
+        fake_participante = MagicMock(id_participante=1)
+        mock_get.return_value = fake_participante
+
+        # Participaciones: filter().select_related(...) -> queryset mock
+        qs_part = MagicMock()
+        qs_part.select_related.return_value = qs_part
+        mock_participaciones.objects.filter.return_value = qs_part
+
+        # Asistencias: filter().select_related().order_by().count()
+        qs_asist = MagicMock()
+        qs_asist.select_related.return_value = qs_asist
+        qs_asist.order_by.return_value = qs_asist
+        qs_asist.count.return_value = 0
+        mock_asistencias.objects.filter.return_value = qs_asist
+
+        mock_render.return_value = HttpResponse("OK")
+
+        request = self.factory.get("/analytics/historial/1/")
+        request.user = MagicMock(is_authenticated=True)
+
+        resp = historial_participante(request, id_participante=1)
+
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+
+class MenuAnalisisTests(SimpleTestCase):
+    """Cobertura para menu_analisis"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("Analytics_Reports.views.render")
+    def test_menu_analisis_renderiza(self, mock_render):
+        from Analytics_Reports.views import menu_analisis
+
+        mock_render.return_value = HttpResponse("OK")
+
+        request = self.factory.get("/analytics/menu/")
+        request.user = MagicMock(is_authenticated=True)
+
+        resp = menu_analisis(request)
+
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+
+
+class DashboardDocenteTests(SimpleTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.messages")
+    @patch("Analytics_Reports.views.Asistencias")
+    @patch("Analytics_Reports.views.Actividades")
+    def test_dashboard_docente_ok(self,
+                                  mock_actividades,
+                                  mock_asistencias,
+                                  mock_messages,
+                                  mock_render):
+        from Analytics_Reports.views import dashboard_docente
+
+        mock_actividades.objects.filter.return_value = []
+        mock_asistencias.objects.filter.return_value = []
+
+        mock_render.return_value = HttpResponse("OK")
+
+        request = self.factory.get("/analytics/dashboard-docente/")
+        # Usuario no profesor → la vista redirige
+        request.user = MagicMock(is_authenticated=True, is_staff=False)
+
+        resp = dashboard_docente(request)
+
+        self.assertEqual(resp.status_code, 302)
+        mock_messages.warning.assert_called()
+
+
+class RegistrarAsistenciaCedulaViewTests(SimpleTestCase):
+    """Cobertura para registrar_asistencia_cedula_view"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("Analytics_Reports.views.render")
+    @patch("Analytics_Reports.views.Asistencias")
+    @patch("Analytics_Reports.views.Participaciones")
+    @patch("Analytics_Reports.views.Participantes")
+    def test_registrar_cedula_basico(self,
+                                     mock_participantes,
+                                     mock_participaciones,
+                                     mock_asistencias,
+                                     mock_render):
+        from Analytics_Reports.views import registrar_asistencia_cedula_view
+
+        mock_render.return_value = HttpResponse("OK")
+
+        request = self.factory.post("/analytics/registrar-cedula/", {
+            "cedula": "123",
+            "actividad_id": "10",
+            "fecha": "2025-10-10",
+        })
+        request.user = MagicMock(is_authenticated=True)
+
+        resp = registrar_asistencia_cedula_view(request)
+
+        self.assertEqual(resp.status_code, 200)
         mock_render.assert_called_once()

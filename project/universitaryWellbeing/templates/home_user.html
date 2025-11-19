@@ -4,6 +4,47 @@
 {% block content %}
 {{ block.super }}
 
+<style>
+    .accordion-body ol li,
+    .accordion-body ul li {
+        padding: 8px 15px;
+        margin-bottom: 6px;
+        border-radius: 8px;
+        background: linear-gradient(90deg, #a6c1ee 0%, #fbcdd4 100%);
+        color: #333;
+        font-weight: 500;
+        box-shadow: 0 4px 8px rgba(166, 193, 238, 0.3);
+        cursor: default;
+        transition: transform 0.3s ease, background 0.4s ease, box-shadow 0.3s ease;
+        user-select: none;
+    }
+
+    .accordion-body ol li:hover,
+    .accordion-body ul li:hover {
+        background: linear-gradient(90deg, #fbcdd4 0%, #a6c1ee 100%);
+        box-shadow: 0 6px 14px rgba(251, 205, 212, 0.7);
+        transform: translateY(-3px);
+    }
+
+    @keyframes fadeSlideIn {
+        0% {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+
+        100% {
+            opacity: 1;
+            transform: translateX(0);
+        }
+    }
+
+    .accordion-body ol li,
+    .accordion-body ul li {
+        animation: fadeSlideIn 0.5s ease forwards;
+    }
+</style>
+
+
 <div class="container mt-4 mb-5">
     <!-- Row con altura mínima para evitar superposición -->
     <div class="row" style="min-height: calc(100vh - 250px);">
@@ -22,8 +63,8 @@
                     <div id="collapseOne" class="accordion-collapse collapse" data-bs-parent="#accordionExample">
                         <div class="accordion-body">
                             <ul>
-                                {% for actividad in actividades %}
-                                <li>{{ actividad.nombre }}</li>
+                                {% for horario in actividades %}
+                                <li>{{ horario.actividades_id_actividad.nombre }}</li>
                                 {% empty %}
                                 <li>No hay actividades disponibles</li>
                                 {% endfor %}
@@ -216,6 +257,31 @@
 
 
     <script src="{% static 'universitaryWellbeing/js/news_home.js' %}"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Escuchar cuando cualquier collapse dentro de #accordionExample se abre
+            const accordions = document.querySelectorAll("#accordionExample .accordion-collapse");
+
+            accordions.forEach(collapse => {
+                collapse.addEventListener("shown.bs.collapse", () => {
+                    const items = collapse.querySelectorAll("li");
+                    items.forEach((li, index) => {
+                        li.style.animation = `fadeSlideIn 0.5s forwards`;
+                        li.style.animationDelay = `${index * 0}s`;
+                    });
+                });
+
+                // Opcional: limpiar animación cuando se cierra para que pueda repetirse
+                collapse.addEventListener("hidden.bs.collapse", () => {
+                    const items = collapse.querySelectorAll("li");
+                    items.forEach(li => {
+                        li.style.animation = "";
+                        li.style.opacity = 0; // reinicia invisible
+                    });
+                });
+            });
+        });
+    </script>
 </div>
 
 {% endblock %}

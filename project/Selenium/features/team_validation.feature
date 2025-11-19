@@ -2,7 +2,7 @@ Feature: Team form validation
 
   Scenario: Intentar crear equipo sin completar campos requeridos
     Given I am on the login page
-    When I login with username "5544" and password "5544"
+    When I login with username "1110287840" and password "123"
     And I go to tournaments from the menu
     And I open tournament details for "Torneo Interno de Tenis de Mesa"
     And I open the team creation form

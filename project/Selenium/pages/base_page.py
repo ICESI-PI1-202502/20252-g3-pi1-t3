@@ -75,3 +75,10 @@ class BasePage:
                 const e2 = new Event('change', {bubbles:true});
                 arguments[0].dispatchEvent(e1); arguments[0].dispatchEvent(e2);
             """, el)
+
+    def get_text(self, locator, timeout=10):
+        el = self.is_visible(locator, timeout=timeout)
+        try:
+            return el.text
+        except Exception:
+            return self.driver.execute_script('return arguments[0].textContent;', el)

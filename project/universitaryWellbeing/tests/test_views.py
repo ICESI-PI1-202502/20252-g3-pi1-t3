@@ -1859,7 +1859,7 @@ class CalendarioUnificadoTests(SimpleTestCase):
         
         request = self.factory.get('/calendario/')
         request.user = MagicMock()  # ✅ CORRECCIÓN
-        request.GET = {}
+        request.GET = {} # type: ignore
         
         vw.unified_calendar(request)
         
@@ -1881,7 +1881,7 @@ class CalendarioUnificadoTests(SimpleTestCase):
         
         request = self.factory.get('/calendario/?tipo=1')
         request.user = MagicMock()  # ✅ CORRECCIÓN
-        request.GET = {'tipo': '1'}
+        request.GET = {'tipo': '1'} # type: ignore
         
         vw.unified_calendar(request)
         
@@ -1905,7 +1905,7 @@ class CalendarioUnificadoTests(SimpleTestCase):
         
         request = self.factory.get('/calendario/')
         request.user = MagicMock()  # ✅ CORRECCIÓN
-        request.GET = {}
+        request.GET = {} # type: ignore
         
         vw.unified_calendar(request)
         
@@ -1936,45 +1936,78 @@ class HomeUserTests(SimpleTestCase):
         self.assertEqual(mock_render.call_args[0][1], "pageNotFound-404.html")
         self.assertEqual(mock_render.call_args[1]['status'], 404)
 
+    
+    @patch('universitaryWellbeing.views.get_recommendations_for_user')
     @patch('universitaryWellbeing.views.obtener_actividades_generales_del_dia')
     @patch('universitaryWellbeing.views.Noticias.objects')
     @patch('universitaryWellbeing.views.HorariosParticipante.objects')
     @patch('universitaryWellbeing.views.Participantes.objects')
     @patch('universitaryWellbeing.views.Actividades.objects')
+    @patch('universitaryWellbeing.views.Preferencias.objects.get')
     @patch('universitaryWellbeing.views.render')
     @patch('universitaryWellbeing.views.timezone')
     def test_home_user_renders_with_context(
-        self, mock_timezone, mock_render, mock_actividades, mock_participantes,
-        mock_horarios, mock_noticias, mock_obtener_act
+        self, mock_timezone, mock_render, mock_get_preferencias, mock_actividades, 
+        mock_participantes, mock_horarios, mock_noticias, mock_obtener_act, mock_get_recommendations
     ):
         """Debe renderizar home con contexto completo"""
-        # Mock timezone
+
+        # --- Mock timezone ---
         mock_now = MagicMock()
         mock_now.date.return_value = date(2025, 11, 18)
         mock_timezone.localtime.return_value = mock_now
         mock_timezone.now.return_value = mock_now
-        
-        # Mock participante con rol
+
+        # --- Mock participante con rol ---
         mock_part = MagicMock()
         mock_part.roles_id_rol.nombre_rol = "Estudiante"
-        mock_participantes.filter.return_value.select_related.return_value.first.return_value = mock_part
-        
-        mock_actividades.values.return_value = []
-        mock_horarios.filter.return_value.order_by.return_value = []
-        mock_noticias.order_by.return_value = []
-        mock_obtener_act.return_value = []
-        
-        request = self.factory.get('/home/')
-        request.user = MagicMock()
-        request.user.is_superuser = False
-        
-        vw.home_user(request)
-        
-        mock_render.assert_called_once()
-        self.assertEqual(mock_render.call_args[0][1], "home_user.html")
-        context = mock_render.call_args[0][2]
-        self.assertIn("user_rol", context)
-        self.assertEqual(context["user_rol"], "Estudiante")
+        mock_participantes.filter.return_value.first.return_value = mock_part
+
+        # --- Mock HorariosParticipante ---
+        mock_horario_obj = MagicMock()
+        mock_horario_obj.values_list.return_value = [1, 2]  # IDs de actividades registradas
+        mock_horarios.filter.return_value.select_related.return_value = mock_horario_obj
+
+        # --- Mock Preferencias ---
+        mock_pref = MagicMock()
+        mock_get_preferencias.return_value = mock_pref
+
+        # Mock PreferenciasActividades para tipos preferidos
+        with patch('universitaryWellbeing.views.PreferenciasActividades.objects.filter') as mock_pref_act:
+            mock_pref_act.return_value.values_list.return_value = [10, 20]
+
+            # --- Mock Actividades recomendadas ---
+            mock_actividades.filter.return_value.exclude.return_value = [{"nombre": "Actividad Recomendada"}]
+            mock_actividades.none.return_value = []
+
+            # --- Mock Noticias ---
+            mock_noticias.order_by.return_value = [{"titulo": "Noticia1"}, {"titulo": "Noticia2"}]
+
+            # --- Mock eventos del día ---
+            mock_obtener_act.return_value = [{"nombre": "Evento1"}]
+
+            # --- Mock recomendaciones ---
+            mock_get_recommendations.return_value = [{"recomendacion": "Recom1"}]
+
+            # --- Mock request ---
+            request = self.factory.get('/home/')
+            request.user = MagicMock()
+            request.user.is_superuser = False
+
+            # --- Llamada a la vista ---
+            vw.home_user(request)
+
+            # --- Assertions ---
+            mock_render.assert_called_once()
+            self.assertEqual(mock_render.call_args[0][1], "home_user.html")
+            context = mock_render.call_args[0][2]
+            self.assertIn("user_rol", context)
+            self.assertEqual(context["user_rol"], "Estudiante")
+            self.assertIn("actividades", context)
+            self.assertIn("horario", context)
+            self.assertIn("noticias", context)
+            self.assertIn("eventos_hoy", context)
+            self.assertIn("actividades_recomendadas", context)
 
 
 # ==========================================================

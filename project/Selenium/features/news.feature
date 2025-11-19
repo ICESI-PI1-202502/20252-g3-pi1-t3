@@ -2,7 +2,7 @@ Feature: Gestión de noticias
 
   Background:
     Given I am on the login page
-    When I login with username "5544" and password "5544"
+    When I login with username "1113624957" and password "00"
     And navega a la sección de gestionar noticias
 
   Scenario: Crear una noticia

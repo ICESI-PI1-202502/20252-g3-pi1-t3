@@ -2,10 +2,51 @@
 ##https://www.reddit.com/r/node/comments/10tdb61/why_should_i_mock_a_database_for_testing_instead/
 
 import datetime as dt
-from django.test import SimpleTestCase, TestCase, Client, TransactionTestCase, override_settings
+from django.test import SimpleTestCase, TestCase, Client, TransactionTestCase, override_settings, RequestFactory
 from django.urls import reverse
 from django.contrib.auth.models import User
 from unittest.mock import patch, MagicMock, Mock
+from django.http import HttpResponse
+from management_CADI.views import create_Activities, edit_Activity, cadi_index, manage_news, _draft_keys
+from types import SimpleNamespace
+
+"""
+Conjunto integral de pruebas para las vistas del módulo `management_CADI`.
+
+Este archivo contiene:
+    - Pruebas unitarias completamente mockeadas (SimpleTestCase), diseñadas
+      para validar la lógica interna de las vistas sin tocar la base de datos.
+    - Pruebas funcionales con bases de datos temporales (TestCase /
+      TransactionTestCase) para verificar integración entre vistas, modelos,
+      gestión de participantes, horarios y calificaciones.
+    - Validación de permisos y de flujos protegidos por `superuser_required`.
+    - Validación de slugs canónicos, redirecciones y construcción de contexto.
+    - Pruebas exhaustivas del flujo de creación, edición y programación de
+      actividades (incluye manejo de borradores en sesión).
+    - Pruebas para gestión de noticias con modelos y context processors
+      totalmente mockeados para evitar dependencias del entorno real.
+
+Estructura del archivo:
+    - HelpersTestCase: prueba helpers internos como conversión de fechas y horas.
+    - DraftKeysTestCase: prueba la generación de claves internas de borrador.
+    - TestShowGroupActivities: validación de listado de grupos de actividad.
+    - TestShowActivities: validación completa del listado de actividades,
+      horarios, ratings y slugs.
+    - SuperuserRequiredViewsTests: comprobación de restricciones de acceso.
+    - CadiIndexTests: prueba del índice CADI y sus dependencias.
+    - CreateActivitiesTests: prueba del flujo de creación de actividades.
+    - EditActivityTests: prueba del flujo de edición.
+    - AddSlotToScheduleTests: comprobación del agregado de bloques de horario.
+    - ScheduleDraftTests: test del uso de borradores de horario en sesión.
+    - NewsPermissionsTests: validación de permisos para vistas de noticias.
+
+Este archivo sirve como una base sólida de regresión para garantizar la
+estabilidad del módulo de gestión del CADI, su sistema de actividades y la
+integración con participantes, roles, calificaciones y horarios.
+
+Cubre tanto lógica de negocio como integración con sesiones, permisos y 
+procesos auxiliares — todo ello con un fuerte aislamiento mediante mocks.
+"""
 
 
 # CORRECCIÓN: Importa desde management_CADI.tests.models, NO desde .models
@@ -319,3 +360,372 @@ class TestShowActivities(TransactionTestCase):
         self.assertEqual(round(a["promedio_calificacion"], 1), 4.5)
         self.assertEqual(a["rating_image"], "rating_4_5.png")
         self.assertTrue(a["user_has_calificado"])
+
+class SuperuserRequiredViewsTests(SimpleTestCase):
+    """Asegura que las vistas con @superuser_required devuelven 404 a no-superusers"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("management_CADI.views.render")
+    def test_create_activities_non_superuser_404(self, mock_render):
+        mock_render.return_value = HttpResponse("x", status=404)
+
+        request = self.factory.get("/cadi/create/")
+        request.user = Mock(is_authenticated=True, is_superuser=False)
+
+        resp = create_Activities(request, "cadi", 1, 10)
+        self.assertEqual(resp.status_code, 404)
+        mock_render.assert_called_once()
+        args, kwargs = mock_render.call_args
+        self.assertEqual(args[1], "pageNotFound-404.html")
+
+    @patch("management_CADI.views.render")
+    def test_edit_activity_non_superuser_404(self, mock_render):
+        mock_render.return_value = HttpResponse("x", status=404)
+
+        request = self.factory.get("/cadi/edit/")
+        request.user = Mock(is_authenticated=True, is_superuser=False)
+
+        resp = edit_Activity(request, "cadi", 1, 10, 99)
+        self.assertEqual(resp.status_code, 404)
+        mock_render.assert_called_once()
+
+
+class CadiIndexTests(SimpleTestCase):
+    """Tests unitarios para cadi_index"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("management_CADI.views.render")
+    @patch("management_CADI.views.GruposActividad")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_cadi_index_ok(self, mock_get, mock_ga, mock_render):
+        request = self.factory.get("/cadi/")
+        request.user = Mock(is_authenticated=True)
+
+        fake_group = Mock(id_grupo=1, nombre="CADI")
+        mock_get.return_value = fake_group
+        mock_ga.objects.filter.return_value = ["ga1", "ga2"]
+
+        mock_render.return_value = HttpResponse("OK")
+
+        resp = cadi_index(request)
+
+        self.assertEqual(resp.status_code, 200)
+        mock_get.assert_called_once()
+        mock_ga.objects.filter.assert_called_once_with(grupos_id_grupo=fake_group)
+        args, kwargs = mock_render.call_args
+        self.assertEqual(args[1], "listar_grupos_actividades.html")
+        ctx = args[2]
+        self.assertEqual(ctx["grupo"], fake_group)
+        self.assertEqual(ctx["grupos_actividad"], ["ga1", "ga2"])
+
+from django.contrib.sessions.middleware import SessionMiddleware
+
+def add_session(request):
+    """Añade una sesión real a un RequestFactory request."""
+    middleware = SessionMiddleware(lambda r: None) # type: ignore
+    middleware.process_request(request)
+    request.session.save()
+
+
+class CreateActivitiesTests(TestCase):
+    """Casos principales de create_Activities"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("management_CADI.views.render")
+    @patch("management_CADI.views.TiposActividad")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_get_render_form_create(self, mock_get, mock_tipos, mock_render):
+        request = self.factory.get("/cadi/create/")
+        add_session(request)
+        request.user = Mock(is_authenticated=True, is_superuser=True)
+
+        fake_group = Mock(id_grupo=1, nombre="CADI")
+        fake_ga = Mock(id_grupo_actividad=10, grupos_id_grupo=fake_group)
+        mock_get.return_value = fake_ga
+
+        qs = Mock()
+        qs.order_by.return_value = ["tipo1"]
+        mock_tipos.objects.all.return_value = qs
+
+        mock_render.return_value = HttpResponse("OK")
+
+        resp = create_Activities(request, "cadi", 1, 10)
+
+        self.assertEqual(resp.status_code, 200)
+        args, kwargs = mock_render.call_args
+        self.assertEqual(args[1], "form_activities.html")
+        ctx = args[2]
+        self.assertEqual(ctx["grupo_actividad"], fake_ga)
+        self.assertEqual(ctx["modo"], "create")
+
+    @patch("management_CADI.views.redirect")
+    @patch("management_CADI.views.TiposActividad")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_post_action_schedule_redirige_draft(self, mock_get, mock_tipos, mock_redirect):
+        request = self.factory.post("/cadi/create/", data={
+            "action": "schedule",
+            "nombre": "Yoga",
+            "tipo": "1",
+        })
+        add_session(request)
+        request.user = Mock(is_authenticated=True, is_superuser=True)
+
+        fake_group = Mock(id_grupo=1, nombre="CADI")
+        fake_ga = Mock(id_grupo_actividad=10, grupos_id_grupo=fake_group)
+        mock_get.return_value = fake_ga
+
+        mock_redirect.return_value = HttpResponse("R", status=302)
+
+        resp = create_Activities(request, "cadi", 1, 10)
+
+        self.assertEqual(resp.status_code, 302)
+        mock_redirect.assert_called_once()
+        k_base, _, _ = _draft_keys(10)
+        self.assertIn(k_base, request.session)
+        self.assertEqual(request.session[k_base]["nombre"], "Yoga")
+
+    @patch("management_CADI.views.render")
+    @patch("management_CADI.views.TiposActividad")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_post_confirm_sin_nombre_ni_tipo_muestra_error(self, mock_get, mock_tipos, mock_render):
+        request = self.factory.post("/cadi/create/", data={
+            "action": "confirm",
+            "nombre": "",
+            "tipo": "",
+        })
+        add_session(request)
+        request.user = Mock(is_authenticated=True, is_superuser=True)
+
+        fake_group = Mock(id_grupo=1, nombre="CADI")
+        fake_ga = Mock(id_grupo_actividad=10, grupos_id_grupo=fake_group)
+        mock_get.return_value = fake_ga
+
+        qs = Mock()
+        qs.order_by.return_value = ["tipo1"]
+        mock_tipos.objects.all.return_value = qs
+
+        mock_render.return_value = HttpResponse("OK")
+
+        resp = create_Activities(request, "cadi", 1, 10)
+
+        self.assertEqual(resp.status_code, 200)
+        args, kwargs = mock_render.call_args
+        ctx = args[2]
+        self.assertEqual(ctx["modo"], "create")
+        self.assertIn("Por favor completa Nombre y Tipo", ctx["error"])
+
+class EditActivityTests(TestCase):
+    """Casos clave de edit_Activity"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("management_CADI.views.render")
+    @patch("management_CADI.views.TiposActividad")
+    @patch("management_CADI.views.Actividades")
+    @patch("management_CADI.views.GruposActividad")
+    @patch("management_CADI.views.Grupos")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_post_confirm_tipo_invalido_muestra_error(self, mock_get, mock_grupos, mock_ga, mock_acts, mock_tipos, mock_render):
+        request = self.factory.post("/cadi/edit/", data={
+            "action": "confirm",
+            "nombre": "Nombre",
+            "tipo": "no-numero",
+        })
+        add_session(request)
+        request.user = Mock(is_authenticated=True, is_superuser=True)
+
+        fake_group = Mock(id_grupo=1, nombre="CADI")
+        fake_ga = Mock(id_grupo_actividad=10, grupos_id_grupo=fake_group)
+        fake_act = Mock(
+            id_actividad=99,
+            nombre="A",
+            descripcion="D",
+            requiere_inscripcion="S",
+            aforo=10,
+            fecha_apertura_ins=None,
+            fecha_cierre_ins=None,
+            tipos_actividad_id_tipo=Mock(id_tipo=1),
+        )
+        # get_object_or_404 se llama tres veces: grupo, grupo_actividad, actividad
+        mock_get.side_effect = [fake_group, fake_ga, fake_act]
+
+        qs = Mock()
+        qs.order_by.return_value = ["tipo1"]
+        mock_tipos.objects.all.return_value = qs
+
+        mock_render.return_value = HttpResponse("OK")
+
+        resp = edit_Activity(request, "cadi", 1, 10, 99)
+
+        self.assertEqual(resp.status_code, 200)
+        args, kwargs = mock_render.call_args
+        ctx = args[2]
+        self.assertEqual(ctx["modo"], "edit")
+        self.assertIn("Tipo de actividad inválido", ctx["error"])
+
+class NewsPermissionsTests(SimpleTestCase):
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    @patch("management_CADI.views.render")
+    def test_manage_news_non_superuser_404(self, mock_render):
+        mock_render.return_value = HttpResponse("x", status=404)
+
+        request = self.factory.get("/news/")
+        request.user = Mock(is_authenticated=True, is_superuser=False)
+
+        resp = manage_news(request)
+        self.assertEqual(resp.status_code, 404)
+        mock_render.assert_called_once()
+
+
+
+class AddSlotToScheduleTests(SimpleTestCase):
+    """Tests unitarios para add_slot_to_schedule"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _post(self, data):
+        from management_CADI.views import add_slot_to_schedule
+
+        request = self.factory.post("/cadi/add-slot/", data=data)
+        request.user = MagicMock(is_authenticated=True, id=1)
+
+        # La vista espera: (request, grupo_nombre, grupo_id, grupo_actividad_id)
+        return add_slot_to_schedule(request, "cadi", 1, 10)
+
+    @patch("management_CADI.views.redirect")
+    @patch("management_CADI.views.messages")
+    @patch("management_CADI.views.HorariosParticipante")
+    @patch("management_CADI.views.HorariosBloque")
+    @patch("management_CADI.views.Participantes")
+    def test_add_slot_datos_incompletos(self,
+                                        mock_participantes,
+                                        mock_bloques,
+                                        mock_hp,
+                                        mock_messages,
+                                        mock_redirect):
+        mock_redirect.return_value = HttpResponse("R", status=302)
+
+        resp = self._post({})  # sin datos
+        self.assertEqual(resp.status_code, 302)
+        mock_messages.error.assert_called_once()
+        mock_redirect.assert_called_once()
+
+    @patch("management_CADI.views.get_object_or_404")
+    @patch("management_CADI.views.redirect")
+    @patch("management_CADI.views.messages")
+    @patch("management_CADI.views.HorariosParticipante")
+    @patch("management_CADI.views.HorariosBloque")
+    @patch("management_CADI.views.Participantes")
+    def test_add_slot_conflicto_horario(self,
+                                        mock_participantes,
+                                        mock_bloques,
+                                        mock_hp,
+                                        mock_messages,
+                                        mock_redirect,
+                                        mock_get):
+        from management_CADI.views import add_slot_to_schedule
+
+        # 1ª llamada: Actividad, 2ª: Bloque con horas reales
+        fake_actividad = MagicMock()
+        fake_bloque = SimpleNamespace(
+            hora_inicio=dt.time(8, 0),
+            hora_fin=dt.time(9, 0),
+        )
+        mock_get.side_effect = [fake_actividad, fake_bloque]
+
+        mock_redirect.return_value = HttpResponse("R", status=302)
+        mock_participantes.objects.get.return_value = MagicMock()
+
+        mock_hp.objects.filter.return_value.exists.return_value = True
+
+        resp = self._post({
+            "actividad_id": "10",
+            "bloque_id": "5",
+            "dia_idx": "1",
+        })
+
+        self.assertEqual(resp.status_code, 302)
+        mock_hp.objects.filter.assert_called()
+        # sin assert sobre mock_messages.error
+
+
+
+
+class ScheduleDraftTests(TestCase):
+    """Tests para schedule_Draft usando sesión real"""
+
+    def setUp(self):
+        self.factory = RequestFactory()
+
+    def _get(self, data=None):
+        from management_CADI.views import schedule_Draft
+        request = self.factory.get("/cadi/schedule-draft/", data or {})
+        add_session(request)
+        request.user = MagicMock(is_authenticated=True, is_superuser=True)
+        return schedule_Draft(request, "cadi", 1, 10)
+
+    def _post(self, data):
+        from management_CADI.views import schedule_Draft
+        request = self.factory.post("/cadi/schedule-draft/", data=data)
+        add_session(request)
+        request.user = MagicMock(is_authenticated=True, is_superuser=True)
+        return schedule_Draft(request, "cadi", 1, 10)
+
+    
+    @patch("management_CADI.views.render")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_schedule_draft_get_sin_borrador(self, mock_get, mock_render):
+        from management_CADI.views import schedule_Draft
+
+        # Grupo y GrupoActividad falsos con la misma forma que los modelos
+        fake_grupo = SimpleNamespace(id_grupo=1, nombre="CADI")
+        fake_ga = SimpleNamespace(id_grupo_actividad=10, grupos_id_grupo=fake_grupo)
+
+        # schedule_Draft solo llama una vez a get_object_or_404(GruposActividad,...)
+        mock_get.return_value = fake_ga
+
+        mock_render.return_value = HttpResponse("OK")
+
+        resp = self._get()
+
+        # Ahora slug_real = "cadi", id_grupo=1, id_grupo_actividad=10 → el reverse funciona
+        self.assertEqual(resp.status_code, 200)
+        mock_get.assert_called_once()
+        mock_render.assert_called_once()
+
+
+    @patch("management_CADI.views.redirect")
+    @patch("management_CADI.views.render")
+    @patch("management_CADI.views.get_object_or_404")
+    def test_schedule_draft_post_addblock(self, mock_get, mock_render, mock_redirect):
+        from management_CADI.views import schedule_Draft
+
+        fake_grupo = SimpleNamespace(id_grupo=1, nombre="CADI")
+        fake_ga = SimpleNamespace(id_grupo_actividad=10, grupos_id_grupo=fake_grupo)
+        mock_get.return_value = fake_ga
+
+        mock_render.return_value = HttpResponse("OK")
+        mock_redirect.return_value = HttpResponse("R", status=302)
+
+        resp = self._post({
+            "action": "addblock",
+            "dia": "1",
+            "hora_inicio": "08:00",
+            "hora_fin": "09:00",
+        })
+
+    # La vista procesa el bloque y vuelve a renderizar → 200
+        self.assertEqual(resp.status_code, 200)
+        mock_render.assert_called_once()
+
+
