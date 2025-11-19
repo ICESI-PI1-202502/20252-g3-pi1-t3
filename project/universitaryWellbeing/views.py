@@ -8,6 +8,8 @@ from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_http_methods
 from django.core.validators import validate_email
+
+from Analytics_Reports.views import recomendaciones
 from .models import Preferencias, Actividades, Participantes, TiposActividad, PreferenciasActividades,Roles,Citas, HorariosParticipante, HorariosActividad, Noticias
 from .forms import UserLoginForm, UserRegisterForm
 from .models import Notificaciones, HorariosBloque
@@ -448,39 +450,54 @@ def home_user(request):
         return render(request, "pageNotFound-404.html", status=404)
     
     user = request.user
-    participante = Participantes.objects.filter(user=user).select_related('roles_id_rol').first()
+    participante = Participantes.objects.filter(user=user).first()
     
-    tz = pytz.timezone('America/Bogota')
     ahora = timezone.localtime(timezone.now())
     hoy = ahora.date()
     
-    actividades = Actividades.objects.values("nombre")[:10]
-    noticias = Noticias.objects.order_by('-fecha_publicacion')[:5]
-    
-    # HORARIO PERSONAL (Mi Horario)
-    horario = HorariosParticipante.objects.filter(
+    # --- ACTIVIDADES REGISTRADAS DEL USUARIO ---
+    actividades_registradas = HorariosParticipante.objects.filter(
         participantes_id_participante=participante,
-        fecha_inicio__gte=ahora
-    ).order_by('fecha_inicio')[:10]
+        actividades_id_actividad__isnull=False
+    ).select_related('actividades_id_actividad')
     
-    # CALENDARIO DE ACTIVIDADES GENERALES (Calendario BU)
+    # IDs de actividades ya registradas
+    actividades_ids = actividades_registradas.values_list('actividades_id_actividad_id', flat=True)
+    
+    # --- PREFERENCIAS ---
+    actividades_recomendadas = Actividades.objects.none()  # default vacío
+    try:
+        preferencias = Preferencias.objects.get(participantes_id_participante=participante)
+        tipos_preferidos = PreferenciasActividades.objects.filter(
+            preferencia=preferencias
+        ).values_list('tipo_actividad_id', flat=True)
+        
+        actividades_recomendadas = Actividades.objects.filter(
+            tipos_actividad_id_tipo__in=tipos_preferidos
+        ).exclude(id_actividad__in=actividades_ids)
+    except Preferencias.DoesNotExist:
+        pass
+    
+    # --- NOTICIAS ---
+    noticias = Noticias.objects.order_by('-fecha_publicacion')
+    
+    # --- EVENTOS GENERALES DEL DÍA ---
     eventos_hoy = obtener_actividades_generales_del_dia(hoy)
-    
-    calendario = Actividades.objects.all()[:5]
     
     user_rol = participante.roles_id_rol.nombre_rol if participante and participante.roles_id_rol else None
 
     context = {
         "today": hoy,
         "eventos_hoy": eventos_hoy,
-        "horario": horario,
-        "calendario": calendario,
-        "actividades": actividades,
+        "horario": actividades_registradas,
+        "actividades": actividades_registradas,
+        "actividades_recomendadas": actividades_recomendadas,
         "user_rol": user_rol,
         "noticias": noticias,
     }
 
     return render(request, "home_user.html", context)
+
 
 
 @login_required
