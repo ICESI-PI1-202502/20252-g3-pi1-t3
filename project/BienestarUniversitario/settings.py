@@ -23,6 +23,8 @@ TESTING = any(cmd in sys.argv for cmd in ("test", "pytest"))
 handler404 = "universitaryWellbeing.views.custom_404"
 
 
+load_dotenv()
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
