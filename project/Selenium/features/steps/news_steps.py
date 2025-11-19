@@ -23,12 +23,17 @@ def step_create_news(context, titulo):
 
 @then("debe visualizar el detalle de la noticia creada")
 def step_verify_news_created(context):
+    # Después de crear desde el formulario la app debería mostrar el detalle.
     detail = NewsDetailPage(context.driver)
-    assert context.last_title in detail.get_title()
+    assert detail.has_publication_label(), "No se encontró 'Fecha de Publicación:' en el detalle de la noticia"
 
 @when('edita la noticia "{titulo}" cambiando el título a "{nuevo}"')
 def step_edit_news(context, titulo, nuevo):
     manage = NewsManagePage(context.driver)
+    # Verificar que la noticia exista en la tabla antes de intentar editar
+    if not manage.title_exists(titulo):
+        raise AssertionError(f"No existe una noticia con título '{titulo}' en la lista")
+
     manage.open_edit_form(titulo)
 
     edit_page = NewsEditPage(context.driver)
@@ -40,7 +45,8 @@ def step_edit_news(context, titulo, nuevo):
 @then("debe visualizar los cambios en el detalle")
 def step_verify_news_edited(context):
     detail = NewsDetailPage(context.driver)
-    assert context.last_title in detail.get_title()
+    title_text = detail.get_title().strip()
+    assert title_text == context.last_title, f"El título en detalle ('{title_text}') no coincide con '{context.last_title}'"
 
 @when('elimina la noticia "{titulo}"')
 def step_delete_news(context, titulo):
